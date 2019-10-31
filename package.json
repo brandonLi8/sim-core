@@ -11,6 +11,7 @@
     "type": "git",
     "url": "https://github.com/brandonLi8/sim-core.git"
   },
+
   "devDependencies": {
     "@brandonli8/grunt-config": "~0.0.0-dev.2",
     "eslint": "^6.1.0",
@@ -21,5 +22,8 @@
     "url": "https://github.com/brandonLi8/sim-core/issues",
     "email": "brandon.li820@gmail.com"
   },
-  "homepage": "https://www.npmjs.com/package/sim-core"
+  "homepage": "https://www.npmjs.com/package/sim-core",
+  "grunt-config": {
+    "relativePath": "./node_modules/@brandonli8/grunt-config"
+  }
 }
