@@ -1,10 +1,11 @@
 // Copyright © 2019 Brandon Li. All rights reserved.
 
 /**
- * Module that includes all SIM_CORE dependencies, so that requiring this module will return an object
- * that consists of the entire exported 'sim-core' namespace API.
+ * Entry Point for the project.
  *
- * Include this as a dependency in your requirejs config file to use all of sim-core.
+ * To use this project, first configure your requirejs file:
+ *  1. Create a path reference. Ex: `SIM_CORE: '../node_modules/sim-core/js'`
+ *  2. Include this file as a dependency. Ex: `deps: [ 'SIM_CORE/sim-core-main' ]``
  *
  * @author Brandon Li <brandon.li820@gmail.com>
  */
