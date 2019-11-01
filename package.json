@@ -14,7 +14,7 @@
   },
 
   "devDependencies": {
-    "@brandonli8/grunt-config": "~0.0.0-dev.3",
+    "@brandonli8/grunt-config": "~0.0.0-dev.4",
     "eslint": "^6.1.0",
     "grunt": "~1.0.0",
     "md5": "^2.2.1"
@@ -26,5 +26,8 @@
   "homepage": "https://www.npmjs.com/package/sim-core",
   "grunt-config": {
     "relativePath": "./node_modules/@brandonli8/grunt-config"
+  },
+  "eslintConfig": {
+    "extends": "./node_modules/@brandonli8/grunt-config/eslint/.eslintrc.js"
   }
 }
