@@ -3,7 +3,7 @@
 /**
  * Assertion module for front-end development.
  *
- * IMPORTANT: Never call Assert.assert() (from this file) directly.
+ * IMPORTANT: Never call Assert.assert() (from this file) directly unless for testing purposes.
  *            Instead, to use this module:
  *                1. Check if the query parameter `?ea` (enable assertions) exists.
  *                2. If the query parameter exists, declare window.assert to call Assert.assert().

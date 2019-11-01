@@ -13,19 +13,19 @@
     "url": "https://github.com/brandonLi8/sim-core.git"
   },
   "scripts": {
-    "test": "node js/sim-core-config.js"
+    "test": "node tests/sim-core-test-config.js"
   },
   "devDependencies": {
     "@brandonli8/grunt-config": "~0.0.0-dev.4",
     "eslint": "^6.1.0",
     "grunt": "~1.0.0",
-    "md5": "^2.2.1"
+    "md5": "^2.2.1",
+    "requirejs": "^2.3.6"
   },
   "bugs": {
     "url": "https://github.com/brandonLi8/sim-core/issues",
     "email": "brandon.li820@gmail.com"
   },
-  "homepage": "https://www.npmjs.com/package/sim-core",
   "grunt-config": {
     "relativePath": "./node_modules/@brandonli8/grunt-config"
   },
