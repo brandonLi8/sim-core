@@ -31,8 +31,5 @@
   },
   "eslintConfig": {
     "extends": "./node_modules/@brandonli8/grunt-config/eslint/.eslintrc.js"
-  },
-  "dependencies": {
-    "lodash": "^4.17.15"
   }
 }
