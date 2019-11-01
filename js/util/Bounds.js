@@ -1,6 +1,6 @@
 define( require => {
 
-  const h = require( 'SIM_CORE/Assert' );
+  const h = require( 'SIM_CORE/util/Assert' );
 
 
   console.log( h );
