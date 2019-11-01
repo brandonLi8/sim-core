@@ -12,6 +12,9 @@
     "type": "git",
     "url": "https://github.com/brandonLi8/sim-core.git"
   },
+  "scripts": {
+    "test": "node js/sim-core-config.js"
+  },
   "devDependencies": {
     "@brandonli8/grunt-config": "~0.0.0-dev.4",
     "eslint": "^6.1.0",
@@ -28,5 +31,8 @@
   },
   "eslintConfig": {
     "extends": "./node_modules/@brandonli8/grunt-config/eslint/.eslintrc.js"
+  },
+  "dependencies": {
+    "lodash": "^4.17.15"
   }
 }
