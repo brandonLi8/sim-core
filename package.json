@@ -12,7 +12,6 @@
     "type": "git",
     "url": "https://github.com/brandonLi8/sim-core.git"
   },
-
   "devDependencies": {
     "@brandonli8/grunt-config": "~0.0.0-dev.4",
     "eslint": "^6.1.0",
