@@ -9,20 +9,64 @@
  *
  * @author Brandon Li <brandon.li820@gmail.com>
  */
-
-module.exports = ( () => {
+( () => {
   'use strict';
+  //----------------------------------------------------------------------------------------
+  // Configure a browser environment to create a window object.
+  require( 'browser-env' )();
 
-  // modules
-  const requirejs = require( 'requirejs' );
+  // Function that loads a script tag.
+  const loadURL = ( scriptPath ) => {
+    const script = document.createElement( 'script' );
+    script.type = 'text/javascript';
+    script.src = scriptPath;
+    script.async = false;
+    document.head.appendChild( script );
+    console.loG
+  };
 
-  requirejs.config( {
+  loadURL( '../src/util/Assert.js' );
 
-    deps: [ 'TESTS/sim-core-test-runner.js' ],
 
-    paths: {
-      SIM_CORE: '../src',
-      TESTS: '.'
-    }
-  } );
+
 } )();
+// module.exports = ( () => {
+
+//   // modules
+//   const requirejs = require( 'requirejs' );
+
+
+//   //----------------------------------------------------------------------------------------
+//   // Configure a browser environment to create a window object.
+//   require( 'browser-env' )();
+
+//   // Function that loads a script tag.
+//   const loadURL = ( scriptPath ) => {
+//     const script = document.createElement( 'script' );
+//     script.type = 'text/javascript';
+//     script.src = scriptPath;
+//     script.async = false;
+//     document.head.appendChild( script );
+//   };
+
+//   loadURL( '../src/util/Assert.js' );
+
+
+//   console.log( "Page location is " + window.location.href)
+
+//   // function assert() {}
+
+
+//   // window.assert = 5;
+
+
+//   requirejs.config( {
+
+//     deps: [ 'TESTS/sim-core-test-runner.js' ],
+
+//     paths: {
+//       SIM_CORE: '../src',
+//       TESTS: '.'
+//     }
+//   } );
+// } )();
