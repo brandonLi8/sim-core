@@ -11,22 +11,17 @@
  */
 module.exports = ( () => {
   'use strict';
-  //----------------------------------------------------------------------------------------
-  // Configure a browser environment to create a window object.
-  require( 'browser-env' )();
 
-  // Function that loads a script tag.
-  const loadURL = ( scriptPath ) => {
-    const script = document.createElement( 'script' );
-    script.type = 'text/javascript';
-    script.src = scriptPath;
-    script.async = false;
-    document.head.appendChild( script );
-    console.loG
-  };
+  // modules
+  const requirejs = require( 'requirejs' );
 
-  loadURL( '../src/util/Assert.js' );
+  requirejs.config( {
 
+    deps: [ 'TESTS/sim-core-test-main' ],
 
-
+    paths: {
+      TESTS: '.',
+      SIM_CORE: '../src',
+    }
+  } );
 } )();
