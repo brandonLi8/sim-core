@@ -131,4 +131,4 @@ define( require => {
   Point.ORIGIN = new Point( 0, 0 );
 
   return Point;
-}
+} );

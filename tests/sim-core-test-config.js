@@ -19,6 +19,8 @@ module.exports = ( () => {
 
     deps: [ 'TESTS/sim-core-test-main' ],
 
+    nodeRequire: require,
+
     paths: {
       TESTS: '.',
       SIM_CORE: '../src',

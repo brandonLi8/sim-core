@@ -20,7 +20,8 @@
     "eslint": "^6.1.0",
     "grunt": "~1.0.0",
     "md5": "^2.2.1",
-    "requirejs": "^2.3.6"
+    "requirejs": "^2.3.6",
+    "truenit": "0.0.0-dev.0"
   },
   "bugs": {
     "url": "https://github.com/brandonLi8/sim-core/issues",

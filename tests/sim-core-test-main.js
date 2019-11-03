@@ -1,7 +1,7 @@
 // Copyright © 2019 Brandon Li. All rights reserved.
 
 /**
- * Runner of all test files in the tests directory.
+ * Main entry point for sim-core tests. Tests all files in the tests directory.
  *
  * @author Brandon Li <brandon.li820@gmail.com>
  */
@@ -10,25 +10,42 @@ define( require => {
   'use strict';
 
   // modules
-  // const Assert = require( 'SIM_CORE/util/Assert' );
+  const truenit = require( 'truenit' );
 
-  // console.log( 'testing all files... \n' );
+  //----------------------------------------------------------------------------------------
+  // truenit.start( () => {
 
-
-
-  // window.assertions.assertFunction = ( predicate, message ) => {
-  //   Assert.assert( predicate, message );
-  // };
-  // window.assert = window.assertions.assertFunction;
-
-  // console.log( document. )
-  // function assert( predicate, message ) { Assert.assert( predicate, message ) };
-  // console.log( window.assert)
+  //   truenit.testModule( 'Point', require( 'TESTS/util/PointTests' ) );
 
 
-  // const scriopt = document.createElemen
-
-  // require( 'TESTS/util/PointTests' );
 
 
+
+
+  // } );
+
+    truenit.registerModule( 'Point', require( 'TESTS/util/PointTests' ) );
+    truenit.registerModule( 'Node', require( 'TESTS/util/PointTests' ) );
+
+    truenit.registerModule( 'ScreenView', require( 'TESTS/util/PointTests' ) );
+    truenit.registerModule( 'Vector', require( 'TESTS/util/PointTests' ) );
+    truenit.registerModule( 'VectorProperty', require( 'TESTS/util/PointTests' ) );
+    truenit.registerModule( 'Merge', require( 'TESTS/util/PointTests' ) );
+    truenit.registerModule( 'Enum', require( 'TESTS/util/PointTests' ) );
+    truenit.registerModule( 'Property', require( 'TESTS/util/PointTests' ) );
+    truenit.registerModule( 'PointProperty', require( 'TESTS/util/PointTests' ) );
+    truenit.registerModule( 'Sim', require( 'TESTS/util/PointTests' ) );
+    truenit.registerModule( 'ErrorModule', () => { throw new Error( 'Error Message')} );
+
+    truenit.start();
+
+  //========================================================================================
+  // Start testing
+  //========================================================================================
+  // console.log( 'testing all...\n' );
+
+
+
+
+  // console.log( '\nall tests passed!' );
 } );
