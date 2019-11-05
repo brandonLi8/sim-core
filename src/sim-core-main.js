@@ -1,7 +1,7 @@
 // Copyright © 2019 Brandon Li. All rights reserved.
 
 /**
- * Entry Point for the project.
+ * Entry point for the project.
  *
  * To use this project, first configure your requirejs file:
  *  1. Create a path reference. Ex: `SIM_CORE: '../node_modules/sim-core/js'`
@@ -13,7 +13,7 @@
 define( [
 
   'SIM_CORE/util/assert',
-  'SIM_CORE/util/Point'
+  'SIM_CORE/util/Vector'
 
 ], simCoreDependency => {
   'use strict';

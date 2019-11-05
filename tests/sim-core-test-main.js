@@ -16,7 +16,8 @@ define( require => {
   // Start testing
   //========================================================================================
   
-  truenit.registerTest( 'Point', require( 'TESTS/util/PointTests' ) );
+
+  truenit.registerTest( 'Vector', require( 'TESTS/util/VectorTests' ) );
 
   truenit.start();
 } );
