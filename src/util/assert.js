@@ -1,7 +1,7 @@
 // Copyright © 2019 Brandon Li. All rights reserved.
 
 /**
- * Assertion module for sim development.
+ * A basic Assertion module for sim development.
  *
  * @author Brandon Li <brandon.li820@gmail.com>
  */
@@ -10,21 +10,22 @@ define( require => {
   'use strict';
 
   /**
-   * The actual assert method.
+   * Assertion function.
    * @public
    *
-   * @param {boolean} predicate
-   * @param {string} [message]
+   * @param {boolean} predicate - only throws and error if the not truthy.
+   * @param {string} [message] - message to throw
    */
-  const assert = ( predicate, message ) => {
+  const assert = function( predicate, message ) {
     if ( !predicate ) {
 
       // Use the default message if a message isn't provided
-      const logMessage = message ? 'Assertion failed: ' + message : 'Assertion failed';
+      message = message ? 'Assertion failed: ' + message : 'Assertion failed';
 
-      throw new Error( logMessage );
+      console.log( message );
+      throw new Error( message );
     }
-  }
+  };
 
   return assert;
 } );
