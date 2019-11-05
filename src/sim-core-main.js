@@ -12,6 +12,8 @@
 
 define( [
 
+  'SIM_CORE/util/assert',
+  'SIM_CORE/util/Point'
 
 ], simCoreDependency => {
   'use strict';

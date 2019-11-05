@@ -17,11 +17,10 @@
   },
   "devDependencies": {
     "@brandonli8/grunt-config": "~0.0.0-dev.4",
-    "eslint": "^6.1.0",
-    "grunt": "~1.0.0",
-    "md5": "^2.2.1",
-    "requirejs": "^2.3.6",
-    "truenit": "0.0.0-dev.0"
+    "truenit": "^0.9.1"
+  },
+  "dependencies": {
+    "requirejs": "^2.3.6"
   },
   "bugs": {
     "url": "https://github.com/brandonLi8/sim-core/issues",

@@ -17,13 +17,13 @@ module.exports = ( () => {
 
   requirejs.config( {
 
-    deps: [ 'TESTS/sim-core-test-main' ],
+    deps: [ 'TESTS/sim-core-test-main', 'SIM_CORE/sim-core-main' ],
 
     nodeRequire: require,
 
     paths: {
       TESTS: '.',
-      SIM_CORE: '../src',
+      SIM_CORE: '../src'
     }
   } );
 } )();

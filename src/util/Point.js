@@ -9,6 +9,9 @@
 define( require => {
   'use strict';
 
+  // modules
+  const assert = require( 'SIM_CORE/util/assert' );
+
   class Point {
     /**
      * @param {number} x - x coordinate of the point

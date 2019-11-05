@@ -10,7 +10,13 @@ define( require => {
   'use strict';
 
   // modules
-  // const Point = require( 'SIM_CORE/util/Point' );
+  // const assert = () => {
+
+  // }
+
+  // window.assert = assert;
+  
+  const Point = require( 'SIM_CORE/util/Point' );
   const truenit = require( 'truenit' );
 
   return () => {
