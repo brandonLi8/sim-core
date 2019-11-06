@@ -25,7 +25,7 @@ define( require => {
     const vector4 = new Vector( 2, 3, true );
 
     //----------------------------------------------------------------------------------------
-    // Basic
+    // Basic properties tests.
     //----------------------------------------------------------------------------------------
     truenit.ok( vector1.x === 4 && vector1.y === 2, 'basic' );
     truenit.ok( vector2.x === 2 && vector2.y === 3, 'basic' );
@@ -34,13 +34,15 @@ define( require => {
     truenit.ok( Vector.ZERO.x === 0 && Vector.ZERO.y === 0, 'basic' );
 
     //----------------------------------------------------------------------------------------
-    // Distance (as points)
+    // Distance and Magnitude tests
     //----------------------------------------------------------------------------------------
     const distance1And3 = ( 1.2 ** 2 + 6.6 ** 2 ) ** 0.5;
     truenit.approximate( vector1.distanceTo( vector3 ), distance1And3 );
     truenit.approximate( vector3.distanceTo( vector1 ), distance1And3 );
     truenit.approximate( vector2.distanceTo( vector1 ), 5 ** 0.5 );
     truenit.approximate( vector2.distanceTo( Vector.ZERO ), 13 ** 0.5 );
+    truenit.approximate( vector2.magnitude, 13 ** 0.5 );
+    truenit.approximate( vector2.getMagnitude(), 13 ** 0.5 );
     truenit.ok( Vector.ZERO.distanceTo( Vector.ZERO ) === 0 );
     truenit.approximate( vector2.distanceTo( vector2 ), 0 );
 
@@ -57,7 +59,7 @@ define( require => {
     truenit.notOk( vector1.equals( closeVector) );
 
     //----------------------------------------------------------------------------------------
-    // IsFinite
+    // IsFinite tests
     //----------------------------------------------------------------------------------------
     const nonFiniteVector1 = new Vector( 1.7976931348623157E+10308, 1.7976931348623157E+10308 );
     const nonFiniteVector2 = new Vector( Infinity, Infinity );
@@ -76,14 +78,19 @@ define( require => {
     truenit.ok( Vector.ZERO.x === 0 && Vector.ZERO.y === 0 );
 
     //----------------------------------------------------------------------------------------
+    // To String
+    //----------------------------------------------------------------------------------------
+    console.log( vector1.toString() )
+
+    //----------------------------------------------------------------------------------------
     // Mutators
     //----------------------------------------------------------------------------------------
     
     // Copy the vectors
-    const vector1Copy = vector1.copy( false );
-    const vector2Copy = vector2.copy( false );
-    const vector3Copy = vector3.copy( false );
-    const vector4Copy = vector4.copy( false );
+    const vector1Copy = vector1.copy();
+    const vector2Copy = vector2.copy();
+    const vector3Copy = vector3.copy();
+    const vector4Copy = vector4.copy();
 
     vector1Copy.set( vector2 );
     truenit.ok( vector1Copy.equals( vector2 ) );
@@ -95,6 +102,15 @@ define( require => {
     vector3Copy.set( vector1Copy );
     vector4Copy.setX( vector1Copy.x ).setY( vector1Copy.y );
     truenit.ok( vector3Copy.equals( vector4Copy ) );
+
+    // normalize (which also tests divide and multiply)
+    truenit.ok( vector4.copy().normalize().equalsEpsilon(
+      new Vector( 2 / vector4.magnitude, 3 / vector4.magnitude )
+    ) );
+
+    // add and subtract
+    truenit.ok( vector1.copy().add( new Vector( 4, 4 ) ).equals( new Vector( 8, 6 ) ) );
+    truenit.ok( vector1.copy().subtract( new Vector( 4, 4 ) ).equals( new Vector( 0, -2 ) ) );
 
     truenit.ok( vector1.x === 4 && vector1.y === 2 );
     truenit.ok( vector2.x === 2 && vector2.y === 3 );
