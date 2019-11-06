@@ -26,9 +26,7 @@
     "url": "https://github.com/brandonLi8/sim-core/issues",
     "email": "brandon.li820@gmail.com"
   },
-  "grunt-config": {
-    "relativePath": "./node_modules/@brandonli8/grunt-config"
-  },
+  "grunt-config": "./node_modules/@brandonli8/grunt-config",
   "eslintConfig": {
     "extends": "./node_modules/@brandonli8/grunt-config/eslint/.eslintrc.js"
   }
