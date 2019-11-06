@@ -33,6 +33,19 @@ define( require => {
     }
  
     /**
+     * Gets the magnitude of this Vector.
+     * @public
+     *
+     * @returns {number}
+     */
+    getMagnitude() {
+      return Math.sqrt( this.x * this.x + this.y * this.y );
+    }
+    get magnitude() {
+      return this.getMagnitude();
+    }
+
+    /**
      * The distance between this Vector (treated as a point) and a (x, y) coordinate pair.
      * @public
      *
@@ -104,6 +117,16 @@ define( require => {
       return new Vector( this.x, this.y, isCopyImmutable );
     }
 
+    /**
+     * Debugging string for the Vector.
+     * @public
+     *
+     * @returns {string}
+     */
+    toString() {
+      return `<${ this.x }, ${ this.y }>`;
+    }
+
     /*---------------------------------------------------------------------------*
      * Mutators
      *---------------------------------------------------------------------------*/
@@ -145,7 +168,105 @@ define( require => {
      */
     set( vector ) {
       assert( this.isImmutable === false, 'cannot mutate a mutable' );
+      assert( vector instanceof Vector, `invalid vector: ${vector}` );      
       return this.setX( vector.x ).setY( vector.y );
+    }
+
+    /**
+     * Multiplies this Vector by a scalar. To NOT mutate this Vector, call copy() and multiply that Vector.
+     * @public
+     *
+     * @param {number} scalar
+     * @returns {Vector} - for chaining
+     */
+    multiply( scalar ) {
+      assert( this.isImmutable === false, 'cannot mutate a mutable' );
+      assert( typeof scalar === 'number', `invalid scalar: ${ scalar }` );
+      return this.setX( this.x * scalar ).setY( this.y * scalar );
+    }
+
+    /**
+     * Divides this Vector by a scalar. To NOT mutate this Vector, call copy() and divide that Vector.
+     * @public
+     *
+     * @param {number} scalar
+     * @returns {Vector} - for chaining
+     */
+    divide( scalar ) {
+      return this.multiply( 1 / scalar );
+    }
+
+    /**
+     * Adds (x, y) to this vector. To NOT mutate this Vector, call copy() and add to that Vector.
+     * @public
+     *
+     * @param {number} x
+     * @param {number} y
+     * @returns {Vector} - for chaining
+     */
+    addXY( x, y ) {
+      assert( this.isImmutable === false, 'cannot mutate a mutable' );
+      assert( typeof x === 'number', `invalid x: ${ x }` );
+      assert( typeof y === 'number', `invalid y: ${ y }` );
+
+      return this.setX( this.x + x ).setY( this.y + y );
+    }
+
+    /**
+     * Adds another Vector to this vector. To NOT mutate this Vector, call copy() and add to that Vector.
+     * @public
+     *
+     * @param {Vector} vector
+     * @returns {Vector} - for chaining
+     */
+    add( vector ) {
+      assert( vector instanceof Vector, `invalid vector: ${vector}` );
+      return this.addXY( vector.x, vector.y );
+    }
+
+    /**
+     * Subtracts (x, y) to this vector. To NOT mutate this Vector, call copy() and subtract to that Vector.
+     * @public
+     *
+     * @param {number} x
+     * @param {number} y
+     * @returns {Vector} - for chaining
+     */
+    subtractXY( x, y ) {
+      assert( this.isImmutable === false, 'cannot mutate a mutable' );
+      assert( typeof x === 'number', `invalid x: ${ x }` );
+      assert( typeof y === 'number', `invalid y: ${ y }` );
+
+      return this.setX( this.x - x ).setY( this.y - y );
+    }
+
+    /**
+     * Subtracts another Vector to this vector. To NOT mutate this Vector, call copy() and subtract to that Vector.
+     * @public
+     *
+     * @param {Vector} vector
+     * @returns {Vector} - for chaining
+     */
+    subtract( vector ) {
+      assert( vector instanceof Vector, `invalid vector: ${vector}` );
+      return this.subtractXY( vector.x, vector.y );
+    }
+
+    /**
+     * Mutates this Vector by setting the magnitude to 1 (but in the same direction). To NOT mutate this Vector, call
+     * copy() and normalize that Vector.
+     * @public
+     *
+     * @returns {Vector2}
+     */
+    normalize() {
+      const magnitude = this.magnitude;
+      if ( magnitude === 0 ) {
+        assert( false, 'Cannot normalize a zero-magnitude vector' );
+      }
+      else {
+        return this.divide( magnitude );
+      }
     }
   }
 
