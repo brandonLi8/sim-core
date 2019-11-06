@@ -1,7 +1,1 @@
-define( require => {
-
-
-  const assert = require( 'SIM_CORE/util/assert')
-
-  return 5;
-})
+// Copyright © 2019 Brandon Li. All rights reserved.

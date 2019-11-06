@@ -3,10 +3,9 @@
 /**
  * A Vector utility class, represented as a <x, y>. Vector can also represent a coordinate point (x, y).
  *
- * For an example of the usage, see `../../tests/util/VectorTests.js`.
- *
  * @author Brandon Li <brandon.li820@gmail.com>
  */
+
 define( require => {
   'use strict';
 
@@ -31,7 +30,7 @@ define( require => {
       // @protected {boolean}
       this.isImmutable = isImmutable;
     }
- 
+
     /**
      * Gets the magnitude of this Vector.
      * @public
@@ -79,7 +78,7 @@ define( require => {
      * @returns {boolean}
      */
     equals( vector ) {
-      assert( vector instanceof Vector, `invalid vector: ${vector}` );
+      assert( vector instanceof Vector, `invalid vector: ${ vector }` );
       return this.x === vector.x && this.y === vector.y;
     }
 
@@ -127,9 +126,9 @@ define( require => {
       return `<${ this.x }, ${ this.y }>`;
     }
 
-    /*---------------------------------------------------------------------------*
-     * Mutators
-     *---------------------------------------------------------------------------*/
+    //========================================================================================
+    // Mutators
+    //========================================================================================
 
     /**
      * Sets the x value, returning this.
@@ -154,7 +153,7 @@ define( require => {
      */
     setY( y ) {
       assert( this.isImmutable === false, 'cannot mutate a mutable' );
-      assert( typeof y === 'number', `invalid y: ${y}` );
+      assert( typeof y === 'number', `invalid y: ${ y }` );
       this.y = y;
       return this;
     }
@@ -168,7 +167,7 @@ define( require => {
      */
     set( vector ) {
       assert( this.isImmutable === false, 'cannot mutate a mutable' );
-      assert( vector instanceof Vector, `invalid vector: ${vector}` );      
+      assert( vector instanceof Vector, `invalid vector: ${ vector }` );
       return this.setX( vector.x ).setY( vector.y );
     }
 
@@ -220,7 +219,7 @@ define( require => {
      * @returns {Vector} - for chaining
      */
     add( vector ) {
-      assert( vector instanceof Vector, `invalid vector: ${vector}` );
+      assert( vector instanceof Vector, `invalid vector: ${ vector }` );
       return this.addXY( vector.x, vector.y );
     }
 
@@ -248,7 +247,7 @@ define( require => {
      * @returns {Vector} - for chaining
      */
     subtract( vector ) {
-      assert( vector instanceof Vector, `invalid vector: ${vector}` );
+      assert( vector instanceof Vector, `invalid vector: ${ vector }` );
       return this.subtractXY( vector.x, vector.y );
     }
 

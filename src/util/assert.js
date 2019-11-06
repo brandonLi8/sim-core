@@ -1,11 +1,12 @@
 // Copyright © 2019 Brandon Li. All rights reserved.
 
+/* eslint no-console: 0 */
+
 /**
  * A basic Assertion module for sim development.
  *
  * @author Brandon Li <brandon.li820@gmail.com>
  */
-
 define( require => {
   'use strict';
 
