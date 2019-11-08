@@ -119,6 +119,9 @@ define( require => {
       this._textNode = document.createTextNode( this._text || '' );
       this._element.appendChild( this._textNode );
 
+      // @protected {DOMObject|null} - the parent of this DOMObject
+      this._parent = null;
+
       // Set the attributes and styles if provided in options, which validates the options
       options.attributes && this.addAttributes( options.attributes );
       options.style && this.addStyle( options.style );
@@ -152,6 +155,7 @@ define( require => {
     getHref() { return this._href; }
     getInnerHTML() { return this._innerHTML; }
     getChildren() { return this._children; }
+    getParent() { return this._parent; }
 
     get element() { return this.getElement(); }
     get type() { return this.getType(); }
@@ -162,6 +166,7 @@ define( require => {
     get href() { return this.getHref(); }
     get innerHTML() { return this.getInnerHTML(); }
     get children() { return this.getChildren(); }
+    get parent() { return this.getParent(); }
     get isDisposed() { return this._isDisposed; }
 
     /**
