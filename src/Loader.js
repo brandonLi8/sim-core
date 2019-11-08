@@ -8,7 +8,7 @@
 define( require => {
   'use strict';
 
-  const Node = require( 'SIM_CORE/scenery/Node' );
+  const Node = require( 'SIM_CORE/scenery/DOMobject' );
 
 
   class Loader {
@@ -19,7 +19,7 @@ define( require => {
       // @private {DOM} the html node ( this is the true root )
       this.htmlNode = document.getElementsByTagName( "html" )[ 0 ];
 
-    
+
       function setStyle( node, style ) {
         let keys = Object.keys( style );
         for ( var i = 0; i < keys.length; i++ ){
@@ -59,13 +59,13 @@ define( require => {
         padding: "0"
       } )
 
+
       const loaderNode = new Node( {
-        id: 'loader',
+
+        text: 'ere',
         style: {
           left: '0px',
           top: '0px',
-          '-webkit-transform-origin': '0 0',
-          '-ms-transform-origin': '0 0',
           'transform-origin': '0 0',
           height: '100%',
           display: 'flex',
@@ -73,15 +73,22 @@ define( require => {
           'align-content': 'center',
           'flex-direction': 'column',
           'justify-content': 'center',
-          border: '2px solid red'
+          border: '2px solidired'
+        },
+        attributes: {
+          width: "60px",
+          height: "60px",
+          viewBox: "0 0 80 80",
+          "shape-rendering": "geometricPrecision",
         }
       } );
 
-      this.bodyNode.appendChild( loaderNode.DOMobject );
 
+
+      this.bodyNode.appendChild( loaderNode._element );
 
       const loader = new Node( {
-
+        text: 'ere',
         type: 'svg',
         nameSpace: 'http://www.w3.org/2000/svg',
 
@@ -129,7 +136,7 @@ define( require => {
 
       })
 
-      loaderNode.addChildren( loader.addChildren( inner, outer ) );
+      // loaderNode.addChildren( loader.addChildren( inner, outer ) );
     }
 
   }

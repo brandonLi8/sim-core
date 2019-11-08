@@ -167,14 +167,12 @@ define( require => {
 
     /**
      * Gets the reference to the CSS Style Declaration Object literal. Modifying this object
-     * WILL affect this DOM object.
+     * WILL affect this DOM object. See `addStyle()` for further documentation on this Object.
      * @public
      *
      * @returns {CSSStyleDeclaration}
      */
-    getStyle() {
-      return this._element.style;
-    }
+    getStyle() { return this._element.style; }
     get style() { return this.getStyle(); }
 
     /**
@@ -184,25 +182,31 @@ define( require => {
      * @returns {*}
      */
     getAttribute( attribute ) {
-      const attributes = this._element.attributes;
-
-      const attributeObject = attributes.getNamedItem( attribute );
-      return attributeObject ? attributeObject.value : null;
+      const attributeContainer = this._element.attributes.getNamedItem( attribute );
+      return attributeContainer ? attributeContainer.value : null;
     }
 
     //========================================================================================
     // Mutators
     //========================================================================================
 
+    /**
+     * Sets an attribute of this DOMObject, updating this object's properties.
+     * @public
+     *
+     * @param {string} name - the name of the attribute
+     * @param {*} value - the value of the attribute
+     * @returns {DOMObject} - Returns 'this' reference, for chaining
+     */
     setAttribute( name, value ) {
       assert( !name || typeof name === 'string', `invalid name: ${ name }` );
 
+      // Check if the attribute is one of our properties.
       if ( [ 'id', 'class', 'src', 'href' ].includes( name ) ) {
+        value && assert( name !== 'src' || this._type === 'img', `cannot set 'src' for type: ${ this._type }` );
+        value && assert( name !== 'href' || this._type === 'a', `cannot set 'href' for type: ${ this._type }` );
 
-        value && assert( name !== 'src' || this._type === 'img', 'cannot set src attribute for non image types' );
-        value && assert( name !== 'href' || this._type === 'a', 'cannot set href attribute for non link types' );
-
-        this[ `_${ name }` ] = value;
+        this[ `_${ name }` ] = value; // update the property of this class
         this[ `_${ name }` ] ? this._element.setAttribute( name, value ) : this._element.removeAttribute( name );
       }
       else {
@@ -211,15 +215,13 @@ define( require => {
       return this;
     }
 
-
-
     /**
      * Sets the id attribute of this DOMObject. DOMObjects can only have one class at a time.
      *
      * @param {string|null} id - null means no id
      * @returns {DOMObject} - Returns 'this' reference, for chaining
      */
-    setID( id ) { this.setAttribute( 'id', id ) }
+    setID( id ) { return this.setAttribute( 'id', id ) }
     set id( id ) { this.setID( id ); }
 
     /**
@@ -229,7 +231,7 @@ define( require => {
      * @param {string|null} class - null means no class
      * @returns {DOMObject} - Returns 'this' reference, for chaining
      */
-    setClass( className ) { this.setAttribute( 'class', className ); }
+    setClass( className ) { return this.setAttribute( 'class', className ); }
     set class( className ) { this.setClass( className ); }
 
     /**
@@ -238,7 +240,7 @@ define( require => {
      * @param {string} src
      * @returns {DOMObject} - Returns 'this' reference, for chaining
      */
-    setSrc( src ) { this.setAttribute( 'src', src ); }
+    setSrc( src ) { return this.setAttribute( 'src', src ); }
     set src( src ) { this.setSrc( src ); }
 
     /**
@@ -247,9 +249,8 @@ define( require => {
      * @param {string} href
      * @returns {DOMObject} - Returns 'this' reference, for chaining
      */
-    setHref( href ) { this.setAttribute( 'href', href ); }
+    setHref( href ) { return this.setAttribute( 'href', href ); }
     set href( href ) { this.setHref( href ); }
-
 
     /**
      * Sets the text of the TextNode of this DOMObject. If this DOMObject is visible, the text will be displayed inside.
@@ -268,7 +269,6 @@ define( require => {
     set text( text ) { this.setText( text ); }
 
 
-
     /**
      * Sets the innerHTML (which isn't an attribute) of this DOM object. For background, see:
      *  - https://developer.mozilla.org/en-US/docs/Web/API/Element/innerHTML
@@ -285,10 +285,6 @@ define( require => {
       return this;
     }
     set innerHTML( innerHTML ) { this.setInnerHTML( innerHTML ); }
-
-
-
-
 
     /**
      * Appends a child DOMObject to our list of children.
@@ -323,10 +319,10 @@ define( require => {
         `invalid children: ${ children }` );
 
       this.removeAllChildren();
-
       children.forEach( this.addChild );
-      return this; // allow chaining
+      return this;
     }
+
     /**
      * Removes a child DOMObject from our list of children. Will fail an assertion if the Object is not currently one of
      * our children.
@@ -354,20 +350,6 @@ define( require => {
       this._children.forEach( this.removeChild );
       return this;
     }
-
-
-      /**
-       * Sets an Attribute of this DOM object.
-       * @public
-       *
-       * @param {string} name
-       * @param {*} value
-       */
-      // setAttribute( name, value )
-
-
-
-
 
     /**
      * Returns whether a DOMObject is a child of this.
@@ -424,7 +406,6 @@ define( require => {
       } );
       return this;
     }
-
   }
 
   return DOMObject;

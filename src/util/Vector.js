@@ -23,6 +23,7 @@ define( require => {
       assert( typeof y === 'number', `invalid y: ${ y }` );
       assert( typeof isImmutable === 'boolean', `invalid isImmutable: ${ isImmutable }` );
 
+      // Reminder: all properties with names that start with '_' are assumed to not be private!
       // @private {number}
       this._x = x;
       this._y = y;
