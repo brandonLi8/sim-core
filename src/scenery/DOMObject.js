@@ -5,27 +5,28 @@
  * Supports DOM, Canvas, SVG, WebGL, etc. Rendering is handled by the browser.
  *
  * ## General Description:
- *  - For the DOM, the display represents a tree (called the scene graph). DOM objects represent a single visual object
- *    and are linked together in a hierarchal tree, which determines the 'order' of rendering.
+ *  - For the DOM, the display represents a tree (called the scene graph). Each DOM object represents a single visual
+ *    object and are linked together in a hierarchical tree, which determines the 'order' things appear on the display.
  *
  *  - DOM objects are only displayed in the browser if their 'parent' (the DOM object that links to it) is displayed.
  *    In other words, if a DOMObject is displayed, its 'children' (what it links to) are also displayed. At the top of
- *    the scene graph, there is a root object that doesn't have a parent but is displayed,
- *    allowing everything else to be displayed.
+ *    the scene graph, there is a root object (see ./RootNode) that is displayed, allowing everything else to be
+ *    displayed.
  *
  *  - While code comments attempt to describe the implementation clearly, fully understanding it may require some
  *    general background. Some useful references include:
+ *      - https://en.wikipedia.org/wiki/Scene_graph
  *      - https://www.w3schools.com/js/js_htmldom.asp
  *      - https://developer.mozilla.org/en-US/docs/Web/API/Document_Object_Model/Introduction
  *      - https://en.wikipedia.org/wiki/Document_Object_Model
  *
  * ## Usage:
- *  - In sim-specific code, DOM objects should RARELY be instantiated.
+ *  - In sim-specific code, the DOMObject class should RARELY be instantiated.
  *    Instead, create a new Sim and its ScreenViews and use Nodes (see ./Node.js) for structuring the scene graph.
  *    Node (a subtype) will provide a much cleaner sim-specific API compared to DOMObject.
  *
  *  - DOMObject and its subtypes generally have the last constructor parameter reserved for the 'options' object - a
- *    key-value map that specifies relevant options that can be overridden.
+ *    key-value map that specifies relevant options that can be overridden by the user.
  *
  * @author Brandon Li <brandon.li820@gmail.com>
  */
@@ -47,17 +48,18 @@ define( require => {
       assert( !options || Object.getPrototypeOf( options ) === Object.prototype,
         `Extra prototype on Options: ${ options }` );
 
+      // Defaults for options.
       const defaults = {
 
-        // {string} - the object type, 'div', 'img', 'a', 'path', etc.
+        // {string} - the DOM object type: 'div', 'img', 'a', 'path', 'svg', etc.
         type: 'div',
 
-        // {string} - a namespace URI (https://developer.mozilla.org/en-US/docs/Web/API/Document/createElementNS)
+        // {string} - a namespace URI - see https://developer.mozilla.org/en-US/docs/Web/API/Document/createElementNS.
         //            If not provided (or null), `document.createElement()` will be used.
         //            Otherwise, `document.createElementNS( options.namespace )` will be used (usually for svg).
         nameSpace: null,
 
-        // {object} - object literal that describes its css style. See `pushStyle()` for full documentation.
+        // {Object} - object literal that describes its CSS style. See `addStyle()` for full documentation.
         style: {
           left: 0,
           top: 0,
@@ -65,23 +67,24 @@ define( require => {
           margin: 0
         },
 
-        // {string|null} - if provided, adds a text string that the object displays. See `setText()` for documentation.
+        // {string|null} - if not null, adds a text string that the object displays. See `setText()` for documentation.
         text: null,
 
-        // {string|null} - if provided, adds inner html. See https://www.w3schools.com/jsref/prop_html_innerhtml.asp.
-        //                 See `setInnerHTML()` for further documentation.
+        // {string|null} - if provided, adds innerHTML. See `setInnerHTML()` for documentation and context.
         innerHTML: null,
 
-        children: [], // {DOMObject[]} - ordered array of the children of the DOM object. See `setChildren()`.
+        // {DOMObject[]} - ordered array of the children of the DOM object. See `setChildren()` for documentation.
+        children: [],
 
+        //----------------------------------------------------------------------------------------
         // Attributes
         id: null,     // {string|null} adds the id attribute for the object. See `setID()` for documentation.
-        class: null,  // {string|null} adds the class name attribute for the object. See `setClass()` for documentation.
-        src: null,    // {string|null} adds a image's 'src' attribute. ONLY used if options.type is 'img'.
-        href: null,   // {string|null} adds a link's url 'src' attribute. ONLY used if options.type is 'a'.
+        class: null,  // {string|null} adds the class attribute for the object. See `setClass()` for documentation.
+        src: null,    // {string|null} adds a image's 'src' attribute. See `setSrc()` for documentation.
+        href: null,   // {string|null} adds a link's url 'src' attribute.  See `setHref()` for documentation.
 
-        // {object} - object literal that describes the any other attributes that aren't already described above.
-        //            See `pushAttributes()` for more context
+        // {Object} - object literal that describes any other attributes that aren't already described above.
+        //            See `addAttributes()` for more context
         attributes: null
       };
 
@@ -105,7 +108,10 @@ define( require => {
       this._href = options.href;
       this._text = options.text;
       this._innerHTML = options.innerHTML;
+      this._children = options.children;
 
+      // @private {boolean} - indicates if this DOMObject has been disposed. See `dispose()`.
+      this._isDisposed = false;
 
       // @private {HTMLElement} (final) - the actual DOM object. See `getElement()` for read access.
       this._element = document.createElement( this._type );
@@ -114,9 +120,9 @@ define( require => {
       this._textNode = document.createTextNode( this._text || '' );
       this._element.appendChild( this._textNode );
 
-      // Set the attributes/styles provided in options
-      options.attributes && this.pushAttributes( options.attributes ); // validates options.attributes
-      options.style && this.pushStyle( options.style ); // validates options.attributes
+      // Set the attributes and styles if provided in options, which validates the options
+      options.attributes && this.addAttributes( options.attributes );
+      options.style && this.addStyle( options.style );
 
       //----------------------------------------------------------------------------------------
       this.setID( this._id );                // validates options.id and sets the id.
@@ -133,10 +139,10 @@ define( require => {
     //========================================================================================
 
     /**
-     * Accessors and ES5 getters of a property of this DOM object.
+     * Accessors and ES5 getters of a private property of this DOM object.
      * @public
      *
-     * @returns {*} See the attribute declaration for documentation of the type.
+     * @returns {*} See the property declaration for documentation of the type.
      */
     getElement() { return this._element; }
     getType() { return this._type; }
@@ -147,6 +153,7 @@ define( require => {
     getHref() { return this._href; }
     getInnerHTML() { return this._innerHTML; }
     getChildren() { return this._children; }
+
     get element() { return this.getElement(); }
     get type() { return this.getType(); }
     get id() { return this.getID(); }
@@ -156,6 +163,7 @@ define( require => {
     get href() { return this.getHref(); }
     get innerHTML() { return this.getInnerHTML(); }
     get children() { return this.getChildren(); }
+    get isDisposed() { return this._isDisposed; }
 
     /**
      * Gets the reference to the CSS Style Declaration Object literal. Modifying this object
@@ -186,25 +194,238 @@ define( require => {
     // Mutators
     //========================================================================================
 
-    setType() { return this._type; }
-    setID() { return this._id; }
-    setClass() { return this._class; }
-    setText() { return this._text; }
-    setSrc() { return this._src; }
-    setHref() { return this._href; }
-    setInnerHTML() { return this._innerHTML; }
-    setChildren() { return this._children; }
+    setAttribute( name, value ) {
+      assert( !name || typeof name === 'string', `invalid name: ${ name }` );
+
+      if ( [ 'id', 'class', 'src', 'href' ].includes( name ) ) {
+
+        value && assert( name !== 'src' || this._type === 'img', 'cannot set src attribute for non image types' );
+        value && assert( name !== 'href' || this._type === 'a', 'cannot set href attribute for non link types' );
+
+        this[ `_${ name }` ] = value;
+        this[ `_${ name }` ] ? this._element.setAttribute( name, value ) : this._element.removeAttribute( name );
+      }
+      else {
+        this._element.setAttribute( name, value );
+      }
+      return this;
+    }
+
+
+
+    /**
+     * Sets the id attribute of this DOMObject. DOMObjects can only have one class at a time.
+     *
+     * @param {string|null} id - null means no id
+     * @returns {DOMObject} - Returns 'this' reference, for chaining
+     */
+    setID( id ) { this.setAttribute( 'id', id ) }
+    set id( id ) { this.setID( id ); }
+
+    /**
+     * Sets the class attribute of this DOMObject. Can have multiple classes; just pass in a string with a space
+     * separating the classes (e.g, setClass( 'class1 class2' )).
+     *
+     * @param {string|null} class - null means no class
+     * @returns {DOMObject} - Returns 'this' reference, for chaining
+     */
+    setClass( className ) { this.setAttribute( 'class', className ); }
+    set class( className ) { this.setClass( className ); }
+
+    /**
+     * Sets the 'src' attribute of this DOM object. Errors if this objects type isn't 'img'.
+     *
+     * @param {string} src
+     * @returns {DOMObject} - Returns 'this' reference, for chaining
+     */
+    setSrc( src ) { this.setAttribute( 'src', src ); }
+    set src( src ) { this.setSrc( src ); }
+
+    /**
+     * Sets the 'href' attribute of this DOM object. Errors if this objects type isn't 'a'.
+     *
+     * @param {string} href
+     * @returns {DOMObject} - Returns 'this' reference, for chaining
+     */
+    setHref( href ) { this.setAttribute( 'href', href ); }
+    set href( href ) { this.setHref( href ); }
+
+
+    /**
+     * Sets the text of the TextNode of this DOMObject. If this DOMObject is visible, the text will be displayed inside.
+     * For background, see https://developer.mozilla.org/en-US/docs/Web/API/Document/createTextNode.
+     * @public
+     *
+     * @param {string|null} text - if null, nothing is displayed
+     * @returns {DOMObject} - Returns 'this' reference, for chaining
+     */
+    setText( text ) {
+      assert( !text || typeof text === 'string', `invalid text: ${ text }` );
+      this._text = text;
+      this._textNode.nodeValue = this._text || '';
+      return this;
+    }
+    set text( text ) { this.setText( text ); }
+
+
+
+    /**
+     * Sets the innerHTML (which isn't an attribute) of this DOM object. For background, see:
+     *  - https://developer.mozilla.org/en-US/docs/Web/API/Element/innerHTML
+     *  - See https://www.w3schools.com/jsref/prop_html_innerhtml.asp
+     * @public
+     *
+     * @param {string|null} innerHTML - if null, the innerHTML is set to nothing
+     * @returns {DOMObject} - Returns 'this' reference, for chaining
+     */
+    setInnerHTML( innerHTML ) {
+      assert( !innerHTML || typeof innerHTML === 'string', `invalid innerHTML: ${ innerHTML }` );
+      this._innerHTML = innerHTML;
+      this._element.innerHTML = innerHTML;
+      return this;
+    }
+    set innerHTML( innerHTML ) { this.setInnerHTML( innerHTML ); }
+
+
+
+
+
+    /**
+     * Appends a child DOMObject to our list of children.
+     * @public
+     *
+     * The new child DOMObject will be displayed in front (on top) of all of this DOMObject's other children.
+     *
+     * @param {DOMObject} child
+     * @returns {DOMObject} - Returns 'this' reference, for chaining
+     */
+    addChild( child ) {
+      assert( child instanceof DOMObject, `invalid child: ${ child }` );
+      assert( this.hasChild( child ), 'cannot add child that is already a child.' );
+      assert( node !== this, 'cannot add self as a child' );
+      assert( !node._isDisposed, 'Tried to add a disposed Node' );
+
+      this._children.push( child );
+      child._parent = this;
+      this._element.appendChild( child.element );
+      return this;
+    }
+
+    /**
+     * Rewrites the children of the DOMObject to be the passed-in array of DOMObjects.
+     * @public
+     *
+     * @param {DOMObject[]} children
+     * @returns {DOMObject} - Returns 'this' reference, for chaining
+     */
+    setChildren( children ) {
+      assert( Array.isArray( children ) && children.every( child => child instanceof DOMobject ),
+        `invalid children: ${ children }` );
+
+      this.removeAllChildren();
+
+      children.forEach( this.addChild );
+      return this; // allow chaining
+    }
+    /**
+     * Removes a child DOMObject from our list of children. Will fail an assertion if the Object is not currently one of
+     * our children.
+     * @public
+     *
+     * @param {DOMobject} child
+     * @returns {DOMobject} - Returns 'this' reference, for chaining
+     */
+    removeChild( child ) {
+      assert( this.hasChild( child ), 'Attempted to removeChild with a DOMObject that was not a child.' );
+
+      this._children.splice( this._children.indexOf( child ), 1 );
+      this._element.removeChild( child.element );
+      child._parent = null;
+      return this;
+    }
+
+    /**
+     * Removes all children from this DOMObject.
+     * @public
+     *
+     * @returns {DOMObject} - Returns 'this' reference, for chaining
+     */
+    removeAllChildren() {
+      this._children.forEach( this.removeChild );
+      return this;
+    }
+
+
+      /**
+       * Sets an Attribute of this DOM object.
+       * @public
+       *
+       * @param {string} name
+       * @param {*} value
+       */
+      // setAttribute( name, value )
+
+
+
+
+
+    /**
+     * Returns whether a DOMObject is a child of this.
+     * @public
+     *
+     * @param {DOMObject} potentialChild
+     * @returns {boolean} - Whether potentialChild is actually our child.
+     */
+    hasChild( potentialChild ) {
+      assert( potentialChild instanceof DOMObject, `invalid potentialChild: ${ potentialChild }` );
+      assert( potentialChild.parent === this, 'child-parent reference should match parent-child reference' );
+      return this._children.includes( potentialChild );
+    }
+
+    /**
+     * Adds onto this DOMObject's CSS style. For context, see:
+     *  - https://www.w3schools.com/js/js_htmldom_css.asp
+     *  - https://www.w3schools.com/jsref/dom_obj_style.asp
+     *  - https://developer.mozilla.org/en-US/docs/Web/API/CSSStyleDeclaration
+     * @public
+     *
+     * Styles that aren't apart of the element's CSS style object will cause an error.
+     *
+     * @param {Object} style - object literal that describes the styles to override for the element
+     * @returns {DOMObject} - Returns 'this' reference, for chaining
+     */
+    addStyle( style ) {
+      assert( !style || Object.getPrototypeOf( style ) === Object.prototype, `invalid style object: ${ style }` );
+
+      // Loop through each key of the style Object literal and add the style.
+      Object.keys( style ).forEach( styleKey => {
+        assert( this._element.style.hasOwnProperty( styleKey ), `invalid style key: ${ styleKey }` );
+
+        this._element.style[ styleKey ] = style[ styleKey ];
+      } );
+      return this;
+    }
+
+    /**
+     * Adds onto this DOMObject's attributes. For context, see:
+     *  - https://www.w3schools.com/jsref/dom_obj_attributes.asp
+     *  - https://developer.mozilla.org/en-US/docs/Web/API/Element/attributes
+     * @public
+     *
+     * @param {Object} style - object literal that describes the attributes. All keys are valid.
+     * @returns {DOMObject} - Returns 'this' reference, for chaining
+     */
+    addAttributes( attributes ) {
+      assert( !attributes || Object.getPrototypeOf( attributes ) === Object.prototype,
+        `invalid attributes object: ${ attributes }` );
+      // Loop through each key of the attributes Object literal and add the attribute.
+      Object.keys( attributes ).forEach( attribute => {
+        this.setAttribute( attribute, attributes[ attribute ] );
+      } );
+      return this;
+    }
+
   }
 
-
-  // setText(), setInnerHTML() pushStyle() setID() setClass
-
-// css
-//  See https://www.w3schools.com/js/js_htmldom_css.asp
-        //            and https://www.w3schools.com/jsref/dom_obj_style.asp. Overrides recursively.
-
-
-// pushAttributes
-//https://www.w3schools.com/jsref/dom_obj_attributes.asp
   return DOMObject;
 } );
