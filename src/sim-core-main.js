@@ -16,6 +16,7 @@ define( [
   'SIM_CORE/util/Vector',
   'SIM_CORE/scenery/DOMObject',
   'SIM_CORE/Node',
+  'SIM_CORE/scenery/Screen',
 
   'SIM_CORE/Loader'
 
