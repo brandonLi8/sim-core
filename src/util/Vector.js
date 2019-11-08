@@ -23,13 +23,22 @@ define( require => {
       assert( typeof y === 'number', `invalid y: ${ y }` );
       assert( typeof isImmutable === 'boolean', `invalid isImmutable: ${ isImmutable }` );
 
-      // @public (read-only) {number}
-      this.x = x;
-      this.y = y;
+      // @private {number}
+      this._x = x;
+      this._y = y;
 
       // @protected {boolean}
-      this.isImmutable = isImmutable;
+      this._isImmutable = isImmutable;
     }
+
+    /**
+     * Getters for the x and y values
+     * @public
+     *
+     * @returns {number}
+     */
+    get x() { return this._x; }
+    get y() { return this._y; }
 
     /**
      * Gets the magnitude of this Vector.
@@ -38,7 +47,7 @@ define( require => {
      * @returns {number}
      */
     getMagnitude() {
-      return Math.sqrt( this.x * this.x + this.y * this.y );
+      return Math.sqrt( this._x * this._x + this._y * this._y );
     }
     get magnitude() {
       return this.getMagnitude();
@@ -55,7 +64,7 @@ define( require => {
     distanceToXY( x, y ) {
       assert( typeof x === 'number', `invalid x: ${ x }` );
       assert( typeof y === 'number', `invalid y: ${ y }` );
-      return Math.sqrt( Math.pow( this.x - x, 2 ) + Math.pow( this.y - y, 2 ) );
+      return Math.sqrt( Math.pow( this._x - x, 2 ) + Math.pow( this._y - y, 2 ) );
     }
 
     /**
@@ -79,7 +88,7 @@ define( require => {
      */
     equals( vector ) {
       assert( vector instanceof Vector, `invalid vector: ${ vector }` );
-      return this.x === vector.x && this.y === vector.y;
+      return this._x === vector.x && this._y === vector.y;
     }
 
     /**
@@ -92,7 +101,7 @@ define( require => {
      */
     equalsEpsilon( other, epsilon=0.00005 ) {
       assert( other instanceof Vector && typeof epsilon === 'number' );
-      return Math.max( Math.abs( this.x - other.x ), Math.abs( this.y - other.y ) ) <= epsilon;
+      return Math.max( Math.abs( this._x - other.x ), Math.abs( this._y - other.y ) ) <= epsilon;
     }
 
     /**
@@ -102,7 +111,7 @@ define( require => {
      * @returns {boolean}
      */
     isFinite() {
-      return isFinite( this.x ) && isFinite( this.y );
+      return isFinite( this._x ) && isFinite( this._y );
     }
 
     /**
@@ -113,7 +122,7 @@ define( require => {
      * @returns {Vector2}
      */
     copy( isCopyImmutable = false ) {
-      return new Vector( this.x, this.y, isCopyImmutable );
+      return new Vector( this._x, this._y, isCopyImmutable );
     }
 
     /**
@@ -123,7 +132,7 @@ define( require => {
      * @returns {string}
      */
     toString() {
-      return `<${ this.x }, ${ this.y }>`;
+      return `<${ this._x }, ${ this._y }>`;
     }
 
     //========================================================================================
@@ -138,9 +147,9 @@ define( require => {
      * @returns {Vector} - for chaining
      */
     setX( x ) {
-      assert( this.isImmutable === false, 'cannot mutate a mutable' );
+      assert( this._isImmutable === false, 'cannot mutate a mutable' );
       assert( typeof x === 'number', `invalid x: ${ x }` );
-      this.x = x;
+      this._x = x;
       return this;
     }
 
@@ -152,9 +161,9 @@ define( require => {
      * @returns {Vector} - for chaining
      */
     setY( y ) {
-      assert( this.isImmutable === false, 'cannot mutate a mutable' );
+      assert( this._isImmutable === false, 'cannot mutate a mutable' );
       assert( typeof y === 'number', `invalid y: ${ y }` );
-      this.y = y;
+      this._y = y;
       return this;
     }
 
@@ -166,7 +175,7 @@ define( require => {
      * @returns {Vector} - for chaining
      */
     set( vector ) {
-      assert( this.isImmutable === false, 'cannot mutate a mutable' );
+      assert( this._isImmutable === false, 'cannot mutate a mutable' );
       assert( vector instanceof Vector, `invalid vector: ${ vector }` );
       return this.setX( vector.x ).setY( vector.y );
     }
@@ -179,9 +188,9 @@ define( require => {
      * @returns {Vector} - for chaining
      */
     multiply( scalar ) {
-      assert( this.isImmutable === false, 'cannot mutate a mutable' );
+      assert( this._isImmutable === false, 'cannot mutate a mutable' );
       assert( typeof scalar === 'number', `invalid scalar: ${ scalar }` );
-      return this.setX( this.x * scalar ).setY( this.y * scalar );
+      return this.setX( this._x * scalar ).setY( this._y * scalar );
     }
 
     /**
@@ -204,11 +213,11 @@ define( require => {
      * @returns {Vector} - for chaining
      */
     addXY( x, y ) {
-      assert( this.isImmutable === false, 'cannot mutate a mutable' );
+      assert( this._isImmutable === false, 'cannot mutate a mutable' );
       assert( typeof x === 'number', `invalid x: ${ x }` );
       assert( typeof y === 'number', `invalid y: ${ y }` );
 
-      return this.setX( this.x + x ).setY( this.y + y );
+      return this.setX( this._x + x ).setY( this._y + y );
     }
 
     /**
@@ -232,11 +241,11 @@ define( require => {
      * @returns {Vector} - for chaining
      */
     subtractXY( x, y ) {
-      assert( this.isImmutable === false, 'cannot mutate a mutable' );
+      assert( this._isImmutable === false, 'cannot mutate a mutable' );
       assert( typeof x === 'number', `invalid x: ${ x }` );
       assert( typeof y === 'number', `invalid y: ${ y }` );
 
-      return this.setX( this.x - x ).setY( this.y - y );
+      return this.setX( this._x - x ).setY( this._y - y );
     }
 
     /**
