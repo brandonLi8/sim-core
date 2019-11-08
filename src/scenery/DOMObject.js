@@ -10,8 +10,7 @@
  *
  *  - DOM objects are only displayed in the browser if their 'parent' (the DOM object that links to it) is displayed.
  *    In other words, if a DOMObject is displayed, its 'children' (what it links to) are also displayed. At the top of
- *    the scene graph, there is a root object (see ./RootNode) that is displayed, allowing everything else to be
- *    displayed.
+ *    the scene graph, there is a root object that is displayed, allowing everything else to be displayed.
  *
  *  - While code comments attempt to describe the implementation clearly, fully understanding it may require some
  *    general background. Some useful references include:
