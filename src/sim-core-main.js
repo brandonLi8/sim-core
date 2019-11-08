@@ -15,6 +15,8 @@ define( [
   'SIM_CORE/util/assert',
   'SIM_CORE/util/Vector',
   'SIM_CORE/scenery/DOMObject',
+  'SIM_CORE/Node',
+
   'SIM_CORE/Loader'
 
 
