@@ -42,6 +42,7 @@ define( require => {
   // constants
   const EXACT_QUERY_PARAMETERS = parseExactQueryParameters();
 
+  //----------------------------------------------------------------------------------------
 
   class QueryParameters {
 
@@ -64,10 +65,9 @@ define( require => {
   //----------------------------------------------------------------------------------------
 
   /**
-   * Parses all of the query parameters of the URI exactly how it appears into an object literal. Values without
-   * the value operator ('=') are given an empty string.
-   *
-   * For performance reasons, this function should be called once at the start.
+   * Parses all query parameters of the URI exactly how it appears into an object literal. Values without
+   * the value operator ('=') are given an empty string. This function is for internal use (not public facing).
+   * For performance reasons, this function should be called once at startup.
    *
    * For context, see:
    *  - https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/decodeURIComponent
