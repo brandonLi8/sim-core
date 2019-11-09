@@ -19,7 +19,7 @@
  *      `QueryParameters.retrieve( {
  *          bar1: {
  *            type: 'number',
- *            isValidValue: value => ( typeof value === 'number' && value >= 0 ),
+ *            isValidValue: value => ( value >= 0 ),
  *            defaultValue: 0
  *          },
  *          dev: {
@@ -41,17 +41,33 @@ define( require => {
 
   // constants
   const EXACT_QUERY_PARAMETERS = parseExactQueryParameters();
+  const VALID_SCHEMA_TYPES = [ 'flag', 'boolean', 'number', 'string' ];
 
   //----------------------------------------------------------------------------------------
 
   class QueryParameters {
 
+
     /**
-     * Gets the value for a single query parameter. If the query parameter is a flag, this returns `true`.
+     * Checks if a query parameter name is apart of the URI.
      * @public
      *
      * @param {string} name - the query parameter name
-     * @returns {*|null} - query parameter value (null if the query parameter doesn't exist)
+     * @returns {boolean}
+     */
+    contains( name ) {
+      assert( typeof name === 'string', `invalid name ${ name }` );
+
+      return EXACT_QUERY_PARAMETERS.hasOwnProperty( name );
+    }
+
+    /**
+     * Gets the value for a single query parameter. If the query parameter is a flag, this returns `true`.
+     * If the parameter isn't apart of the URI, this returns 'null'. All other values are straight forward.
+     * @public
+     *
+     * @param {string} name - the query parameter name
+     * @returns {*|null} - query parameter value
      */
     static get( name ) {
       assert( typeof name === 'string', `invalid name ${ name }` );
