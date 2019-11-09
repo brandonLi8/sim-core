@@ -47,6 +47,28 @@ define( require => {
 
   class QueryParameters {
 
+    /**
+     * Validates and retrieves a set of values based on a schema. See the doc string for background.
+     * @public
+     *
+     * @param {Object} schema - Schema that contains the set of values to retrieve. For instance,
+     *                            QueryParameters.retrieve( {
+     *                                parameterName: {
+     *                                  type: 'number',
+     *                                  defaultValue: 0
+     *                                }
+     *                            } );
+     *                          - All objects must contain a 'type' key-value pair. See VALID_SCHEMA_TYPES for the
+     *                          possible types.
+     *                          - All objects except for `type: 'flag'` must provide a default value.
+     *                          - Each object may contain a 'isValidValue' key-value which provides a function that
+     *                            checks if a value is valid (defined by user). This option will be ignored for flags
+     *                            and booleans (which will have a built in type checker).
+     * @returns {Object} - a Object literal of the names corresponding to the values retrieved.
+     */
+    retrieve( schema ) {
+
+    }
 
     /**
      * Checks if a query parameter name is apart of the URI.
