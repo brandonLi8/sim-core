@@ -40,7 +40,7 @@ define( require => {
   const assert = require( 'SIM_CORE/util/assert' );
 
   // constants
-  const EXACT_QUERY_PARAMETERS = parseAllQueryParameters();
+  const PARSED_QUERY_PARAMETERS = parseAllQueryParameters();
   const VALID_SCHEMA_TYPES = [ 'flag', 'boolean', 'number', 'string' ];
 
   //----------------------------------------------------------------------------------------
@@ -104,23 +104,25 @@ define( require => {
     contains( name ) {
       assert( typeof name === 'string', `invalid name ${ name }` );
 
-      return EXACT_QUERY_PARAMETERS.hasOwnProperty( name );
+      return PARSED_QUERY_PARAMETERS.hasOwnProperty( name );
     }
 
     /**
-     * Gets the value for a single query parameter. If the query parameter is a flag, this returns `true`.
-     * If the parameter isn't apart of the URI, this returns 'null'. All other values are straight forward.
+     * Gets the value for a single query parameter.
      * @public
      *
+     * IMPORTANT: flag parameter values (no value) will return `null`. Non-existent parameters will return `undefined`.
+     *            It is therefore recommended to use `QueryParameters.retrieve` to specify types and get truthy values
+     *            for flags.
+     *
      * @param {string} name - the query parameter name
-     * @returns {*|null} - query parameter value
+     * @returns {*} - query parameter value
      */
     static get( name ) {
       assert( typeof name === 'string', `invalid name ${ name }` );
 
-      // Get the value from the parsed query parameters.
-      const value = EXACT_QUERY_PARAMETERS.hasOwnProperty( name ) ?  EXACT_QUERY_PARAMETERS[ name ] : null;
-      return value === '' ? true : value; // true if the value is the empty string, signaling a flag.
+      // Get the value from the already parsed query parameters.
+      return PARSED_QUERY_PARAMETERS[ name ];
     }
   }
 
@@ -137,11 +139,10 @@ define( require => {
    *  - https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/decodeURIComponent
    *  - https://www.w3schools.com/jsref/prop_loc_search.asp
    *
-   * @returns {Object}
+   * @returns {Object} - parsed into an object literal with the keys as the parameter names.
    */
   function parseAllQueryParameters() {
 
-    // Object of the output of this function.
     const parsedQueryParameters = {};
 
     // Get the Query Component or the URI and split each argument (separated by '&') into an array.
@@ -158,6 +159,7 @@ define( require => {
         parsedQueryParameters[ name ] = value ? decodeURIComponent( value ) : value;
       }
     } );
+
     return parsedQueryParameters;
   }
 
