@@ -101,9 +101,10 @@ define( require => {
      * @param {string} name - the query parameter name
      * @returns {boolean}
      */
-    contains( name ) {
+    static contains( name ) {
       assert( typeof name === 'string', `invalid name ${ name }` );
 
+      // Get the result from the already parsed query parameters.
       return PARSED_QUERY_PARAMETERS.hasOwnProperty( name );
     }
 
