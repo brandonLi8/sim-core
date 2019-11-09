@@ -40,7 +40,7 @@ define( require => {
   const assert = require( 'SIM_CORE/util/assert' );
 
   // constants
-  const EXACT_QUERY_PARAMETERS = parseExactQueryParameters();
+  const EXACT_QUERY_PARAMETERS = parseAllQueryParameters();
   const VALID_SCHEMA_TYPES = [ 'flag', 'boolean', 'number', 'string' ];
 
   //----------------------------------------------------------------------------------------
@@ -67,6 +67,30 @@ define( require => {
      * @returns {Object} - a Object literal of the names corresponding to the values retrieved.
      */
     retrieve( schema ) {
+      assert( Object.getPrototypeOf( schema ) === Object.prototype, `invalid schema: ${ schema }` );
+
+      const parametersRetrieved = {}; // the result
+
+      Object.keys( schema ).forEach( name => {
+
+        const object = schema[ name ];
+        assert( Object.getPrototypeOf( object ) === Object.prototype, `invalid schema object: ${ object }` );
+
+        const type = object.type;
+        assert( VALID_SCHEMA_TYPES.contains( type ), `schema object didn't implement 'type' correctly: ${ object }` );
+
+        //----------------------------------------------------------------------------------------
+        // Flags
+        if ( type === 'flag' ) {
+          parametersRetrieved[ name ] = this.contains( name );
+          // assert( this.get( name ))
+        }
+        else {
+          const value = this.get( name );
+        }
+
+      } );
+
 
     }
 
@@ -103,30 +127,38 @@ define( require => {
   //----------------------------------------------------------------------------------------
 
   /**
-   * Parses all query parameters of the URI exactly how it appears into an object literal. Values without
-   * the value operator ('=') are given an empty string. This function is for internal use (not public facing).
-   * For performance reasons, this function should be called once at startup.
+   * Parses all query parameters of the URI into an object literal. Values without the value operator ('=') are given
+   * the value `null`.
    *
-   * For context, see:
+   * This function is for internal use (not public facing). For performance reasons, this function should be called once
+   * at startup.
+   *
+   * For background of implementation, see:
    *  - https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/decodeURIComponent
    *  - https://www.w3schools.com/jsref/prop_loc_search.asp
-   *  - https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/RegExp/exec
    *
    * @returns {Object}
    */
-  function parseExactQueryParameters() {
+  function parseAllQueryParameters() {
 
-    // Get the Query Component of the URI
-    const queryComponent = window.location.search.substring( 1 );
-    const searchRegEx = /([^&=]+)=?([^&]*)/g;
-    let matches = searchRegEx.exec( queryComponent );
-    const parameters = {};
+    // Object of the output of this function.
+    const parsedQueryParameters = {};
 
-    while ( matches ) {
-      parameters[ decodeURIComponent( matches[ 1 ] ) ] = decodeURIComponent( matches[ 2 ] );
-      matches = searchRegEx.exec( queryComponent );
-    }
-    return parameters;
+    // Get the Query Component or the URI and split each argument (separated by '&') into an array.
+    const queryComponents = window.location.search.substring( 1 ).split( '&' );
+
+    queryComponents.forEach( component => {
+
+      if ( component !== '' ) {
+        // Parse the component by spitting it from the first '=' sign.
+        const parsedComponent = component.split( '=', 2 );
+
+        const name = parsedComponent[ 0 ];
+        const value = parsedComponent.length === 2 ? parsedComponent[ 1 ] : null; // null if no '=' is provided (a flag).
+        parsedQueryParameters[ name ] = value ? decodeURIComponent( value ) : value;
+      }
+    } );
+    return parsedQueryParameters;
   }
 
   return QueryParameters;
