@@ -131,6 +131,8 @@ define( require => {
   }
 
   //----------------------------------------------------------------------------------------
+  // Helpers
+  //----------------------------------------------------------------------------------------
 
   /**
    * Parses all query parameters of the URI into an object literal. Values without the value operator ('=') are given
@@ -167,26 +169,34 @@ define( require => {
     return parsedQueryParameters;
   }
 
-
+  /**
+   * Coerces input from QueryParameters.get() to a type assuming the URI contains the parameter. Validates new values.
+   *
+   * @param {*} value - value to coerce
+   * @param {*} type - the type to coerce into. See VALID_SCHEMA_TYPES.
+   * @param {*} name - the name of the query parameter for validating.
+   * @param
+   */
   function coerceType( value, type, name ) {
-    if ( type === 'number' ) {
-      const coercedValue = Number( value );
 
+    if ( type === 'number' ) {
+      // coerce into a number
+      const coercedValue = Number( value );
       assert( !isNaN( coercedValue ), `invalid number value for ?${ name }: ${ value }` );
       return coercedValue;
     }
     else if ( type === 'boolean' ) {
-
+      // coerce into a boolean
       assert( value === 'true' || value === 'false', `invalid boolean value for ?${ name }: ${ value }` );
-
       return value === 'true';
     }
     else if ( type === 'flag' ) {
+      // for flags, error if there is a value. returns true as this function assumes the URI contains the parameter.
       assert( value === null, `value for ?${ name } shouldn't exist: ${ value } for 'flag' parameter types` );
       return true;
     }
     else {
-      return value;
+      return value; // nothing to coerce, leave as-is
     }
   }
 
