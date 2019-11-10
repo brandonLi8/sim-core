@@ -168,27 +168,27 @@ define( require => {
   }
 
 
-  // function coerceType( value, type, name ) {
-  //   if ( type === 'number' ) {
-  //     const coercedValue = Number( value );
+  function coerceType( value, type, name ) {
+    if ( type === 'number' ) {
+      const coercedValue = Number( value );
 
-  //     assert( !isNaN( coercedValue ), `invalid number value for ?${ name }: ${ value }` );
-  //     return coercedValue;
-  //   }
-  //   else if ( type === 'boolean' ) {
+      assert( !isNaN( coercedValue ), `invalid number value for ?${ name }: ${ value }` );
+      return coercedValue;
+    }
+    else if ( type === 'boolean' ) {
 
-  //     assert( value === 'true' || value === 'false', `invalid boolean value for ?${ name }: ${ value }` );
+      assert( value === 'true' || value === 'false', `invalid boolean value for ?${ name }: ${ value }` );
 
-  //     return value === 'true';
-  //   }
-  //   else if ( type === 'flag' ) {
-  //     assert( value === null, `value for ?${ name } shouldn't exist: ${ value } for 'flag' parameter types` );
-  //     return true;
-  //   }
-  //   else {
-  //     return value;
-  //   }
-  // }
+      return value === 'true';
+    }
+    else if ( type === 'flag' ) {
+      assert( value === null, `value for ?${ name } shouldn't exist: ${ value } for 'flag' parameter types` );
+      return true;
+    }
+    else {
+      return value;
+    }
+  }
 
   /**
    * Validates a schema. See `QueryParameters.retrieve()` for background.
