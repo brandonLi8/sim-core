@@ -48,7 +48,7 @@ define( require => {
   class QueryParameters {
 
     /**
-     * Validates and retrieves a set of values based on a schema. See the doc string for context.
+     * Retrieves, validates, and coerces a set of values based on a schema. See the doc string for context.
      * @public
      *
      * @param {Object} schema - Schema that contains the set of values to retrieve. For instance,
@@ -68,64 +68,34 @@ define( require => {
      *
      * @returns {Object} - parsed into an object literal with the keys as the parameter names.
      */
-    static retrieve( schema ) {
-      const queryParametersRetrieved = {};
+    // static retrieve( schema ) {
+    //   // validate the schema
+    //   validateSchema( schema );
 
-      assert( Object.getPrototypeOf( schema ) === Object.prototype, `invalid schema: ${ schema }` );
+    //   const queryParametersRetrieved = {}; // the output
 
-      //----------------------------------------------------------------------------------------
-      // Loop through the schema and retrieve each Query Parameter value.
-      Object.keys( schema ).forEach( name => {
+    //   //----------------------------------------------------------------------------------------
+    //   // Loop through the schema and retrieve each Query Parameter value.
+    //   Object.keys( schema ).forEach( name => {
 
-        //----------------------------------------------------------------------------------------
-        // Validate the schema objects
-        const object = schema[ name ];
-        assert( Object.getPrototypeOf( object ) === Object.prototype,
-          `invalid schema object for ${ name }: ${ object }` );
+    //     const object = schema[ name ]; // objects of the schema
+    //     const type = object.type; // convenience reference to the type, which has been validated in validateSchema
+    //     const defaultValue = ( type === 'flag') ? false : object.defaultValue; // reference the default value
+    //     const value = this.get( name ); // value parsed from the URI. Undefined if the parameter isn't present.
+    //     const isValidValue = object.isValidValue;
 
-        const type = object.type;
-        assert( VALID_SCHEMA_TYPES.includes( type ),
-          `${ name } of schema didn't implement 'type' correctly: ${ object }` );
+    //     // Correct using the default value if the parameter isn't present in the URI and coercing its type if it is.
+    //     const correctedValue = this.contains( name ) ? coerceType( value, type, name ) : defaultValue;
 
-        const exactValue = this.get( name );
-        const parsedValue = parse( exactValue, type );
+    //     // Check that the value is valid if provided.
+    //     assert( !isValidValue || isValidValue( correctedValue ),
+    //       `value ${ correctedValue } for ?${ name } didn't pass isValidValue()` );
 
-        let retrievedValue;
+    //     queryParametersRetrieved[ name ] = correctedValue;
+    //   } );
 
-        // Flags
-        if ( type === 'flag' ) {
-          retrievedValue = this.contains( name );
-
-          // Check that the flag was entered correctly if it exists.
-          ( retrievedValue ) && assert( parsedValue === null,
-            `Query Parameter ${ name } is type 'flag', which doesn't support the value ${ parsedValue }` );
-        }
-        else {
-
-          // check the default value is implemented correctly
-          const defaultValue = object.defaultValue;
-          assert( typeof defaultValue === type,
-            `schema default value for ${ name } must be a ${ type }. Invalid default value: ${ defaultValue }` );
-
-          exactValue !== undefined && validateValue( exactValue, type, name );
-
-          retrievedValue = this.contains( name ) ? parsedValue : defaultValue;
-
-          assert( !this.contains( name ) || exactValue !== null,
-            `Query Parameter for ${ name } requires a value as it is of type ${ type }` );
-
-          if ( object.isValidValue && type !== 'boolean' ) {
-            assert( typeof object.isValidValue === 'function', `isValidValue for ${ name } must be a function` );
-            assert( object.isValidValue( retrievedValue ) === true,
-              `Query Parameter for ${ name } isn't a valid value: ${ retrievedValue}` );
-          }
-        }
-
-        queryParametersRetrieved[ name ] = retrievedValue;
-      } );
-
-      return queryParametersRetrieved;
-    }
+    //   return queryParametersRetrieved;
+    // }
 
     /**
      * Checks if a query parameter name is apart of the URI.
@@ -198,25 +168,68 @@ define( require => {
   }
 
 
-  function parse( value, type ) {
-    if ( type === 'number' ) {
-      return Number( value );
-    }
-    else if ( type === 'boolean' ) {
-      return value === 'true';
-    }
-    else {
-      return value;
-    }
-  }
+  // function coerceType( value, type, name ) {
+  //   if ( type === 'number' ) {
+  //     const coercedValue = Number( value );
 
-  function validateValue( value, type, name ) {
-    if ( type === 'number' ) {
-      assert( !isNaN( Number( value ) ), `Invalid ${ type } for Query Parameter ${ name }: ${ value }` );
-    }
-    else if ( type === 'boolean' ) {
-      assert( value === 'false' || value === 'true', `Invalid ${ type } for Query Parameter ${ name }: ${ value }` );
-    }
+  //     assert( !isNaN( coercedValue ), `invalid number value for ?${ name }: ${ value }` );
+  //     return coercedValue;
+  //   }
+  //   else if ( type === 'boolean' ) {
+
+  //     assert( value === 'true' || value === 'false', `invalid boolean value for ?${ name }: ${ value }` );
+
+  //     return value === 'true';
+  //   }
+  //   else if ( type === 'flag' ) {
+  //     assert( value === null, `value for ?${ name } shouldn't exist: ${ value } for 'flag' parameter types` );
+  //     return true;
+  //   }
+  //   else {
+  //     return value;
+  //   }
+  // }
+
+  /**
+   * Validates a schema. See `QueryParameters.retrieve()` for background.
+   *
+   * This function checks that (annotated in the function):
+   *  1. Schema is a object literal
+   *  2. Each key of schema corresponds to a object literal.
+   *  3. Each object of schema contains a 'type' key with a value in VALID_SCHEMA_TYPES.
+   *  4. Each object of schema that isn't `type: 'flag` has a default value that is the correct type.
+   *  5. Objects of schema with the optional `isValidValue` is a function.
+   *  6. The default value (for not type: flag) passes `isValidValue` (if it exists).
+   *
+   * @param {Object} schema
+   */
+  function validateSchema( schema ) {
+
+    // test 1
+    assert( Object.getPrototypeOf( schema ) === Object.prototype, `invalid schema: ${ schema }` );
+
+    Object.keys( schema ).forEach( name => {
+
+      const object = schema[ name ];
+
+      // test 2
+      assert( Object.getPrototypeOf( object ) === Object.prototype, `invalid object for ?${ name }: ${ object }` );
+
+      // test 3
+      assert( VALID_SCHEMA_TYPES.includes( object.type ), `invalid type for ?${ name }: ${ object.type }` );
+
+      // test 4
+      assert( object.type === 'flag' || typeof object.defaultValue === object.type,
+        `invalid defaultValue for ?${ name }: ${ object.defaultValue }` );
+
+      // test 5
+      assert( !object.isValidValue || typeof object.isValidValue === 'function',
+        `invalid isValidValue for ?${ name }: ${ object.isValidValue }` );
+
+      // test 6
+      assert( !( object.type !== 'flag' && object.isValidValue ) || object.isValidValue( object.defaultValue ),
+        `invalid defaultValue for ?${ name } doesn't pass isValidValue(): ${ object.defaultValue }` );
+    } );
   }
 
   return QueryParameters;
