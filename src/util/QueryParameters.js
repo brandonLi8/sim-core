@@ -121,11 +121,11 @@ define( require => {
 
     /**
      * Gets the value for a single query parameter.
-     * @public
      *
      * IMPORTANT: flag parameter values (no value) will return `null`. Non-existent parameters will return `undefined`.
      *            It is therefore recommended to use `QueryParameters.retrieve` to specify types and get truthy values
      *            for flags.
+     * @public
      *
      * @param {string} name - the query parameter name
      * @returns {*} - query parameter value

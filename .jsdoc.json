@@ -5,19 +5,21 @@
   },
   "source": {
     "include": [ "src" ],
-    "includePattern": ".+\\.js(doc|x)?$",
+    "includePattern": ".js$",
     "excludePattern": "(^|\\/|\\\\)_"
   },
   "plugins": [
     "plugins/markdown"
   ],
   "templates": {
-    "cleverLinks": true,
-    "monospaceLinks": true
+    "cleverLinks": false,
+    "monospaceLinks": true,
+    "useLongnameInNav": false,
+    "showInheritedInNav": true
   },
   "opts": {
     "destination": "docs",
+    "encoding": "utf8",
     "recurse": true,
-    "readme": "README.md"
   }
 }
