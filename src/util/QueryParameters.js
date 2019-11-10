@@ -68,34 +68,34 @@ define( require => {
      *
      * @returns {Object} - parsed into an object literal with the keys as the parameter names.
      */
-    // static retrieve( schema ) {
-    //   // validate the schema
-    //   validateSchema( schema );
+    static retrieve( schema ) {
+      // validate the schema
+      validateSchema( schema );
 
-    //   const queryParametersRetrieved = {}; // the output
+      const queryParametersRetrieved = {}; // the output
 
-    //   //----------------------------------------------------------------------------------------
-    //   // Loop through the schema and retrieve each Query Parameter value.
-    //   Object.keys( schema ).forEach( name => {
+      //----------------------------------------------------------------------------------------
+      // Loop through the schema and retrieve each Query Parameter value.
+      Object.keys( schema ).forEach( name => {
 
-    //     const object = schema[ name ]; // objects of the schema
-    //     const type = object.type; // convenience reference to the type, which has been validated in validateSchema
-    //     const defaultValue = ( type === 'flag') ? false : object.defaultValue; // reference the default value
-    //     const value = this.get( name ); // value parsed from the URI. Undefined if the parameter isn't present.
-    //     const isValidValue = object.isValidValue;
+        const object = schema[ name ]; // objects of the schema
+        const type = object.type; // convenience reference to the type, which has been validated in validateSchema
+        const defaultValue = ( type === 'flag') ? false : object.defaultValue; // reference the default value
+        const value = this.get( name ); // value parsed from the URI. Undefined if the parameter isn't present.
+        const isValidValue = object.isValidValue;
 
-    //     // Correct using the default value if the parameter isn't present in the URI and coercing its type if it is.
-    //     const correctedValue = this.contains( name ) ? coerceType( value, type, name ) : defaultValue;
+        // Correct using the default value if the parameter isn't present in the URI and coercing its type if it is.
+        const correctedValue = this.contains( name ) ? coerceType( value, type, name ) : defaultValue;
 
-    //     // Check that the value is valid if provided.
-    //     assert( !isValidValue || isValidValue( correctedValue ),
-    //       `value ${ correctedValue } for ?${ name } didn't pass isValidValue()` );
+        // Check that the value is valid if provided.
+        assert( !isValidValue || isValidValue( correctedValue ),
+          `value ${ correctedValue } for ?${ name } didn't pass isValidValue()` );
 
-    //     queryParametersRetrieved[ name ] = correctedValue;
-    //   } );
+        queryParametersRetrieved[ name ] = correctedValue;
+      } );
 
-    //   return queryParametersRetrieved;
-    // }
+      return queryParametersRetrieved;
+    }
 
     /**
      * Checks if a query parameter name is apart of the URI.
