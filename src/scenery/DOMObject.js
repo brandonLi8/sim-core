@@ -144,7 +144,7 @@ define( require => {
      * Accessors and ES5 getters of a private property of this DOM object.
      * @public
      *
-     * @return {*} See the property declaration for documentation of the type.
+     * @returns {*} See the property declaration for documentation of the type.
      */
     getElement() { return this._element; }
     getType() { return this._type; }
@@ -174,7 +174,7 @@ define( require => {
      * WILL affect this DOM object. See `addStyle()` for further documentation on this Object.
      * @public
      *
-     * @return {CSSStyleDeclaration}
+     * @returns {CSSStyleDeclaration}
      */
     getStyle() { return this._element.style; }
     get style() { return this.getStyle(); }
@@ -183,7 +183,7 @@ define( require => {
      * Gets a attribute based on its name.
      *
      * @param {string} attribute
-     * @return {*}
+     * @returns {*}
      */
     getAttribute( attribute ) {
       const attributeContainer = this._element.attributes.getNamedItem( attribute );
@@ -200,7 +200,7 @@ define( require => {
      *
      * @param {string} name - the name of the attribute
      * @param {*} value - the value of the attribute
-     * @return {DOMObject} - Returns 'this' reference, for chaining
+     * @returns {DOMObject} - Returns 'this' reference, for chaining
      */
     setAttribute( name, value ) {
       assert( !name || typeof name === 'string', `invalid name: ${ name }` );
@@ -223,7 +223,7 @@ define( require => {
      * Sets the id attribute of this DOMObject. DOMObjects can only have one class at a time.
      *
      * @param {string|null} id - null means no id
-     * @return {DOMObject} - Returns 'this' reference, for chaining
+     * @returns {DOMObject} - Returns 'this' reference, for chaining
      */
     setID( id ) { return this.setAttribute( 'id', id ) }
     set id( id ) { this.setID( id ); }
@@ -233,7 +233,7 @@ define( require => {
      * separating the classes (e.g, setClass( 'class1 class2' )).
      *
      * @param {string|null} class - null means no class
-     * @return {DOMObject} - Returns 'this' reference, for chaining
+     * @returns {DOMObject} - Returns 'this' reference, for chaining
      */
     setClass( className ) { return this.setAttribute( 'class', className ); }
     set class( className ) { this.setClass( className ); }
@@ -242,7 +242,7 @@ define( require => {
      * Sets the 'src' attribute of this DOM object. Errors if this objects type isn't 'img'.
      *
      * @param {string} src
-     * @return {DOMObject} - Returns 'this' reference, for chaining
+     * @returns {DOMObject} - Returns 'this' reference, for chaining
      */
     setSrc( src ) { return this.setAttribute( 'src', src ); }
     set src( src ) { this.setSrc( src ); }
@@ -251,7 +251,7 @@ define( require => {
      * Sets the 'href' attribute of this DOM object. Errors if this objects type isn't 'a'.
      *
      * @param {string} href
-     * @return {DOMObject} - Returns 'this' reference, for chaining
+     * @returns {DOMObject} - Returns 'this' reference, for chaining
      */
     setHref( href ) { return this.setAttribute( 'href', href ); }
     set href( href ) { this.setHref( href ); }
@@ -262,7 +262,7 @@ define( require => {
      * @public
      *
      * @param {string|null} text - if null, nothing is displayed
-     * @return {DOMObject} - Returns 'this' reference, for chaining
+     * @returns {DOMObject} - Returns 'this' reference, for chaining
      */
     setText( text ) {
       assert( !text || typeof text === 'string', `invalid text: ${ text }` );
@@ -280,7 +280,7 @@ define( require => {
      * @public
      *
      * @param {string|null} innerHTML - if null, the innerHTML is set to nothing
-     * @return {DOMObject} - Returns 'this' reference, for chaining
+     * @returns {DOMObject} - Returns 'this' reference, for chaining
      */
     setInnerHTML( innerHTML ) {
       assert( !innerHTML || typeof innerHTML === 'string', `invalid innerHTML: ${ innerHTML }` );
@@ -297,7 +297,7 @@ define( require => {
      * The new child DOMObject will be displayed in front (on top) of all of this DOMObject's other children.
      *
      * @param {DOMObject} child
-     * @return {DOMObject} - Returns 'this' reference, for chaining
+     * @returns {DOMObject} - Returns 'this' reference, for chaining
      */
     addChild( child ) {
       assert( child instanceof DOMObject, `invalid child: ${ child }` );
@@ -316,7 +316,7 @@ define( require => {
      * @public
      *
      * @param {DOMObject[]} children
-     * @return {DOMObject} - Returns 'this' reference, for chaining
+     * @returns {DOMObject} - Returns 'this' reference, for chaining
      */
     setChildren( children ) {
       assert( Array.isArray( children ) && children.every( child => child instanceof DOMobject ),
@@ -333,7 +333,7 @@ define( require => {
      * @public
      *
      * @param {DOMobject} child
-     * @return {DOMobject} - Returns 'this' reference, for chaining
+     * @returns {DOMobject} - Returns 'this' reference, for chaining
      */
     removeChild( child ) {
       assert( this.hasChild( child ), 'Attempted to removeChild with a DOMObject that was not a child.' );
@@ -348,7 +348,7 @@ define( require => {
      * Removes all children from this DOMObject.
      * @public
      *
-     * @return {DOMObject} - Returns 'this' reference, for chaining
+     * @returns {DOMObject} - Returns 'this' reference, for chaining
      */
     removeAllChildren() {
       this._children.forEach( this.removeChild );
@@ -360,7 +360,7 @@ define( require => {
      * @public
      *
      * @param {DOMObject} potentialChild
-     * @return {boolean} - Whether potentialChild is actually our child.
+     * @returns {boolean} - Whether potentialChild is actually our child.
      */
     hasChild( potentialChild ) {
       assert( potentialChild instanceof DOMObject, `invalid potentialChild: ${ potentialChild }` );
@@ -378,7 +378,7 @@ define( require => {
      * Styles that aren't apart of the element's CSS style object will cause an error.
      *
      * @param {Object} style - object literal that describes the styles to override for the element
-     * @return {DOMObject} - Returns 'this' reference, for chaining
+     * @returns {DOMObject} - Returns 'this' reference, for chaining
      */
     addStyle( style ) {
       assert( !style || Object.getPrototypeOf( style ) === Object.prototype, `invalid style object: ${ style }` );
@@ -399,7 +399,7 @@ define( require => {
      * @public
      *
      * @param {Object} style - object literal that describes the attributes. All keys are valid.
-     * @return {DOMObject} - Returns 'this' reference, for chaining
+     * @returns {DOMObject} - Returns 'this' reference, for chaining
      */
     addAttributes( attributes ) {
       assert( !attributes || Object.getPrototypeOf( attributes ) === Object.prototype,

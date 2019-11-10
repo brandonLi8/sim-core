@@ -17,6 +17,7 @@
   },
   "devDependencies": {
     "@brandonli8/grunt-config": "0.0.0-dev.7",
+    "jsdoc": "^3.6.3",
     "truenit": "^0.9.6"
   },
   "dependencies": {

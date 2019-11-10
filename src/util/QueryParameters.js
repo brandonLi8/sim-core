@@ -74,7 +74,7 @@ define( require => {
      *                            and booleans (which will have a built in type checker).
      *                          - Flag types will retrieve `true` if it exists and `false` if it doesn't.
      *
-     * @return {Object} - parsed into an object literal with the keys as the parameter names.
+     * @returns {Object} - parsed into an object literal with the keys as the parameter names.
      */
     static retrieve( schema ) {
       // validate the schema
@@ -110,7 +110,7 @@ define( require => {
      * @public
      *
      * @param {string} name - the query parameter name
-     * @return {boolean}
+     * @returns {boolean}
      */
     static contains( name ) {
       assert( typeof name === 'string', `invalid name ${ name }` );
@@ -128,7 +128,7 @@ define( require => {
      *            for flags.
      *
      * @param {string} name - the query parameter name
-     * @return {*} - query parameter value
+     * @returns {*} - query parameter value
      */
     static get( name ) {
       assert( typeof name === 'string', `invalid name ${ name }` );
@@ -153,7 +153,7 @@ define( require => {
    *  - https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/decodeURIComponent
    *  - https://www.w3schools.com/jsref/prop_loc_search.asp
    *
-   * @return {Object} - parsed into an object literal with the keys as the parameter names.
+   * @returns {Object} - parsed into an object literal with the keys as the parameter names.
    */
   function parseAllQueryParameters() {
 

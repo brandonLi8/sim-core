@@ -16,7 +16,7 @@ define( require => {
     /**
      * @param {number} x - x value
      * @param {number} y - y value
-     * @param {boolean=false} [isImmutable] - determines if the Vector is immutable or not.
+     * @param {boolean} [isImmutable] - determines if the Vector is immutable or not.
      */
     constructor( x, y, isImmutable = false ) {
       assert( typeof x === 'number', `invalid x: ${ x }` );
@@ -36,7 +36,7 @@ define( require => {
      * Getters for the x and y values
      * @public
      *
-     * @return {number}
+     * @returns {number}
      */
     get x() { return this._x; }
     get y() { return this._y; }
@@ -45,7 +45,7 @@ define( require => {
      * Gets the magnitude of this Vector.
      * @public
      *
-     * @return {number}
+     * @returns {number}
      */
     getMagnitude() {
       return Math.sqrt( this._x * this._x + this._y * this._y );
@@ -60,7 +60,7 @@ define( require => {
      *
      * @param {number} x
      * @param {number} y
-     * @return {number}
+     * @returns {number}
      */
     distanceToXY( x, y ) {
       assert( typeof x === 'number', `invalid x: ${ x }` );
@@ -73,7 +73,7 @@ define( require => {
      * @public
      *
      * @param {Vector} point
-     * @return {number}
+     * @returns {number}
      */
     distanceTo( point ) {
       assert( point instanceof Vector, `invalid point: ${ point }` );
@@ -85,7 +85,7 @@ define( require => {
      * @public
      *
      * @param {Vector} vector
-     * @return {boolean}
+     * @returns {boolean}
      */
     equals( vector ) {
       assert( vector instanceof Vector, `invalid vector: ${ vector }` );
@@ -98,7 +98,7 @@ define( require => {
      *
      * @param {Vector} other
      * @param {number} [epsilon]
-     * @return {boolean} - if the other vector is within epsilon distance
+     * @returns {boolean} - if the other vector is within epsilon distance
      */
     equalsEpsilon( other, epsilon=0.00005 ) {
       assert( other instanceof Vector && typeof epsilon === 'number' );
@@ -109,7 +109,7 @@ define( require => {
      * Checks if the Vector is finite
      * @public
      *
-     * @return {boolean}
+     * @returns {boolean}
      */
     isFinite() {
       return isFinite( this._x ) && isFinite( this._y );
@@ -119,8 +119,8 @@ define( require => {
      * Creates a copy of this Vector.
      * @public
      *
-     * @param {boolean = false} [isCopyImmutable] determines if the copy is immutable or not
-     * @return {Vector2}
+     * @param {boolean} [isCopyImmutable] determines if the copy is immutable or not
+     * @returns {Vector2}
      */
     copy( isCopyImmutable = false ) {
       return new Vector( this._x, this._y, isCopyImmutable );
@@ -130,7 +130,7 @@ define( require => {
      * Debugging string for the Vector.
      * @public
      *
-     * @return {string}
+     * @returns {string}
      */
     toString() {
       return `<${ this._x }, ${ this._y }>`;
@@ -145,7 +145,7 @@ define( require => {
      * @public
      *
      * @param {number} x
-     * @return {Vector} - for chaining
+     * @returns {Vector} - for chaining
      */
     setX( x ) {
       assert( this._isImmutable === false, 'cannot mutate a mutable' );
@@ -159,7 +159,7 @@ define( require => {
      * @public
      *
      * @param {number} y
-     * @return {Vector} - for chaining
+     * @returns {Vector} - for chaining
      */
     setY( y ) {
       assert( this._isImmutable === false, 'cannot mutate a mutable' );
@@ -173,7 +173,7 @@ define( require => {
      * @public
      *
      * @param {Vector} vector
-     * @return {Vector} - for chaining
+     * @returns {Vector} - for chaining
      */
     set( vector ) {
       assert( this._isImmutable === false, 'cannot mutate a mutable' );
@@ -186,7 +186,7 @@ define( require => {
      * @public
      *
      * @param {number} scalar
-     * @return {Vector} - for chaining
+     * @returns {Vector} - for chaining
      */
     multiply( scalar ) {
       assert( this._isImmutable === false, 'cannot mutate a mutable' );
@@ -199,7 +199,7 @@ define( require => {
      * @public
      *
      * @param {number} scalar
-     * @return {Vector} - for chaining
+     * @returns {Vector} - for chaining
      */
     divide( scalar ) {
       return this.multiply( 1 / scalar );
@@ -211,7 +211,7 @@ define( require => {
      *
      * @param {number} x
      * @param {number} y
-     * @return {Vector} - for chaining
+     * @returns {Vector} - for chaining
      */
     addXY( x, y ) {
       assert( this._isImmutable === false, 'cannot mutate a mutable' );
@@ -226,7 +226,7 @@ define( require => {
      * @public
      *
      * @param {Vector} vector
-     * @return {Vector} - for chaining
+     * @returns {Vector} - for chaining
      */
     add( vector ) {
       assert( vector instanceof Vector, `invalid vector: ${ vector }` );
@@ -239,7 +239,7 @@ define( require => {
      *
      * @param {number} x
      * @param {number} y
-     * @return {Vector} - for chaining
+     * @returns {Vector} - for chaining
      */
     subtractXY( x, y ) {
       assert( this._isImmutable === false, 'cannot mutate a mutable' );
@@ -254,7 +254,7 @@ define( require => {
      * @public
      *
      * @param {Vector} vector
-     * @return {Vector} - for chaining
+     * @returns {Vector} - for chaining
      */
     subtract( vector ) {
       assert( vector instanceof Vector, `invalid vector: ${ vector }` );
@@ -266,7 +266,7 @@ define( require => {
      * copy() and normalize that Vector.
      * @public
      *
-     * @return {Vector2}
+     * @returns {Vector2}
      */
     normalize() {
       const magnitude = this.magnitude;
