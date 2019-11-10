@@ -2,34 +2,44 @@
 
 /**
  * Query Parameter parser that retrieves and/or validates a set of Query Parameters.
+ * Supports type coercion, defaults, error checking, types. etc.
  *
  * ## Background:
- *  - The Query Component of a URI is indicated by the first `?`, followed by parameters, which are separated by a '&'.
- *    For instance, `https://example.com?dev&bar1=5&bar2` would yield three query parameters: `dev`, `bar1=5`, `bar2`.
+ *  - The Query Component of a URI is indicated by the first ?, followed by the parameters, which are separated by &s.
+ *    For instance, https://example.com?dev&bar1=5&bar2=true would yield three query parameters: dev, bar1=5, bar2=true.
  *
  * ## Usage
- *  - To see if a parameter was provided, use `QueryParemeters.contains()`. In the case above,
- *    `QueryParameters.contains( 'dev' )` would return `true`.
- *
- *  - To get the value of a query parameter, use `QueryParameters.get()`. In the case above,
- *    `QueryParameters.get( 'bar1' )` would return `5`.
- *
- *  - For validating values and providing a default value, use `QueryParameters.retrieve()`.
- *    For instance, in the case above,
- *      `QueryParameters.retrieve( {
- *          bar1: {
- *            type: 'number',
- *            isValidValue: value => ( value >= 0 ),
- *            defaultValue: 0
- *          },
- *          dev: {
- *            type: 'flag'
- *          }
- *          ... // add as many parameters as you want
+ *  - The main method of this module is QueryParameters.retrieve(). It validates values, provides a default value,
+ *    and coerces the values to different types. For instance, in the case above,
+ *      QueryParameters.retrieve( {
+ *         bar1: {
+ *           type: 'number',                         // checks values are numbers. See VALID_SCHEMA_TYPES.
+ *           isValidValue: value => ( value >= 0 ),  // validator that is called to validate numbers.
+ *           defaultValue: 0                         // default value if the query parameter isn't present in the URI.
+ *         },
+ *         dev: {
+ *           type: 'flag'                            // checks for presence of ?dev. Values (like ?dev=8) error out.
+ *         },
+ *         otherBar: {
+ *           type: 'string',
+ *           defaultValue: 'value'
+ *         }
+ *         // ... add as many as you want.
  *      } );`
- *    would return an object of the values. See `QueryParameters.retrieve()` for further documentation.
+ *    would return: {
+ *      bar1: 5,           // coerced as a number type. 5 because ?bar1=5 is present in the URI.
+ *      dev: true,         // coerced as a boolean type. true because ?dev is present in the URI.
+ *      otherBar: 'value'  // uses the default since ?otherBar isn't present in the URI
+ *    }
+ *    See QueryParameters.retrieve() for further documentation.
  *
- * NOTE: if a query parameter is present multiple times in the Query Component, the value will be the latest declared,
+ *  - You can also check if a parameter is present with QueryParameters.contains(). In the case above,
+ *    QueryParameters.contains( 'dev' ) would return true but QueryParameters.contains( 'count' ) would return false.
+ *
+ *  - To get the non-coerced exact value of a query parameter, use QueryParameters.get(). In the case above,
+ *    QueryParameters.get( 'bar2' ) would return 'true' as a string.
+ *
+ * NOTE: if a query parameter is present multiple times in the Query Component, the value would be the latest declared,
  *       or the furthest to the right.
  */
 
