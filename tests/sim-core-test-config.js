@@ -17,7 +17,7 @@ module.exports = ( () => {
 
   requirejs.config( {
 
-    deps: [ 'TESTS/sim-core-test-main', 'SIM_CORE/sim-core-main' ],
+    deps: [ 'TESTS/sim-core-test-main' ],
 
     nodeRequire: require,
 

@@ -1,7 +1,15 @@
 // Copyright © 2019 Brandon Li. All rights reserved.
 
 /**
- * A sim-specific Display, for rendering the scene graph. Generate a 'root' Node that connects to the HTML
+ * A Screen represents different sections of the simulation.
+ *
+ * When creating a new Sim, instances of Screens are supplied as the arguments.
+ *
+ * Screens are responsible for:
+ *  - generate a 'root' Node that connects t
+ *
+
+ * A Screen, for rendering the scene graph. Generate a 'root' Node that connects to the HTML
  * Body element and scales with the window size to maintain a sim-screen ratio.
  *
  * A standard way of making a Simulation is:

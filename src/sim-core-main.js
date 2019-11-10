@@ -10,20 +10,21 @@
  * @author Brandon Li <brandon.li820@gmail.com>
  */
 
-define( [
+// define( [
 
-  'SIM_CORE/util/assert',
-  'SIM_CORE/util/Vector',
-  'SIM_CORE/scenery/DOMObject',
-  'SIM_CORE/Node',
-  'SIM_CORE/scenery/Screen',
+//   'SIM_CORE/util/assert',
+//   'SIM_CORE/util/Vector',
+//   'SIM_CORE/scenery/DOMObject',
+//   'SIM_CORE/scenery/Node',
+//   'SIM_CORE/scenery/Screen',
+//   'SIM_CORE/Sim',
 
-  'SIM_CORE/Loader'
+//   'SIM_CORE/Loader'
 
 
 
-], simCoreDependency => {
-  'use strict';
+// ], simCoreDependency => {
+//   'use strict';
 
-  return simCoreDependency;
-} );
+//   return simCoreDependency;
+// } );

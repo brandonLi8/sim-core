@@ -53,12 +53,10 @@ define( require => {
   const PARSED_QUERY_PARAMETERS = parseAllQueryParameters();
   const VALID_SCHEMA_TYPES = [ 'flag', 'boolean', 'number', 'string' ];
 
-  //----------------------------------------------------------------------------------------
-
   class QueryParameters {
 
     /**
-     * Retrieves, validates, and coerces a set of values based on a schema. See the doc string for context.
+     * Retrieves, validates, and coerces a set of values based on a schema. See the top comments for context.
      * @public
      *
      * @param {Object} schema - Schema that contains the set of values to retrieve. For instance,
@@ -76,7 +74,7 @@ define( require => {
      *                            and booleans (which will have a built in type checker).
      *                          - Flag types will retrieve `true` if it exists and `false` if it doesn't.
      *
-     * @returns {Object} - parsed into an object literal with the keys as the parameter names.
+     * @return {Object} - parsed into an object literal with the keys as the parameter names.
      */
     static retrieve( schema ) {
       // validate the schema
@@ -112,7 +110,7 @@ define( require => {
      * @public
      *
      * @param {string} name - the query parameter name
-     * @returns {boolean}
+     * @return {boolean}
      */
     static contains( name ) {
       assert( typeof name === 'string', `invalid name ${ name }` );
@@ -130,7 +128,7 @@ define( require => {
      *            for flags.
      *
      * @param {string} name - the query parameter name
-     * @returns {*} - query parameter value
+     * @return {*} - query parameter value
      */
     static get( name ) {
       assert( typeof name === 'string', `invalid name ${ name }` );
@@ -155,7 +153,7 @@ define( require => {
    *  - https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/decodeURIComponent
    *  - https://www.w3schools.com/jsref/prop_loc_search.asp
    *
-   * @returns {Object} - parsed into an object literal with the keys as the parameter names.
+   * @return {Object} - parsed into an object literal with the keys as the parameter names.
    */
   function parseAllQueryParameters() {
 

@@ -10,7 +10,6 @@ define( require => {
 
   const Node = require( 'SIM_CORE/scenery/DOMobject' );
 
-
   class Loader {
 
     constructor() {
