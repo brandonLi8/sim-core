@@ -8,7 +8,7 @@
 define( require => {
   'use strict';
 
-  const Node = require( 'SIM_CORE/scenery/DOMobject' );
+  const Node = require( 'SIM_CORE/display/DOMobject' );
 
   class Loader {
 
