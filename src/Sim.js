@@ -16,23 +16,23 @@ define( require => {
   const Node = require( 'SIM_CORE/scenery/Node' );
   const QueryParameters = require( 'SIM_CORE/util/QueryParameters' );
 
+  // constants
+  const SIM_CORE_QUERY_PARAMETERS = QueryParameters.retrieve( {
+    ea: {
+      type: 'flag'
+    }
+
+  } );
+
+
   class Sim {
-    constructor( f ) {
-      console.log( QueryParameters.retrieve( {
+    constructor() {
 
-        dev: {
-          type: 'flag'
-        },
-
-        ea: {
-          type: 'string',
-          defaultValue: 'hello',
-          isValidValue: value => ( true )
-        }
+      // initialize the query parameter functionality
+      if ( SIM_CORE_QUERY_PARAMETERS.ea ) assert.enableAssertions();
 
 
-
-      } ) )
+      const loader = new Loader();
 
 
     }

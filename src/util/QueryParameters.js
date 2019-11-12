@@ -47,7 +47,7 @@ define( require => {
   'use strict';
 
   // modules
-  const assert = require( 'SIM_CORE/util/assert' );
+  const assert = require( 'SIM_CORE/util/assert' ).always;
 
   // constants
   const PARSED_QUERY_PARAMETERS = parseAllQueryParameters();

@@ -301,9 +301,9 @@ define( require => {
      */
     addChild( child ) {
       assert( child instanceof DOMObject, `invalid child: ${ child }` );
-      assert( this.hasChild( child ), 'cannot add child that is already a child.' );
-      assert( node !== this, 'cannot add self as a child' );
-      assert( !node._isDisposed, 'Tried to add a disposed Node' );
+      assert( !this.hasChild( child ), 'cannot add child that is already a child.' );
+      assert( child !== this, 'cannot add self as a child' );
+      assert( !child._isDisposed, 'Tried to add a disposed Node' );
 
       this._children.push( child );
       child._parent = this;
@@ -364,8 +364,7 @@ define( require => {
      */
     hasChild( potentialChild ) {
       assert( potentialChild instanceof DOMObject, `invalid potentialChild: ${ potentialChild }` );
-      assert( potentialChild.parent === this, 'child-parent reference should match parent-child reference' );
-      return this._children.includes( potentialChild );
+      return this._children.includes( potentialChild ) && potentialChild.parent === this;
     }
 
     /**

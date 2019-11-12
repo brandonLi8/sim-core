@@ -135,7 +135,7 @@ define( require => {
 
       })
 
-      // loaderNode.addChildren( loader.addChildren( inner, outer ) );
+      loaderNode.addChild( loader.addChild( inner ).addChild( outer ) );
     }
 
   }
