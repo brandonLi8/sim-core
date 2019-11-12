@@ -1,12 +1,14 @@
 // Copyright © 2019 Brandon Li. All rights reserved.
-
 /* eslint no-console: 0 */
 
 /**
  * A basic Assertion module for sim development.
  *
+ * NOTE: assertions will only error with `?ea`. See `../Sim.js` for details.
+ *
  * @author Brandon Li <brandon.li820@gmail.com>
  */
+
 define( require => {
   'use strict';
 
@@ -34,7 +36,8 @@ define( require => {
   //----------------------------------------------------------------------------------------
 
   /**
-   * Main Assertion Function. Only throws an error if assertionsEnabled is true. See `assert.enableAssertions()`.
+   * Main Assertion Function (the export). Only throws an error if assertionsEnabled is true.
+   * See `assert.enableAssertions()`.
    * @public
    *
    * @param {boolean} predicate - only throws and error if the not truthy.
