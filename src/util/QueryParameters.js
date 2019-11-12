@@ -108,7 +108,7 @@ define( require => {
     /**
      * Checks if a query parameter name is apart of the URI.
      * @public
-     *
+     * @static
      * @param {string} name - the query parameter name
      * @returns {boolean}
      */
