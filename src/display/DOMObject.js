@@ -63,7 +63,8 @@ define( require => {
           left: 0,
           top: 0,
           padding: 0,
-          margin: 0
+          margin: 0,
+          position: 'relative'
         },
 
         // {string|null} - if not null, adds a text string that the object displays. See `setText()` for documentation.

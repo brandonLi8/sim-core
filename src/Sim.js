@@ -15,13 +15,13 @@ define( require => {
   const Loader = require( 'SIM_CORE/launch/loader' );
   const Node = require( 'SIM_CORE/scenery/Node' );
   const QueryParameters = require( 'SIM_CORE/util/QueryParameters' );
+  const Display = require( 'SIM_CORE/display/Display' );
 
   // constants
   const SIM_CORE_QUERY_PARAMETERS = QueryParameters.retrieve( {
     ea: {
       type: 'flag'
     }
-
   } );
 
 
@@ -31,9 +31,9 @@ define( require => {
       // initialize the query parameter functionality
       if ( SIM_CORE_QUERY_PARAMETERS.ea ) assert.enableAssertions();
 
+      const display = new Display();
 
-      const loader = new Loader();
-
+      const loader = new Loader( display );
 
     }
   }

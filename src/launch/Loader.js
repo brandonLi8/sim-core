@@ -8,83 +8,44 @@
 define( require => {
   'use strict';
 
-  // const Node = require( 'SIM_CORE/display/DOMobject' );
-  const Display = require( 'SIM_CORE/display/Display' );
+  const DOMobject = require( 'SIM_CORE/display/DOMobject' );
 
-  class Loader {
+  class Loader extends DOMobject {
 
-    constructor() {
+    constructor( display ) {
 
-      const display = new Display();
-      // // @private {DOM} the body node
-      // this.bodyNode = document.getElementsByTagName( "body" )[ 0 ];
-      // // @private {DOM} the html node ( this is the true root )
-      // this.htmlNode = document.getElementsByTagName( "html" )[ 0 ];
+      super( {
 
+        text: 'ere',
+        style: {
+          background: 'rgb( 15, 15, 15 )',
+          height: '100%'
+        }
 
-      // function setStyle( node, style ) {
-      //   let keys = Object.keys( style );
-      //   for ( var i = 0; i < keys.length; i++ ){
-      //     node.style[ keys[ i ] ] = style[ keys[ i ] ];
-      //   }
-      // }
+      } );
 
-      // setStyle( this.htmlNode, {
-      //   maxWidth: "100%",
-      //   maxHeight: "100%",
-
-      //   overflow: "hidden",
-
-      //   height: "100%",
-      //   width: "100%",
-      //   position: "relative",
-      //   margin: "0",
-      //   padding: "0",
-      //   background: "rgb( 238 , 239 , 241 )"
-      // } );
-
-      // setStyle( this.bodyNode, {
-      //   maxWidth: "100%",
-      //   overflow: "hidden",
-      //   height: "100%",
-      //   maxHeight: "100%",
-      //   maxWidth: "100%",
-      //   background: "none",
-      //   padding: "0",
-      //   margin: "0",
-      //   lineHeight: "1.5",
-      //   color: "#333",
-      //   userSelect: "none",
-      //   width: "100%",
-      //   position: "relative",
-      //   margin: "0",
-      //   padding: "0"
-      // } )
+      display.addChild( this )
 
 
-      // const loaderNode = new Node( {
 
-      //   text: 'ere',
-      //   style: {
-      //     left: '0px',
-      //     top: '0px',
-      //     'transform-origin': '0 0',
-      //     height: '100%',
-      //     display: 'flex',
-      //     'align-items': 'center',
-      //     'align-content': 'center',
-      //     'flex-direction': 'column',
-      //     'justify-content': 'center',
-      //     border: '2px solidired'
-      //   },
-      //   attributes: {
-      //     width: "60px",
-      //     height: "60px",
-      //     viewBox: "0 0 80 80",
-      //     "shape-rendering": "geometricPrecision",
-      //   }
-      // } );
-
+        // style: {
+        //   left: '0px',
+        //   top: '0px',
+        //   'transform-origin': '0 0',
+        //   height: '100%',
+        //   display: 'flex',
+        //   'align-items': 'center',
+        //   'align-content': 'center',
+        //   'flex-direction': 'column',
+        //   'justify-content': 'center',
+        //   border: '2px solidired'
+        // },
+        // attributes: {
+        //   width: "60px",
+        //   height: "60px",
+        //   viewBox: "0 0 80 80",
+        //   "shape-rendering": "geometricPrecision",
+        // }
 
 
       // this.bodyNode.appendChild( loaderNode._element );

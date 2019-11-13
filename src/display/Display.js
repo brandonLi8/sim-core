@@ -44,11 +44,11 @@ define( require => {
         type: 'div',
 
         style: {
-          border: '2px solid red',
-          height: '100%'
+          height: '100%',
+          position: 'relative'
         },
 
-        id: 'Display',
+        id: 'display',
         ...options
       };
 
@@ -65,6 +65,7 @@ define( require => {
 
       // connect this object to the Body object.
       this.bodyObject.appendChild( this.element );
+      this._parent = this.bodyObject;
 
 
       //----------------------------------------------------------------------------------------
