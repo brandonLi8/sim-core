@@ -115,7 +115,7 @@ define( require => {
       // @private {HTMLElement} (final) - the actual DOM object. See `getElement()` for read access.
       this._element = document.createElement( this._type );
 
-      // @private {HTMLTestNode} (final) - the text node of the DOM object.
+      // @private {HTMLTextNode} (final) - the text node of the DOM object.
       this._textNode = document.createTextNode( this._text || '' );
       this._element.appendChild( this._textNode );
 
@@ -132,7 +132,7 @@ define( require => {
       this.setText( this._text );            // validates options.text and sets the text.
       this.setSrc( this._src );              // validates options.src and sets the src only if this._type is a image.
       this.setHref( this._href );            // validates options.href and sets the href only if this._type is a link.
-      this.setInnerHTML( this._innerHTML );  // validates options.innerHTML and sets the inner HTML.
+      this._innerHTML && this.setInnerHTML( this._innerHTML );  // validates options.innerHTML and sets the inner HTML.
       this.setChildren( this._children );    // validates options.children and sets the children.
     }
 
@@ -267,7 +267,7 @@ define( require => {
     setText( text ) {
       assert( !text || typeof text === 'string', `invalid text: ${ text }` );
       this._text = text;
-      this._textNode.nodeValue = this._text || '';
+      this._textNode.nodeValue = this._text;
       return this;
     }
     set text( text ) { this.setText( text ); }
