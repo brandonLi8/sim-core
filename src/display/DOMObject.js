@@ -56,7 +56,7 @@ define( require => {
         // {string} - a namespace URI - see https://developer.mozilla.org/en-US/docs/Web/API/Document/createElementNS.
         //            If not provided (or null), `document.createElement()` will be used.
         //            Otherwise, `document.createElementNS( options.namespace )` will be used (usually for svg).
-        nameSpace: null,
+        namespace: null,
 
         // {Object} - object literal that describes its CSS style. See `addStyle()` for full documentation.
         style: {
@@ -113,8 +113,14 @@ define( require => {
       // @private {boolean} - indicates if this DOMObject has been disposed. See `dispose()`.
       this._isDisposed = false;
 
-      // @private {HTMLElement} (final) - the actual DOM object. See `getElement()` for read access.
-      this._element = document.createElement( this._type );
+      if ( !options.namespace ) {
+        // @private {HTMLElement} (final) - the actual DOM object. See `getElement()` for read access.
+        this._element = document.createElement( this._type );
+      }
+      else {
+        assert( typeof options.namespace === 'string', `invalid namespace: ${ options.namespace }` )
+        this._element = document.createElementNS( options.namespace, this._type );
+      }
 
       // @private {HTMLTextNode} (final) - the text node of the DOM object.
       this._textNode = document.createTextNode( this._text || '' );
