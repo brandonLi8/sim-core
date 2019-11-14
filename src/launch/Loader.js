@@ -1,6 +1,10 @@
 // Copyright © 2019 Brandon Li. All rights reserved.
 
 /**
+ * A DOMObject that displays a loading page and loads all the images of the simulation.
+ *
+ * Uses registered images from the global window object (see ../util/image-plugin) and loads all images synchronously.
+ * Shows a progress in a loading circle bar to show the progress of loading images.
  *
  * @author Brandon Li <brandon.li820@gmail.com>
  */
@@ -8,12 +12,18 @@
 define( require => {
   'use strict';
 
-  const DOMObject = require( 'SIM_CORE/display/DOMObject' );
+  // modules
   const assert = require( 'SIM_CORE/util/assert' );
+  const DOMObject = require( 'SIM_CORE/display/DOMObject' );
 
   class Loader extends DOMObject {
 
-    constructor( display ) {
+    /**
+     * variable
+     *
+     * @
+     */
+    constructor( options ) {
 
       super( {
 
@@ -23,7 +33,9 @@ define( require => {
           height: '100%'
         },
 
-        id: 'loader'
+        id: 'loader',
+
+        ...options
       } );
 
 
@@ -47,7 +59,7 @@ define( require => {
             image.element.onload = () => {
               loadedImages++;
               if ( loadedImages === window.simImages.length ) {
-                assert( isImageOK( image.element ), `error while loading image`)
+                assert( isImageOK( image.element ), `error while loading image` )
                 console.log( 'done')
               }
             }
