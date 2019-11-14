@@ -9,6 +9,7 @@ define( require => {
   'use strict';
 
   const DOMObject = require( 'SIM_CORE/display/DOMObject' );
+  const assert = require( 'SIM_CORE/util/assert' );
 
   class Loader extends DOMObject {
 
@@ -25,7 +26,36 @@ define( require => {
         id: 'loader'
       } );
 
-      console.log( window.simImages )
+
+      let loadedImages = 0;
+      if ( window.simImages ) {
+
+        window.simImages.forEach( other => {
+
+          const image = other.image;
+          const imagePath = other.src;
+
+          image.src = imagePath;
+
+          if ( isImageOK( image.element ) ) {
+            loadedImages++;
+            if ( loadedImages === window.simImages.length ) {
+              console.log( 'done here')
+            }
+          }
+          else {
+            image.element.onload = () => {
+              loadedImages++;
+              if ( loadedImages === window.simImages.length ) {
+                assert( isImageOK( image.element ), `error while loading image`)
+                console.log( 'done')
+              }
+            }
+          }
+        } );
+      }
+
+
 
         // style: {
         //   left: '0px',
@@ -101,6 +131,28 @@ define( require => {
       // loaderNode.addChild( loader.addChild( inner ).addChild( outer ) );
     }
 
+  }
+
+
+  // Taken from http://stackoverflow.com/questions/1977871/check-if-an-image-is-loaded-no-errors-in-javascript
+  function isImageOK( img ) {
+
+    // During the onload event, IE correctly identifies any images that
+    // weren't downloaded as not complete. Others should too. Gecko-based
+    // browsers act like NS4 in that they report this incorrectly.
+    if ( !img.complete ) {
+      return false;
+    }
+
+    // However, they do have two very useful properties: naturalWidth and
+    // naturalHeight. These give the true size of the image. If it failed
+    // to load, either of these should be zero.
+    if ( typeof img.naturalWidth !== 'undefined' && img.naturalWidth === 0 ) {
+      return false;
+    }
+
+    // No other way of checking: assume it’s ok.
+    return true;
   }
 
   return Loader;
