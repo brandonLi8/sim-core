@@ -268,7 +268,7 @@ define( require => {
     setText( text ) {
       assert( !text || typeof text === 'string', `invalid text: ${ text }` );
       this._text = text;
-      this._textNode.nodeValue = this._text;
+      this._textNode.innerHTML = this._text;
       return this;
     }
     set text( text ) { this.setText( text ); }
@@ -304,7 +304,7 @@ define( require => {
       assert( child instanceof DOMObject, `invalid child: ${ child }` );
       assert( !this.hasChild( child ), 'cannot add child that is already a child.' );
       assert( child !== this, 'cannot add self as a child' );
-      assert( !child._isDisposed, 'Tried to add a disposed Node' );
+      assert( !child._isDisposed, 'Tried to add a disposed DOMObject' );
 
       this._children.push( child );
       child._parent = this;
@@ -320,7 +320,7 @@ define( require => {
      * @returns {DOMObject} - Returns 'this' reference, for chaining
      */
     setChildren( children ) {
-      assert( Array.isArray( children ) && children.every( child => child instanceof DOMobject ),
+      assert( Array.isArray( children ) && children.every( child => child instanceof DOMObject ),
         `invalid children: ${ children }` );
 
       this.removeAllChildren();
@@ -333,8 +333,8 @@ define( require => {
      * our children.
      * @public
      *
-     * @param {DOMobject} child
-     * @returns {DOMobject} - Returns 'this' reference, for chaining
+     * @param {DOMObject} child
+     * @returns {DOMObject} - Returns 'this' reference, for chaining
      */
     removeChild( child ) {
       assert( this.hasChild( child ), 'Attempted to removeChild with a DOMObject that was not a child.' );

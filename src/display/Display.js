@@ -17,7 +17,7 @@ define( require => {
 
   // modules
   const assert = require( 'SIM_CORE/util/assert' );
-  const DOMObject = require( 'SIM_CORE/display/DOMobject' );
+  const DOMObject = require( 'SIM_CORE/display/DOMObject' );
 
   // constants
 

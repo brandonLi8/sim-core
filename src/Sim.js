@@ -16,11 +16,8 @@ define( require => {
   const Node = require( 'SIM_CORE/scenery/Node' );
   const QueryParameters = require( 'SIM_CORE/util/QueryParameters' );
   const Display = require( 'SIM_CORE/display/Display' );
+  const DOMObject = require( 'SIM_CORE/display/DOMObject' );
 
-  // images
-  const test = require( 'image!SIM_CORE/pauseButton.png' );
-
-  console.log( test )
   // constants
   const SIM_CORE_QUERY_PARAMETERS = QueryParameters.retrieve( {
     ea: {
@@ -30,7 +27,7 @@ define( require => {
 
 
   class Sim {
-    constructor() {
+    constructor( test ) {
 
       // initialize the query parameter functionality
       if ( SIM_CORE_QUERY_PARAMETERS.ea ) assert.enableAssertions();
@@ -40,8 +37,12 @@ define( require => {
 
 
       const display = new Display();
+      const loader = new Loader();
 
-      const loader = new Loader( display );
+      display.addChild( loader );
+      loader.addChild( test )
+
+
 
     }
   }
