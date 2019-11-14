@@ -108,7 +108,7 @@ define( require => {
       this._href = options.href;
       this._text = options.text;
       this._innerHTML = options.innerHTML;
-      this._children = options.children;
+      this._children = [];
 
       // @private {boolean} - indicates if this DOMObject has been disposed. See `dispose()`.
       this._isDisposed = false;
@@ -134,7 +134,7 @@ define( require => {
       this.setSrc( this._src );              // validates options.src and sets the src only if this._type is a image.
       this.setHref( this._href );            // validates options.href and sets the href only if this._type is a link.
       this._innerHTML && this.setInnerHTML( this._innerHTML );  // validates options.innerHTML and sets the inner HTML.
-      this.setChildren( this._children );    // validates options.children and sets the children.
+      this.setChildren( options.children );  // validates options.children and sets the children.
     }
 
     //========================================================================================
@@ -324,7 +324,8 @@ define( require => {
         `invalid children: ${ children }` );
 
       this.removeAllChildren();
-      children.forEach( this.addChild );
+      this._children = children;
+      children.forEach( child => this.addChild( child ) );
       return this;
     }
 
