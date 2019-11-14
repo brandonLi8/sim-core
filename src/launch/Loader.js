@@ -8,9 +8,9 @@
 define( require => {
   'use strict';
 
-  const DOMobject = require( 'SIM_CORE/display/DOMobject' );
+  const DOMObject = require( 'SIM_CORE/display/DOMObject' );
 
-  class Loader extends DOMobject {
+  class Loader extends DOMObject {
 
     constructor( display ) {
 
@@ -20,13 +20,12 @@ define( require => {
         style: {
           background: 'rgb( 15, 15, 15 )',
           height: '100%'
-        }
+        },
 
+        id: 'loader'
       } );
 
-      display.addChild( this )
-
-
+      console.log( window.simImages )
 
         // style: {
         //   left: '0px',
