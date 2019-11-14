@@ -38,7 +38,6 @@ define( require => {
   // modules
   const DOMObject = require( 'SIM_CORE/display/DOMObject' );
 
-
   return {
 
     /**
@@ -73,9 +72,18 @@ define( require => {
         throw new Error( `invalid image src: ${ image.element.src }` );
       };
 
+      //----------------------------------------------------------------------------------------
+      // Register the image into the global window object. To be loaded in `loader.js`.
+      if ( !window.simImages ) {
+        window.simImages = [];
+      }
+      window.simImages.push( image );
+
+      //----------------------------------------------------------------------------------------
       // Set the src of the image.
       image.src = imageSrc;
 
+      // Tell requirejs to export the image.
       onload( image );
     }
   };

@@ -17,6 +17,10 @@ define( require => {
   const QueryParameters = require( 'SIM_CORE/util/QueryParameters' );
   const Display = require( 'SIM_CORE/display/Display' );
 
+  // images
+  const test = require( 'image!SIM_CORE/pauseButton.png' );
+
+  console.log( test )
   // constants
   const SIM_CORE_QUERY_PARAMETERS = QueryParameters.retrieve( {
     ea: {
@@ -30,6 +34,10 @@ define( require => {
 
       // initialize the query parameter functionality
       if ( SIM_CORE_QUERY_PARAMETERS.ea ) assert.enableAssertions();
+
+
+
+
 
       const display = new Display();
 
