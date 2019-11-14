@@ -75,13 +75,9 @@ define( require => {
       //----------------------------------------------------------------------------------------
       // Register the image into the global window object. To be loaded in `loader.js`.
       if ( !window.simImages ) {
-        window.simImages = [];
+        window.simImages = {};
       }
-      window.simImages.push( image );
-
-      //----------------------------------------------------------------------------------------
-      // Set the src of the image.
-      image.src = imageSrc;
+      window.simImages[ image ] = imageSrc;
 
       // Tell requirejs to export the image.
       onload( image );
