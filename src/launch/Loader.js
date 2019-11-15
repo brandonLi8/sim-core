@@ -25,7 +25,11 @@ define( require => {
 
   // constants
   const XML_NAMESPACE = 'http://www.w3.org/2000/svg';
-  const LOADER_CIRCLE_STROKE_WIDTH = 6; // in pixels
+  const LOADER_STROKE_WIDTH = 8; // in percentage of the loader circle radius
+  const LOADER_CIRCLE_SIZE = '15%'; // percentage of the window width
+  const LOADER_CIRCLE_MAX_SIZE = 110; // in pixels, the largest possible loader circle
+  const LOADER_CIRCLE_MIN_SIZE = 95; // in pixels, the smallest loader circle
+  const LOADER_CIRCLE_COLOR = '#2974b2';
 
   class Loader extends DOMObject {
 
@@ -37,7 +41,7 @@ define( require => {
     constructor( options ) {
 
       if ( options ) {
-        // changes to the API means excluding some of the options.
+        // Changes to the API means excluding some of the options.
         assert( Object.getPrototypeOf( options ) === Object.prototype, `Extra prototype on Options: ${ options }` );
         assert( !options.style, 'Loader sets options.style.' );
         assert( !options.type, 'Loader sets options.type.' );
@@ -46,71 +50,87 @@ define( require => {
         assert( !options.children, 'Loader sets children.' );
       }
 
+      // Set the options
       options = {
         id: 'loader',
+
         style: {
           background: 'rgb( 15, 15, 15 )',
-          height: '100%'
+          height: '100%',
+          display: 'flex', // use a centered flex box to center the loader
+          'align-items': 'center',
+          'justify-content': 'center',
+          border: '2px solid red'
         },
+
         ...options
       };
 
       //----------------------------------------------------------------------------------------
-      // Create the Loader content DOM using SVG.
-      // See https://developer.mozilla.org/en-US/docs/Web/SVG/Element/svg
+      // Create the loader progress circle container using an SVG DOMObject.
+      // See https://developer.mozilla.org/en-US/docs/Web/SVG/Element/svg for more details.
 
-      // Create the container of the loader circles
       const loaderCircleContainer = new DOMObject( {
         type: 'svg',
         namespace: XML_NAMESPACE,
         attributes: {
-          viewBox: '0 0 100 100', // Create a relative unit in terms of percent for the children
-          'shape-rendering': 'geometricPrecision',
+          viewBox: '0 0 100 100', // Create a relative unit in terms of percent for the svg children.
+          'shape-rendering': 'geometricPrecision', // Use geometricPrecision for aesthetic accuracy.
         },
         style: {
-          width: '15%',   // size the loader in terms of the constant flag
-          background: 'white'
+          width: LOADER_CIRCLE_SIZE,
+          maxWidth: LOADER_CIRCLE_MAX_SIZE,
+          minWidth: LOADER_CIRCLE_MIN_SIZE
         }
       } );
 
-      // To create the loading circle, we overlay 2 circles on top of each other.
-      // Create the circle in the background. The circle has no fill but has a stroke.
+      //----------------------------------------------------------------------------------------
+      // To create the loading progress circle, we overlay 2 circles on top of each other.
+      // Now create the circle in the background. The circle has no fill (hollow) but has a stroke and is a complete
+      // circle arc.
       const backgroundCircle = new DOMObject( {
         type: 'circle',
         namespace: XML_NAMESPACE,
         attributes: {
-          r: 50 - LOADER_CIRCLE_STROKE_WIDTH / 2,
-          cx: 50,
-          cy: 50,
-          fill: 'none',
-          'stroke-width': LOADER_CIRCLE_STROKE_WIDTH,
-          stroke: '#C5C5C5' // light colored
-        },
-        style: {
-          'stroke-dashoffset': 100,
+          r: 50 - LOADER_STROKE_WIDTH / 2, // In percentage of the container. Subtract a half loader stroke both sides.
+          cx: 50, // In percentage of the container. In the exact center.
+          cy: 50, // In the percentage of the container. In the exact center.
+          fill: 'none', // Hollow
+          'stroke-width': LOADER_STROKE_WIDTH,
+          'shape-rendering': 'geometricPrecision', // Use geometricPrecision for aesthetic accuracy.
+          stroke: '#A5A5A5' // light colored
         }
       } );
 
+      //----------------------------------------------------------------------------------------
+      // Now create the circle (path) in the foreground. The circle has no fill (hollow) but has a stroke.
+      // This represents the percentage of bandwidth loaded (see comment at the top of the file).
+      // For now, initialize with arc length 0.
       const foregroundCircle = new DOMObject( {
         type: 'path',
         namespace: XML_NAMESPACE,
         style: {
-          fill: 'none',
-          'stroke-width': LOADER_CIRCLE_STROKE_WIDTH,
-          stroke: '#2974b2'
+          fill: 'none', // Hollow
+          'stroke-width': LOADER_STROKE_WIDTH,
+          stroke: LOADER_CIRCLE_COLOR
+        },
+        attributes: {
+          'shape-rendering': 'geometricPrecision', // Use geometricPrecision for aesthetic accuracy.
         }
       } );
 
-
+      //----------------------------------------------------------------------------------------
+      // Set up the initial Loader scene graph.
       loaderCircleContainer.setChildren( [ backgroundCircle, foregroundCircle ] );
 
-
-      foregroundCircle.setAttribute( 'd', describeArc(50, 50, 50 - LOADER_CIRCLE_STROKE_WIDTH / 2, 0, 230 ) )
-      //----------------------------------------------------------------------------------------
       // Set up the DOM of the Loader
       options.children = [ loaderCircleContainer ];
 
       super( options );
+
+      //----------------------------------------------------------------------------------------
+
+      // foregroundCircle.setAttribute( 'd', describeArc(50, 50, 50 - LOADER_STROKE_WIDTH / 2, 0, 350 ) )
 
       // let loadedImages = 0;
       // if ( window.simImages ) {
