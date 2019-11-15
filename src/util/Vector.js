@@ -215,6 +215,7 @@ define( require => {
      * @returns {Vector} - for chaining
      */
     divide( scalar ) {
+      assert( this._isImmutable === false, 'cannot mutate a mutable' );
       return this.multiply( 1 / scalar );
     }
 
@@ -242,6 +243,7 @@ define( require => {
      * @returns {Vector} - for chaining
      */
     add( vector ) {
+      assert( this._isImmutable === false, 'cannot mutate a mutable' );
       assert( vector instanceof Vector, `invalid vector: ${ vector }` );
       return this.addXY( vector.x, vector.y );
     }
@@ -270,6 +272,7 @@ define( require => {
      * @returns {Vector} - for chaining
      */
     subtract( vector ) {
+      assert( this._isImmutable === false, 'cannot mutate a mutable' );
       assert( vector instanceof Vector, `invalid vector: ${ vector }` );
       return this.subtractXY( vector.x, vector.y );
     }
@@ -282,6 +285,7 @@ define( require => {
      * @returns {Vector}
      */
     normalize() {
+      assert( this._isImmutable === false, 'cannot mutate a mutable' );
       const magnitude = this.magnitude;
       if ( magnitude === 0 ) {
         assert( false, 'Cannot normalize a zero-magnitude vector' );
@@ -299,6 +303,7 @@ define( require => {
      * @returns {Vector} - for chaining
      */
     rotate( angle ) {
+      assert( this._isImmutable === false, 'cannot mutate a mutable' );
       const newAngle = this.angle + angle;
       const mag = this.magnitude;
       this.x = mag * Math.cos( newAngle );
@@ -315,6 +320,7 @@ define( require => {
      * @returns {Vector} - for chaining
      */
     rotateAboutXY( x, y, angle ) {
+      assert( this._isImmutable === false, 'cannot mutate a mutable' );
       const dx = this.x - x;
       const dy = this.y - y;
       const cos = Math.cos( angle );
