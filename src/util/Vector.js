@@ -120,11 +120,22 @@ define( require => {
      * @public
      *
      * @param {boolean} [isCopyImmutable] determines if the copy is immutable or not
-     * @returns {Vector2}
+     * @returns {Vector}
      */
     copy( isCopyImmutable = false ) {
       return new Vector( this._x, this._y, isCopyImmutable );
     }
+
+    /**
+     * Gets the angle of this vector relative as a position vector relative to the origin.
+     * @public
+     *
+     * @returns {number}
+     */
+    getAngle() {
+      return Math.atan2( this.y, this.x );
+    }
+    get angle() { return this.getAngle(); }
 
     /**
      * Debugging string for the Vector.
@@ -153,6 +164,7 @@ define( require => {
       this._x = x;
       return this;
     }
+    set x( x ) { this.setX( x ); }
 
     /**
      * Sets the y value, returning this.
@@ -167,6 +179,7 @@ define( require => {
       this._y = y;
       return this;
     }
+    set y( y ) { this.setX( y ); }
 
     /**
      * Sets the values of this Vector to another Vector. Does not change immutability.
@@ -266,7 +279,7 @@ define( require => {
      * copy() and normalize that Vector.
      * @public
      *
-     * @returns {Vector2}
+     * @returns {Vector}
      */
     normalize() {
       const magnitude = this.magnitude;
@@ -276,6 +289,51 @@ define( require => {
       else {
         return this.divide( magnitude );
       }
+    }
+
+    /**
+     * Rotates by an arbitrary angle, in radians. To NOT mutate this Vector, call copy() and rotate that Vector.
+     * @public
+     *
+     * @param {number} angle - In radians
+     * @returns {Vector} - for chaining
+     */
+    rotate( angle ) {
+      const newAngle = this.angle + angle;
+      const mag = this.magnitude;
+      this.x = mag * Math.cos( newAngle );
+      this.y = mag * Math.sin( newAngle );
+    }
+
+    /**
+     * Rotates about a point (x, y), in radians. To NOT mutate this Vector, call copy() and rotate that Vector.
+     * @public
+     *
+     * @param {number} x - origin of rotation in x
+     * @param {number} y - origin of rotation in y
+     * @param {number} angle - radians to rotate
+     * @returns {Vector} - for chaining
+     */
+    rotateAboutXY( x, y, angle ) {
+      const dx = this.x - x;
+      const dy = this.y - y;
+      const cos = Math.cos( angle );
+      const sin = Math.sin( angle );
+      this.x = x + dx * cos - dy * sin;
+      this.y = y + dx * sin + dy * cos;
+      return this;
+    }
+
+    /**
+     * Rotates about a point, in radians. To NOT mutate this Vector, call copy() and rotate that Vector.
+     * @public
+     *
+     * @param {Vector} point
+     * @param {number} angle
+     * @returns {Vector} this for chaining
+     */
+    rotateAboutPoint( point, angle ) {
+      return this.rotateAboutXY( point.x, point.y, angle );
     }
   }
 
