@@ -3,15 +3,17 @@
 /**
  * A Loader DOMObject that displays a loading page while loading the simulation.
  *
- * While loading, a variety of tasks are completed, each signaling a percentage closer to finishing the loader. This ishown
- * shown as a progress circle loader.
+ * While loading, a variety of tasks are completed, each signaling a percentage amount closer to finishing the loader.
+ * This is shown as a progress circle.
  *
- * These tasks include:
- *   1. Synchronously loading registered images from the global window object (see ../util/image-plugin).
- *      Each image loaded adds a percentage depending on how many images are loaded. This process is defined
- *      to be 90% of the loading bandwidth, even if there are 0 images to load.
- *   2. Ensure that the DOM is fully loaded and ready to be manipulated with all simulation rendering is setup.
- *      This is defined as 10% of the loading bandwidth, even if the DOM is fully ready already.
+ * Loading tasks include:
+ *  (1) Synchronously loading registered images from the global window object (see ../util/image-plugin).
+ *      Each image loaded adds a percentage amount depending on how many images are loaded. This process is defined
+ *      to be 90% of the loading bandwidth, even if there are 0 images to load (which would finish really quickly).
+ *      This portion of the loading will be sped up with cached images.
+ *  (2) Synchronously ensuring that the DOM is fully loaded and ready to be manipulated with all simulation rendering
+ *      ready. This is defined as 10% of the loading bandwidth, even if the DOM is fully ready already.
+ *      This portion of the loading should not be greatly affected by caching.
  *
  * @author Brandon Li <brandon.li820@gmail.com>
  */
@@ -92,7 +94,7 @@ define( require => {
         type: 'circle',
         namespace: XML_NAMESPACE,
         attributes: {
-          r: 50 - LOADER_STROKE_WIDTH / 2, // In percentage of the container. Subtract a half loader stroke both sides.
+          r: 50 - LOADER_STROKE_WIDTH / 2, // In percentage of the container. Subtract to account for the stroke width.
           cx: 50, // In percentage of the container. In the exact center.
           cy: 50, // In the percentage of the container. In the exact center.
           fill: 'none', // Hollow
@@ -130,7 +132,8 @@ define( require => {
 
       //----------------------------------------------------------------------------------------
 
-      // foregroundCircle.setAttribute( 'd', describeArc(50, 50, 50 - LOADER_STROKE_WIDTH / 2, 0, 350 ) )
+      foregroundCircle.setAttribute( 'd', describeArc(50, 50, 50 - LOADER_STROKE_WIDTH / 2, 0, 350 ) )
+      foregroundCircle.setAttribute( 'd', getCirclePathData( 350 ) )
 
       // let loadedImages = 0;
       // if ( window.simImages ) {
@@ -215,9 +218,44 @@ function describeArc(x, y, radius, startAngle, endAngle){
         "M", start.x, start.y,
         "A", radius, radius, 0, largeArcFlag, 0, end.x, end.y
     ].join(" ");
-
+    // console.log( d)
     return d;
 }
-  return Loader;
 
+/**
+ * Creates a path attribute data structure for SVG descriptions for a circle arc path.
+ * Assumes that the path starts at angle 0. Angle 360 fills an entire circular path while 0 fills none of it.
+ * For more details, see https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/d.
+ *
+ * @param {number} endAngle
+ * @returns {string} - the SVG data.
+ */
+function getCirclePathData( endAngle ) {
+
+  // convert to radians first
+  const angleInRadians = ( angleInDegrees - 90 ) * Math.PI / 180.0;
+
+  const outerRadius = 50 - LOADER_STROKE_WIDTH / 2;
+  return {
+    x: centerX + (radius * Math.cos(angleInRadians)),
+    y: centerY + (radius * Math.sin(angleInRadians))
+  };
+  const startX = polarToCartesian( 0 );
+  const end = polarToCartesian( startAngle );
+
+  /**
+   * The path is described in two steps:
+   *   1. Move to the start of the loader circle path.
+   *   2. Create an elliptical circle arc to match the end angle.
+   */
+  const data = [
+    "M", start.x, start.y,
+    "A", radius, radius, 0, largeArcFlag, 0, end.x, end.y
+
+  ].join( ' ' );
+
+  return data;
+}
+
+  return Loader;
 } );
