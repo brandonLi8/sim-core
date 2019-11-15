@@ -40,7 +40,7 @@ define( require => {
       const loader = new Loader();
 
       display.addChild( loader );
-      loader.addChild( test )
+      // loader.addChild( test )
 
 
 

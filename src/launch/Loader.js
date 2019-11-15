@@ -16,129 +16,139 @@ define( require => {
   const assert = require( 'SIM_CORE/util/assert' );
   const DOMObject = require( 'SIM_CORE/display/DOMObject' );
 
+  // constants
+  const XML_NAMESPACE = 'http://www.w3.org/2000/svg';
+  const LOADER_BOX_SIZE = 100; // in pixels
+  const BACKGROUND_COLOR = 'rgb( 15, 15, 15 )';
+  const LOADER_STROKE_WIDTH = 6; // in pixels
+
   class Loader extends DOMObject {
 
     /**
-     * variable
-     *
-     * @
+     * @param {Object} [options] - Various key-value pairs that control the appearance and behavior.
+     *                             Some options are specific to this class while others are passed to the super class.
+     *                             See the early portion of the constructor for details.
      */
     constructor( options ) {
 
-      super( {
+      if ( options ) {
+        // changes to the API means excluding some of the options.
+        assert( Object.getPrototypeOf( options ) === Object.prototype, `Extra prototype on Options: ${ options }` );
+        assert( !options.style, 'Loader sets options.style.' );
+        assert( !options.type, 'Loader sets options.type.' );
+        assert( !options.innerHTML && !options.text, 'Loader should be a container with no inner content.' );
+        assert( !options.id && !options.class && !options.attributes, 'Loader sets options.attributes' );
+        assert( !options.children, 'Loader sets children.' );
+      }
 
-        text: 'ere',
-        style: {
-          background: 'rgb( 15, 15, 15 )',
-          height: '100%'
-        },
-
+      options = {
         id: 'loader',
 
+        style: {
+          // background: BACKGROUND_COLOR,
+          height: '100%',
+          display: 'flex', // use a centered flex box to center the loader
+          'align-items': 'center',
+          'align-content': 'center',
+          'justify-content': 'center'
+        },
+
         ...options
+      };
+
+      //----------------------------------------------------------------------------------------
+      // Create the Loader content DOM using SVG.
+      // See https://developer.mozilla.org/en-US/docs/Web/SVG/Element/svg
+
+      // Create the container of the loader circles
+      const loaderCircleContainer = new DOMObject( {
+        type: 'svg',
+        namespace: XML_NAMESPACE,
+        attributes: {
+          viewBox: '0 0 100 100', // Create a relative unit in terms of percent for the children
+          'shape-rendering': 'geometricPrecision',
+        },
+        style: {
+          width: LOADER_BOX_SIZE,   // size the loader in terms of the constant flag
+          height: LOADER_BOX_SIZE,  // size the loader in terms of the constant flag
+          background: 'white'
+        }
+      } );
+
+      // To create the loading circle, we overlay 2 circles on top of each other.
+      // Create the circle in the background. The circle has no fill but has a stroke.
+      const backgroundCircle = new DOMObject( {
+        type: 'circle',
+        namespace: XML_NAMESPACE,
+        attributes: {
+          r: 50 - LOADER_STROKE_WIDTH / 2,
+          cx: 50,
+          cy: 50,
+          fill: 'none',
+          'stroke-width': LOADER_STROKE_WIDTH,
+          stroke: '#C5C5C5' // light colored
+        },
+        style: {
+          'stroke-dashoffset': 100,
+        }
+      } );
+
+      const foregroundCircle = new DOMObject( {
+        type: 'path',
+        namespace: XML_NAMESPACE,
+        style: {
+          fill: 'none',
+          'stroke-width': LOADER_STROKE_WIDTH,
+          stroke: '#2974b2'
+        }
       } );
 
 
-      let loadedImages = 0;
-      if ( window.simImages ) {
-
-        window.simImages.forEach( other => {
-
-          const image = other.image;
-          const imagePath = other.src;
-
-          image.src = imagePath;
-
-          if ( isImageOK( image.element ) ) {
-            loadedImages++;
-            if ( loadedImages === window.simImages.length ) {
-              console.log( 'done here')
-            }
-          }
-          else {
-            image.element.onload = () => {
-              loadedImages++;
-              if ( loadedImages === window.simImages.length ) {
-                assert( isImageOK( image.element ), `error while loading image` )
-                console.log( 'done')
-              }
-            }
-          }
-        } );
-      }
+      loaderCircleContainer.setChildren( [ backgroundCircle, foregroundCircle ] );
 
 
+      foregroundCircle.setAttribute( 'd', describeArc(50, 50, 50 - LOADER_STROKE_WIDTH / 2, 0, 230 ) )
+      //----------------------------------------------------------------------------------------
+      // Set up the DOM of the Loader
+      options.children = [ loaderCircleContainer ];
 
-        // style: {
-        //   left: '0px',
-        //   top: '0px',
-        //   'transform-origin': '0 0',
-        //   height: '100%',
-        //   display: 'flex',
-        //   'align-items': 'center',
-        //   'align-content': 'center',
-        //   'flex-direction': 'column',
-        //   'justify-content': 'center',
-        //   border: '2px solidired'
-        // },
-        // attributes: {
-        //   width: "60px",
-        //   height: "60px",
-        //   viewBox: "0 0 80 80",
-        //   "shape-rendering": "geometricPrecision",
-        // }
+      super( options );
+
+      // let loadedImages = 0;
+      // if ( window.simImages ) {
+
+      //   window.simImages.forEach( other => {
+
+      //     const image = other.image;
+      //     const imagePath = other.src;
+
+      //     image.src = imagePath;
+
+      //     if ( isImageOK( image.element ) ) {
+      //       loadedImages++;
+      //       if ( loadedImages === window.simImages.length ) {
+      //         console.log( 'done here')
+      //       }
+      //     }
+      //     else {
+      //       image.element.onload = () => {
+      //         loadedImages++;
+      //         if ( loadedImages === window.simImages.length ) {
+      //           assert( isImageOK( image.element ), `error while loading image` )
+      //           console.log( 'done')
+      //         }
+      //       }
+      //     }
+      //   } );
+      // }
+
+
 
 
       // this.bodyNode.appendChild( loaderNode._element );
 
-      // const loader = new Node( {
-      //   text: 'ere',
-      //   type: 'svg',
-      //   nameSpace: 'http://www.w3.org/2000/svg',
 
-      //   attributes: {
-      //     width: "60px",
-      //     height: "60px",
-      //     viewBox: "0 0 80 80",
-      //     "shape-rendering": "geometricPrecision",
-      //   }
 
-      // } );
-
-      // const inner = new Node( {
-
-      //   type: 'path',
-      //   attributes: {
-      //     d: 'M40,10C57.351,10,71,23.649,71,40.5S57.351,71,40.5,71 S10,57.351,10,40.5S23.649,10,40.5,10z',
-      //   },
-      //     nameSpace: 'http://www.w3.org/2000/svg',
-
-      //   style: {
-      //     fill: "none",
-      //     'stroke-width': "6px",
-      //     stroke: '#C5C5C5',
-      //     'stroke-dashoffset': 100,
-      //     'stroke-dasharray': 192.617,
-      //   }
-
-      // })
-      // const outer = new Node( {
-
-      //   type: 'path',
-      //   attributes: {
-      //     d: "M40,10C57.351,10,71,23.649,71,40.5S57.351,71,40.5,71 S10,57.351,10,40.5S23.649,10,40.5,10z",
-      //   },
-      //     nameSpace: 'http://www.w3.org/2000/svg',
-
-      //   style: {
-      //     fill: "none",
-      //     'stroke-width': '7px',
-      //     stroke: '#2974b2',
-      //     'stroke-dashoffset': 100,
-      //     'stroke-dasharray': '0, 192.617',
-      //   }
-
-      // })
 
       // loaderNode.addChild( loader.addChild( inner ).addChild( outer ) );
     }
@@ -167,6 +177,29 @@ define( require => {
     return true;
   }
 
+function polarToCartesian(centerX, centerY, radius, angleInDegrees) {
+  var angleInRadians = (angleInDegrees-90) * Math.PI / 180.0;
+
+  return {
+    x: centerX + (radius * Math.cos(angleInRadians)),
+    y: centerY + (radius * Math.sin(angleInRadians))
+  };
+}
+
+function describeArc(x, y, radius, startAngle, endAngle){
+
+    var start = polarToCartesian(x, y, radius, endAngle);
+    var end = polarToCartesian(x, y, radius, startAngle);
+
+    var largeArcFlag = endAngle - startAngle <= 180 ? "0" : "1";
+
+    var d = [
+        "M", start.x, start.y,
+        "A", radius, radius, 0, largeArcFlag, 0, end.x, end.y
+    ].join(" ");
+
+    return d;
+}
   return Loader;
 
 } );

@@ -118,7 +118,7 @@ define( require => {
         this._element = document.createElement( this._type );
       }
       else {
-        assert( typeof options.namespace === 'string', `invalid namespace: ${ options.namespace }` )
+        assert( typeof options.namespace === 'string', `invalid namespace: ${ options.namespace }` );
         this._element = document.createElementNS( options.namespace, this._type );
       }
 
