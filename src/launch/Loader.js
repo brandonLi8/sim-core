@@ -27,11 +27,19 @@ define( require => {
 
   // constants
   const XML_NAMESPACE = 'http://www.w3.org/2000/svg';
-  const LOADER_STROKE_WIDTH = 8; // in percentage of the loader circle radius
-  const LOADER_CIRCLE_SIZE = '15%'; // percentage of the window width
-  const LOADER_CIRCLE_MAX_SIZE = 110; // in pixels, the largest possible loader circle
-  const LOADER_CIRCLE_MIN_SIZE = 95; // in pixels, the smallest loader circle
+
+  // loader box (container of the loader circle)
+  const LOADER_BOX_RELATIVE = 100; // Create a relative flag for all loader box content.
+  const LOADER_BOX_SIZE = '15%'; // Size of loader box in percentage of the window width.
+  const LOADER_BOX_MAX_WIDTH = 110; // in pixels, the largest possible loader box size
+  const LOADER_BOX_MIN_WIDTH = 95; // in pixels, the smallest possible loader box size
+
+  // loader circle
+  const LOADER_CIRCLE_OUTER_RADIUS = 100; // in percentage of the LOADER_BOX_RELATIVE
+  const LOADER_STROKE_WIDTH = 8; // in percentage of the LOADER_BOX_RELATIVE
+  const LOADER_CIRCLE_INNER_RADIUS = ( LOADER_BOX_RELATIVE - LOADER_STROKE_WIDTH ) / 2;
   const LOADER_CIRCLE_COLOR = '#2974b2';
+
 
   class Loader extends DOMObject {
 
@@ -52,7 +60,6 @@ define( require => {
         assert( !options.children, 'Loader sets children.' );
       }
 
-      // Set the options
       options = {
         id: 'loader',
 
@@ -69,34 +76,33 @@ define( require => {
       };
 
       //----------------------------------------------------------------------------------------
-      // Create the loader progress circle container using an SVG DOMObject.
+      // Create the loader box, the container of the progress circles, using an SVG DOMObject.
       // See https://developer.mozilla.org/en-US/docs/Web/SVG/Element/svg for more details.
-
-      const loaderCircleContainer = new DOMObject( {
+      const loaderBox = new DOMObject( {
         type: 'svg',
         namespace: XML_NAMESPACE,
         attributes: {
-          viewBox: '0 0 100 100', // Create a relative unit in terms of percent for the svg children.
+          viewBox: `0 0 ${ LOADER_BOX_RELATIVE } ${ LOADER_BOX_RELATIVE }`,
           'shape-rendering': 'geometricPrecision', // Use geometricPrecision for aesthetic accuracy.
         },
         style: {
-          width: LOADER_CIRCLE_SIZE,
-          maxWidth: LOADER_CIRCLE_MAX_SIZE,
-          minWidth: LOADER_CIRCLE_MIN_SIZE
+          width: LOADER_BOX_SIZE,
+          maxWidth: LOADER_BOX_MAX_WIDTH,
+          minWidth: LOADER_BOX_MIN_WIDTH
         }
       } );
 
       //----------------------------------------------------------------------------------------
-      // To create the loading progress circle, we overlay 2 circles on top of each other.
+      // To create the loading progress circle, overlay 2 circles on top of each other.
       // Now create the circle in the background. The circle has no fill (hollow) but has a stroke and is a complete
       // circle arc.
       const backgroundCircle = new DOMObject( {
         type: 'circle',
         namespace: XML_NAMESPACE,
         attributes: {
-          r: 50 - LOADER_STROKE_WIDTH / 2, // In percentage of the container. Subtract to account for the stroke width.
-          cx: 50, // In percentage of the container. In the exact center.
-          cy: 50, // In the percentage of the container. In the exact center.
+          r: LOADER_CIRCLE_INNER_RADIUS, // In percentage of the container.
+          cx: LOADER_BOX_RELATIVE / 2, // In percentage of the container. In the exact center.
+          cy: LOADER_BOX_RELATIVE / 2, // In the percentage of the container. In the exact center.
           fill: 'none', // Hollow
           'stroke-width': LOADER_STROKE_WIDTH,
           'shape-rendering': 'geometricPrecision', // Use geometricPrecision for aesthetic accuracy.
@@ -123,17 +129,17 @@ define( require => {
 
       //----------------------------------------------------------------------------------------
       // Set up the initial Loader scene graph.
-      loaderCircleContainer.setChildren( [ backgroundCircle, foregroundCircle ] );
+      loaderBox.setChildren( [ backgroundCircle, foregroundCircle ] );
 
       // Set up the DOM of the Loader
-      options.children = [ loaderCircleContainer ];
+      options.children = [ loaderBox ];
 
       super( options );
 
       //----------------------------------------------------------------------------------------
 
-      foregroundCircle.setAttribute( 'd', describeArc(50, 50, 50 - LOADER_STROKE_WIDTH / 2, 0, 350 ) )
-      foregroundCircle.setAttribute( 'd', getCirclePathData( 350 ) )
+      foregroundCircle.setAttribute( 'd', describeArc( 50, 50, LOADER_CIRCLE_INNER_RADIUS, 0, 350 ) )
+      // foregroundCircle.setAttribute( 'd', getCirclePathData( 350 ) )
 
       // let loadedImages = 0;
       // if ( window.simImages ) {
