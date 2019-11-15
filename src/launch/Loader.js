@@ -1,10 +1,17 @@
 // Copyright © 2019 Brandon Li. All rights reserved.
 
 /**
- * A DOMObject that displays a loading page and loads all the images of the simulation.
+ * A Loader DOMObject that displays a loading page while loading the simulation.
  *
- * Uses registered images from the global window object (see ../util/image-plugin) and loads all images synchronously.
- * Shows a progress in a loading circle bar to show the progress of loading images.
+ * While loading, a variety of tasks are completed, each signaling a percentage closer to finishing the loader. This ishown
+ * shown as a progress circle loader.
+ *
+ * These tasks include:
+ *   1. Synchronously loading registered images from the global window object (see ../util/image-plugin).
+ *      Each image loaded adds a percentage depending on how many images are loaded. This process is defined
+ *      to be 90% of the loading bandwidth, even if there are 0 images to load.
+ *   2. Ensure that the DOM is fully loaded and ready to be manipulated with all simulation rendering is setup.
+ *      This is defined as 10% of the loading bandwidth, even if the DOM is fully ready already.
  *
  * @author Brandon Li <brandon.li820@gmail.com>
  */
@@ -18,9 +25,7 @@ define( require => {
 
   // constants
   const XML_NAMESPACE = 'http://www.w3.org/2000/svg';
-  const LOADER_BOX_SIZE = 100; // in pixels
-  const BACKGROUND_COLOR = 'rgb( 15, 15, 15 )';
-  const LOADER_STROKE_WIDTH = 6; // in pixels
+  const LOADER_CIRCLE_STROKE_WIDTH = 6; // in pixels
 
   class Loader extends DOMObject {
 
@@ -43,16 +48,10 @@ define( require => {
 
       options = {
         id: 'loader',
-
         style: {
-          // background: BACKGROUND_COLOR,
-          height: '100%',
-          display: 'flex', // use a centered flex box to center the loader
-          'align-items': 'center',
-          'align-content': 'center',
-          'justify-content': 'center'
+          background: 'rgb( 15, 15, 15 )',
+          height: '100%'
         },
-
         ...options
       };
 
@@ -69,8 +68,7 @@ define( require => {
           'shape-rendering': 'geometricPrecision',
         },
         style: {
-          width: LOADER_BOX_SIZE,   // size the loader in terms of the constant flag
-          height: LOADER_BOX_SIZE,  // size the loader in terms of the constant flag
+          width: '15%',   // size the loader in terms of the constant flag
           background: 'white'
         }
       } );
@@ -81,11 +79,11 @@ define( require => {
         type: 'circle',
         namespace: XML_NAMESPACE,
         attributes: {
-          r: 50 - LOADER_STROKE_WIDTH / 2,
+          r: 50 - LOADER_CIRCLE_STROKE_WIDTH / 2,
           cx: 50,
           cy: 50,
           fill: 'none',
-          'stroke-width': LOADER_STROKE_WIDTH,
+          'stroke-width': LOADER_CIRCLE_STROKE_WIDTH,
           stroke: '#C5C5C5' // light colored
         },
         style: {
@@ -98,7 +96,7 @@ define( require => {
         namespace: XML_NAMESPACE,
         style: {
           fill: 'none',
-          'stroke-width': LOADER_STROKE_WIDTH,
+          'stroke-width': LOADER_CIRCLE_STROKE_WIDTH,
           stroke: '#2974b2'
         }
       } );
@@ -107,7 +105,7 @@ define( require => {
       loaderCircleContainer.setChildren( [ backgroundCircle, foregroundCircle ] );
 
 
-      foregroundCircle.setAttribute( 'd', describeArc(50, 50, 50 - LOADER_STROKE_WIDTH / 2, 0, 230 ) )
+      foregroundCircle.setAttribute( 'd', describeArc(50, 50, 50 - LOADER_CIRCLE_STROKE_WIDTH / 2, 0, 230 ) )
       //----------------------------------------------------------------------------------------
       // Set up the DOM of the Loader
       options.children = [ loaderCircleContainer ];
