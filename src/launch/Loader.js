@@ -4,16 +4,18 @@
  * A Loader DOMObject that displays a loading page while loading the simulation.
  *
  * While loading, a variety of tasks are completed, each signaling a percentage amount closer to finishing the loader.
- * This is shown as a progress circle.
+ * This is shown as a progress circle while launching the simulation and is removed once finished.
  *
  * Loading tasks include:
+ *
  *  (1) Synchronously loading registered images from the global window object (see ../util/image-plugin).
  *      Each image loaded adds a percentage amount depending on how many images are loaded. This process is defined
- *      to be 90% of the loading bandwidth, even if there are 0 images to load (which would finish really quickly).
- *      This portion of the loading will be sped up with cached images.
+ *      to be IMAGE_LOADING_BANDWIDTH of the loading bandwidth, even if there are 0 images to load (which would
+ *      launch really quickly). This portion of the loading will be sped up with cached images.
+ *
  *  (2) Synchronously ensuring that the DOM is fully loaded and ready to be manipulated with all simulation rendering
- *      ready. This is defined as 10% of the loading bandwidth, even if the DOM is fully ready already.
- *      This portion of the loading should not be greatly affected by caching.
+ *      ready. This is defined as DOM_LOADING_BANDWIDTH of the loading bandwidth, even if the DOM is fully ready
+ *      already. This portion of the loading should not be greatly affected by caching.
  *
  * @author Brandon Li <brandon.li820@gmail.com>
  */
@@ -24,6 +26,7 @@ define( require => {
   // modules
   const assert = require( 'SIM_CORE/util/assert' );
   const DOMObject = require( 'SIM_CORE/display/DOMObject' );
+  const Vector = require( 'SIM_CORE/util/Vector' );
 
   // constants
   const XML_NAMESPACE = 'http://www.w3.org/2000/svg';
