@@ -28,19 +28,26 @@ define( require => {
   const DOMObject = require( 'SIM_CORE/display/DOMObject' );
   const Vector = require( 'SIM_CORE/util/Vector' );
 
+  //----------------------------------------------------------------------------------------
   // constants
   const XML_NAMESPACE = 'http://www.w3.org/2000/svg';
 
-  // loader box (container of the loader circle)
-  const LOADER_BOX_RELATIVE = 100; // Create a relative flag for all loader box content.
-  const LOADER_BOX_SIZE = '15%'; // Size of loader box in percentage of the window width.
-  const LOADER_BOX_MAX_WIDTH = 110; // in pixels, the largest possible loader box size
-  const LOADER_BOX_MIN_WIDTH = 95; // in pixels, the smallest possible loader box size
+  // Relative size of all loader circles, as a percent.
+  const LOADER_CIRCLE_RELATIVE = 100;
+  const LOADER_RADIUS = LOADER_CIRCLE_RELATIVE / 2;
 
-  // loader circle
-  const LOADER_CIRCLE_OUTER_RADIUS = 100; // in percentage of the LOADER_BOX_RELATIVE
-  const LOADER_STROKE_WIDTH = 8; // in percentage of the LOADER_BOX_RELATIVE
-  const LOADER_CIRCLE_INNER_RADIUS = ( LOADER_BOX_RELATIVE - LOADER_STROKE_WIDTH ) / 2;
+  // Create a relative view box for all the loader content, with the origin at the center. <minX, minY, width, height>.
+  const LOADER_CIRCLE_VIEW_BOX = '-50 -50 100 100';
+
+  // Width of loader circle (which would match pixels with the height) relative to the window width.
+  const LOADER_CIRCLE_WIDTH = '15%';
+  const LOADER_CIRCLE_MAX_WIDTH = 180; // in pixels, the largest possible loader circle size
+  const LOADER_CIRCLE_MIN_WIDTH = 105; // in pixels, the smallest possible loader circle size
+
+  // Outer radius (including the stroke) of the loader circle in percentage of the LOADER_CIRCLE_RELATIVE.
+  const LOADER_CIRCLE_OUTER_RADIUS = LOADER_RADIUS;
+  const LOADER_STROKE_WIDTH = 8; // in percentage of the LOADER_CIRCLE_RELATIVE
+  const LOADER_CIRCLE_INNER_RADIUS = ( LOADER_CIRCLE_RELATIVE - LOADER_STROKE_WIDTH ) / 2;
   const LOADER_CIRCLE_COLOR = '#2974b2';
 
 
@@ -69,7 +76,7 @@ define( require => {
         style: {
           background: 'rgb( 15, 15, 15 )',
           height: '100%',
-          display: 'flex', // use a centered flex box to center the loader
+          display: 'flex', // use a centered flex box to center the loader circle
           'align-items': 'center',
           'justify-content': 'center',
           border: '2px solid red'
@@ -79,19 +86,20 @@ define( require => {
       };
 
       //----------------------------------------------------------------------------------------
-      // Create the loader box, the container of the progress circles, using an SVG DOMObject.
+      // Create the container of the loader progress circles, using an SVG DOMObject.
       // See https://developer.mozilla.org/en-US/docs/Web/SVG/Element/svg for more details.
-      const loaderBox = new DOMObject( {
+      // centered
+      const loaderCircleContainer = new DOMObject( {
         type: 'svg',
         namespace: XML_NAMESPACE,
         attributes: {
-          viewBox: `0 0 ${ LOADER_BOX_RELATIVE } ${ LOADER_BOX_RELATIVE }`,
+          viewBox: LOADER_CIRCLE_VIEW_BOX,
           'shape-rendering': 'geometricPrecision', // Use geometricPrecision for aesthetic accuracy.
         },
         style: {
-          width: LOADER_BOX_SIZE,
-          maxWidth: LOADER_BOX_MAX_WIDTH,
-          minWidth: LOADER_BOX_MIN_WIDTH
+          width: LOADER_CIRCLE_WIDTH,
+          maxWidth: LOADER_CIRCLE_MAX_WIDTH,
+          minWidth: LOADER_CIRCLE_MIN_WIDTH
         }
       } );
 
@@ -104,8 +112,8 @@ define( require => {
         namespace: XML_NAMESPACE,
         attributes: {
           r: LOADER_CIRCLE_INNER_RADIUS, // In percentage of the container.
-          cx: LOADER_BOX_RELATIVE / 2, // In percentage of the container. In the exact center.
-          cy: LOADER_BOX_RELATIVE / 2, // In the percentage of the container. In the exact center.
+          cx: 0, // Center the circle
+          cy: 0, // Center the circle
           fill: 'none', // Hollow
           'stroke-width': LOADER_STROKE_WIDTH,
           'shape-rendering': 'geometricPrecision', // Use geometricPrecision for aesthetic accuracy.
@@ -132,17 +140,16 @@ define( require => {
 
       //----------------------------------------------------------------------------------------
       // Set up the initial Loader scene graph.
-      loaderBox.setChildren( [ backgroundCircle, foregroundCircle ] );
+      loaderCircleContainer.setChildren( [ backgroundCircle, foregroundCircle ] );
 
       // Set up the DOM of the Loader
-      options.children = [ loaderBox ];
+      options.children = [ loaderCircleContainer ];
 
       super( options );
 
       //----------------------------------------------------------------------------------------
 
-      foregroundCircle.setAttribute( 'd', describeArc( 50, 50, LOADER_CIRCLE_INNER_RADIUS, 0, 350 ) )
-      // foregroundCircle.setAttribute( 'd', getCirclePathData( 350 ) )
+      foregroundCircle.setAttribute( 'd', getCirclePathData( 20 ) )
 
       // let loadedImages = 0;
       // if ( window.simImages ) {
@@ -232,39 +239,38 @@ function describeArc(x, y, radius, startAngle, endAngle){
 }
 
 /**
- * Creates a path attribute data structure for SVG descriptions for a circle arc path.
+ * Creates a path attribute data structure for SVG descriptions for a circle arc path about the origin.
  * Assumes that the path starts at angle 0. Angle 360 fills an entire circular path while 0 fills none of it.
  * For more details, see https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/d.
  *
  * @param {number} endAngle
  * @returns {string} - the SVG data.
  */
-function getCirclePathData( endAngle ) {
+function getCirclePathData( percentage ) {
 
-  // convert to radians first
-  const angleInRadians = ( angleInDegrees - 90 ) * Math.PI / 180.0;
+  const angle = percentage / 100 * Math.PI * 2; // in radians
 
-  const outerRadius = 50 - LOADER_STROKE_WIDTH / 2;
-  return {
-    x: centerX + (radius * Math.cos(angleInRadians)),
-    y: centerY + (radius * Math.sin(angleInRadians))
-  };
-  const startX = polarToCartesian( 0 );
-  const end = polarToCartesian( startAngle );
+  const adjustedAngle = Math.PI / 2 - angle;
 
+  const pathVector = new Vector( 0, LOADER_CIRCLE_INNER_RADIUS ).setAngle( adjustedAngle );
+  const startVector = new Vector( 0, LOADER_CIRCLE_INNER_RADIUS );
+  console.log( adjustedAngle, pathVector, LOADER_CIRCLE_INNER_RADIUS)
+  const largeArcFlag = '1';
+  console.log( 'ehrehr', -pathVector.y)
   /**
    * The path is described in two steps:
    *   1. Move to the start of the loader circle path.
    *   2. Create an elliptical circle arc to match the end angle.
    */
   const data = [
-    "M", start.x, start.y,
-    "A", radius, radius, 0, largeArcFlag, 0, end.x, end.y
+    'M', startVector.x, startVector.y,
+    'A', LOADER_CIRCLE_INNER_RADIUS, LOADER_CIRCLE_INNER_RADIUS, 0, largeArcFlag, 1, pathVector.x, pathVector.y
 
   ].join( ' ' );
 
   return data;
 }
+
 
   return Loader;
 } );
