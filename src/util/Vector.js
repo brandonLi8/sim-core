@@ -133,7 +133,7 @@ define( require => {
      * @returns {number}
      */
     getAngle() {
-      return Math.atan2( this.y, this.x );
+      return Math.atan2( this._y, this._x );
     }
     get angle() { return this.getAngle(); }
 
@@ -179,7 +179,7 @@ define( require => {
       this._y = y;
       return this;
     }
-    set y( y ) { this.setX( y ); }
+    set y( y ) { this.setY( y ); }
 
     /**
      * Sets the values of this Vector to another Vector. Does not change immutability.
@@ -296,6 +296,24 @@ define( require => {
     }
 
     /**
+     * Sets the angle of this vector relative to the y-axis with positive angles in the counter-clockwise direction.
+     * @public
+     *
+     * @param {number} angle - In radians
+     * @returns {Vector} - for chaining
+     */
+    setAngle( angle ) {
+      assert( this._isImmutable === false, 'cannot mutate a mutable' );
+      assert( typeof angle === 'number', `invalid angle: ${ angle }` );
+      const mag = this.getMagnitude();
+      this.x = mag * Math.cos( angle );
+      this.y = mag * Math.sin( angle );
+      return this;
+    }
+    set angle( angle ) { this.setAngle( angle ); }
+
+
+    /**
      * Rotates by an arbitrary angle, in radians. To NOT mutate this Vector, call copy() and rotate that Vector.
      * @public
      *
@@ -304,10 +322,7 @@ define( require => {
      */
     rotate( angle ) {
       assert( this._isImmutable === false, 'cannot mutate a mutable' );
-      const newAngle = this.angle + angle;
-      const mag = this.magnitude;
-      this.x = mag * Math.cos( newAngle );
-      this.y = mag * Math.sin( newAngle );
+      return this.setAngle( angle + this.angle );
     }
 
     /**
