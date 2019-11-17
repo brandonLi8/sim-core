@@ -36,7 +36,7 @@ define( require => {
   'use strict';
 
   // modules
-  const DOMObject = require( 'SIM_CORE/display/DOMObject' );
+  const DOMObject = require( 'SIM_CORE/core-internal/DOMObject' );
 
   return {
 
