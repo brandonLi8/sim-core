@@ -12,7 +12,7 @@ define( require => {
 
   // modules
   const assert = require( 'SIM_CORE/util/assert' );
-  const Loader = require( 'SIM_CORE/core-internal/loader' );
+  const Loader = require( 'SIM_CORE/core-internal/Loader' );
   const Node = require( 'SIM_CORE/scenery/Node' );
   const QueryParameters = require( 'SIM_CORE/util/QueryParameters' );
   const Display = require( 'SIM_CORE/core-internal/Display' );
