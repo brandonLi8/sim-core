@@ -359,7 +359,7 @@ define( require => {
      * @returns {DOMObject} - Returns 'this' reference, for chaining
      */
     removeAllChildren() {
-      this._children.forEach( this.removeChild );
+      this._children.forEach( child => this.removeChild( child ) );
       return this;
     }
 
@@ -415,6 +415,20 @@ define( require => {
       Object.keys( attributes ).forEach( attribute => {
         this.setAttribute( attribute, attributes[ attribute ] );
       } );
+      return this;
+    }
+
+    /**
+     * Disposes the DOMObject, releasing all references that it maintained.
+     * @public
+     *
+     * @returns {DOMObject} - Returns 'this' reference, for chaining
+     */
+    dispose() {
+      this._isDisposed = true;
+
+      this.removeAllChildren();
+      this._parent && this._parent.removeChild( this );
       return this;
     }
   }
