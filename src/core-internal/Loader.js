@@ -49,6 +49,10 @@ define( require => {
   const LOADER_STROKE_WIDTH = 8; // in percentage, relative to LOADER_CIRCLE_RELATIVE
   const LOADER_CIRCLE_INNER_RADIUS = ( LOADER_CIRCLE_RELATIVE - LOADER_STROKE_WIDTH ) / 2; // in percentage
 
+  // Loading bandwidths. See comment at the top of the file.
+  const IMAGE_LOADING_BANDWIDTH = 90;
+  const DOM_LOADING_BANDWIDTH = 100 - IMAGE_LOADING_BANDWIDTH;
+
 
   class Loader extends DOMObject {
 
@@ -143,49 +147,49 @@ define( require => {
 
       //----------------------------------------------------------------------------------------
 
-      foregroundCircle.setAttribute( 'd', getCirclePathData( 90 ) )
-
-      // let loadedImages = 0;
-      // if ( window.simImages ) {
-
-      //   window.simImages.forEach( other => {
-
-      //     const image = other.image;
-      //     const imagePath = other.src;
-
-      //     image.src = imagePath;
-
-      //     if ( isImageOK( image.element ) ) {
-      //       loadedImages++;
-      //       if ( loadedImages === window.simImages.length ) {
-      //         console.log( 'done here')
-      //       }
-      //     }
-      //     else {
-      //       image.element.onload = () => {
-      //         loadedImages++;
-      //         if ( loadedImages === window.simImages.length ) {
-      //           assert( isImageOK( image.element ), `error while loading image` )
-      //           console.log( 'done')
-      //         }
-      //       }
-      //     }
-      //   } );
-      // }
+      let loadedImages = 0;
+      let loadedPercentage = 0;
+      const incrementImageLoad = ( loadedImages ) => {
+        const percentage = 1 / window.simImages.length * Math.random() * IMAGE_LOADING_BANDWIDTH;
+        loadedPercentage += percentage;
+        foregroundCircle.setAttribute( 'd', getCirclePathData( loadedPercentage ) );
+      }
 
 
+      if ( window.simImages ) {
+        let i = 0;
 
+        const step = () => {
 
-      // this.bodyNode.appendChild( loaderNode._element );
+          const simImage = window.simImages[ i ];
+          const image = simImage.image;
+          const imagePath = simImage.src;
+
+          image.element.onload = () => {
+            loadedImages++;
+            assert( isImageOK( image.element ), `error while loading image` )
+            incrementImageLoad( loadedImages );
+            i++;
+            if ( loadedImages !== window.simImages.length ) {
+              window.setTimeout( step, Math.random() * 200 );
+            }
+          }
+          image.src = imagePath;
+        };
+        step();
+      }
 
 
 
 
-      // loaderNode.addChild( loader.addChild( inner ).addChild( outer ) );
+
+
     }
-
   }
 
+  //----------------------------------------------------------------------------------------
+  // Helpers
+  //----------------------------------------------------------------------------------------
 
   // Taken from http://stackoverflow.com/questions/1977871/check-if-an-image-is-loaded-no-errors-in-javascript
   function isImageOK( img ) {
