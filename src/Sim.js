@@ -25,10 +25,10 @@ define( require => {
     }
   } );
 
-  const second = require( 'image!SIM_CORE/About/Brandon.jpg')
-  const third = require( 'image!SIM_CORE/Skills/CSS.png')
-  const fourth = require( 'image!SIM_CORE/Contact/Phone.png')
-  const fifth = require( 'image!SIM_CORE/Education/Fairview.png')
+  // const second = require( 'image!SIM_CORE/About/Brandon.jpg')
+  // const third = require( 'image!SIM_CORE/Skills/CSS.png')
+  // const fourth = require( 'image!SIM_CORE/Contact/Phone.png')
+  // const fifth = require( 'image!SIM_CORE/Education/Fairview.png')
 
   class Sim {
     constructor( test ) {
@@ -44,11 +44,11 @@ define( require => {
       const loader = new Loader();
 
       display.addChild( loader );
-      display.addChild( test )
-      display.addChild( fifth )
-      display.addChild( second )
-      display.addChild( third )
-      display.addChild( fourth )
+      display.addChild( )
+      // display.addChild( fifth )
+      // display.addChild( second )
+      // display.addChild( third )
+      // display.addChild( fourth )
 
 
 

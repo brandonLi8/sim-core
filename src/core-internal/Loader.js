@@ -50,7 +50,7 @@ define( require => {
   const LOADER_CIRCLE_INNER_RADIUS = ( LOADER_CIRCLE_RELATIVE - LOADER_STROKE_WIDTH ) / 2; // in percentage
 
   // Loading bandwidths. See comment at the top of the file.
-  const IMAGE_LOADING_BANDWIDTH = 90;
+  const IMAGE_LOADING_BANDWIDTH = 84;
   const DOM_LOADING_BANDWIDTH = 100 - IMAGE_LOADING_BANDWIDTH;
 
 
@@ -149,21 +149,33 @@ define( require => {
 
       let loadedImages = 0;
       let loadedPercentage = 0;
-      const incrementImageLoad = ( loadedImages ) => {
-        const percentage = 1 / window.simImages.length * Math.random() * IMAGE_LOADING_BANDWIDTH;
+      const incrementImageLoad = () => {
+        const percentage = 1 / window.simImages.length * IMAGE_LOADING_BANDWIDTH;
         loadedPercentage += percentage;
         foregroundCircle.setAttribute( 'd', getCirclePathData( loadedPercentage ) );
       }
 
+      const startLoadingTime = new Date();
 
+
+      const finishDom = () => {
+        isReady( document, () => {
+          loadedPercentage = 99.99;
+          window.setTimeout( () => {
+            foregroundCircle.setAttribute( 'd', getCirclePathData( loadedPercentage ) );
+            window.setTimeout( () => this.dispose(), 400 );
+          }, ( new Date() - startLoadingTime ) * DOM_LOADING_BANDWIDTH / 100 * ( Math.random() * 9 ) );
+        } );
+      }
       if ( window.simImages ) {
         let i = 0;
 
         const step = () => {
-
           const simImage = window.simImages[ i ];
           const image = simImage.image;
           const imagePath = simImage.src;
+
+          const dt = new Date();
 
           image.element.onload = () => {
             loadedImages++;
@@ -171,16 +183,19 @@ define( require => {
             incrementImageLoad( loadedImages );
             i++;
             if ( loadedImages !== window.simImages.length ) {
-              window.setTimeout( step, Math.random() * 200 );
+              window.setTimeout( step, ( new Date() - dt ) * 4.5 );
+            }
+            else {
+              finishDom();
             }
           }
           image.src = imagePath;
         };
         step();
       }
-
-
-
+      else {
+        window.setTimeout( finishDom, 200 );
+      }
 
 
 
@@ -212,6 +227,18 @@ define( require => {
     return true;
   }
 
+// function that checks if a node is ready
+function isReady( Dom, callback ){
+  // in case the document is already rendered
+  if ( Dom.readyState != "loading" ) callback();
+  // modern browsers
+  else if ( Dom.addEventListener )
+    Dom.addEventListener( "DOMContentLoaded", callback );
+  // IE <= 8
+  else Dom.attachEvent( "onreadystatechange", function(){
+    if ( Dom.readyState == "complete" ) callback();
+  } );
+}
 
 
   /**
