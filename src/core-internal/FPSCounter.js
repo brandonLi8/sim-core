@@ -27,4 +27,14 @@
 define( require => {
   'use strict';
 
+  // modules
+
+  // constants
+  const COUNTER_CYCLE = 60; // In frames. See the comment at the top of the file for context.
+  const DOWN_ARROW = '\u2193';
+  const UP_ARROW = '\u2191';
+
+
+
+
 } );
