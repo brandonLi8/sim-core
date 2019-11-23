@@ -117,7 +117,7 @@ define( require => {
      * @returns {number}
      */
     gcd( a, b ) {
-      return Math.abs( b === 0 ? a : this.gcd( b, Util.mod( a, b ) ) );
+      return Math.abs( b === 0 ? a : this.gcd( b, a % b ) );
     },
 
     /**
@@ -254,7 +254,7 @@ define( require => {
      * @param {number} epsilon
      * @returns {boolean}
      */
-    equalsEpsilon( a, b, epsilon = Utils.EPSILON ) {
+    equalsEpsilon( a, b, epsilon = Util.EPSILON ) {
       return Math.abs( a - b ) <= epsilon;
     },
 
