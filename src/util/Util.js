@@ -9,6 +9,9 @@
 define( require => {
   'use strict';
 
+  // modules
+  const assert = require( 'SIM_CORE/util/assert' );
+
   const Util = {
 
     //========================================================================================
@@ -19,20 +22,68 @@ define( require => {
     EPSILON: 1e-5,
     PHI: ( 1 + Math.sqrt( 5 ) ) / 2, // see https://en.wikipedia.org/wiki/Golden_ratio
 
-    // conversion prefixes
+    // conversion prefixes, in base units per unit
     MICRO: 1e-6,
     MILLI: 0.001,
     CENTI: 0.01,
     KILO: 1000,
     GIGA: 1e9,
 
-
-    //========================================================================================
-    // Static Methods
-    //========================================================================================
+    //----------------------------------------------------------------------------------------
+    // Conversions
+    //----------------------------------------------------------------------------------------
+    /**
+     * Converts degrees to radians.
+     * @public
+     *
+     * @param {number} degrees
+     * @return {number}
+     */
+    toRadians( degrees ) {
+      return degrees * ( Math.PI / 180 ); // dimensional analysis: deg * (PI Rad / 180 Deg)
+    },
 
     /**
-     * Returns the original value if it is inclusively within the [max,min] range. If it's below the range, min is
+     * Converts radians to degrees.
+     * @public
+     *
+     * @param {number} radians
+     * @returns {number}
+     */
+    toDegrees( radians ) {
+      return radians * ( 180 / Math.PI ); // dimensional analysis: rad * (180 Deg / PI Rad)
+    },
+
+    /**
+     * Converts from the base unit to a conversion factor (see Static References).
+     * For instance, to convert 2 meters to centimeters, call `Util.convertTo( 2, Util.CENTI );`
+     * @public
+     *
+     * @param {number} value
+     * @param {number} conversionFactor - in base units per other unit
+     * @returns {number}
+     */
+    convertTo( value, conversionFactor ) {
+      return value / conversionFactor; // dimensional analysis: base units * ( units / base units )
+    }
+
+    /**
+     * Converts to the base unit from a conversion factor (see Static References).
+     * For instance, to convert 200 centimeters to meters (the base unit), call `Util.convertFrom( 200, Util.CENTI )`
+     *
+     * @param {number} value
+     * @param {number} conversionFactor - in base units per other unit
+     * @returns {number}
+     */
+    convertFrom( value, conversionFactor ) {
+      return value * conversionFactor; // dimensional analysis: units * ( base units / units )
+    }
+
+    //----------------------------------------------------------------------------------------
+    // Math Utilities
+    //----------------------------------------------------------------------------------------
+    /**
+     * Returns the original value if it is inclusively within the [ max, min ] range. If it's below the range, min is
      * returned, and if it's above the range, max is returned.
      * @public
      *
@@ -41,7 +92,7 @@ define( require => {
      * @param {number} max
      * @returns {number}
      */
-    clamp: ( value, min, max ) => {
+    clamp( value, min, max ) {
       if ( value < min ) {
         return min;
       }
@@ -54,28 +105,6 @@ define( require => {
     },
 
     /**
-     * Converts degrees to radians.
-     * @public
-     *
-     * @param {number} degrees
-     * @returns {number}
-     */
-    toRadians: function( degrees ) {
-      return Math.PI * degrees / 180;
-    },
-
-    /**
-     * Converts radians to degrees.
-     * @public
-     *
-     * @param {number} radians
-     * @returns {number}
-     */
-    toDegrees: function( radians ) {
-      return 180 * radians / Math.PI;
-    },
-
-    /**
      * Greatest Common Divisor, using https://en.wikipedia.org/wiki/Euclidean_algorithm. See
      * https://en.wikipedia.org/wiki/Greatest_common_divisor
      * @public
@@ -84,7 +113,7 @@ define( require => {
      * @param {number} b
      * @returns {number}
      */
-    gcd: function( a, b ) {
+    gcd( a, b ) {
       return Math.abs( b === 0 ? a : this.gcd( b, Util.mod( a, b ) ) );
     },
 
@@ -96,20 +125,20 @@ define( require => {
      * @param {number} b
      * @returns {number} lcm, an integer
      */
-    lcm: function( a, b ) {
+    lcm( a, b ) {
       return Util.roundSymmetric( Math.abs( a * b ) / Util.gcd( a, b ) );
     },
 
     /**
-     * Returns an array of the real roots of the quadratic equation $ax + b=0$, or null if every value is a solution.
+     * Returns an array of the real roots of the quadratic equation ax + b = 0, or null if every value is a solution.
      * @public
      *
      * @param {number} a
      * @param {number} b
-     * @returns {Array.<number>|null} - The real roots of the equation, or null if all values are roots. If the root has
-     *                                  a multiplicity larger than 1, it will be repeated that many times.
+     * @returns {number[]|null} - The real roots of the equation, or null if all values are roots. If the root has
+     *                            a multiplicity larger than 1, it will be repeated that many times.
      */
-    solveLinearRootsReal: function( a, b ) {
+    solveLinearRootsReal( a, b ) {
       if ( a === 0 ) {
         if ( b === 0 ) {
           return null;
@@ -124,65 +153,64 @@ define( require => {
     },
 
     /**
-     * Returns an array of the real roots of the quadratic equation $ax^2 + bx + c=0$, or null if every value is a
+     * Returns an array of the real roots of the quadratic equation ax^2 + bx + c = 0, or null if every value is a
      * solution. If a is nonzero, there should be between 0 and 2 (inclusive) values returned.
      * @public
      *
      * @param {number} a
      * @param {number} b
      * @param {number} c
-     * @returns {Array.<number>|null} - The real roots of the equation, or null if all values are roots. If the root has
-     *                                  a multiplicity larger than 1, it will be repeated that many times.
+     * @returns {number[]|null} - The real roots of the equation, or null if all values are roots. If the root has
+     *                            a multiplicity larger than 1, it will be repeated that many times.
      */
-    solveQuadraticRootsReal: function( a, b, c ) {
+    solveQuadraticRootsReal( a, b, c ) {
       // Check for a degenerate case where we don't have a quadratic, or if the order of magnitude is such where the
       // linear solution would be expected
-      const epsilon = 1E7;
-      if ( a === 0 || Math.abs( b / a ) > epsilon || Math.abs( c / a ) > epsilon ) {
+      if ( a === 0 || Math.abs( b / a ) > Util.EPSILON || Math.abs( c / a ) > Util.EPSILON ) {
         return Util.solveLinearRootsReal( b, c );
       }
-
       const discriminant = b * b - 4 * a * c;
       if ( discriminant < 0 ) {
         return [];
       }
-      const sqrt = Math.sqrt( discriminant );
-      // TODO: how to handle if discriminant is 0? give unique root or double it?
-      // TODO: probably just use Complex for the future
-      return [
-        ( -b - sqrt ) / ( 2 * a ),
-        ( -b + sqrt ) / ( 2 * a )
-      ];
+      else if ( discriminant === 0 ) {
+        return [ -b / ( 2 * a ) ]
+      }
+      else {
+        return [
+          ( -b - Math.sqrt( discriminant ) ) / ( 2 * a ),
+          ( -b + Math.sqrt( discriminant ) ) / ( 2 * a )
+        ];
+      }
     },
 
-
     /**
-     * Returns the unique real cube root of x, such that $y^3=x$.
+     * Returns the unique real cube root of x.
      * @public
      *
      * @param {number} x
      * @returns {number}
      */
-    cubeRoot: function( x ) {
+    cubeRoot( x ) {
       return x >= 0 ? Math.pow( x, 1 / 3 ) : -Math.pow( -x, 1 / 3 );
     },
 
     /**
-     * Rounds using "Round half away from zero" algorithm. See dot#35.
+     * Rounds using "Round half away from zero" algorithm.
      * @public
      *
      * JavaScript's Math.round is not symmetric for positive and negative numbers, it uses IEEE 754 "Round half up".
      * See https://en.wikipedia.org/wiki/Rounding#Round_half_up.
-     * For sims, we want to treat positive and negative values symmetrically, which is IEEE 754 "Round half away from zero",
+     * To treat positive and negative values symmetrically, this method uses the IEEE 754 "Round half away from zero",
      * See https://en.wikipedia.org/wiki/Rounding#Round_half_away_from_zero
      *
-     * Note that -0 is rounded to 0, since we typically do not want to display -0 in sims.
+     * Note that -0 is rounded to 0.
      *
      * @param {number} value                               `
      * @returns {number}
      */
-    roundSymmetric: function( value ) {
-      return ( ( value < 0 ) ? -1 : 1 ) * Math.round( Math.abs( value ) );
+    roundSymmetric( value ) {
+      return Util.sign( value ) * Math.round( Math.abs( value ) );
     },
 
     /**
@@ -195,39 +223,23 @@ define( require => {
      *
      * @param {number} value
      * @param {number} decimalPlaces
-     * @returns {string}
-     */
-    toFixed: function( value, decimalPlaces ) {
-      const multiplier = Math.pow( 10, decimalPlaces );
-      const newValue = Util.roundSymmetric( value * multiplier ) / multiplier;
-      return newValue.toFixed( decimalPlaces );
-    },
-
-    /**
-     * A predictable implementation of toFixed, where the result is returned as a number instead of a string.
-     * @public
-     *
-     * JavaScript's toFixed is notoriously buggy, behavior differs depending on browser,
-     * because the spec doesn't specify whether to round or floor.
-     * Rounding is symmetric for positive and negative values, see Util.roundSymmetric.
-     *
-     * @param {number} value
-     * @param {number} decimalPlaces
      * @returns {number}
      */
-    toFixedNumber: function( value, decimalPlaces ) {
-      return parseFloat( Util.toFixed( value, decimalPlaces ) );
+    toFixed( value, decimalPlaces ) {
+      const multiplier = Math.pow( 10, decimalPlaces );
+      const newValue = Util.roundSymmetric( value * multiplier ) / multiplier;
+      return parseFloat( newValue.toFixed( decimalPlaces ) );
     },
 
     /**
-     * Returns whether the input is a number that is an integer (no fractional part).
+     * Returns whether the input is a number that is an integer (no fractional part), for IE support.
      * @public
      *
      * @param {number} n
      * @returns {boolean}
      */
-    isInteger: function( n ) {
-      assert && assert( typeof n === 'number', 'isInteger requires its argument to be a number: ' + n );
+    isInteger( n ) {
+      assert( typeof n === 'number', 'isInteger requires its argument to be a number: ' + n );
       return n % 1 === 0;
     },
 
@@ -239,7 +251,7 @@ define( require => {
      * @param {number} epsilon
      * @returns {boolean}
      */
-    equalsEpsilon: function( a, b, epsilon ) {
+    equalsEpsilon( a, b, epsilon = Utils.EPSILON ) {
       return Math.abs( a - b ) <= epsilon;
     },
 
@@ -248,14 +260,16 @@ define( require => {
      * https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Math/sign
      * @public
      *
-     * We cannot use Math.sign because it is not supported on IE
-     *
      * @param {number} x
      * @returns {number}
      */
-    sign: function( x ) {
+    sign( x ) {
       return ( ( x > 0 ) - ( x < 0 ) ) || +x;
     },
+
+    //----------------------------------------------------------------------------------------
+    // Hyperbolic Trig Functions
+    //----------------------------------------------------------------------------------------
 
     /**
      * Function that returns the hyperbolic cosine of a number
@@ -264,7 +278,7 @@ define( require => {
      * @param {number} value
      * @returns {number}
      */
-    cosh: function( value ) {
+    cosh( value ) {
       return ( Math.exp( value ) + Math.exp( -value ) ) / 2;
     },
 
@@ -275,9 +289,13 @@ define( require => {
      * @param {number} value
      * @returns {number}
      */
-    sinh: function( value ) {
+    sinh( value ) {
       return ( Math.exp( value ) - Math.exp( -value ) ) / 2;
     },
+
+    //----------------------------------------------------------------------------------------
+    // Logarithmic Functions
+    //----------------------------------------------------------------------------------------
 
     /**
      * Log base-10, since it wasn't included in every supported browser.
@@ -286,18 +304,16 @@ define( require => {
      * @param {number} val
      * @returns {number}
      */
-    log10: function( val ) {
+    log10( val ) {
       return Math.log( val ) / Math.LN10;
     },
-
-
 
     /**
      * Determines the number of decimal places in a value.
      * @param {number} value
      * @returns {number}
      */
-    numberOfDecimalPlaces: function( value ) {
+    numberOfDecimalPlaces( value ) {
       let count = 0;
       let multiplier = 1;
       while ( ( value * multiplier ) % 1 !== 0 ) {
@@ -307,20 +323,51 @@ define( require => {
       return count;
     },
 
+    //----------------------------------------------------------------------------------------
+    // Miscellaneous Utilities
+    //----------------------------------------------------------------------------------------
     /**
-     * Rounds a value to a multiple of a specified interval.
-     * Examples:
-     * roundToInterval( 0.567, 0.01 ) -> 0.57
-     * roundToInterval( 0.567, 0.02 ) -> 0.56
-     * roundToInterval( 5.67, 0.5 ) -> 5.5
+     * Determines if the passed value is a array type.
+     * See http://stackoverflow.com/questions/4775722/javascript-check-if-object-is-array
      *
-     * @param {number} value
-     * @param {number} interval
-     * @returns {number}
+     * @param {*} value
+     * @returns {boolean}
      */
-    roundToInterval: function( value, interval ) {
-      return Util.toFixedNumber( Util.roundSymmetric( value / interval ) * interval,
-        Util.numberOfDecimalPlaces( interval ) );
+    isArray( value ) {
+      return Object.prototype.toString.call( value ) === '[object Array]';
+    },
+
+    /**
+     * Removes the first matching object from an Array. Errors if the item is not found in the array.
+     * @public
+     *
+     * @param {*[]} array
+     * @param {*} item - the item to remove from the array
+     */
+    arrayRemove( array, item ) {
+      assert( Util.isArray( array ), `invalid array: ${ array }` );
+
+      const index = array.indexOf( item );
+      assert( index >= 0, `item, ${ item } not found in Array` );
+
+      array.splice( index, 1 );
+    },
+
+    //----------------------------------------------------------------------------------------
+    // String Utilities
+    //----------------------------------------------------------------------------------------
+
+    /**
+     * Converts a string separated with dashes to camel case. For instance: Util.toCamelCase( 'foo-bar' ) -> 'fooBar'
+     * See http://stackoverflow.com/questions/10425287/convert-string-to-camelcase-with-regular-expression
+     *
+     * @param {string} str - the input string
+     * @returns {string}
+     */
+    toCamelCase( str ) {
+      return str.toLowerCase().replace( /-(.)/g, ( match, group ) => {
+        return group.toUpperCase();
+      } );
     }
   };
 
