@@ -141,14 +141,9 @@ define( require => {
      * @returns {number[]|null} - The real roots of the equation, or null if all values are roots. If the root has
      *                            a multiplicity larger than 1, it will be repeated that many times.
      */
-    solveLinearRootsReal( a, b ) {
+    solveLinearRoots( a, b ) {
       if ( a === 0 ) {
-        if ( b === 0 ) {
-          return null;
-        }
-        else {
-          return [];
-        }
+        return ( b === 0 ) ? null : [];
       }
       else {
         return [ -b / a ];
@@ -166,12 +161,10 @@ define( require => {
      * @returns {number[]|null} - The real roots of the equation, or null if all values are roots. If the root has
      *                            a multiplicity larger than 1, it will be repeated that many times.
      */
-    solveQuadraticRootsReal( a, b, c ) {
-      // Check for a degenerate case where we don't have a quadratic, or if the order of magnitude is such where the
-      // linear solution would be expected
-      if ( a === 0 || Math.abs( b / a ) > Util.EPSILON || Math.abs( c / a ) > Util.EPSILON ) {
-        return Util.solveLinearRootsReal( b, c );
-      }
+    solveQuadraticRoots( a, b, c ) {
+      // Check for a degenerate case where we don't have a quadratic
+      if ( a === 0 ) { return Util.solveLinearRoots( b, c ); }
+
       const discriminant = b * b - 4 * a * c;
       if ( discriminant < 0 ) {
         return [];
@@ -271,7 +264,7 @@ define( require => {
     },
 
     //----------------------------------------------------------------------------------------
-    // Hyperbolic Trig Functions
+    // Elementary Functions
     //----------------------------------------------------------------------------------------
 
     /**
@@ -296,9 +289,6 @@ define( require => {
       return ( Math.exp( value ) - Math.exp( -value ) ) / 2;
     },
 
-    //----------------------------------------------------------------------------------------
-    // Logarithmic Functions
-    //----------------------------------------------------------------------------------------
 
     /**
      * Log base-10, since it wasn't included in every supported browser.
@@ -311,8 +301,14 @@ define( require => {
       return Math.log( val ) / Math.LN10;
     },
 
+    //----------------------------------------------------------------------------------------
+    // Miscellaneous Utilities
+    //----------------------------------------------------------------------------------------
+
     /**
      * Determines the number of decimal places in a value.
+     * @public
+     *
      * @param {number} value
      * @returns {number}
      */
@@ -326,12 +322,10 @@ define( require => {
       return count;
     },
 
-    //----------------------------------------------------------------------------------------
-    // Miscellaneous Utilities
-    //----------------------------------------------------------------------------------------
     /**
      * Determines if the passed value is a array type.
      * See http://stackoverflow.com/questions/4775722/javascript-check-if-object-is-array
+     * @public
      *
      * @param {*} value
      * @returns {boolean}

@@ -17,13 +17,6 @@ define( require => {
   const UtilTester = () => {
 
     //----------------------------------------------------------------------------------------
-    // Equals Epsilon (test first to use in other tests)
-    //----------------------------------------------------------------------------------------
-    // truenit.ok( Util.equalsEpsilon( 5.000001, 5 ) );
-    // truenit.notOk( Util.equalsEpsilon( 5.12093, 1.213 ) );
-    // truenit.ok( Util.equalsEpsilon( 5, 5 ) );
-
-    //----------------------------------------------------------------------------------------
     // Conversion Tests
     //----------------------------------------------------------------------------------------
 
@@ -66,15 +59,81 @@ define( require => {
     truenit.equals( Util.lcm( 15, 20 ), 60 );
     truenit.equals( Util.lcm( 0, 1000 ), 0 );
 
-    // solveLinearRootsReal
-    truenit.equals( Util.solveLinearRootsReal( 0, 0 ), null );        // 0 = 0        => null
-    truenit.arrayApproximate( Util.solveLinearRootsReal( 1, 0 ), [ 0 ] );       // x = 0        => x = 0
-    truenit.arrayApproximate( Util.solveLinearRootsReal( -1, 0 ), [ 0 ] );      // -x = 0       => x = 0
-    truenit.arrayApproximate( Util.solveLinearRootsReal( 0, 1 ), [] );          // 1 = 0        => null
-    truenit.arrayApproximate( Util.solveLinearRootsReal( 1, 1 ), [ -1 ] );      // x + 1 = 0    => x = -1
-    truenit.arrayApproximate( Util.solveLinearRootsReal( -1, 1 ), [ 1 ] );      // -x + 1 = 0   => x = 1
-    truenit.arrayApproximate( Util.solveLinearRootsReal( 3, 2 ), [ -2 / 3 ] );  // 3x + 2 = 0   => x = -2/3
-    truenit.arrayApproximate( Util.solveLinearRootsReal( -3, 2 ), [ 2 / 3 ] );  // -3x + 2 = 0  => x = 2/3
+    // solveLinearRoots
+    truenit.equals( Util.solveLinearRoots( 0, 0 ), null );                  // 0 = 0        => null
+    truenit.arrayApproximate( Util.solveLinearRoots( 1, 0 ), [ 0 ] );       // x = 0        => x = 0
+    truenit.arrayApproximate( Util.solveLinearRoots( -1, 0 ), [ 0 ] );      // -x = 0       => x = 0
+    truenit.arrayApproximate( Util.solveLinearRoots( 0, 1 ), [] );          // 1 = 0        => _
+    truenit.arrayApproximate( Util.solveLinearRoots( 1, 1 ), [ -1 ] );      // x + 1 = 0    => x = -1
+    truenit.arrayApproximate( Util.solveLinearRoots( -1, 1 ), [ 1 ] );      // -x + 1 = 0   => x = 1
+    truenit.arrayApproximate( Util.solveLinearRoots( 3, 2 ), [ -2 / 3 ] );  // 3x + 2 = 0   => x = -2/3
+    truenit.arrayApproximate( Util.solveLinearRoots( -3, 2 ), [ 2 / 3 ] );  // -3x + 2 = 0  => x = 2/3
+
+    // solveQuadraticRoots
+    truenit.equals( Util.solveQuadraticRoots( 0, 0, 0 ), null );                       // 0 = 0         => null
+    truenit.arrayApproximate( Util.solveQuadraticRoots( 0, 1, 0 ), [ 0 ] );            // x = 0         => x = 0
+    truenit.arrayApproximate( Util.solveQuadraticRoots( 0, 0, 1 ), [] );               // 1 = 0         => _
+    truenit.arrayApproximate( Util.solveQuadraticRoots( 1, -6, 9 ), [ 3 ] );           // x^2 - 6x + 0  => x = 3
+    truenit.arrayApproximate( Util.solveQuadraticRoots( 0, -3, 2 ), [ 2 / 3 ] );       // -3x + 2       => x = 2 /3
+    truenit.arrayApproximate( Util.solveQuadraticRoots( 1, 0, 1 ), [] );               // x^2 + 1 = 0   => null
+    truenit.arrayApproximate( Util.solveQuadraticRoots( 2, -1, -3 ), [ -1, 3 / 2 ] );  // 2x^2 -x - 3   => x = -1 || 3/2
+
+    // cubeRoot
+    truenit.equals( Util.cubeRoot( 8 ), 2 );
+    truenit.equals( Util.cubeRoot( -8 ), -2 );
+    truenit.equals( Util.cubeRoot( 27 ), 3 );
+
+    // roundSymmetric
+    truenit.equals( Util.roundSymmetric( 0.5 ), 1 );
+    truenit.equals( Util.roundSymmetric( 0.3 ), 0 );
+    truenit.equals( Util.roundSymmetric( 0.8 ), 1 );
+    truenit.equals( Util.roundSymmetric( -0.5 ), -1 );
+    for ( let i = 0; i < 20; i++ ) {
+      truenit.equals( Util.roundSymmetric( i ), i );
+      truenit.equals( Util.roundSymmetric( -i ), -i );
+      truenit.equals( Util.roundSymmetric( i + 0.5 ), i + 1 );
+      truenit.equals( Util.roundSymmetric( -i - 0.5 ), -i - 1 );
+    }
+
+    // toFixed
+    truenit.equals( Util.toFixed( 54.23, 2 ), 54.23 );
+    truenit.equals( Util.toFixed( 60, 100 ), 60 );
+    truenit.equals( Util.toFixed( 60.32, 0 ), 60 );
+    truenit.equals( Util.toFixed( 60.3235, 3 ), 60.324 );
+    truenit.equals( Util.toFixed( 60.3236, 3 ), 60.324 );
+    truenit.equals( Util.toFixed( 60.3234, 3 ), 60.323 );
+
+    // isInteger
+    truenit.ok( Util.isInteger( 60.00 ) );
+    truenit.ok( Util.isInteger( 34 ) );
+    truenit.ok( Util.isInteger( 0 ) );
+    truenit.notOk( Util.isInteger( 60.02 ) );
+    truenit.notOk( Util.isInteger( 62.2 ) );
+
+    // equalsEpsilon
+    truenit.ok( Util.equalsEpsilon( 5.000001, 5 ) );
+    truenit.notOk( Util.equalsEpsilon( 5.12093, 1.213 ) );
+    truenit.ok( Util.equalsEpsilon( 5, 5 ) );
+
+    // sign
+    truenit.equals( Util.sign( 3 ), 1 );
+    truenit.equals( Util.sign( '-3' ), -1 );
+    truenit.equals( Util.sign( -0 ), -0 );
+
+    //----------------------------------------------------------------------------------------
+    // Hyperbolic Trig Functions
+    //----------------------------------------------------------------------------------------
+
+    // cosh
+    truenit.equals( Util.cosh( 0 ), 1 );
+    truenit.approximate( Util.cosh( 3 ), 10.067662 );
+    truenit.approximate( Util.cosh( -10 ), 11013.23292 );
+
+    // sinh
+    truenit.equals( Util.sinh( 0 ), 0 );
+    truenit.approximate( Util.sinh( 3 ), 10.017874974099 );
+    truenit.approximate( Util.sinh( -10 ), -11013.232874703 );
+
 
   };
 
