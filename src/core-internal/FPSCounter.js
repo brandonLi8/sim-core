@@ -110,7 +110,7 @@ define( require => {
      */
     update( averageFPS, minInstantFPS, maxInstantFPS ) {
       // convert from frames per second to milliseconds per frame
-      const msPerFrame = Util.toFixed( Util.convertTo( 1 / averageFPS, Util.MILLI ) , DECIMAL_PLACES );
+      const msPerFrame = Util.toFixed( Util.convertTo( 1 / averageFPS, Util.MILLI ), DECIMAL_PLACES );
 
       // round the values
       const fps = Util.toFixed( averageFPS, DECIMAL_PLACES );

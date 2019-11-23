@@ -70,7 +70,7 @@ define( require => {
     },
 
     /**
-     * Converts to the base unit from a a custom unit (see Static References).
+     * Converts to the base unit from a custom unit (see Static References).
      * For instance, to convert 300 centimeters to meters, call `Util.convertFrom( 300, Util.CENTI )`
      *
      * @param {number} value
@@ -170,7 +170,7 @@ define( require => {
         return [];
       }
       else if ( discriminant === 0 ) {
-        return [ -b / ( 2 * a ) ]
+        return [ -b / ( 2 * a ) ];
       }
       else {
         return [
@@ -252,7 +252,7 @@ define( require => {
     },
 
     /**
-     * Polyfill for Math.sign from MDN, see
+     * Polyfill for the Math object's sign method from MDN, see
      * https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Math/sign
      * @public
      *
