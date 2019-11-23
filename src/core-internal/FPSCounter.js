@@ -19,10 +19,10 @@
  *   (4) the highest the instantaneous FPS hit in the last cycle
  *
  * The format that is displayed is:
- * `FPS [{{DOWN_ARROW}}low {{UP_ARROW}}high] - ms/frame`
+ * `FPS [ {{DOWN_ARROW}}low {{UP_ARROW}}high ] -- ~ms/frame`
  *
  * For instance:
- * `64.4 FPS [{{DOWN_ARROW}}50.2 {{UP_ARROW}}69.3] - 15.5 ms/frame`
+ * `64.4 FPS [ {{DOWN_ARROW}}50.2 {{UP_ARROW}}69.3 ] -- ~15.5 ms/frame`
  *
  * @author Brandon Li <brandon.li820@gmail.com>
  */
@@ -36,8 +36,8 @@ define( require => {
 
   // constants
   const COUNTER_CYCLE = 60; // In frames. See the comment at the top of the file for context.
-  const DOWN_ARROW = '\u2193';
-  const UP_ARROW = '\u2191';
+  const DOWN_ARROW = '\u21A1';
+  const UP_ARROW = '\u219F';
   const DECIMAL_PLACES = 2;
 
   const Util = {
@@ -95,12 +95,20 @@ define( require => {
         assert( !options.children, 'FPSCounter sets children.' );
       }
 
+      const font = new FontFace( 'Montserrat', `url('https://fonts.googleapis.com/css?family=Montserrat&display=swap')` );
+      font.load();
+
       const defaults = {
         type: 'div',
         style: {
           'z-index': 99999999,
           position: 'absolute',
-          color: 'red'
+          color: 'red',
+          left: '10px',
+          top: '5px',
+          fontSize: '17px',
+          fontWeight: 500,
+          userSelect: 'none'
         },
         id: 'fps-counter'
       };
@@ -148,7 +156,7 @@ define( require => {
       const min = Util.toFixed( minInstantFPS, DECIMAL_PLACES );
       const max = Util.toFixed( maxInstantFPS, DECIMAL_PLACES );
 
-      this.setText( `${ fps } FPS [${ DOWN_ARROW } ${ min } ${ UP_ARROW } ${ max }] - ${ msPerFrame } ms/frame` );
+      this.setText( `${ fps } FPS [ ${ DOWN_ARROW }${ min } ${ UP_ARROW }${ max } ] -- ~${ msPerFrame } ms/frame` );
     }
 
     /**
