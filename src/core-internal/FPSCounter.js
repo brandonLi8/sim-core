@@ -33,6 +33,7 @@ define( require => {
   // modules
   const assert = require( 'SIM_CORE/util/assert' );
   const DOMObject = require( 'SIM_CORE/core-internal/DOMObject' );
+  const Util = require( 'SIM_CORE/util/Util' );
 
   // constants
   const COUNTER_CYCLE = 60; // In frames. See the comment at the top of the file for context.
@@ -40,44 +41,6 @@ define( require => {
   const UP_ARROW = '\u219F';
   const DECIMAL_PLACES = 2;
 
-  const Util = {
-    /**
-     * Rounds using "Round half away from zero" algorithm. See dot#35.
-     * @public
-     *
-     * JavaScript's Math.round is not symmetric for positive and negative numbers, it uses IEEE 754 "Round half up".
-     * See https://en.wikipedia.org/wiki/Rounding#Round_half_up.
-     * For sims, we want to treat positive and negative values symmetrically, which is IEEE 754
-     * "Round half away from zero",
-     * See https://en.wikipedia.org/wiki/Rounding#Round_half_away_from_zero
-     *
-     * Note that -0 is rounded to 0, since we typically do not want to display -0 in sims.
-     *
-     * @param {number} value                               `
-     * @returns {number}
-     */
-    roundSymmetric: ( value ) => {
-      return ( ( value < 0 ) ? -1 : 1 ) * Math.round( Math.abs( value ) );
-    },
-
-    /**
-     * A predictable implementation of toFixed.
-     * @public
-     *
-     * JavaScript's toFixed is notoriously buggy, behavior differs depending on browser,
-     * because the spec doesn't specify whether to round or floor.
-     * Rounding is symmetric for positive and negative values, see Util.roundSymmetric.
-     *
-     * @param {number} value
-     * @param {number} decimalPlaces
-     * @returns {string}
-     */
-    toFixed: ( value, decimalPlaces ) => {
-      const multiplier = Math.pow( 10, decimalPlaces );
-      const newValue = Util.roundSymmetric( value * multiplier ) / multiplier;
-      return newValue.toFixed( decimalPlaces );
-    }
-  };
 
   class FPSCounter extends DOMObject {
 
@@ -94,9 +57,6 @@ define( require => {
         assert( !options.id && !options.class && !options.attributes, 'FPSCounter sets options.attributes' );
         assert( !options.children, 'FPSCounter sets children.' );
       }
-
-      const font = new FontFace( 'Montserrat', `url('https://fonts.googleapis.com/css?family=Montserrat&display=swap')` );
-      font.load();
 
       const defaults = {
         type: 'div',
