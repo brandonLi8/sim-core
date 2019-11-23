@@ -50,9 +50,9 @@ define( require => {
   const LOADER_CIRCLE_INNER_RADIUS = ( LOADER_CIRCLE_RELATIVE - LOADER_STROKE_WIDTH ) / 2; // in percentage
 
   // Loading bandwidths. See comment at the top of the file.
-  const IMAGE_LOADING_BANDWIDTH = 84;
+  const IMAGE_LOADING_BANDWIDTH = 70 + Math.random() * 10;
   const DOM_LOADING_BANDWIDTH = 100 - IMAGE_LOADING_BANDWIDTH;
-
+  const MIN = 600;
 
   class Loader extends DOMObject {
 
@@ -129,13 +129,13 @@ define( require => {
         namespace: XML_NAMESPACE,
         attributes: {
           viewBox: LOADER_CIRCLE_VIEW_BOX,
-          transform: 'scale( 1, -1 )',  // Invert the y-axis to match traditional cartesian coordinates.
           'shape-rendering': 'geometricPrecision', // Use geometricPrecision for aesthetic accuracy.
         },
         style: {
           width: LOADER_CIRCLE_WIDTH,
           maxWidth: LOADER_CIRCLE_MAX_SIZE,
-          minWidth: LOADER_CIRCLE_MIN_SIZE
+          minWidth: LOADER_CIRCLE_MIN_SIZE,
+          transform: 'scale( 1, -1 )'  // Invert the y-axis to match traditional cartesian coordinates.
         }
       } );
 
@@ -149,6 +149,7 @@ define( require => {
 
       let loadedImages = 0;
       let loadedPercentage = 0;
+
       const incrementImageLoad = () => {
         const percentage = 1 / window.simImages.length * IMAGE_LOADING_BANDWIDTH;
         loadedPercentage += percentage;
@@ -159,12 +160,15 @@ define( require => {
 
 
       const finishDom = () => {
-        isReady( document, () => {
+        foregroundCircle.setAttribute( 'd', getCirclePathData( IMAGE_LOADING_BANDWIDTH ) );
+
+        isReady( () => {
+
           loadedPercentage = 99.99;
           window.setTimeout( () => {
             foregroundCircle.setAttribute( 'd', getCirclePathData( loadedPercentage ) );
             window.setTimeout( () => this.dispose(), 400 );
-          }, ( new Date() - startLoadingTime ) * DOM_LOADING_BANDWIDTH / 100 * ( Math.random() * 9 ) );
+          }, Math.max( ( new Date() - startLoadingTime ) * DOM_LOADING_BANDWIDTH / 100 * ( Math.random() * 9 ), MIN ) );
         } );
       }
       if ( window.simImages ) {
@@ -183,7 +187,7 @@ define( require => {
             incrementImageLoad( loadedImages );
             i++;
             if ( loadedImages !== window.simImages.length ) {
-              window.setTimeout( step, ( new Date() - dt ) * 4.5 );
+              window.setTimeout( step, Math.max( ( new Date() - dt ) * 4.5, 80 ) );
             }
             else {
               finishDom();
@@ -196,6 +200,9 @@ define( require => {
       else {
         window.setTimeout( finishDom, 200 );
       }
+
+
+
 
 
 
@@ -228,16 +235,16 @@ define( require => {
   }
 
 // function that checks if a node is ready
-function isReady( Dom, callback ){
+function isReady( callback ){
   // in case the document is already rendered
-  if ( Dom.readyState != "loading" ) callback();
+  if ( document.readyState !== 'loading' ) callback();
   // modern browsers
-  else if ( Dom.addEventListener )
-    Dom.addEventListener( "DOMContentLoaded", callback );
+  else if ( document.addEventListener )
+    document.addEventListener( 'DOMContentLoaded', callback );
   // IE <= 8
-  else Dom.attachEvent( "onreadystatechange", function(){
-    if ( Dom.readyState == "complete" ) callback();
-  } );
+  else document.attachEvent( 'onreadystatechange', function(){
+    if ( document.readyState == 'complete' ) callback();
+  } )
 }
 
 
