@@ -36,6 +36,7 @@ define( require => {
   'use strict';
 
   // modules
+  const assert = require( 'SIM_CORE/util/assert' ).always;
   const DOMObject = require( 'SIM_CORE/core-internal/DOMObject' );
 
   return {
@@ -69,7 +70,7 @@ define( require => {
 
       // If the image src fails to load, throw an error.
       image.element.onerror = error => {
-        throw new Error( `invalid image src: ${ image.element.src }` );
+        assert( false, `invalid image src: ${ image.element.src }` )
       };
 
       //----------------------------------------------------------------------------------------
