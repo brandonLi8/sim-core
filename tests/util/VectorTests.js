@@ -54,15 +54,15 @@ define( require => {
     truenit.ok( vector2.equals( vector4 ) );
     truenit.ok( vector4.equals( vector2.copy() ) );
     truenit.notOk( vector3.equals( vector2 ) );
-    truenit.notOk( vector1.equals( closeVector) );
-    truenit.ok( vector1.equalsEpsilon( closeVector) );
-    truenit.notOk( vector1.equals( closeVector) );
+    truenit.notOk( vector1.equals( closeVector ) );
+    truenit.ok( vector1.equalsEpsilon( closeVector ) );
+    truenit.notOk( vector1.equals( closeVector ) );
 
     //----------------------------------------------------------------------------------------
     // IsFinite tests
     //----------------------------------------------------------------------------------------
     const nonFiniteVector1 = new Vector( 1.7976931348623157E+10308, 1.7976931348623157E+10308 );
-    const nonFiniteVector2 = new Vector( Infinity, Infinity );
+    // const nonFiniteVector2 = new Vector( Infinity, Infinity );
 
     truenit.ok( vector1.isFinite() && vector2.isFinite() && vector3.isFinite() && Vector.ZERO.isFinite() );
     truenit.notOk( nonFiniteVector1.isFinite() );
@@ -88,7 +88,7 @@ define( require => {
 
     // Copy the vectors
     const vector1Copy = vector1.copy();
-    const vector2Copy = vector2.copy();
+    // const vector2Copy = vector2.copy();
     const vector3Copy = vector3.copy();
     const vector4Copy = vector4.copy();
 

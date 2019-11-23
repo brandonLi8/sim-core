@@ -13,10 +13,10 @@ define( require => {
   // modules
   const assert = require( 'SIM_CORE/util/assert' );
   const Loader = require( 'SIM_CORE/core-internal/Loader' );
-  const Node = require( 'SIM_CORE/scenery/Node' );
+  // const Node = require( 'SIM_CORE/scenery/Node' );
   const QueryParameters = require( 'SIM_CORE/util/QueryParameters' );
   const Display = require( 'SIM_CORE/core-internal/Display' );
-  const DOMObject = require( 'SIM_CORE/core-internal/DOMObject' );
+  // const DOMObject = require( 'SIM_CORE/core-internal/DOMObject' );
   const FPSCounter = require( 'SIM_CORE/core-internal/FPSCounter' );
 
   // constants
@@ -42,7 +42,7 @@ define( require => {
   // const fifth7 = require( 'image!SIM_CORE/Projects/Metronome1.jpg')
 
   class Sim {
-    constructor( test ) {
+    constructor() {
 
       // initialize the query parameter functionality
       if ( SIM_CORE_QUERY_PARAMETERS.ea ) assert.enableAssertions();
@@ -74,7 +74,6 @@ define( require => {
       // display.addChild( fifth7 )
 
       if ( SIM_CORE_QUERY_PARAMETERS.fps ) {
-        console.log( 'erhe')
         const counter = new FPSCounter();
         counter.start();
         display.addChild( counter );

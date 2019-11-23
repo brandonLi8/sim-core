@@ -47,7 +47,8 @@ define( require => {
      *
      * JavaScript's Math.round is not symmetric for positive and negative numbers, it uses IEEE 754 "Round half up".
      * See https://en.wikipedia.org/wiki/Rounding#Round_half_up.
-     * For sims, we want to treat positive and negative values symmetrically, which is IEEE 754 "Round half away from zero",
+     * For sims, we want to treat positive and negative values symmetrically, which is IEEE 754
+     * "Round half away from zero",
      * See https://en.wikipedia.org/wiki/Rounding#Round_half_away_from_zero
      *
      * Note that -0 is rounded to 0, since we typically do not want to display -0 in sims.
@@ -55,8 +56,8 @@ define( require => {
      * @param {number} value                               `
      * @returns {number}
      */
-    roundSymmetric: function( value ) {
-      return ( ( value < 0 ) ? -1 : 1 ) * Math.round( Math.abs( value ) ); // eslint-disable-line bad-sim-text
+    roundSymmetric: ( value ) => {
+      return ( ( value < 0 ) ? -1 : 1 ) * Math.round( Math.abs( value ) );
     },
 
     /**
@@ -71,12 +72,12 @@ define( require => {
      * @param {number} decimalPlaces
      * @returns {string}
      */
-    toFixed: function( value, decimalPlaces ) {
+    toFixed: ( value, decimalPlaces ) => {
       const multiplier = Math.pow( 10, decimalPlaces );
       const newValue = Util.roundSymmetric( value * multiplier ) / multiplier;
       return newValue.toFixed( decimalPlaces );
     }
-  }
+  };
 
   class FPSCounter extends DOMObject {
 
@@ -114,9 +115,9 @@ define( require => {
       // @private {function} requestAnimationFrame - gets the windows request animation frame function
       //                                             but provides a fullback for other browsers.
       this.requestAnimationFrame = window.requestAnimationFrame
-        ||  window.webkitRequestAnimationFrame
-        ||  window.mozRequestAnimationFrame
-        ||  window.ieRequestAnimationFrame;
+        || window.webkitRequestAnimationFrame
+        || window.mozRequestAnimationFrame
+        || window.ieRequestAnimationFrame;
     }
 
     /**

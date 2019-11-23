@@ -232,7 +232,7 @@ define( require => {
      * @param {string|null} id - null means no id
      * @returns {DOMObject} - Returns 'this' reference, for chaining
      */
-    setID( id ) { return this.setAttribute( 'id', id ) }
+    setID( id ) { return this.setAttribute( 'id', id ); }
     set id( id ) { this.setID( id ); }
 
     /**
@@ -392,7 +392,7 @@ define( require => {
 
       // Loop through each key of the style Object literal and add the style.
       Object.keys( style ).forEach( styleKey => {
-        assert( this._element.style.hasOwnProperty( styleKey ), `invalid style key: ${ styleKey }` );
+        assert( Object.prototype.hasOwnProperty.call( this._element.style, styleKey ), `invalid style: ${ styleKey }` );
 
         this._element.style[ styleKey ] = style[ styleKey ];
       } );

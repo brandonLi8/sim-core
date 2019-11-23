@@ -45,7 +45,6 @@ define( require => {
   const LOADER_CIRCLE_MIN_SIZE = 105; // the smallest possible loader circle size, in pixels.
 
   // Outer radius (including the stroke) of the loader circle in percentage relative to LOADER_CIRCLE_RELATIVE.
-  const LOADER_CIRCLE_OUTER_RADIUS = LOADER_RADIUS;
   const LOADER_STROKE_WIDTH = 8; // in percentage, relative to LOADER_CIRCLE_RELATIVE
   const LOADER_CIRCLE_INNER_RADIUS = ( LOADER_CIRCLE_RELATIVE - LOADER_STROKE_WIDTH ) / 2; // in percentage
 
@@ -116,7 +115,7 @@ define( require => {
           stroke: '#2974b2'
         },
         attributes: {
-          'shape-rendering': 'geometricPrecision', // Use geometricPrecision for aesthetic accuracy.
+          'shape-rendering': 'geometricPrecision' // Use geometricPrecision for aesthetic accuracy.
         }
       } );
 
@@ -129,7 +128,7 @@ define( require => {
         namespace: XML_NAMESPACE,
         attributes: {
           viewBox: LOADER_CIRCLE_VIEW_BOX,
-          'shape-rendering': 'geometricPrecision', // Use geometricPrecision for aesthetic accuracy.
+          'shape-rendering': 'geometricPrecision' // Use geometricPrecision for aesthetic accuracy.
         },
         style: {
           width: LOADER_CIRCLE_WIDTH,
@@ -154,7 +153,7 @@ define( require => {
         const percentage = 1 / window.simImages.length * IMAGE_LOADING_BANDWIDTH;
         loadedPercentage += percentage;
         foregroundCircle.setAttribute( 'd', getCirclePathData( loadedPercentage ) );
-      }
+      };
 
       const startLoadingTime = new Date();
 
@@ -170,7 +169,7 @@ define( require => {
             window.setTimeout( () => this.dispose(), 400 );
           }, Math.max( ( new Date() - startLoadingTime ) * DOM_LOADING_BANDWIDTH / 100 * ( Math.random() * 9 ), MIN ) );
         } );
-      }
+      };
       if ( window.simImages ) {
         let i = 0;
 
@@ -183,7 +182,7 @@ define( require => {
 
           image.element.onload = () => {
             loadedImages++;
-            assert( isImageOK( image.element ), `error while loading image` )
+            assert( isImageOK( image.element ), 'error while loading image' );
             incrementImageLoad( loadedImages );
             i++;
             if ( loadedImages !== window.simImages.length ) {
@@ -192,7 +191,7 @@ define( require => {
             else {
               finishDom();
             }
-          }
+          };
           image.src = imagePath;
         };
         step();
@@ -235,16 +234,16 @@ define( require => {
   }
 
 // function that checks if a node is ready
-function isReady( callback ){
+function isReady( callback ) {
   // in case the document is already rendered
   if ( document.readyState !== 'loading' ) callback();
   // modern browsers
   else if ( document.addEventListener )
     document.addEventListener( 'DOMContentLoaded', callback );
   // IE <= 8
-  else document.attachEvent( 'onreadystatechange', function(){
-    if ( document.readyState == 'complete' ) callback();
-  } )
+  else document.attachEvent( 'onreadystatechange', function() {
+    if ( document.readyState === 'complete' ) callback();
+  } );
 }
 
 

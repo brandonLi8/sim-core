@@ -24,20 +24,6 @@
 define( require => {
   'use strict';
 
-  // modules
-  const assert = require( 'SIM_CORE/util/assert' );
-  const Node = require( 'SIM_CORE/scenery/Node' );
-  const DOMObject = require( 'SIM_CORE/scenery/DOMObject' );
 
-  class Display extends DOMObject {
-
-
-
-
-
-
-
-  }
-
-  return Display;
+  return 5;
 } );

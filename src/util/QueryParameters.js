@@ -88,7 +88,7 @@ define( require => {
 
         const object = schema[ name ]; // objects of the schema
         const type = object.type; // convenience reference to the type, which has been validated in validateSchema
-        const defaultValue = ( type === 'flag') ? false : object.defaultValue; // reference the default value
+        const defaultValue = ( type === 'flag' ) ? false : object.defaultValue; // reference the default value
         const value = this.get( name ); // value parsed from the URI. Undefined if the parameter isn't present.
         const isValidValue = object.isValidValue;
 
@@ -116,7 +116,7 @@ define( require => {
       assert( typeof name === 'string', `invalid name ${ name }` );
 
       // Get the result from the already parsed query parameters.
-      return PARSED_QUERY_PARAMETERS.hasOwnProperty( name );
+      return Object.prototype.hasOwnProperty.call( PARSED_QUERY_PARAMETERS, name );
     }
 
     /**
@@ -169,7 +169,7 @@ define( require => {
         const parsedComponent = component.split( '=', 2 );
 
         const name = parsedComponent[ 0 ];
-        const value = parsedComponent.length === 2 ? parsedComponent[ 1 ] : null; // null if no '=' is provided (a flag).
+        const value = parsedComponent.length === 2 ? parsedComponent[ 1 ] : null; // null if no '=' exists (a flag).
         parsedQueryParameters[ name ] = value ? decodeURIComponent( value ) : value;
       }
     } );

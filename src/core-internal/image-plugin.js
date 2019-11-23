@@ -55,7 +55,7 @@ define( require => {
 
       // This plugin assumes that you use your path to the `src` or `js` directory to reference the image.
       // In addition, your images should be located within the `image` directory (sub paths are ok).
-      // As a result, we reference the the image path after the namespace.
+      // As a result, we reference the image path after the namespace.
       // For example: 'SIM_CORE/types/button.jpg' turns into `types/button.jpg`;
       const imagePath = name.substring( name.indexOf( '/' ) );
 
@@ -70,7 +70,7 @@ define( require => {
 
       // If the image src fails to load, throw an error.
       image.element.onerror = error => {
-        assert( false, `invalid image src: ${ image.element.src }` )
+        assert( false, `invalid image src: ${ image.element.src }` );
       };
 
       //----------------------------------------------------------------------------------------
