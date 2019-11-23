@@ -274,7 +274,7 @@ define( require => {
     setText( text ) {
       assert( !text || typeof text === 'string', `invalid text: ${ text }` );
       this._text = text;
-      this._textNode.innerHTML = this._text;
+      this._textNode.textContent = this._text;
       return this;
     }
     set text( text ) { this.setText( text ); }
