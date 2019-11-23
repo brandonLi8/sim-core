@@ -121,7 +121,7 @@ define( require => {
     truenit.equals( Util.sign( -0 ), -0 );
 
     //----------------------------------------------------------------------------------------
-    // Hyperbolic Trig Functions
+    // Elementary Functions
     //----------------------------------------------------------------------------------------
 
     // cosh
@@ -134,7 +134,62 @@ define( require => {
     truenit.approximate( Util.sinh( 3 ), 10.017874974099 );
     truenit.approximate( Util.sinh( -10 ), -11013.232874703 );
 
+    // log10
+    truenit.equals( Util.log10( 1 ), 0 );
+    truenit.approximate( Util.log10( 3 ), 0.4771212547 );
 
+
+    //----------------------------------------------------------------------------------------
+    // Miscellaneous Utilities
+    //----------------------------------------------------------------------------------------
+
+    // numberOfDecimalPlaces
+    truenit.equals( Util.numberOfDecimalPlaces( 10 ), 0 );
+    truenit.equals( Util.numberOfDecimalPlaces( -10 ), 0 );
+    truenit.equals( Util.numberOfDecimalPlaces( 10.1 ), 1 );
+    truenit.equals( Util.numberOfDecimalPlaces( -10.1 ), 1 );
+    truenit.equals( Util.numberOfDecimalPlaces( 10.10 ), 1 );
+    truenit.equals( Util.numberOfDecimalPlaces( -10.10 ), 1 );
+    truenit.equals( Util.numberOfDecimalPlaces( 0.567 ), 3 );
+    truenit.equals( Util.numberOfDecimalPlaces( -0.567 ), 3 );
+    truenit.equals( Util.numberOfDecimalPlaces( 0.001 ), 3 );
+    truenit.equals( Util.numberOfDecimalPlaces( -0.001 ), 3 );
+
+    // isArray
+    truenit.ok( Util.isArray( [ 1, 2, 3 ] ) );
+    truenit.ok( Util.isArray( [] ) );
+    truenit.ok( !Util.isArray( 0 ) );
+    truenit.ok( !Util.isArray( {} ) );
+    truenit.ok( !Util.isArray( function() {} ) );
+
+    //----------------------------------------------------------------------------------------
+    // arrayRemove
+    let arr = [ 4, 3, 2, 1, 3 ];
+    Util.arrayRemove( arr, 3 );
+
+    truenit.equals( arr[ 0 ], 4 );
+    truenit.equals( arr[ 1 ], 2 );
+    truenit.equals( arr[ 2 ], 1 );
+    truenit.equals( arr[ 3 ], 3 );
+    truenit.equals( arr.length, 4 );
+
+    // check reference removal
+    const a = {};
+    const b = {};
+    const c = {};
+
+    arr = [ a, b, c ];
+    Util.arrayRemove( arr, b );
+
+    truenit.equals( arr[ 0 ], a );
+    truenit.equals( arr[ 1 ], c );
+    truenit.equals( arr.length, 2 );
+
+    // toCamelCase
+    truenit.equals( Util.toCamelCase( 'foo-bar' ), 'fooBar' );
+    truenit.equals( Util.toCamelCase( 'foobar' ), 'foobar' );
+    truenit.equals( Util.toCamelCase( 'foo-bar-tap-map' ), 'fooBarTapMap' );
+    truenit.equals( Util.toCamelCase( '' ), '' );
   };
 
   return UtilTester;
