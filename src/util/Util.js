@@ -1,7 +1,7 @@
 // Copyright © 2019 Brandon Li. All rights reserved.
 
 /**
- * Utility static methods for sim-development.
+ * A combination of utility static methods and references for sim-development.
  *
  * @author Brandon Li <brandon.li820@gmail.com>
  */
@@ -22,9 +22,10 @@ define( require => {
     EPSILON: 1e-5,
     PHI: ( 1 + Math.sqrt( 5 ) ) / 2, // see https://en.wikipedia.org/wiki/Golden_ratio
 
-    // conversion prefixes, in base units per unit
+    // conversion prefixes, in base units per unit bellow
     MICRO: 1e-6,
     MILLI: 0.001,
+    BASE: 1,
     CENTI: 0.01,
     KILO: 1000,
     GIGA: 1e9,
@@ -32,6 +33,7 @@ define( require => {
     //----------------------------------------------------------------------------------------
     // Conversions
     //----------------------------------------------------------------------------------------
+
     /**
      * Converts degrees to radians.
      * @public
@@ -55,33 +57,34 @@ define( require => {
     },
 
     /**
-     * Converts from the base unit to a conversion factor (see Static References).
-     * For instance, to convert 2 meters to centimeters, call `Util.convertTo( 2, Util.CENTI );`
+     * Converts from the base unit to a custom unit (see Static References).
+     * For instance, to convert 3 meters to centimeters, call `Util.convertTo( 3, Util.CENTI );`
      * @public
      *
      * @param {number} value
-     * @param {number} conversionFactor - in base units per other unit
+     * @param {number} conversionFactor - in base units per custom unit
      * @returns {number}
      */
     convertTo( value, conversionFactor ) {
-      return value / conversionFactor; // dimensional analysis: base units * ( units / base units )
-    }
+      return value / conversionFactor; // dimensional analysis: base units * ( custom units / base unit )
+    },
 
     /**
-     * Converts to the base unit from a conversion factor (see Static References).
-     * For instance, to convert 200 centimeters to meters (the base unit), call `Util.convertFrom( 200, Util.CENTI )`
+     * Converts to the base unit from a a custom unit (see Static References).
+     * For instance, to convert 300 centimeters to meters, call `Util.convertFrom( 300, Util.CENTI )`
      *
      * @param {number} value
-     * @param {number} conversionFactor - in base units per other unit
+     * @param {number} conversionFactor - in base units per custom unit
      * @returns {number}
      */
     convertFrom( value, conversionFactor ) {
-      return value * conversionFactor; // dimensional analysis: units * ( base units / units )
-    }
+      return value * conversionFactor; // dimensional analysis: custom units * ( base units / custom unit )
+    },
 
     //----------------------------------------------------------------------------------------
     // Math Utilities
     //----------------------------------------------------------------------------------------
+
     /**
      * Returns the original value if it is inclusively within the [ max, min ] range. If it's below the range, min is
      * returned, and if it's above the range, max is returned.
