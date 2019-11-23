@@ -10,6 +10,27 @@ define( require => {
   'use strict';
 
   const Util = {
+
+    //========================================================================================
+    // Static References
+    //========================================================================================
+
+    // constants
+    EPSILON: 1e-5,
+    PHI: ( 1 + Math.sqrt( 5 ) ) / 2, // see https://en.wikipedia.org/wiki/Golden_ratio
+
+    // conversion prefixes
+    MICRO: 1e-6,
+    MILLI: 0.001,
+    CENTI: 0.01,
+    KILO: 1000,
+    GIGA: 1e9,
+
+
+    //========================================================================================
+    // Static Methods
+    //========================================================================================
+
     /**
      * Returns the original value if it is inclusively within the [max,min] range. If it's below the range, min is
      * returned, and if it's above the range, max is returned.
