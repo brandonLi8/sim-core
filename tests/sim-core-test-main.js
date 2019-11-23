@@ -12,10 +12,9 @@ define( require => {
   // modules
   const truenit = require( 'truenit' );
 
-  //========================================================================================
-  // Start testing
-  //========================================================================================
+  //----------------------------------------------------------------------------------------
 
+  truenit.registerTest( 'Util', require( 'TESTS/util/UtilTests' ) );
   truenit.registerTest( 'Vector', require( 'TESTS/util/VectorTests' ) );
 
   truenit.start();
