@@ -96,7 +96,7 @@ define( require => {
      * @returns {number} - time in seconds
      */
     get currentTime() {
-      return Date.now() / 1000; // dimensional analysis to seconds
+      return Util.convertFrom( Date.now(), Util.MILLI ); // convert from milliseconds to seconds
     }
 
     /**
@@ -109,7 +109,8 @@ define( require => {
      * @param {number} maxInstantFPS
      */
     update( averageFPS, minInstantFPS, maxInstantFPS ) {
-      const msPerFrame = Util.toFixed( 1000 / averageFPS, DECIMAL_PLACES );
+      // convert from frames per second to milliseconds per frame
+      const msPerFrame = Util.toFixed( Util.convertTo( 1 / averageFPS, Util.MILLI ) , DECIMAL_PLACES );
 
       // round the values
       const fps = Util.toFixed( averageFPS, DECIMAL_PLACES );
