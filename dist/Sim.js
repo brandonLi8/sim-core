@@ -1,2 +1,4 @@
-/* minified */
+// Copyright © 2019 Brandon Li. All rights reserved.
+
+// Minified distribution version - sim-core 0.0.0-dev.3 - MIT.
 define(require=>{"use strict";const e=require("SIM_CORE/util/assert"),t=require("SIM_CORE/core-internal/Loader"),n=require("SIM_CORE/util/QueryParameters"),r=require("SIM_CORE/core-internal/Display"),s=require("SIM_CORE/core-internal/FPSCounter"),a=n.retrieve({ea:{type:"flag"},fps:{type:"flag"}});return class{constructor(){a.ea&&e.enableAssertions(),window.addEventListener("pageshow",(function(e){e.persisted&&window.location.reload()}));const n=new r,i=new t;if(n.addChild(i),a.fps){const e=new s;e.start(),n.addChild(e)}}}});
