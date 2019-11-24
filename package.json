@@ -16,7 +16,7 @@
     "test": "node tests/sim-core-test-config.js"
   },
   "devDependencies": {
-    "@brandonli8/grunt-config": "0.0.0-dev.9",
+    "@brandonli8/grunt-config": "0.0.0-dev.11",
     "truenit": "^0.9.12"
   },
   "dependencies": {
