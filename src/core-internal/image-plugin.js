@@ -1,33 +1,29 @@
 // Copyright © 2019 Brandon Li. All rights reserved.
 
 /**
- * A sim-specific Image plugin for requirejs that allows for the dynamic loading of images in the loader.
+ * A sim-specific image plugin for requirejs that allows for the dynamic loading of images in the loader.
+ * If the simulation is started normally, all images will be loaded inside of `Loader.js` when the sim is launched.
  *
  * ## Usage
+ *   (1) In your requirejs config, add this file as a path.
+ *       ```
+ *       requirejs.config( {
+ *         paths: {
  *
- *   1. In your requirejs config, add this file as a path.
- *   ```
- *    requirejs.config( {
- *      paths: {
+ *           image: '../node_modules/sim-core/src/util/image-plugin',
+ *          ...
+ *         }
+ *       } );
+ *       ```
+ *   (2) Use the plugin syntax. For example: `const image = require( 'image!SIM_CORE/image.jpg' )`
  *
- *        image: '../node_modules/sim-core/src/util/image-plugin',
- *        ...
- *      }
- *    } );
- *   ```
- *   2. Use the plugin. For example: `const image = require( 'image!SIM_CORE/image.jpg' )`
- *
- *   If the simulation is started normally in `Sim.js`, all images will be loaded in `Loader.js`.
- *
- *   IMPORTANT: This plugin assumes that you use your namespace path to the `src` or `js` directory to reference images.
- *              In addition, your images should be located within the `image` directory (sub paths are ok).
+ * NOTE: This plugin assumes that you have configured your namespace path to the `src` or `js` directory and that
+ *       you reference the image with this path. For the example above, `SIM_CORE` points to `src`.
+ *       In addition, your images should be located within the `image` directory (sub paths are ok).
  *
  * ## Implementation
- *
  *  - For the implementation of the loader, this plugin registers images into the global window object.
  *    This is referenced in `Loader.js` and dynamically loaded, allowing for the loader to load all images.
- *
- *  - For more background on requirejs plugins, see https://requirejs.org/docs/plugins.html.
  *
  * @author Brandon Li <brandon.li820@gmail.com>
  */
@@ -36,7 +32,7 @@ define( require => {
   'use strict';
 
   // modules
-  const assert = require( 'SIM_CORE/util/assert' ).always;
+  const assert = require( 'SIM_CORE/util/assert' );
   const DOMObject = require( 'SIM_CORE/core-internal/DOMObject' );
 
   return {
@@ -46,7 +42,7 @@ define( require => {
      * For more documentation: see https://requirejs.org/docs/plugins.html#api.
      * @public
      *
-     * @param {string} name - the name of the image resource to load. For instance, 'image!bar' would the name 'bar'.
+     * @param {string} name - the name of the image resource to load. For example, 'image!bar' would have the name 'bar'
      * @param {function} parentRequire - local require function to load other modules. Contains many utilities.
      * @param {function} onload - function to call with the return value of the load.
      * @param {object} config - the requirejs configuration object
@@ -70,7 +66,7 @@ define( require => {
 
       // If the image src fails to load, throw an error.
       image.element.onerror = error => {
-        assert( false, `invalid image src: ${ image.element.src }` );
+        assert.always( false, `invalid image src: ${ image.element.src }` );
       };
 
       //----------------------------------------------------------------------------------------
@@ -78,7 +74,10 @@ define( require => {
       if ( !window.simImages ) {
         window.simImages = [];
       }
-      window.simImages.push( { image, src: imageSrc } );
+      window.simImages.push( {
+        image,
+        src: imageSrc
+      } );
 
       // Tell requirejs to export the image.
       onload( image );
