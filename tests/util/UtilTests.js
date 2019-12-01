@@ -190,6 +190,12 @@ define( require => {
     truenit.equals( Util.toCamelCase( 'foobar' ), 'foobar' );
     truenit.equals( Util.toCamelCase( 'foo-bar-tap-map' ), 'fooBarTapMap' );
     truenit.equals( Util.toCamelCase( '' ), '' );
+
+    // toTitleCase
+    truenit.equals( Util.toTitleCase( 'foo-bar' ), 'Foo Bar' );
+    truenit.equals( Util.toTitleCase( 'foobar' ), 'Foobar' );
+    truenit.equals( Util.toTitleCase( 'foo-bar-tap-map' ), 'Foo Bar Tap Map' );
+    truenit.equals( Util.toTitleCase( '' ), '' );
   };
 
   return UtilTester;

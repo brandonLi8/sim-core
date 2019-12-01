@@ -362,9 +362,27 @@ define( require => {
      * @returns {string}
      */
     toCamelCase( str ) {
+      assert( typeof str === 'string' && str.length > 0, `invalid str: ${ str }` );
+
       return str.toLowerCase().replace( /-(.)/g, ( match, group ) => {
         return group.toUpperCase();
       } );
+    },
+
+    /**
+     * Converts a string separated with dashes to Title Case. For instance: Util.toTitleCase( 'foo-bar' ) -> 'Foo Bar'
+     * @public
+     *
+     * @param {string} str - the input string
+     * @returns {string}
+     */
+    toTitleCase( str ) {
+      assert( typeof str === 'string' && str.length > 0, `invalid str: ${ str }` );
+
+      // Use Lodash's start case. See https://lodash.com/docs#startCase.
+      return str.split( '-' )
+                .map( word => word.length > 0 ? word[ 0 ].toUpperCase() + word.substr( 1 ).toLowerCase() : '' )
+                .join( ' ' );
     }
   };
 
