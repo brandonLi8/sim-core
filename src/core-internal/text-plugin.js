@@ -67,6 +67,15 @@ define( require => {
         if ( HTTPRequest.readyState === 4 && HTTPRequest.status === 200 ) {
           onload( HTTPRequest.responseText );
         }
+        else if ( HTTPRequest.status >= 399 && HTTPRequest.status < 600 ) {
+
+          // An unsuccessful request. Dereference this function to a null pointer so that the asynchronous HTTPRequest
+          // doesn't call this function any more.
+          HTTPRequest.onreadystatechange = null;
+
+          // Tell requirejs that a error has occurred and provide a stack trace.
+          onload.error( `Text Plugin error for "text!${ name }".${ new Error().stack.replace( 'Error', '' ) }` );
+        }
       };
       HTTPRequest.send( null );
     }
