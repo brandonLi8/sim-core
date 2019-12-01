@@ -43,7 +43,7 @@ define( require => {
      * @param {function} onload - function to call with the return value of the load.
      * @param {object} config - the requirejs configuration object
      */
-    load: ( name, parentRequire, onload, config ) => {
+    load( name, parentRequire, onload, config ) {
 
       // Reference the name as the true image src, adding the image directory and path.
       const imageSrc = parentRequire.toUrl( name );
