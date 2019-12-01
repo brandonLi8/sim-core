@@ -82,9 +82,6 @@ define( require => {
         display.addChild( counter );
       }
 
-
-      console.log( require( 'text!REPOSITORY/package.json'))
-
     }
   }
 

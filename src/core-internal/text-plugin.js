@@ -46,7 +46,7 @@ define( require => {
     load( name, parentRequire, onload, config ) {
 
       // Reference the name as the true path to the raw text file.
-      const textPath = parentRequire.toUrl( name )
+      const textPath = parentRequire.toUrl( name );
 
       // Create an HTTP Request via XMLHttpRequest for the given textPath.
       const HTTPRequest = new XMLHttpRequest();
