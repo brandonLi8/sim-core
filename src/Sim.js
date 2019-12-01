@@ -1,4 +1,5 @@
 // Copyright © 2019 Brandon Li. All rights reserved.
+/* eslint no-console: 0 */
 
 /**
  * Main class encapsulation for a simulation. Provides:
@@ -50,7 +51,7 @@ define( require => {
     constructor( h ) {
 
       if ( SIM_CORE_QUERY_PARAMETERS.version ) {
-        console.log( `${ Util.toTitleCase( PACKAGE_OBJECT.name ) } v${ PACKAGE_OBJECT.version }`)
+        console.log( `${ Util.toTitleCase( PACKAGE_OBJECT.name ) } v${ PACKAGE_OBJECT.version }` );
       }
 
       // initialize the query parameter functionality
