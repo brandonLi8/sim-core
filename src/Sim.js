@@ -18,13 +18,18 @@ define( require => {
   const Display = require( 'SIM_CORE/core-internal/Display' );
   // const DOMObject = require( 'SIM_CORE/core-internal/DOMObject' );
   const FPSCounter = require( 'SIM_CORE/core-internal/FPSCounter' );
+  const Util = require( 'SIM_CORE/util/Util' );
 
   // constants
+  const PACKAGE_OBJECT = JSON.parse( require( 'text!REPOSITORY/package.json' ) );
   const SIM_CORE_QUERY_PARAMETERS = QueryParameters.retrieve( {
     ea: {
       type: 'flag'
     },
     fps: {
+      type: 'flag'
+    },
+    version: {
       type: 'flag'
     }
   } );
@@ -43,6 +48,10 @@ define( require => {
 
   class Sim {
     constructor( h ) {
+
+      if ( SIM_CORE_QUERY_PARAMETERS.version ) {
+        console.log( `${ Util.toTitleCase( PACKAGE_OBJECT.name ) } v${ PACKAGE_OBJECT.version }`)
+      }
 
       // initialize the query parameter functionality
       if ( SIM_CORE_QUERY_PARAMETERS.ea ) assert.enableAssertions();
@@ -81,6 +90,8 @@ define( require => {
         counter.start();
         display.addChild( counter );
       }
+
+
 
     }
   }
