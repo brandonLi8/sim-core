@@ -5,25 +5,21 @@
  * If the simulation is started normally, all images will be loaded inside of `Loader.js` when the sim is launched.
  *
  * ## Usage
- *   (1) In your requirejs config, add this file as a path.
+ *   (1) In your requirejs config, add this file as a path and a reference to the image directory.
  *       ```
  *       requirejs.config( {
  *         paths: {
  *
  *           image: '../node_modules/sim-core/src/util/image-plugin',
+ *           IMAGES: '../images'
  *          ...
  *         }
  *       } );
  *       ```
- *   (2) Use the plugin syntax. For example: `const image = require( 'image!SIM_CORE/image.jpg' )`
+ *   (2) Use the plugin syntax. For example: `const image = require( 'image!IMAGES/image.jpg' )`
  *
- * NOTE: This plugin assumes that you have configured your namespace path to the `src` or `js` directory and that
- *       you reference the image with this path. For the example above, `SIM_CORE` points to `src`.
- *       In addition, your images should be located within the `image` directory (sub paths are ok).
- *
- * ## Implementation
- *  - For the implementation of the loader, this plugin registers images into the global window object.
- *    This is referenced in `Loader.js` and dynamically loaded, allowing for the loader to load all images.
+ * This plugin registers images into the global window object to be loaded later.
+ * This is referenced in `Loader.js` and dynamically loaded, allowing for the loader to load all images.
  *
  * @author Brandon Li <brandon.li820@gmail.com>
  */
@@ -49,16 +45,9 @@ define( require => {
      */
     load: ( name, parentRequire, onload, config ) => {
 
-      // This plugin assumes that you use your path to the `src` or `js` directory to reference the image.
-      // In addition, your images should be located within the `image` directory (sub paths are ok).
-      // As a result, we reference the image path after the namespace.
-      // For example: 'SIM_CORE/types/button.jpg' turns into `types/button.jpg`;
-      const imagePath = name.substring( name.indexOf( '/' ) );
-
       // Reference the name as the true image src, adding the image directory and path.
-      const imageSrc = parentRequire.toUrl( name.substring( 0, name.indexOf( '/' ) ) ) + '/../images' + imagePath;
+      const imageSrc = parentRequire.toUrl( name );
 
-      //----------------------------------------------------------------------------------------
       // Create the DOMObject to hold the image.
       const image = new DOMObject( {
         type: 'img'

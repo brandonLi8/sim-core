@@ -42,7 +42,7 @@ define( require => {
   // const fifth7 = require( 'image!SIM_CORE/Projects/Metronome1.jpg')
 
   class Sim {
-    constructor() {
+    constructor( h ) {
 
       // initialize the query parameter functionality
       if ( SIM_CORE_QUERY_PARAMETERS.ea ) assert.enableAssertions();
@@ -60,7 +60,10 @@ define( require => {
       const display = new Display();
       const loader = new Loader();
 
+
       display.addChild( loader );
+      display.addChild( h );
+
       // display.addChild( fifth )
       // display.addChild( second )
       // display.addChild( third )
