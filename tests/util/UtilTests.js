@@ -137,6 +137,7 @@ define( require => {
     // log10
     truenit.equals( Util.log10( 1 ), 0 );
     truenit.approximate( Util.log10( 3 ), 0.4771212547 );
+    truenit.approximate( Util.log10( 0.000001 ), -6 );
 
 
     //----------------------------------------------------------------------------------------
@@ -185,6 +186,7 @@ define( require => {
     truenit.equals( arr[ 1 ], c );
     truenit.equals( arr.length, 2 );
 
+    //----------------------------------------------------------------------------------------
     // toCamelCase
     truenit.equals( Util.toCamelCase( 'foo-bar' ), 'fooBar' );
     truenit.equals( Util.toCamelCase( 'foobar' ), 'foobar' );
@@ -196,6 +198,7 @@ define( require => {
     truenit.equals( Util.toTitleCase( 'foobar' ), 'Foobar' );
     truenit.equals( Util.toTitleCase( 'foo-bar-tap-map' ), 'Foo Bar Tap Map' );
     truenit.equals( Util.toTitleCase( '' ), '' );
+    truenit.equals( Util.toTitleCase( 'f' ), 'F' );
   };
 
   return UtilTester;
