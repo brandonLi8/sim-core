@@ -83,6 +83,8 @@ define( require => {
       }
 
 
+      console.log( require( 'text!REPOSITORY/package.json'))
+
     }
   }
 
