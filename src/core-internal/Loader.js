@@ -165,7 +165,7 @@ define( require => {
           window.setTimeout( () => {
             foregroundCircle.setAttribute( 'd', getCirclePathData( loadedPercentage ) );
             window.setTimeout( () => this.dispose(), 400 );
-          }, Math.max( ( new Date() - startLoadingTime ) * DOM_LOADING_BANDWIDTH / 100 * ( Math.random() * 9 ), 100 ) );
+          }, Math.max( ( new Date() - startLoadingTime ) * DOM_LOADING_BANDWIDTH / 100 * ( Math.random() * 3 ), 100 ) );
         } );
       };
       if ( window.simImages ) {
@@ -195,14 +195,12 @@ define( require => {
         step();
       }
       else {
-        window.setTimeout( finishDom, 200 );
+        window.setTimeout( () => {
+          foregroundCircle.setAttribute( 'd', getCirclePathData( 30.9 ) );
+
+          window.setTimeout( finishDom, 800 );
+        }, 500 );
       }
-
-
-
-
-
-
     }
   }
 
