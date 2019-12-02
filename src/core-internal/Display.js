@@ -46,6 +46,7 @@ define( require => {
         style: {
           height: '100%',
           position: 'relative',
+          fontFamily: 'Arial, sans-serif',
           display: 2
         },
 

@@ -29,6 +29,8 @@ define( require => {
   // constants
   const NAVIGATION_BAR_HEIGHT = 40;
   const SCREEN_SIZE = new Vector( 768, 504 );
+  const TITLE_FONT_SIZE = 16;
+  const TITLE_LEFT_MARGIN = 8;
 
   class NavigationBar extends DOMObject {
 
@@ -56,34 +58,39 @@ define( require => {
       };
 
       // Rewrite options so that it overrides the defaults.
-      options = { ...defaults, ...options };g
+      options = { ...defaults, ...options };
       options.style = { ...defaults.style, ...options.style };
 
       super( options );
 
-           // // @public {node} the title of the sim
-    // this.title = new Node( {
-    //   text: options.title,
-    //   style: {
-    //     position: 'absolute',
-    //     fontSize: '24px',
-    //     padding: '0',
-    //     left: '200px',
-    //     fontFamily: 'Courier'
-    //   }
-    // } )
 
-    // // @public {node} the author of the sim
-    // this.author = new Node({
-    //   text: options.author,
-    //   style: {
-    //     position: 'absolute',
-    //     fontSize: '17px',
-    //     padding: '0',
-    //     right: '130px',
-    //     fontFamily: 'Courier'
-    //   }
-    // });
+      // @public {DOMObject} navigationBarContent - container of all the navigation bar content.
+      this.navigationBarContent = new DOMObject( {
+        id: 'content',
+        style: {
+          height: '100%', // width set later
+          // boxShadow: 'inset 0px 0px 0px 2px red',
+          margin: '0 auto'
+        }
+      } );
+
+      // @public {DOMObject} titleDOMObject - the title node
+      this.titleDOMObject = new DOMObject( {
+        text: title,
+        style: {
+          height: '100%',
+          display: 'inline-flex',
+          alignItems: 'center'
+        }
+      } );
+
+      this.setChildren( [
+        this.navigationBarContent,
+      ] );
+
+      this.navigationBarContent.setChildren( [
+        this.titleDOMObject
+      ] );
     }
 
     /**
@@ -97,10 +104,15 @@ define( require => {
 
       const scale = Math.min( width / SCREEN_SIZE.x, height / SCREEN_SIZE.y );
       const navBarHeight = scale * NAVIGATION_BAR_HEIGHT;
+      const navBarContentWidth = scale * SCREEN_SIZE.x;
+      const titleFont = scale * TITLE_FONT_SIZE;
 
       this.style.height = `${ navBarHeight }px`;
-      // this.setScaleMagnitude( scale );
 
+      this.navigationBarContent.style.width = `${ navBarContentWidth }px`;
+
+      this.titleDOMObject.style.fontSize = `${ titleFont }px`;
+      this.titleDOMObject.style.left = `${ scale * TITLE_LEFT_MARGIN }px`;
     }
   }
 
