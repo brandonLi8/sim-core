@@ -14,7 +14,7 @@
  *      launch really quickly). This portion of the loading will be sped up with cached images.
  *
  *  (2) Synchronously ensuring that the DOM is fully loaded and ready to be manipulated with all simulation rendering
- *      ready. This is defined as DOM_LOADING_BANDWIDTH of the loading bandwidth, even if the DOM is fully ready
+ *      ready. This is defined as DOM_LOADING_BANDWIDTH% of the loading bandwidth, even if the DOM is fully ready
  *      already. This portion of the loading should not be greatly affected by caching.
  *
  * @author Brandon Li <brandon.li820@gmail.com>
@@ -40,18 +40,18 @@ define( require => {
   const LOADER_CIRCLE_VIEW_BOX = `-${ LOADER_RADIUS } `.repeat( 2 ) + `${ LOADER_CIRCLE_RELATIVE } `.repeat( 2 );
 
   // Width of loader circle (which would match pixels with the height) relative to the window.
-  const LOADER_CIRCLE_WIDTH = '15%';
-  const LOADER_CIRCLE_MAX_SIZE = 180; // the largest possible loader circle size, in pixels.
-  const LOADER_CIRCLE_MIN_SIZE = 105; // the smallest possible loader circle size, in pixels.
+  const LOADER_CIRCLE_WIDTH = '13%';
+  const LOADER_CIRCLE_MAX_SIZE = 120; // the largest possible loader circle size, in pixels.
+  const LOADER_CIRCLE_MIN_SIZE = 80; // the smallest possible loader circle size, in pixels.
 
-  // Outer radius (including the stroke) of the loader circle in percentage relative to LOADER_CIRCLE_RELATIVE.
-  const LOADER_STROKE_WIDTH = 8; // in percentage, relative to LOADER_CIRCLE_RELATIVE
+  // Stroke of the loader circle in percentage relative to LOADER_CIRCLE_RELATIVE.
+  const LOADER_STROKE_WIDTH = 12;
   const LOADER_CIRCLE_INNER_RADIUS = ( LOADER_CIRCLE_RELATIVE - LOADER_STROKE_WIDTH ) / 2; // in percentage
 
-  // Loading bandwidths. See comment at the top of the file.
-  const IMAGE_LOADING_BANDWIDTH = 70 + Math.random() * 10;
+  // Loading bandwidths. See comment at the top of the file for more context.
+  const IMAGE_LOADING_BANDWIDTH = 65 + Math.random() * 15;
   const DOM_LOADING_BANDWIDTH = 100 - IMAGE_LOADING_BANDWIDTH;
-  const MIN = 600;
+
 
   class Loader extends DOMObject {
 
@@ -82,7 +82,6 @@ define( require => {
         },
         ...options
       };
-
 
       //----------------------------------------------------------------------------------------
       // To create the loading progress circle, overlay 2 circles on top of each other.
@@ -118,7 +117,6 @@ define( require => {
           'shape-rendering': 'geometricPrecision' // Use geometricPrecision for aesthetic accuracy.
         }
       } );
-
 
       //----------------------------------------------------------------------------------------
       // Create the container of the background and foreground circles, using an SVG DOMObject.
@@ -167,7 +165,7 @@ define( require => {
           window.setTimeout( () => {
             foregroundCircle.setAttribute( 'd', getCirclePathData( loadedPercentage ) );
             window.setTimeout( () => this.dispose(), 400 );
-          }, Math.max( ( new Date() - startLoadingTime ) * DOM_LOADING_BANDWIDTH / 100 * ( Math.random() * 9 ), MIN ) );
+          }, Math.max( ( new Date() - startLoadingTime ) * DOM_LOADING_BANDWIDTH / 100 * ( Math.random() * 9 ), 100 ) );
         } );
       };
       if ( window.simImages ) {
@@ -282,7 +280,6 @@ function isReady( callback ) {
 
     ].join( ' ' );
   }
-
 
   return Loader;
 } );
