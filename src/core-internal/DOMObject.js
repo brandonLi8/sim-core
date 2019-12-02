@@ -61,7 +61,6 @@ define( require => {
         // {Object} - object literal that describes its CSS style. See `addStyle()` for full documentation.
         style: {
           left: 0,
-          top: 0,
           padding: 0,
           margin: 0,
           position: 'relative'
