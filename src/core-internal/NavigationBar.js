@@ -12,9 +12,8 @@
  *
  * The bar is composed of a background (always pixel-perfect), and expandable content (that gets scaled as one part).
  * If we are width-constrained, the navigation bar is in a 'compact' state where the children of the content (e.g.
- * home button, screen buttons, phet menu, title) do not change positions. If we are height-constrained, the amount
- * available to the bar expands, so we lay out the children to fit. See https://github.com/phetsims/joist/issues/283
- * for more details on how this is done.
+ * home button, screen buttons, menu, title) do not change positions. If we are height-constrained, the amount
+ * available to the bar expands, so we lay out the children to fit.
  *
  * @author Brandon Li <brandon.li820@gmail.com>
  */
@@ -25,10 +24,11 @@ define( require => {
   // modules
   const assert = require( 'SIM_CORE/util/assert' );
   const DOMObject = require( 'SIM_CORE/core-internal/DOMObject' );
+  const Vector = require( 'SIM_CORE/util/Vector' );
 
   // constants
   const NAVIGATION_BAR_HEIGHT = 40;
-
+  const SCREEN_SIZE = new Vector( 768, 504 );
 
   class NavigationBar extends DOMObject {
 
@@ -48,17 +48,10 @@ define( require => {
         id: 'navigation-bar',
         style: {
           width: '100%',
-          height: '8%',
           color: 'white',
           bottom: 0,
           background: 'black',
-          position: 'absolute',
-          // display: 'flex',
-          // justifyContent: 'center',
-          // alignSelf: 'center',
-          // alignItems: 'center',
-          // marginBottom: '0',
-          // boxShadow: '0 -3px 0 0 rgba( 50, 50, 50, 0.2 )'
+          position: 'absolute'
         }
       }
 
@@ -66,13 +59,25 @@ define( require => {
       options = { ...defaults, ...options };
       options.style = { ...defaults.style, ...options.style };
 
-      // super( {
-
-      // } );
-
       super( options );
     }
 
+    /**
+     * Called when the navigation bar layout needs to be updated, typically when the browser window is resized.
+     * @param
+     *
+     * @param {number} width - in pixels of the window
+     * @param {number} height - in pixels of the window
+     */
+    layout( width, height ) {
+
+      const scale = Math.min( width / SCREEN_SIZE.x, height / SCREEN_SIZE.y );
+      const navBarHeight = scale * NAVIGATION_BAR_HEIGHT;
+
+      this.style.height = `${ navBarHeight }px`;
+      // this.setScaleMagnitude( scale );
+
+    }
   }
 
     // // @public {node} the title of the sim

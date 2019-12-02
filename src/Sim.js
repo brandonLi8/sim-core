@@ -104,6 +104,15 @@ define( require => {
       const navigationBar = new NavigationBar( options.name );
 
       display.addChild( navigationBar );
+
+
+      window.onresize = () => {
+        const windowHeight = window.innerHeight;
+        const windowWidth = window.innerWidth;
+
+        navigationBar.layout( windowWidth, windowHeight );
+      }
+
     }
   }
 
