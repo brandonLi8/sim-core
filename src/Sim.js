@@ -18,6 +18,7 @@ define( require => {
   const Loader = require( 'SIM_CORE/core-internal/Loader' );
   const QueryParameters = require( 'SIM_CORE/util/QueryParameters' );
   const Util = require( 'SIM_CORE/util/Util' );
+  const NavigationBar = require( 'SIM_CORE/core-internal/NavigationBar' );
 
   // constants
   const PACKAGE_OBJECT = JSON.parse( require( 'text!REPOSITORY/package.json' ) );
@@ -98,6 +99,11 @@ define( require => {
         counter.start();
         display.addChild( counter );
       }
+
+      // Add the navigation bar
+      const navigationBar = new NavigationBar( options.name );
+
+      display.addChild( navigationBar );
     }
   }
 
