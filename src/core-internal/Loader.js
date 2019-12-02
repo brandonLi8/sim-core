@@ -78,7 +78,8 @@ define( require => {
           background: 'rgb( 15, 15, 15 )',
           height: '100%',
           display: 'flex', // use a centered flex box to center the loader circle
-          'justify-content': 'center'
+          'justify-content': 'center',
+          zIndex: 999999
         },
         ...options
       };

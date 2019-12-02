@@ -111,7 +111,8 @@ define( require => {
         const windowWidth = window.innerWidth;
 
         navigationBar.layout( windowWidth, windowHeight );
-      }
+      };
+      window.onresize();
 
     }
   }

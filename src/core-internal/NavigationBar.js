@@ -53,34 +53,15 @@ define( require => {
           background: 'black',
           position: 'absolute'
         }
-      }
+      };
 
       // Rewrite options so that it overrides the defaults.
       options = { ...defaults, ...options };
       options.style = { ...defaults.style, ...options.style };
 
       super( options );
-    }
 
-    /**
-     * Called when the navigation bar layout needs to be updated, typically when the browser window is resized.
-     * @param
-     *
-     * @param {number} width - in pixels of the window
-     * @param {number} height - in pixels of the window
-     */
-    layout( width, height ) {
-
-      const scale = Math.min( width / SCREEN_SIZE.x, height / SCREEN_SIZE.y );
-      const navBarHeight = scale * NAVIGATION_BAR_HEIGHT;
-
-      this.style.height = `${ navBarHeight }px`;
-      // this.setScaleMagnitude( scale );
-
-    }
-  }
-
-    // // @public {node} the title of the sim
+           // // @public {node} the title of the sim
     // this.title = new Node( {
     //   text: options.title,
     //   style: {
@@ -103,6 +84,29 @@ define( require => {
     //     fontFamily: 'Courier'
     //   }
     // });
+    }
+
+    /**
+     * Called when the navigation bar layout needs to be updated, typically when the browser window is resized.
+     * @param
+     *
+     * @param {number} width - in pixels of the window
+     * @param {number} height - in pixels of the window
+     */
+    layout( width, height ) {
+
+      const scale = Math.min( width / SCREEN_SIZE.x, height / SCREEN_SIZE.y );
+      const navBarHeight = scale * NAVIGATION_BAR_HEIGHT;
+
+      this.style.height = `${ navBarHeight }px`;
+      // this.setScaleMagnitude( scale );
+
+    }
+  }
+
+  NavigationBar.SCREEN_SIZE = SCREEN_SIZE;
+  NavigationBar.NAVIGATION_BAR_HEIGHT = NAVIGATION_BAR_HEIGHT;
+
 
     // // add the author and the home button to the footer
     // this.footer.appendChildren([ this.homeButton, this.title, this.author ]);

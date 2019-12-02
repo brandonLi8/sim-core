@@ -45,7 +45,8 @@ define( require => {
 
         style: {
           height: '100%',
-          position: 'relative'
+          position: 'relative',
+          display: 2
         },
 
         id: 'display',
