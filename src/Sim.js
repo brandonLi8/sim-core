@@ -22,20 +22,54 @@ define( require => {
   // constants
   const PACKAGE_OBJECT = JSON.parse( require( 'text!REPOSITORY/package.json' ) );
   const SIM_CORE_QUERY_PARAMETERS = QueryParameters.retrieve( {
+
+    /**
+     * Enables assertions, which are disable unless this parameter is provided.
+     * See './util/assert.js' for more details.
+     * For internal testing only.
+     */
     ea: {
       type: 'flag'
     },
+
+    /**
+     * Disables the fps in the top left is provided.
+     * See './core-internal/FPSCounter' for more details.
+     * For internal testing only.
+     */
     fps: {
       type: 'flag'
     },
+
+    /**
+     * Logs the current version of the simulation if provided.
+     * For internal testing only.
+     */
     version: {
       type: 'flag'
     }
   } );
 
-  class Sim {
-    constructor() {
+  //----------------------------------------------------------------------------------------
 
+  class Sim {
+
+    /**
+     * @param {Object} [options] - Various key-value pairs that control the appearance and behavior of this class.
+     *                             All options are specific to this class. See below details.
+     */
+    constructor( options ) {
+
+      options = {
+
+        // {string} - the name of the simulation. Defaults to an attempted title case conversion from the package name.
+        name: PACKAGE_OBJECT.name ? Util.toTitleCase( PACKAGE_OBJECT.name ) : '',
+
+        // override
+        ...options
+      };
+
+      //----------------------------------------------------------------------------------------
       // If the page is loaded from the back-forward cache, then reload the page to avoid bugginess,
       // see https://stackoverflow.com/questions/8788802/prevent-safari-loading-from-cache-when-back-button-is-clicked
       window.addEventListener( 'pageshow', function( event ) {
@@ -44,19 +78,21 @@ define( require => {
         }
       } );
 
+      // Log the current version of the simulation if the query parameter was provided.
       if ( SIM_CORE_QUERY_PARAMETERS.version ) {
-        console.log( `${ Util.toTitleCase( PACKAGE_OBJECT.name ) }: v${ PACKAGE_OBJECT.version }` );
+        console.log( `${ options.name }: v${ PACKAGE_OBJECT.version }` );
       }
 
-      // initialize the query parameter functionality
+      // Enable assertion if the query parameter was provided.
       if ( SIM_CORE_QUERY_PARAMETERS.ea ) assert.enableAssertions();
 
+      // Initialize a display and loader
       const display = new Display();
       const loader = new Loader();
 
       display.addChild( loader );
 
-
+      // Add the FPSCounter if the query parameter was provided.
       if ( SIM_CORE_QUERY_PARAMETERS.fps ) {
         const counter = new FPSCounter();
         counter.start();
