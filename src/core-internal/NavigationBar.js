@@ -56,7 +56,7 @@ define( require => {
       };
 
       // Rewrite options so that it overrides the defaults.
-      options = { ...defaults, ...options };
+      options = { ...defaults, ...options };g
       options.style = { ...defaults.style, ...options.style };
 
       super( options );
