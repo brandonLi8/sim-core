@@ -84,7 +84,8 @@ define( require => {
      */
     initializeView() {
       assert( this._view === null, 'there was already a model' );
-      this._view = this._createView();
+      assert( this._model !== null, 'model must be created first' );
+      this._view = this._createView( this._model );
 
       this.addChild( this._view );
     }
