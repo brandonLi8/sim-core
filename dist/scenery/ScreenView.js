@@ -1,0 +1,4 @@
+// Copyright © 2019 Brandon Li. All rights reserved.
+
+// Minified distribution version - sim-core 0.0.0-dev.6 - MIT.
+define(require=>{"use strict";const e=require("SIM_CORE/util/assert"),i=require("SIM_CORE/core-internal/DOMObject"),t=require("SIM_CORE/util/Vector"),s=require("SIM_CORE/scenery/Node"),r=new t(1024,618);return class extends i{constructor(i){e(!i||Object.getPrototypeOf(i)===Object.prototype,`invalid options: ${i}`),super(i={viewSize:r.copy(),...i}),this.viewSize=i.viewSize}addChild(i){return e(i instanceof s,`invalid child: ${i}`),super.addChild(i)}layout(e,i){const t=Math.min(e/this.viewSize.x,i/this.viewSize.y),s=t*this.viewSize.y,r=t*this.viewSize.x;this.style.height=`${s}px`,this.style.width=`${r}px`}enableDevBorder(){this.addStyle({border:"2px solid red"})}}});
