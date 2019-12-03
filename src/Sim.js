@@ -56,10 +56,11 @@ define( require => {
   class Sim {
 
     /**
+     * @param {Screen} screen - the screen to display
      * @param {Object} [options] - Various key-value pairs that control the appearance and behavior of this class.
      *                             All options are specific to this class. See below details.
      */
-    constructor( options ) {
+    constructor( screen, options ) {
 
       options = {
 
@@ -111,6 +112,8 @@ define( require => {
         const windowWidth = window.innerWidth;
 
         navigationBar.layout( windowWidth, windowHeight );
+
+        // const screenHeight = windowHeight - parseFloat( navigationBar.style.height );
       };
       window.onresize();
 
