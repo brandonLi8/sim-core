@@ -68,6 +68,7 @@ define( require => {
           top: '5px',
           fontSize: '17px',
           fontWeight: 500,
+          fontFamily: 'Times, Arial, sans-serif',
           userSelect: 'none'
         },
         id: 'fps-counter'
