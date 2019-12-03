@@ -45,7 +45,11 @@ define( require => {
 
       super( options );
 
+      // @public (read-only)
       this.viewSize = options.viewSize;
+
+      // @public (read-only)
+      this.scale = null;
     }
 
     /**
@@ -74,8 +78,19 @@ define( require => {
       const screenViewHeight = scale * this.viewSize.y;
       const screenViewWidth = scale * this.viewSize.x;
 
+      this.scale = scale;
+
       this.style.height = `${ screenViewHeight }px`;
       this.style.width = `${ screenViewWidth }px`;
+
+      const layoutChildren = ( children ) => {
+        children.forEach( ( child ) => {
+          child.layout( this, width, height );
+
+          layoutChildren( child.children );
+        } );
+      }
+      layoutChildren( this.children );
     }
 
     /**
