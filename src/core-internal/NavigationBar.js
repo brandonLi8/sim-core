@@ -69,7 +69,7 @@ define( require => {
         id: 'content',
         style: {
           height: '100%', // width set later
-          // boxShadow: 'inset 0px 0px 0px 2px red',
+          border: '2px solid red',
           margin: '0 auto'
         }
       } );
