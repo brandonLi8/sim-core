@@ -19,6 +19,7 @@ define( require => {
   const QueryParameters = require( 'SIM_CORE/util/QueryParameters' );
   const Util = require( 'SIM_CORE/util/Util' );
   const NavigationBar = require( 'SIM_CORE/core-internal/NavigationBar' );
+  const Screen = require( 'SIM_CORE/Screen' );
 
   // constants
   const PACKAGE_OBJECT = JSON.parse( require( 'text!REPOSITORY/package.json' ) );
@@ -61,6 +62,9 @@ define( require => {
      *                             All options are specific to this class. See below details.
      */
     constructor( screen, options ) {
+
+      assert( screen instanceof Screen, `invalid screen: ${ screen }` );
+      assert( !options || Object.getPrototypeOf( options ) === Object.prototype, `invalid options: ${ options }` );
 
       options = {
 
@@ -105,6 +109,9 @@ define( require => {
       const navigationBar = new NavigationBar( options.name );
 
       display.addChild( navigationBar );
+
+      display.addChild( screen );
+      screen.initializeModelAndView();
 
 
       window.onresize = () => {

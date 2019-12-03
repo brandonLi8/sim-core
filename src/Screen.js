@@ -13,28 +13,42 @@ define( require => {
 
   // modules
   const assert = require( 'SIM_CORE/util/assert' );
+  const DOMObject = require( 'SIM_CORE/core-internal/DOMObject' );
 
-  /**
-   * @param {function} createModel
-   * @param {function} createView - function( model )
-   * @param {Object} [options]
-   */
-  class Screen {
 
+  class Screen extends DOMObject {
+
+    /**
+     * @param {function} createModel
+     * @param {function} createView - function( model )
+     * @param {Object} [options] - Various key-value pairs that control the appearance and behavior of this class.
+     *                             Some options are specific to this class while others are passed to the super class.
+     *                             See the early portion of the constructor for details.
+     */
     constructor( createModel, createView, options ) {
 
       assert( !options || Object.getPrototypeOf( options ) === Object.prototype, `invalid options: ${ options }` );
 
-      options = {
+      const defaults = {
 
+        // Custom to this class
         // {string|null} name of the sim, as displayed to the user.
         name: null,
 
-        // {string} background color of the Screen
-        background: 'white',
-
-        ...options
+        // Passed to the superclass
+        style: {
+          width: '100%',
+          top: 0,
+          background: 'white',
+          position: 'absolute'
+        }
       };
+
+      // Rewrite options so that it overrides the defaults.
+      options = { ...defaults, ...options };
+      options.style = { ...defaults.style, ...options.style };
+
+      super( options );
 
       // @public (read-only)
       this.name = options.name;
