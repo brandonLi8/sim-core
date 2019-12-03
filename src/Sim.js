@@ -122,6 +122,9 @@ define( require => {
 
         const screenHeight = windowHeight - parseFloat( navigationBar.style.height );
         screen.style.height = `${ screenHeight }px`;
+
+        console.log( screenHeight, windowHeight )
+        screen._view.layout( windowWidth, screenHeight );
       };
       window.onresize();
 

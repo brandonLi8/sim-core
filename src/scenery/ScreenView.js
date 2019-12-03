@@ -46,11 +46,6 @@ define( require => {
       super( options );
 
       this.viewSize = options.viewSize;
-
-      this.addStyle( {
-        border: '2px solid red',
-        position: 'absolute'
-      } );
     }
 
     /**
@@ -68,21 +63,31 @@ define( require => {
 
     /**
      * Called when the navigation bar layout needs to be updated, typically when the browser window is resized.
-     * @param
+     * @public
      *
      * @param {number} width - in pixels of the window
      * @param {number} height - in pixels of the window
      */
     layout( width, height ) {
 
-      const scale = Math.min( width / SCREEN_SIZE.x, height / SCREEN_SIZE.y );
-      const screenViewHeight = scale * this.viewSize.x;
-      const screenViewWidth = scale * this.viewSize.y;
+      const scale = Math.min( width / this.viewSize.x, height / this.viewSize.y );
+      const screenViewHeight = scale * this.viewSize.y;
+      const screenViewWidth = scale * this.viewSize.x;
 
       this.style.height = `${ screenViewHeight }px`;
       this.style.width = `${ screenViewWidth }px`;
     }
+
+    /**
+     * Called if ?dev was provided as a Query Parameter. See Sim.js for more information.
+     * @public
+     */
+    enableDevBorder() {
+      this.addStyle( {
+        border: '2px solid red'
+      } );
+    }
   }
 
-  return Screen;
+  return ScreenView;
 } );

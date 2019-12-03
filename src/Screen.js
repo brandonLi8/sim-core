@@ -40,7 +40,10 @@ define( require => {
           width: '100%',
           top: 0,
           background: 'white',
-          position: 'absolute'
+          display: 'flex',
+          justifyContent: 'center',
+          alignContent: 'center',
+          alignItems: 'center'
         }
       };
 
@@ -82,6 +85,8 @@ define( require => {
     initializeView() {
       assert( this._view === null, 'there was already a model' );
       this._view = this._createView();
+
+      this.addChild( this._view );
     }
 
     // Initialize both the model and view
