@@ -87,9 +87,7 @@ define( require => {
         }
       } );
 
-      this.setChildren( [
-        this.navigationBarContent,
-      ] );
+      this.addChild( this.navigationBarContent );
 
       this.navigationBarContent.setChildren( [
         this.titleDOMObject
