@@ -49,6 +49,14 @@ define( require => {
      */
     version: {
       type: 'flag'
+    },
+
+    /**
+     * Provides a border of the ScreenView instances.
+     * For internal testing only.
+     */
+    dev: {
+      type: 'flag'
     }
   } );
 
@@ -113,6 +121,10 @@ define( require => {
       display.addChild( screen );
       screen.initializeModelAndView();
 
+
+      if ( SIM_CORE_QUERY_PARAMETERS.dev ) {
+        screen._view.enableDevBorder();
+      }
 
       window.onresize = () => {
         const windowHeight = window.innerHeight;
