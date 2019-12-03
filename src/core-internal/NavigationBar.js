@@ -15,6 +15,9 @@
  * home button, screen buttons, menu, title) do not change positions. If we are height-constrained, the amount
  * available to the bar expands, so we lay out the children to fit.
  *
+ * TODO: This module needs significant reconsidering. In particular, the layout method is manually calculated a new
+ *       width. This should be handled in ScreenView and with Nodes instead of DOMObject.
+ *
  * @author Brandon Li <brandon.li820@gmail.com>
  */
 
@@ -118,11 +121,6 @@ define( require => {
 
   NavigationBar.SCREEN_SIZE = SCREEN_SIZE;
   NavigationBar.NAVIGATION_BAR_HEIGHT = NAVIGATION_BAR_HEIGHT;
-
-
-    // // add the author and the home button to the footer
-    // this.footer.appendChildren([ this.homeButton, this.title, this.author ]);
-
 
   return NavigationBar;
 } );
