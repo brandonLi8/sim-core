@@ -69,7 +69,7 @@ define( require => {
         id: 'content',
         style: {
           height: '100%', // width set later
-          border: '2px solid red',
+          webkitFontSmoothing: 'antialiased',
           margin: '0 auto'
         }
       } );
