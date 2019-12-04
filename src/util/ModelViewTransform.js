@@ -20,7 +20,6 @@ define( require => {
   // modules
   const assert = require( 'SIM_CORE/util/assert' );
   const Bounds = require( 'SIM_CORE/util/Bounds' );
-  const Util = require( 'SIM_CORE/util/Util' );
   const Vector = require( 'SIM_CORE/util/Vector' );
 
   class ModelViewTransform {
@@ -73,7 +72,7 @@ define( require => {
     // @public View => Model
     //----------------------------------------------------------------------------------------
     viewToModelX( x ) { return x / this.xViewToModelScale + this.xModelOffset; }
-    viewToModelX( y ) { return y / this.yViewToModelScale + this.yModelOffset; }
+    viewToModelY( y ) { return y / this.yViewToModelScale + this.yModelOffset; }
     viewToModelXY( x, y ) { return new Vector( this.viewToModelX( x ), this.viewToModelY( y ) ); }
     viewToModelPosition( point ) { return new Vector( this.viewToModelX( point.x ), this.viewToModelY( point.y ) ); }
     viewToModelBounds( bounds ) {
@@ -85,4 +84,6 @@ define( require => {
       );
     }
   }
+
+  return ModelViewTransform;
 } );
