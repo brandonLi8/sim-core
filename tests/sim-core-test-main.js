@@ -17,6 +17,7 @@ define( require => {
   truenit.registerTest( 'Util', require( 'TESTS/util/UtilTests' ) );
   truenit.registerTest( 'Vector', require( 'TESTS/util/VectorTests' ) );
   truenit.registerTest( 'Bounds', require( 'TESTS/util/BoundsTests' ) );
+  truenit.registerTest( 'ModelViewTransform', require( 'TESTS/util/ModelViewTransformTests' ) );
 
   truenit.start();
 } );

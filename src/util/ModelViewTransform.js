@@ -41,15 +41,15 @@ define( require => {
       this.xViewToModelScale = viewBounds.width / modelBounds.width;
 
       // @private {number} yViewToModelScale (in view units per model unit)
-      this.invertedYViewToModelScale = -viewBounds.height / modelBounds.height;
+      this.yViewToModelScale = -viewBounds.height / modelBounds.height;
 
       // @private {number} x-offset
       this.xViewOffset = viewBounds.minX - this.xViewToModelScale * modelBounds.minX;
       this.xModelOffset = modelBounds.minX - viewBounds.minX / this.xViewToModelScale;
 
       // @private {number} yViewOffset
-      this.yViewOffset = viewBounds.minY - this.invertedYViewToModelScale * modelBounds.maxY;
-      this.yModelOffset = modelBounds.minY - viewBounds.minY / this.yViewToModelScale;
+      this.yViewOffset = viewBounds.minY - this.yViewToModelScale * modelBounds.maxY;
+      this.yModelOffset = modelBounds.minY - viewBounds.maxY / this.yViewToModelScale;
     }
 
     //----------------------------------------------------------------------------------------
@@ -62,9 +62,9 @@ define( require => {
     modelToViewBounds( bounds ) {
       return new Bounds(
         this.modelToViewX( bounds.minX ),
-        this.modelToViewY( bounds.minY ),
+        this.modelToViewY( bounds.maxY ), // inverts y
         this.modelToViewX( bounds.maxX ),
-        this.modelToViewY( bounds.maxY )
+        this.modelToViewY( bounds.minY )
       );
     }
 
@@ -74,13 +74,13 @@ define( require => {
     viewToModelX( x ) { return x / this.xViewToModelScale + this.xModelOffset; }
     viewToModelY( y ) { return y / this.yViewToModelScale + this.yModelOffset; }
     viewToModelXY( x, y ) { return new Vector( this.viewToModelX( x ), this.viewToModelY( y ) ); }
-    viewToModelPosition( point ) { return new Vector( this.viewToModelX( point.x ), this.viewToModelY( point.y ) ); }
+    viewToModelPoint( point ) { return new Vector( this.viewToModelX( point.x ), this.viewToModelY( point.y ) ); }
     viewToModelBounds( bounds ) {
       return new Bounds(
         this.viewToModelX( bounds.minX ),
-        this.viewToModelY( bounds.minY ),
+        this.viewToModelY( bounds.maxY ), // inverts y
         this.viewToModelX( bounds.maxX ),
-        this.viewToModelY( bounds.maxY )
+        this.viewToModelY( bounds.minY )
       );
     }
   }
