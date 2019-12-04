@@ -68,5 +68,21 @@ define( require => {
         this.modelToViewY( bounds.maxY )
       );
     }
+
+    //----------------------------------------------------------------------------------------
+    // @public View => Model
+    //----------------------------------------------------------------------------------------
+    viewToModelX( x ) { return x / this.xViewToModelScale + this.xModelOffset; }
+    viewToModelX( y ) { return y / this.yViewToModelScale + this.yModelOffset; }
+    viewToModelXY( x, y ) { return new Vector( this.viewToModelX( x ), this.viewToModelY( y ) ); }
+    viewToModelPosition( point ) { return new Vector( this.viewToModelX( point.x ), this.viewToModelY( point.y ) ); }
+    viewToModelBounds( bounds ) {
+      return new Bounds(
+        this.viewToModelX( bounds.minX ),
+        this.viewToModelY( bounds.minY ),
+        this.viewToModelX( bounds.maxX ),
+        this.viewToModelY( bounds.maxY )
+      );
+    }
   }
 } );
