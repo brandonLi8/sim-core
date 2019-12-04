@@ -52,5 +52,21 @@ define( require => {
       this.yViewOffset = viewBounds.minY - this.invertedYViewToModelScale * modelBounds.maxY;
       this.yModelOffset = modelBounds.minY - viewBounds.minY / this.yViewToModelScale;
     }
+
+    //----------------------------------------------------------------------------------------
+    // @public Model => View
+    //----------------------------------------------------------------------------------------
+    modelToViewX( x ) { return this.xViewToModelScale * x + this.xViewOffset; }
+    modelToViewY( y ) { return this.yViewToModelScale * y + this.yViewOffset; }
+    modelToViewXY( x, y ) { return new Vector( this.modelToViewX( x ), this.modelToViewY( y ) ); }
+    modelToViewPoint( point ) { return new Vector( this.modelToViewX( point.x ), this.modelToViewY( point.y ) ); }
+    modelToViewBounds( bounds ) {
+      return new Bounds(
+        this.modelToViewX( bounds.minX ),
+        this.modelToViewY( bounds.minY ),
+        this.modelToViewX( bounds.maxX ),
+        this.modelToViewY( bounds.maxY )
+      );
+    }
   }
 } );
