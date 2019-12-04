@@ -55,9 +55,18 @@ define( require => {
     //----------------------------------------------------------------------------------------
     // @public Model => View
     //----------------------------------------------------------------------------------------
+
+    // Coordinate Transforms
     modelToViewX( x ) { return this.xViewToModelScale * x + this.xViewOffset; }
     modelToViewY( y ) { return this.yViewToModelScale * y + this.yViewOffset; }
     modelToViewXY( x, y ) { return new Vector( this.modelToViewX( x ), this.modelToViewY( y ) ); }
+
+    // Width/Height Transforms
+    modelToViewDeltaX( x ) { return this.xViewToModelScale * x }
+    modelToViewDeltaY( y ) { return this.yViewToModelScale * y }
+    modelToViewDelta( vector ) { return new Vector( this.modelToViewDeltaX( x ), this.modelToViewDeltaY( y ) ); }
+
+    // Utilities
     modelToViewPoint( point ) { return new Vector( this.modelToViewX( point.x ), this.modelToViewY( point.y ) ); }
     modelToViewBounds( bounds ) {
       return new Bounds(
@@ -71,9 +80,18 @@ define( require => {
     //----------------------------------------------------------------------------------------
     // @public View => Model
     //----------------------------------------------------------------------------------------
+
+    // Coordinate Transforms
     viewToModelX( x ) { return x / this.xViewToModelScale + this.xModelOffset; }
     viewToModelY( y ) { return y / this.yViewToModelScale + this.yModelOffset; }
     viewToModelXY( x, y ) { return new Vector( this.viewToModelX( x ), this.viewToModelY( y ) ); }
+
+    // Width/Height Transforms
+    viewToModelDeltaX( x ) { return x / this.xViewToModelScale }
+    viewToModelDeltaY( y ) { return y /this.yViewToModelScale }
+    viewToModelDelta( vector ) { return new Vector( this.modelToViewDeltaX( x ), this.modelToViewDeltaY( y ) ); }
+
+    // Utilities
     viewToModelPoint( point ) { return new Vector( this.viewToModelX( point.x ), this.viewToModelY( point.y ) ); }
     viewToModelBounds( bounds ) {
       return new Bounds(
