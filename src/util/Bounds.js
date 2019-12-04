@@ -164,7 +164,7 @@ define( require => {
      *
      * @returns {number}
      */
-    getArea() { return this.getWidth() * this.getHeight; }
+    getArea() { return this.getWidth() * this.getHeight(); }
     get area() { return this.getArea(); }
 
     /**
