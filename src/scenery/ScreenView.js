@@ -14,7 +14,7 @@ define( require => {
   // modules
   const assert = require( 'SIM_CORE/util/assert' );
   const DOMObject = require( 'SIM_CORE/core-internal/DOMObject' );
-  const Vector = require( 'SIM_CORE/util/Vector' );
+  const Bounds = require( 'SIM_CORE/util/Bounds' );
   const Node = require( 'SIM_CORE/scenery/Node' );
 
   /*
@@ -22,7 +22,7 @@ define( require => {
    * These bounds were added in Sep 2014 and are based on a screenshot from a non-Retina iPad, in Safari, iOS7.
    * It therefore accounts for the nav bar on the bottom and the space consumed by the browser on the top.
    */
-  const DEFAULT_VIEW_SIZE = new Vector( 1024, 618 );
+  const DEFAULT_VIEW_SIZE = new Bounds( 0, 0, 1024, 618 );
 
   class ScreenView extends DOMObject {
 
@@ -37,7 +37,7 @@ define( require => {
 
       options = {
 
-        // {Vector} the bounds that are safe to draw in on all supported platforms
+        // {Bounds} the bounds that are safe to draw in on all supported platforms
         viewSize: DEFAULT_VIEW_SIZE.copy(),
 
         ...options
@@ -74,9 +74,9 @@ define( require => {
      */
     layout( width, height ) {
 
-      const scale = Math.min( width / this.viewSize.x, height / this.viewSize.y );
-      const screenViewHeight = scale * this.viewSize.y;
-      const screenViewWidth = scale * this.viewSize.x;
+      const scale = Math.min( width / this.viewSize.width, height / this.viewSize.height );
+      const screenViewHeight = scale * this.viewSize.height;
+      const screenViewWidth = scale * this.viewSize.width;
 
       this.scale = scale;
       window.globalToLocalScale = scale; // in local units per global
