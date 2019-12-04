@@ -30,7 +30,7 @@ define( require => {
 
 
       // Defaults for options.
-      const defaults =  {
+      const defaults = {
 
         type: 'circle',
         namespace: XML_NAMESPACE,

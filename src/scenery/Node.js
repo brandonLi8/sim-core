@@ -12,7 +12,6 @@ define( require => {
   // modules
   const assert = require( 'SIM_CORE/util/assert' );
   const DOMObject = require( 'SIM_CORE/core-internal/DOMObject' );
-  const Vector = require( 'SIM_CORE/util/Vector' );
 
   class Node extends DOMObject {
 

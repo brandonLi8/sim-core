@@ -16,7 +16,6 @@ define( require => {
   //----------------------------------------------------------------------------------------
   // constants
   const XML_NAMESPACE = 'http://www.w3.org/2000/svg';
-  const INVERT_Y_AXIS_TRANSFORM = 'scale( 1, -1 )';
 
   class SVGNode extends Node {
 
@@ -31,7 +30,7 @@ define( require => {
 
 
       // Defaults for options.
-      const defaults =  {
+      const defaults = {
 
         // passed to the super class
         type: 'svg',

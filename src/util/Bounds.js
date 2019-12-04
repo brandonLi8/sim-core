@@ -208,7 +208,7 @@ define( require => {
       else {
         const closestX = Math.max( Math.min( location.x, this.maxX ), this.minX );
         const closestY = Math.max( Math.min( location.y, this.maxY ), this.minY );
-        return new Vector( xConstrained, closestY );
+        return new Vector( closestX, closestY );
       }
     }
 
@@ -409,7 +409,7 @@ define( require => {
    */
   Bounds.rect = ( x, y, width, height ) => {
     return new Bounds( x, y, x + width, y + height );
-  }
+  };
 
   // @public {Bounds} Bounds.ZERO - a static Bounds that represents an empty Bounds.
   Bounds.ZERO = new Bounds( 0, 0, 0, 0 );

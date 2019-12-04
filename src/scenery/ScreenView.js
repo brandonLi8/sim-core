@@ -89,7 +89,7 @@ define( require => {
 
           layoutChildren( child.children );
         } );
-      }
+      };
       layoutChildren( this.children );
     }
 
