@@ -61,10 +61,10 @@ define( require => {
      * @returns {boolean} - whether the two bounds are within epsilon of each other
      */
     equalsEpsilon( other, epsilon = Util.EPSILON ) {
-      return Math.abs( this.minX - b.minX ) <= epsilon
-        && Math.abs( this.minY - b.minY ) <= epsilon
-        && Math.abs( this.maxX - b.maxX ) <= epsilon
-        && Math.abs( this.maxY - b.maxY ) <= epsilon;
+      return Math.abs( this.minX - other.minX ) <= epsilon
+        && Math.abs( this.minY - other.minY ) <= epsilon
+        && Math.abs( this.maxX - other.maxX ) <= epsilon
+        && Math.abs( this.maxY - other.maxY ) <= epsilon;
     }
 
     //========================================================================================
