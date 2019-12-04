@@ -79,13 +79,13 @@ define( require => {
       const screenViewWidth = scale * this.viewSize.x;
 
       this.scale = scale;
-
+      window.globalToLocalScale = scale; // in local units per global
       this.style.height = `${ screenViewHeight }px`;
       this.style.width = `${ screenViewWidth }px`;
 
       const layoutChildren = ( children ) => {
         children.forEach( ( child ) => {
-          child.layout( this, width, height );
+          child.layout( width, height );
 
           layoutChildren( child.children );
         } );

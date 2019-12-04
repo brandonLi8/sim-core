@@ -33,6 +33,8 @@ define( require => {
         // {number|null} - null means self computed height in the constructor, otherwise specifies a height.
         width: null,
         height: null,
+        top: null,
+        left: null
       };
 
       // Rewrite options so that it overrides the defaults.
@@ -43,10 +45,8 @@ define( require => {
       // @protected {number} - the width and height in scenery units.
       this._width = options.width;
       this._height = options.width;
-
-
-      this.style.width = this._width + 'px';
-      this.style.height = this._height + 'px';
+      this._top = options.top;
+      this._left = options.left;
     }
 
 
@@ -56,24 +56,29 @@ define( require => {
      *
      * @returns {*} See the property declaration for documentation of the type.
      */
-    getWidth() { return this._width; }
+    getWidth() { return this._width || this.style.width; }
     get width() { return this.getWidth(); }
-    getHeight() { return this._height; }
+    getHeight() { return this._height|| this.style.height; }
     get height() { return this.getHeight(); }
+    getTop() { return this._top|| this.style.top; }
+    get top() { return this.getTop(); }
+    getLeft() { return this._left|| this.style.left; }
+    get left() { return this.getLeft(); }
 
 
     /**
      * Called when the Node layout needs to be updated, typically when the browser window is resized.
      * @private (scenery-internal)
      *
-     * @param {ScreenView} screenView
      * @param {number} width - in pixels of the window
      * @param {number} height - in pixels of the window
      */
-    layout( screenView, width, height ) {
+    layout( width, height ) {
 
-      this.style.width = `${ screenView.scale * this._width }px`;
-      this.style.height = `${ screenView.scale * this._height }px`;
+      this.style.width = `${ window.globalToLocalScale * this._width }px`;
+      this.style.height = `${ window.globalToLocalScale * this._height }px`;
+      this.style.top = `${ window.globalToLocalScale * this._top }px`;
+      this.style.left = `${ window.globalToLocalScale * this._left }px`;
 
     }
 
