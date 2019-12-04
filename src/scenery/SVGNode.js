@@ -49,10 +49,17 @@ define( require => {
 
 
       super( options );
+
       // @protected
-      this.viewBox = `0 0 ${ options.width } ${ options.height }`;
+      this.viewBox = `0 0 ${ this.width } ${ this.height }`;
 
       this.addAttributes( { viewBox: this.viewBox } );
+
+      if ( options.invertYAxis ) {
+        this.addStyle( {
+          transform: INVERT_Y_AXIS_TRANSFORM
+        } );
+      }
     }
 
 
@@ -63,9 +70,9 @@ define( require => {
      * @param {number} width - in pixels of the window
      * @param {number} height - in pixels of the window
      */
-    layout( width, height ) {
+    // layout( width, height ) {
 
-    }
+    // }
   }
 
   return SVGNode;

@@ -80,6 +80,9 @@ define( require => {
       this.style.top = `${ window.globalToLocalScale * this._top }px`;
       this.style.left = `${ window.globalToLocalScale * this._left }px`;
 
+      if ( this.type === 'svg' ) {
+        console.log( this.width, this.height )
+      }
     }
 
     /**
