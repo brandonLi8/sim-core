@@ -158,3 +158,130 @@ define( require => {
     get centerX() { return this.getCenterX(); }
     get centerY() { return this.getCenterY(); }
 
+    /**
+     * Whether our properties are all finite numbers.
+     * @public
+     *
+     * @returns {boolean}
+     */
+    isFinite() { return [ this.minX, this.minY, this.maxX, this.maxY ].every( property => isFinite( property ) ); }
+
+    /**
+     * Whether the coordinates (x, y) are contained inside this bounding box.
+     * @public
+     *
+     * @param {number} x
+     * @param {number} y
+     * @returns {boolean}
+     */
+    containsCoordinates( x, y ) {
+      assert( typeof x === 'number', `invalid x: ${ x }` );
+      assert( typeof y === 'number', `invalid y: ${ y }` );
+      return this.minX <= x && x <= this.maxX && this.minY <= y && y <= this.maxY;
+    }
+
+    /**
+     * Whether the point (x, y) are contained inside this bounding box.
+     * @public
+     *
+     * @param {Vector} point
+     * @returns {boolean}
+     */
+    containsPoint( point ) {
+      assert( point instanceof Vector, `invalid point: ${ point }` );
+      return this.containsCoordinates( point.x, point.y );
+    }
+
+    /**
+     * Gets the closest point inside the bounds. If the location is inside the bounds, the location will be returned.
+     * Otherwise, this will return a new location on the edge of the bounds that is closest to the provided location.
+     * @public
+     *
+     * @param {Vector} location
+     * @returns {Vector}
+     */
+    closestPointTo( location ) {
+      assert( location instanceof Vector, `invalid location: ${ location }` );
+      if ( this.containsPoint( location ) ) {
+        return location.copy();
+      }
+      else {
+        const closestX = Math.max( Math.min( location.x, this.maxX ), this.minX );
+        const closestY = Math.max( Math.min( location.y, this.maxY ), this.minY );
+        return new Vector( xConstrained, closestY );
+      }
+    }
+
+    /**
+     * Whether this bounding box completely contains the bounding box passed as a parameter.
+     * @public
+     *
+     * @param {Bounds} bounds
+     * @returns {boolean}
+     */
+    containsBounds( bounds ) {
+      assert( bounds instanceof Bounds, `invalid bounds: ${ bounds }` );
+      return this.minX <= bounds.minX
+        && this.maxX >= bounds.maxX
+        && this.minY <= bounds.minY
+        && this.maxY >= bounds.maxY;
+    }
+
+    /**
+     * Whether this and another bounding box have any points of intersection (including touching boundaries).
+     * @public
+     *
+     * @param {Bounds} bounds
+     * @returns {boolean}
+     */
+    intersectsBounds( bounds ) {
+      assert( bounds instanceof Bounds, `invalid bounds: ${ bounds }` );
+      const minX = Math.max( this.minX, bounds.minX );
+      const minY = Math.max( this.minY, bounds.minY );
+      const maxX = Math.min( this.maxX, bounds.maxX );
+      const maxY = Math.min( this.maxY, bounds.maxY );
+      return ( maxX - minX ) >= 0 && ( maxY - minY >= 0 );
+    }
+
+    /**
+     * Creates a copy of this bounds.
+     * @public
+     *
+     * @returns {Bounds} - for chaining
+     */
+    copy() { return new Bounds( this.minX, this.minY, this.maxX, this.maxY ); }
+
+    /**
+     * Gets the smallest bounds that contains both this bounds and the input bounds.
+     * @public
+     *
+     * @param {Bounds} bounds
+     * @returns {Bounds} - for chaining
+     */
+    union( bounds ) {
+      assert( bounds instanceof Bounds, `invalid bounds: ${ bounds }` );
+      return new Bounds(
+        Math.min( this.minX, bounds.minX ),
+        Math.min( this.minY, bounds.minY ),
+        Math.max( this.maxX, bounds.maxX ),
+        Math.max( this.maxY, bounds.maxY )
+      );
+    }
+
+    /**
+     * The smallest bounds that is contained by both this bounds and the input bounds.
+     * @public
+     *
+     * @param {Bounds} bounds
+     * @returns {Bounds}
+     */
+    intersection( bounds ) {
+      assert( bounds instanceof Bounds, `invalid bounds: ${ bounds }` );
+      return new Bounds(
+        Math.max( this.minX, bounds.minX ),
+        Math.max( this.minY, bounds.minY ),
+        Math.min( this.maxX, bounds.maxX ),
+        Math.min( this.maxY, bounds.maxY )
+      );
+    }
+
