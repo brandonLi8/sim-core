@@ -43,10 +43,6 @@ define( require => {
       // Rewrite options so that it overrides the defaults.
       options = { ...defaults, ...options };
 
-      // options.width = 2 * options.radius;
-      // options.height = 2 * options.radius;
-
-
       super( options );
 
       this.addAttributes( {
