@@ -93,6 +93,68 @@ define( require => {
     get width() { return this.getWidth(); }
     get height() { return this.getHeight(); }
 
+    /**
+     * Location getters, in terms of the conventional mathematical coordinate system.
+     *                        centerX                maxX
+     *          ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓ maxY
+     *          ┃ leftTop     centerTop     rightTop    ┃
+     * centerY  ┃ leftCenter  center        rightCenter ┃
+     *          ┃ leftBottom  centerBottom  rightBottom ┃
+     *    minY  ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
+     *          minX
+     */
 
-  return Bounds;
-} );
+    /**
+     * Gets the side locations of the Bounding Box
+     * @public
+     *
+     * @returns {number}
+     */
+    getLeft() { return this.minX; }
+    getTop() { return this.maxY; }
+    getRight() { return this.maxX; }
+    getBottom() { return this.minY; }
+
+    get left() { return this.getLeft(); }
+    get top() { return this.getTop(); }
+    get right() { return this.getRight(); }
+    get bottom() { return this.getBottom(); }
+
+    /**
+     * Gets the box points of the Bounding Box
+     * @public
+     *
+     * @returns {Vector}
+     */
+    getLeftTop() { return new Vector( this.minX, this.maxY ); }
+    getCenterTop() { return new Vector( this.getCenterX(), this.maxY ); }
+    getRightTop() { return new Vector( this.maxX, this.maxY ); }
+    getLeftCenter() { return new Vector( this.minX, this.getCenterY() ); }
+    getRightCenter() { return new Vector( this.maxX, this.getCenterY() ); }
+    getLeftBottom() { return new Vector( this.minX, this.minY ); }
+    getCenterBottom() { return new Vector( this.getCenterX(), this.minY ); }
+    getRightBottom() { return new Vector( this.maxX, this.minY ); }
+    getCenter() { return new Vector( this.getCenterX(), this.getCenterY() ); }
+
+    get leftTop() { return this.getLeftTop(); }
+    get centerTop() { return this.getCenterTop(); }
+    get rightTop() { return this.getRightTop(); }
+    get leftCenter() { return this.getLeftCenter(); }
+    get rightCenter() { return this.getRightCenter(); }
+    get leftBottom() { return this.getLeftBottom(); }
+    get centerBottom() { return this.getCenterBottom(); }
+    get rightBottom() { return this.getRightBottom(); }
+    get center() { return this.getCenter(); }
+
+    /**
+     * Gets the center x and y location of the Bounding Box
+     * @public
+     *
+     * @returns {number}
+     */
+    getCenterX() { return ( this.minX + this.maxX ) / 2; }
+    getCenterY() { return ( this.minY + this.maxY ) / 2; }
+
+    get centerX() { return this.getCenterX(); }
+    get centerY() { return this.getCenterY(); }
+
