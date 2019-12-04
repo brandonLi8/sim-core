@@ -57,18 +57,6 @@ define( require => {
 
     }
 
-
-    /**
-     * Called when the Node layout needs to be updated, typically when the browser window is resized.
-     * @private (scenery-internal)
-     *
-     * @param {number} width - in pixels of the window
-     * @param {number} height - in pixels of the window
-     */
-    layout( width, height ) {
-
-      super.layout( width, height );
-    }
   }
 
   return Circle;
