@@ -393,5 +393,26 @@ define( require => {
     }
   }
 
+  //========================================================================================
+  // Static References
+  //========================================================================================
+
+  /**
+   * Returns a new Bounds object, constructed with by <minX, minY, width, height>.
+   * @public
+   *
+   * @param {number} x - the minimum value of X for the bounds.
+   * @param {number} y - the minimum value of Y for the bounds.
+   * @param {number} width - the width (maxX - minX) of the bounds.
+   * @param {number} height - the height (maxY - minY) of the bounds.
+   * @returns {Bounds}
+   */
+  Bounds.rect = ( x, y, width, height ) => {
+    return new Bounds( x, y, x + width, y + height );
+  }
+
+  // @public {Bounds} Bounds.ZERO - a static Bounds that represents an empty Bounds.
+  Bounds.ZERO = new Bounds( 0, 0, 0, 0 );
+
   return Bounds;
 } );
