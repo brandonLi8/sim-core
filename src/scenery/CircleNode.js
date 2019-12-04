@@ -1,7 +1,7 @@
 // Copyright © 2019 Brandon Li. All rights reserved.
 
 /**
- * A sim-specific node for SVG (scalable vector graphics).
+ * A sim-specific Circle node for SVG (scalable vector graphics).
  *
  * @author Brandon Li <brandon.li820@gmail.com>
  */
@@ -11,14 +11,13 @@ define( require => {
 
   // modules
   const assert = require( 'SIM_CORE/util/assert' );
-  const Node = require( 'SIM_CORE/scenery/Node' );
+  const SVGNode = require( 'SIM_CORE/scenery/SVGNode' );
+  const Vector = require( 'SIM_CORE/util/Vector' );
 
-  //----------------------------------------------------------------------------------------
   // constants
   const XML_NAMESPACE = 'http://www.w3.org/2000/svg';
-  const INVERT_Y_AXIS_TRANSFORM = 'scale( 1, -1 )';
 
-  class SVGNode extends Node {
+  class Circle extends SVGNode {
 
     /**
      * @param {Object} [options] - Various key-value pairs that control the appearance and behavior. Subclasses
@@ -33,34 +32,29 @@ define( require => {
       // Defaults for options.
       const defaults =  {
 
-        // passed to the super class
-        type: 'svg',
+        type: 'circle',
         namespace: XML_NAMESPACE,
 
-        // custom to this class
-        invertYAxis: true,
-        fill: null,
-        stroke: null,
-        strokeWidth: null
+        radius: 0,
+        center: Vector.ZERO,
+        setViewBox: false
       };
 
       // Rewrite options so that it overrides the defaults.
       options = { ...defaults, ...options };
 
+      // options.width = 2 * options.radius;
+      // options.height = 2 * options.radius;
+
 
       super( options );
 
-      // @protected
-      this.viewBox = `0 0 ${ this.width || 0 } ${ this.height || 0 }`;
-
       this.addAttributes( {
-        viewBox: this.viewBox,
-
-        fill: options.fill,
-        stroke: options.stroke,
-        strokeWidth: options.strokeWidth
-
+        r: options.radius, // In percentage of the container.
+        cx: options.center.x, // Center the circle
+        cy: options.center.y // Center the circle
       } );
+
     }
 
 
@@ -71,10 +65,11 @@ define( require => {
      * @param {number} width - in pixels of the window
      * @param {number} height - in pixels of the window
      */
-    // layout( width, height ) {
+    layout( width, height ) {
 
-    // }
+      super.layout( width, height );
+    }
   }
 
-  return SVGNode;
+  return Circle;
 } );

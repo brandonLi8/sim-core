@@ -12,6 +12,7 @@ define( require => {
   // modules
   const assert = require( 'SIM_CORE/util/assert' );
   const DOMObject = require( 'SIM_CORE/core-internal/DOMObject' );
+  const Vector = require( 'SIM_CORE/util/Vector' );
 
   class Node extends DOMObject {
 
@@ -34,7 +35,8 @@ define( require => {
         width: null,
         height: null,
         top: null,
-        left: null
+        left: null,
+        center: null
       };
 
       // Rewrite options so that it overrides the defaults.
@@ -44,9 +46,11 @@ define( require => {
 
       // @protected {number} - the width and height in scenery units.
       this._width = options.width;
-      this._height = options.width;
+      this._height = options.height;
       this._top = options.top;
       this._left = options.left;
+      this._center = options.center;
+
     }
 
 
@@ -64,6 +68,8 @@ define( require => {
     get top() { return this.getTop(); }
     getLeft() { return this._left|| this.style.left; }
     get left() { return this.getLeft(); }
+    getCenter() { return this._center || this.style.center; }
+    get center() { return this.getCenter(); }
 
 
     /**
@@ -80,8 +86,9 @@ define( require => {
       this.style.top = `${ window.globalToLocalScale * this._top }px`;
       this.style.left = `${ window.globalToLocalScale * this._left }px`;
 
-      if ( this.type === 'svg' ) {
-        console.log( this.width, this.height )
+      if ( this.center ) {
+        this.style.top = `${ window.globalToLocalScale * ( this._center.y - this.height / 2 ) }px`;
+        this.style.left = `${ window.globalToLocalScale * ( this._center.x - this.width / 2 ) }px`;
       }
     }
 
