@@ -285,3 +285,113 @@ define( require => {
       );
     }
 
+    //========================================================================================
+    // Mutators
+    //========================================================================================
+
+    /**
+     * Sets each value for this bounds.
+     * @public
+     *
+     * @param {number} minX
+     * @param {number} minY
+     * @param {number} maxX
+     * @param {number} maxY
+     * @returns {Bounds} - for chaining
+     */
+    setAll( minX, minY, maxX, maxY ) {
+      assert( typeof minX === 'number', `invalid minX: ${ minX }` );
+      assert( typeof minY === 'number', `invalid minY: ${ minY }` );
+      assert( typeof maxX === 'number', `invalid maxX: ${ maxX }` );
+      assert( typeof maxY === 'number', `invalid maxY: ${ maxY }` );
+
+      this.minX = minX;
+      this.minY = minY;
+      this.maxX = maxX;
+      this.maxY = maxY;
+      return this;
+    }
+
+    /**
+     * Sets the values of this bounds to be equal to the input bounds.
+     * @public
+     *
+     * @param {Bounds} bounds
+     * @returns {Bounds} - for chaining
+     */
+    set( bounds ) {
+      assert( bounds instanceof Bounds, `invalid bounds: ${ bounds }` );
+      return this.setAll( bounds.minX, bounds.minY, bounds.maxX, bounds.maxY );
+    }
+
+    /**
+     * Rounds each the edges of this bounds with Util.roundSymmetric.
+     * @public
+     *
+     * @returns {Bounds} - for chaining
+     */
+    roundSymmetric() {
+      return this.setAll(
+        Util.roundSymmetric( this.minX ),
+        Util.roundSymmetric( this.minY ),
+        Util.roundSymmetric( this.maxX ),
+        Util.roundSymmetric( this.maxY )
+      );
+    }
+
+    /**
+     * Expands this bounds on all sides by the specified amount.
+     * @public
+     *
+     * @param {number} d
+     * @returns {Bounds} - for chaining
+     */
+    dilate( d ) {
+      assert( typeof d === 'number', `invalid d: ${ d }` );
+      return this.setMinMax( this.minX - d, this.minY - d, this.maxX + d, this.maxY + d );
+    }
+
+    /**
+     * Contracts this bounds on all sides by the specified amount.
+     * @public
+     *
+     * @param {number} d
+     * @returns {Bounds} - for chaining
+     */
+    erode( d ) { return this.dilate( -d ); }
+
+    /**
+     * Expands this bounds independently for each side (or if some offsets are negative, will contract those sides).
+     * @public
+     *
+     * @param {number} left - Amount to expand to the left (subtracts from minX)
+     * @param {number} top - Amount to expand to the top (subtracts from minY)
+     * @param {number} right - Amount to expand to the right (adds to maxX)
+     * @param {number} bottom - Amount to expand to the bottom (adds to maxY)
+     * @returns {Bounds} - for chaining
+     */
+    expand( left, top, right, bottom ) {
+      assert( typeof left === 'number', `invalid left: ${ left }` );
+      assert( typeof top === 'number', `invalid top: ${ top }` );
+      assert( typeof right === 'number', `invalid right: ${ right }` );
+      assert( typeof bottom === 'number', `invalid bottom: ${ bottom }` );
+      return new Bounds( this.minX - left, this.minY - top, this.maxX + right, this.maxY + bottom );
+    }
+
+    /**
+     * Translates our bounds by (x, y).
+     * @public
+     *
+     * @param {number} x
+     * @param {number} y
+     * @returns {Bounds} - for chaining
+     */
+    shift( x, y ) {
+      assert( typeof x === 'number', `invalid x: ${ x }` );
+      assert( typeof y === 'number', `invalid y: ${ y }` );
+      return this.setMinMax( this.minX + x, this.minY + y, this.maxX + x, this.maxY + y );
+    }
+  }
+
+  return Bounds;
+} );
