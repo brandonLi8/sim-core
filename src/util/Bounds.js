@@ -159,6 +159,15 @@ define( require => {
     get centerY() { return this.getCenterY(); }
 
     /**
+     * Gets the Area of the Bounds.
+     * @public
+     *
+     * @returns {number}
+     */
+    getArea() { return this.getWidth() * this.getHeight }
+    get area() { return this.getArea(); }
+
+    /**
      * Whether our properties are all finite numbers.
      * @public
      *
