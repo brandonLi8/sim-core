@@ -1,7 +1,7 @@
 // Copyright © 2019 Brandon Li. All rights reserved.
 
 /**
- * A sim-specific Circle node for SVG (scalable vector graphics).
+ * A sim-specific Line node for SVG (scalable vector graphics).
  *
  * @author Brandon Li <brandon.li820@gmail.com>
  */
@@ -14,12 +14,11 @@ define( require => {
   const SVGNode = require( 'SIM_CORE/scenery/SVGNode' );
   const Vector = require( 'SIM_CORE/util/Vector' );
 
-  // constants
-  const XML_NAMESPACE = 'http://www.w3.org/2000/svg';
-
   class Circle extends SVGNode {
 
     /**
+     * @param {Vector} start
+     * @param {Vector} end
      * @param {Object} [options] - Various key-value pairs that control the appearance and behavior. Subclasses
      *                             may have different options for their API. See the code where the options are set in
      *                             the early portion of the constructor for details.
@@ -31,12 +30,7 @@ define( require => {
 
       // Defaults for options.
       const defaults = {
-
-        type: 'circle',
-        namespace: XML_NAMESPACE,
-
-        radius: 0,
-        center: Vector.ZERO
+        type: 'line',
       };
 
       // Rewrite options so that it overrides the defaults.
@@ -44,22 +38,17 @@ define( require => {
 
       super( options );
 
-      this.radius = options.radius;
-
-      this.addAttributes( {
-        r: options.radius, // In percentage of the container.
-        cx: options.center.x, // Center the circle
-        cy: options.center.y // Center the circle
-      } );
-
+      this.start = start;
+      this.end = end;
     }
 
     layout( scale ) {
 
       this.addAttributes( {
-        cx: `${ scale * this._center.x }px`,
-        cy: `${ scale * this._center.y }px`,
-        r: `${ scale * this.radius }px`,
+        x1: `${ scale * this.start.x }px`,
+        y1: `${ scale * this.start.y }px`,
+        x2: `${ scale * this.end.x }px`,
+        y2: `${ scale * this.end.y }px`,
       } );
     }
   }

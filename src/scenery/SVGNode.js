@@ -40,8 +40,7 @@ define( require => {
         invertYAxis: true,
         fill: null,
         stroke: null,
-        strokeWidth: null,
-        setViewBox: true
+        strokeWidth: null
       };
 
       // Rewrite options so that it overrides the defaults.
