@@ -45,6 +45,8 @@ define( require => {
 
       super( options );
 
+      this.radius = options.radius;
+
       this.addAttributes( {
         r: options.radius, // In percentage of the container.
         cx: options.center.x, // Center the circle
@@ -53,6 +55,14 @@ define( require => {
 
     }
 
+    layout( scale ) {
+
+      this.addAttributes( {
+        cx: `${ scale * this._center.x }px`,
+        cy: `${ scale * this._center.y }px`,
+        r: `${ scale * this.radius }px`,
+      } );
+    }
   }
 
   return Circle;

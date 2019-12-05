@@ -22,7 +22,7 @@ define( require => {
    * These bounds were added in Sep 2014 and are based on a screenshot from a non-Retina iPad, in Safari, iOS7.
    * It therefore accounts for the nav bar on the bottom and the space consumed by the browser on the top.
    */
-  const DEFAULT_VIEW_SIZE = new Bounds( 0, 0, 1024, 618 );
+  const DEFAULT_VIEW_BOUNDs = new Bounds( 0, 0, 1024, 618 );
 
   class ScreenView extends DOMObject {
 
@@ -38,7 +38,7 @@ define( require => {
       options = {
 
         // {Bounds} the bounds that are safe to draw in on all supported platforms
-        viewSize: DEFAULT_VIEW_SIZE.copy(),
+        viewBounds: DEFAULT_VIEW_BOUNDs.copy(),
 
         ...options
       };
@@ -46,10 +46,7 @@ define( require => {
       super( options );
 
       // @public (read-only)
-      this.viewSize = options.viewSize;
-
-      // @public (read-only)
-      this.scale = null;
+      this.viewBounds = options.viewBounds;
     }
 
     /**
@@ -74,18 +71,16 @@ define( require => {
      */
     layout( width, height ) {
 
-      const scale = Math.min( width / this.viewSize.width, height / this.viewSize.height );
-      const screenViewHeight = scale * this.viewSize.height;
-      const screenViewWidth = scale * this.viewSize.width;
+      const scale = Math.min( width / this.viewBounds.width, height / this.viewBounds.height );
+      const screenViewHeight = scale * this.viewBounds.height;
+      const screenViewWidth = scale * this.viewBounds.width;
 
-      this.scale = scale;
-      window.globalToLocalScale = scale; // in local units per global
       this.style.height = `${ screenViewHeight }px`;
       this.style.width = `${ screenViewWidth }px`;
 
       const layoutChildren = ( children ) => {
         children.forEach( ( child ) => {
-          child.layout( width, height );
+          child.layout( scale );
 
           layoutChildren( child.children );
         } );

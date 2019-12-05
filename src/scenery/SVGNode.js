@@ -40,25 +40,19 @@ define( require => {
         invertYAxis: true,
         fill: null,
         stroke: null,
-        strokeWidth: null
+        strokeWidth: null,
+        setViewBox: true
       };
 
       // Rewrite options so that it overrides the defaults.
       options = { ...defaults, ...options };
 
-
       super( options );
 
-      // @protected
-      this.viewBox = `0 0 ${ this.width || 0 } ${ this.height || 0 }`;
-
       this.addAttributes( {
-        viewBox: this.viewBox,
-
         fill: options.fill,
         stroke: options.stroke,
         strokeWidth: options.strokeWidth
-
       } );
     }
 
@@ -67,12 +61,22 @@ define( require => {
      * Called when the Node layout needs to be updated, typically when the browser window is resized.
      * @private (scenery-internal)
      *
-     * @param {number} width - in pixels of the window
-     * @param {number} height - in pixels of the window
+     * @param {number} scale
      */
-    // layout( width, height ) {
+    layout( scale ) {
 
-    // }
+      this.addAttributes( {
+        height: `${ scale * this._height }px`,
+        width: `${ scale * this._width }px`
+      } );
+      this.style.top = `${ scale * this._top }px`;
+      this.style.left = `${ scale * this._left }px`;
+
+      if ( this.center ) {
+        this.style.top = `${ scale * ( this._center.y - this.height / 2 ) }px`;
+        this.style.left = `${ scale * ( this._center.x - this.width / 2 ) }px`;
+      }
+    }
   }
 
   return SVGNode;

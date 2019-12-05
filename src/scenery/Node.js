@@ -75,19 +75,18 @@ define( require => {
      * Called when the Node layout needs to be updated, typically when the browser window is resized.
      * @private (scenery-internal)
      *
-     * @param {number} width - in pixels of the window
-     * @param {number} height - in pixels of the window
+     * @param {number} scale - scale in terms of global units per local unit
      */
-    layout( width, height ) {
+    layout( scale ) {
 
-      this.style.width = `${ window.globalToLocalScale * this._width }px`;
-      this.style.height = `${ window.globalToLocalScale * this._height }px`;
-      this.style.top = `${ window.globalToLocalScale * this._top }px`;
-      this.style.left = `${ window.globalToLocalScale * this._left }px`;
+      this.style.width = `${ scale * this._width }px`;
+      this.style.height = `${ scale * this._height }px`;
+      this.style.top = `${ scale * this._top }px`;
+      this.style.left = `${ scale * this._left }px`;
 
       if ( this.center ) {
-        this.style.top = `${ window.globalToLocalScale * ( this._center.y - this.height / 2 ) }px`;
-        this.style.left = `${ window.globalToLocalScale * ( this._center.x - this.width / 2 ) }px`;
+        this.style.top = `${ scale * ( this._center.y - this.height / 2 ) }px`;
+        this.style.left = `${ scale * ( this._center.x - this.width / 2 ) }px`;
       }
     }
 
