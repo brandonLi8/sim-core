@@ -23,7 +23,7 @@ define( require => {
      *                             may have different options for their API. See the code where the options are set in
      *                             the early portion of the constructor for details.
      */
-    constructor( options ) {
+    constructor( start, end, options ) {
       assert( !options || Object.getPrototypeOf( options ) === Object.prototype,
         `Extra prototype on Options: ${ options }` );
 
