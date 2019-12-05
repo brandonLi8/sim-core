@@ -389,12 +389,22 @@ define( require => {
      */
     addStyle( style ) {
       assert( !style || Object.getPrototypeOf( style ) === Object.prototype, `invalid style object: ${ style }` );
+      // convenience references
+      const contains = styleKey => Object.prototype.hasOwnProperty.call( this._element.style, styleKey );
+      const setStyle = ( name, key ) => { this._element.style[ name ] = style[ key ]; };
 
       // Loop through each key of the style Object literal and add the style.
       Object.keys( style ).forEach( styleKey => {
-        assert( Object.prototype.hasOwnProperty.call( this._element.style, styleKey ), `invalid style: ${ styleKey }` );
+        const camelStyleKey = styleKey.charAt( 0 ).toUpperCase() + styleKey.slice( 1 );
 
-        this._element.style[ styleKey ] = style[ styleKey ];
+        if ( contains( styleKey ) ) setStyle( styleKey, styleKey );
+        else if ( contains( `moz${ camelStyleKey }` ) ) setStyle( `moz${ camelStyleKey }`, styleKey );
+        else if ( contains( `Moz${ camelStyleKey }` ) ) setStyle( `Moz${ camelStyleKey }`, styleKey );
+        else if ( contains( `webkit${ camelStyleKey }` ) ) setStyle( `webkit${ camelStyleKey }`, styleKey );
+        else if ( contains( `ms${ camelStyleKey }` ) ) setStyle( `ms${ camelStyleKey }`, styleKey );
+        else if ( contains( `o${ camelStyleKey }` ) ) setStyle( `o${ camelStyleKey }`, styleKey );
+        else { assert( false, `invalid styleKey: ${ styleKey }` ); }
+
       } );
       return this;
     }
