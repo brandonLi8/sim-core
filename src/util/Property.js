@@ -70,7 +70,7 @@ define( require => {
       // @private - see defaults declaration
       this._valueType = options.valueType;
       this._validValues = options.validValues;
-      this._isValidValue = options.isValidValue || () => true;
+      this._isValidValue = options.isValidValue;
 
       // validate the initial value
       this._validateValue( this._value );
@@ -243,7 +243,7 @@ define( require => {
     _validateValue( value ) {
 
       // Always validate with the function.
-      assert( this._isValidValue( value ), `invalid value: ${ value }` );
+      assert( !this.isValidValue || this._isValidValue( value ), `invalid value: ${ value }` );
 
       if ( this._valueType ) {
         if ( TYPEOF_STRINGS.includes( this._valueType ) ) {
