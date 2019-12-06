@@ -12,6 +12,7 @@ define( require => {
   // modules
   const assert = require( 'SIM_CORE/util/assert' );
   const DOMObject = require( 'SIM_CORE/core-internal/DOMObject' );
+  const Vector = require( 'SIM_CORE/util/Vector' );
 
   class Node extends DOMObject {
 
@@ -35,6 +36,7 @@ define( require => {
         height: null,
         top: null,
         left: null,
+        onClick: null,
         center: null
       };
 
@@ -50,6 +52,24 @@ define( require => {
       this._left = options.left;
       this._center = options.center;
 
+      this.scale = null;
+
+      if ( options.onClick ) {
+        this.element.addEventListener( 'mousedown', event => {
+          event.stopPropagation();
+
+          const globalNodeBounds = this.element.getBoundingClientRect();
+          const globalPosition = new Vector( event.clientX, event.clientY );
+          const globalTopLeft = new Vector( globalNodeBounds.x, globalNodeBounds.y );
+
+          const convertedPosition = globalPosition.copy().subtract( globalTopLeft );
+
+          const localPosition = convertedPosition.copy().divide( this.scale );
+          const globalLocalPosition = globalPosition.copy().divide( this.scale );
+
+          options.onClick( localPosition, globalPosition );
+        } );
+      }
     }
 
 
@@ -88,6 +108,8 @@ define( require => {
         this.style.top = `${ scale * ( this._center.y - this.height / 2 ) }px`;
         this.style.left = `${ scale * ( this._center.x - this.width / 2 ) }px`;
       }
+
+      this.scale = scale;
     }
 
     /**
