@@ -161,6 +161,7 @@ define( require => {
           minInstantFPS = null;
           maxInstantFPS = null;
         }
+        window.requestAnimationFrame( frameListener );
       };
       window.requestAnimationFrame( frameListener );
     }

@@ -139,6 +139,20 @@ define( require => {
       };
       window.onresize();
 
+      let lastStepTime = new Date();
+
+      const stepper = () => {
+
+        const currentTime = new Date();
+        const ellapsedTime = Util.convertFrom( currentTime - lastStepTime, Util.MILLI );
+        lastStepTime = currentTime;
+
+        screen._model.step && screen._model.step( ellapsedTime );
+
+        window.requestAnimationFrame( stepper );
+      };
+      window.requestAnimationFrame( stepper );
+
     }
   }
 
