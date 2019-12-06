@@ -37,11 +37,15 @@ define( require => {
         top: null,
         left: null,
         onClick: null,
-        center: null
+        center: null,
+        style: {
+          position: 'absolute'
+        }
       };
 
       // Rewrite options so that it overrides the defaults.
       options = { ...defaults, ...options };
+      options.style = { ...defaults.style, ...options.style };
 
       super( options );
 
