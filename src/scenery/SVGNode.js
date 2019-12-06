@@ -48,10 +48,12 @@ define( require => {
 
       super( options );
 
+
+      this.strokeWidth = options.strokeWidth;
       this.addAttributes( {
         fill: options.fill,
         stroke: options.stroke,
-        strokeWidth: options.strokeWidth
+        'stroke-width': options.strokeWidth
       } );
     }
 
@@ -74,6 +76,12 @@ define( require => {
       if ( this.center ) {
         this.style.top = `${ scale * ( this._center.y - this.height / 2 ) }px`;
         this.style.left = `${ scale * ( this._center.x - this.width / 2 ) }px`;
+      }
+
+      if ( this.strokeWidth ) {
+        this.addAttributes( {
+          'stroke-width': this.strokeWidth * scale
+        } );
       }
     }
   }

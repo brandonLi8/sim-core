@@ -19,9 +19,11 @@ define( require => {
   const Rectangle = require( 'SIM_CORE/scenery/Rectangle' );
 
   // constants
+  const STROKE_WIDTH = 10;
   const DEFAULT_RADIUS = 28;
-  const PAUSE_BUTTON_WIDTH = 10;
-  const PAUSE_BUTTON_HEGIHT = 20;
+  const PAUSE_BUTTON_WIDTH = 8;
+  const PAUSE_BUTTON_HEGIHT = 28;
+  const PAUSE_BUTTON_MARGIN = 4;
 
   class PlayPauseButton extends SVGNode {
 
@@ -44,8 +46,8 @@ define( require => {
 
       // Rewrite options so that it overrides the defaults.
       options = { ...defaults, ...options };
-      options.width = 2 * options.radius;
-      options.height = 2 * options.radius;
+      options.width = 2 * options.radius + STROKE_WIDTH;
+      options.height = 2 * options.radius + STROKE_WIDTH;
 
       super( options );
 
@@ -58,14 +60,16 @@ define( require => {
         center: this.selfCenter,
         width: this._width,
         height: this._height,
-        fill: 'black'
+        fill: 'black',
+        stroke: 'rgb( 100, 100, 100 )',
+        strokeWidth: 10
       } );
 
       const pauseRectangle1 = new Rectangle( {
         type: 'rect',
         width: PAUSE_BUTTON_WIDTH,
         height: PAUSE_BUTTON_HEGIHT,
-        x: this._width / 3 - PAUSE_BUTTON_WIDTH / 2,
+        x: this.selfCenter.x - PAUSE_BUTTON_WIDTH - PAUSE_BUTTON_MARGIN,
         y: this._height / 2 - PAUSE_BUTTON_HEGIHT / 2,
         fill: 'white'
       } );
@@ -73,11 +77,17 @@ define( require => {
         type: 'rect',
         width: PAUSE_BUTTON_WIDTH,
         height: PAUSE_BUTTON_HEGIHT,
-        x: this._width * 2 / 3 - PAUSE_BUTTON_WIDTH / 2,
+        x: this.selfCenter.x + PAUSE_BUTTON_MARGIN,
         y: this._height / 2 - PAUSE_BUTTON_HEGIHT / 2,
         fill: 'white'
       } );
-      this.setChildren( [ button, pauseRectangle1, pauseRectangle2 ] );
+      const pauseButton = new SVGNode( {
+        children: [ pauseRectangle1, pauseRectangle2 ],
+        width: this._width,
+        height: this._height,
+      } );
+
+      this.setChildren( [ button, pauseButton ] );
 
     }
   }

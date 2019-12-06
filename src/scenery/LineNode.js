@@ -43,7 +43,7 @@ define( require => {
     }
 
     layout( scale ) {
-
+      super.layout( scale );
       this.addAttributes( {
         x1: `${ scale * this.start.x }px`,
         y1: `${ scale * this.start.y }px`,
