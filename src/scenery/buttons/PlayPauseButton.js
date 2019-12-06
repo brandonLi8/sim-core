@@ -19,10 +19,10 @@ define( require => {
   const Rectangle = require( 'SIM_CORE/scenery/Rectangle' );
 
   // constants
-  const STROKE_WIDTH = 10;
-  const DEFAULT_RADIUS = 28;
-  const PAUSE_BUTTON_WIDTH = 8;
-  const PAUSE_BUTTON_HEGIHT = 28;
+  const STROKE_WIDTH = 3;
+  const DEFAULT_RADIUS = 23;
+  const PAUSE_BUTTON_WIDTH = 7;
+  const PAUSE_BUTTON_HEGIHT = 26;
   const PAUSE_BUTTON_MARGIN = 4;
 
   class PlayPauseButton extends SVGNode {
@@ -40,8 +40,7 @@ define( require => {
 
       // Defaults for options.
       const defaults = {
-        radius: DEFAULT_RADIUS,
-
+        radius: DEFAULT_RADIUS
       };
 
       // Rewrite options so that it overrides the defaults.
@@ -60,9 +59,9 @@ define( require => {
         center: this.selfCenter,
         width: this._width,
         height: this._height,
-        fill: 'black',
-        stroke: 'rgb( 100, 100, 100 )',
-        strokeWidth: 10
+        fill: '#D48D00',
+        stroke: '#996600',
+        strokeWidth: STROKE_WIDTH
       } );
 
       const pauseRectangle1 = new Rectangle( {
@@ -88,6 +87,19 @@ define( require => {
       } );
 
       this.setChildren( [ button, pauseButton ] );
+
+      this.mouseover = () => {
+        this.addStyle( {
+          filter: 'brightness( 120% )',
+          cursor: 'pointer'
+        } );
+      }
+      this.mouseout = () => {
+        this.addStyle( {
+          filter: 'none',
+          cursor: 'default'
+        } );
+      }
 
     }
   }

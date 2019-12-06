@@ -94,6 +94,21 @@ define( require => {
     getCenter() { return this._center || this.style.center; }
     get center() { return this.getCenter(); }
 
+    set mouseover( listener ) {
+      this._element.addEventListener( 'mouseover', event => {
+        // stop propagation to children
+        event.stopPropagation();
+        listener();
+      } );
+    }
+    set mouseout( listener ) {
+
+      // change back to original src on the mouse out
+      this._element.addEventListener( 'mouseout', ( event ) => {
+        event.stopPropagation();
+        listener();
+      } );
+    }
 
     /**
      * Called when the Node layout needs to be updated, typically when the browser window is resized.
