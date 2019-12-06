@@ -29,12 +29,12 @@ define( require => {
 
   // modules
   const assert = require( 'SIM_CORE/util/assert' );
-  const DOMObject = require( 'SIM_CORE/core-internal/DOMObject' );
+  const Node = require( 'SIM_CORE/scenery/Node' );
 
   return {
 
     /**
-     * Function that is called to load a image DOMObject when the image plugin is used.
+     * Function that is called to load a image Node when the image plugin is used.
      * For more documentation: see https://requirejs.org/docs/plugins.html#api.
      * @public
      *
@@ -48,8 +48,8 @@ define( require => {
       // Reference the name as the true image src, adding the image directory and path.
       const imageSrc = parentRequire.toUrl( name );
 
-      // Create the DOMObject to hold the image.
-      const image = new DOMObject( {
+      // Create the Node to hold the image.
+      const image = new Node( {
         type: 'img'
       } );
 
