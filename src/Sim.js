@@ -150,6 +150,8 @@ define( require => {
         screen._model.step && screen._model.step( ellapsedTime );
 
         window.requestAnimationFrame( stepper );
+
+        window.onresize();
       };
       window.requestAnimationFrame( stepper );
 
