@@ -80,14 +80,6 @@ define( require => {
       options.style = { ...defaults.style, ...options.style };
       super( options );
 
-      //----------------------------------------------------------------------------------------
-
-      // @private {function} requestAnimationFrame - gets the windows request animation frame function
-      //                                             but provides a fullback for other browsers.
-      this.requestAnimationFrame = window.requestAnimationFrame
-        || window.webkitRequestAnimationFrame
-        || window.mozRequestAnimationFrame
-        || window.ieRequestAnimationFrame;
     }
 
     /**
@@ -169,7 +161,6 @@ define( require => {
           minInstantFPS = null;
           maxInstantFPS = null;
         }
-        window.requestAnimationFrame( frameListener );
       };
       window.requestAnimationFrame( frameListener );
     }
