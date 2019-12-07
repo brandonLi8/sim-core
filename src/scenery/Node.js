@@ -135,11 +135,11 @@ define( require => {
      * Dragging events will propagate down its tree respectively.
      * @public
      */
-    drag( listener, closedrag ) {
+    drag( startdrag, listener, closedrag ) {
 
       let cursorViewPosition;
       // start drag event listener
-      this.element.onmousedown = ( event ) => {
+      this._element.addEventListener( 'mousedown', ( event ) => {
         event = event || window.event;
         event.preventDefault();
         // mouse cursor
@@ -147,9 +147,11 @@ define( require => {
         const globalTopLeft = new Vector( globalNodeBounds.x, globalNodeBounds.y );
         cursorViewPosition = new Vector( event.clientX, event.clientY ).subtract( globalTopLeft ).divide( this.scale );
 
+        startdrag();
+
         document.onmouseup = closeDrag;
         document.onmousemove = drag;
-      }
+      } );
       const drag = event => {
         event = event || window.event;
         event.preventDefault();
