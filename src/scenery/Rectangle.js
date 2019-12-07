@@ -35,7 +35,8 @@ define( require => {
         namespace: XML_NAMESPACE,
 
         x: 0,
-        y: 0
+        y: 0,
+        cornerRadius: 5
       };
 
       // Rewrite options so that it overrides the defaults.
@@ -45,6 +46,7 @@ define( require => {
 
       this.x = options.x;
       this.y = options.y;
+      this.cornerRadius = options.cornerRadius;
     }
 
     layout( scale ) {
@@ -52,7 +54,9 @@ define( require => {
       super.layout( scale );
       this.addAttributes( {
         x: `${ scale * this.x }px`,
-        y: `${ scale * this.y }px`
+        y: `${ scale * this.y }px`,
+        rx: `${ scale * this.cornerRadius }px`,
+        ry: `${ scale * this.cornerRadius }px`,
       } );
     }
   }
