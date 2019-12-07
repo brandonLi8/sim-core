@@ -71,7 +71,7 @@ define( require => {
           const localPosition = convertedPosition.copy().divide( this.scale );
           const globalLocalPosition = globalPosition.copy().divide( this.scale );
 
-          options.onClick( localPosition, globalPosition );
+          options.onClick( localPosition, globalLocalPosition );
         } );
       }
     }

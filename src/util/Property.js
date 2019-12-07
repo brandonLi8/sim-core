@@ -167,7 +167,7 @@ define( require => {
      * @param {function} listener
      */
     unlink( listener ) {
-      assert( this.hasListener( listener ), `listener was never registered` );
+      assert( this.hasListener( listener ), 'listener was never registered' );
       Util.arrayRemove( this._listeners, listener );
     }
 

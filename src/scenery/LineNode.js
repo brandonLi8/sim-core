@@ -12,7 +12,6 @@ define( require => {
   // modules
   const assert = require( 'SIM_CORE/util/assert' );
   const SVGNode = require( 'SIM_CORE/scenery/SVGNode' );
-  const Vector = require( 'SIM_CORE/util/Vector' );
 
   class Circle extends SVGNode {
 
@@ -30,7 +29,7 @@ define( require => {
 
       // Defaults for options.
       const defaults = {
-        type: 'line',
+        type: 'line'
       };
 
       // Rewrite options so that it overrides the defaults.
@@ -48,7 +47,7 @@ define( require => {
         x1: `${ scale * this.start.x }px`,
         y1: `${ scale * this.start.y }px`,
         x2: `${ scale * this.end.x }px`,
-        y2: `${ scale * this.end.y }px`,
+        y2: `${ scale * this.end.y }px`
       } );
     }
   }

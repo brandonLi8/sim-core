@@ -15,7 +15,6 @@ define( require => {
   const Property = require( 'SIM_CORE/util/Property' );
   const CircleNode = require( 'SIM_CORE/scenery/CircleNode' );
   const Vector = require( 'SIM_CORE/util/Vector' );
-  const DOMObject = require( 'SIM_CORE/core-internal/DOMObject' );
   const Rectangle = require( 'SIM_CORE/scenery/Rectangle' );
   const Polygon = require( 'SIM_CORE/scenery/Polygon' );
 
@@ -25,7 +24,7 @@ define( require => {
   const PAUSE_BUTTON_WIDTH = 9;
   const PAUSE_BUTTON_HEGIHT = 27;
   const PAUSE_BUTTON_MARGIN = 2;
-  const PLAY_BUTTON_SIDE_LENGTH = 28;
+  const TRIANGLE_LENGTH = 28;
 
   class PlayPauseButton extends SVGNode {
 
@@ -103,9 +102,9 @@ define( require => {
       //----------------------------------------------------------------------------------------
       // Play button
       const playButton = new Polygon( [
-        this.selfCenter.copy().addXY( 2 / Math.sqrt( 3 ) * PLAY_BUTTON_SIDE_LENGTH / 2, 0 ),
-        this.selfCenter.copy().subtract( new Vector( 1 / Math.sqrt( 3 ) * PLAY_BUTTON_SIDE_LENGTH / 2, -PLAY_BUTTON_SIDE_LENGTH / 2 ) ),
-        this.selfCenter.copy().subtract( new Vector( 1 / Math.sqrt( 3 ) * PLAY_BUTTON_SIDE_LENGTH / 2, PLAY_BUTTON_SIDE_LENGTH / 2 ) )
+        this.selfCenter.copy().addXY( 2 / Math.sqrt( 3 ) * TRIANGLE_LENGTH / 2, 0 ),
+        this.selfCenter.copy().subtractXY( 1 / Math.sqrt( 3 ) * TRIANGLE_LENGTH / 2, -TRIANGLE_LENGTH / 2 ),
+        this.selfCenter.copy().subtractXY( 1 / Math.sqrt( 3 ) * TRIANGLE_LENGTH / 2, TRIANGLE_LENGTH / 2 )
       ], {
         fill: 'white',
         width: this._width,
@@ -121,13 +120,13 @@ define( require => {
           filter: isPlayingProperty.value ? 'brightness( 130% )' : 'brightness( 90% )',
           cursor: 'pointer'
         } );
-      }
+      };
       this.mouseout = () => {
         this.addStyle( {
           filter: 'none',
           cursor: 'default'
         } );
-      }
+      };
 
       isPlayingProperty.link( isPlaying => {
         playButton.style.opacity = isPlaying ? 0 : 1;

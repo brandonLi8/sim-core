@@ -65,8 +65,8 @@ define( require => {
     modelToViewXY( x, y ) { return V( this.modelToViewX( x ), this.modelToViewY( y ) ); }
 
     // Width/Height Transforms
-    modelToViewDeltaX( x ) { return this.xViewToModelScale * x }
-    modelToViewDeltaY( y ) { return this.yViewToModelScale * y }
+    modelToViewDeltaX( x ) { return this.xViewToModelScale * x; }
+    modelToViewDeltaY( y ) { return this.yViewToModelScale * y; }
     modelToViewDelta( point ) { return V( this.modelToViewDeltaX( point.x ), this.modelToViewDeltaY( point.y ) ); }
 
     // Utilities
@@ -90,8 +90,8 @@ define( require => {
     viewToModelXY( x, y ) { return V( this.viewToModelX( x ), this.viewToModelY( y ) ); }
 
     // Width/Height Transforms
-    viewToModelDeltaX( x ) { return x / this.xViewToModelScale }
-    viewToModelDeltaY( y ) { return y /this.yViewToModelScale }
+    viewToModelDeltaX( x ) { return x / this.xViewToModelScale; }
+    viewToModelDeltaY( y ) { return y /this.yViewToModelScale; }
     viewToModelDelta( point ) { return V( this.modelToViewDeltaX( point.x ), this.modelToViewDeltaY( point.y ) ); }
 
     // Utilities

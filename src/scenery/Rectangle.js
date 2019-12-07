@@ -12,7 +12,6 @@ define( require => {
   // modules
   const assert = require( 'SIM_CORE/util/assert' );
   const SVGNode = require( 'SIM_CORE/scenery/SVGNode' );
-  const Vector = require( 'SIM_CORE/util/Vector' );
 
   // constants
   const XML_NAMESPACE = 'http://www.w3.org/2000/svg';

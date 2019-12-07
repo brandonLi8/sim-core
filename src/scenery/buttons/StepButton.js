@@ -14,10 +14,8 @@ define( require => {
   // modules
   const assert = require( 'SIM_CORE/util/assert' );
   const SVGNode = require( 'SIM_CORE/scenery/SVGNode' );
-  const Property = require( 'SIM_CORE/util/Property' );
   const CircleNode = require( 'SIM_CORE/scenery/CircleNode' );
   const Vector = require( 'SIM_CORE/util/Vector' );
-  const DOMObject = require( 'SIM_CORE/core-internal/DOMObject' );
   const Rectangle = require( 'SIM_CORE/scenery/Rectangle' );
   const Polygon = require( 'SIM_CORE/scenery/Polygon' );
 
@@ -116,13 +114,13 @@ define( require => {
           filter: 'brightness( 90% )',
           cursor: 'pointer'
         } );
-      }
+      };
       this.mouseout = () => {
         this.addStyle( {
           filter: 'none',
           cursor: 'default'
         } );
-      }
+      };
 
       if ( options.direction === 'backward' ) {
         this.style.transform = 'scaleX( -1 )';

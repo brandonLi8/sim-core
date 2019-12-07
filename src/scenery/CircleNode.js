@@ -60,7 +60,7 @@ define( require => {
       this.addAttributes( {
         cx: `${ scale * this._center.x }px`,
         cy: `${ scale * this._center.y }px`,
-        r: `${ scale * this.radius }px`,
+        r: `${ scale * this.radius }px`
       } );
     }
   }
