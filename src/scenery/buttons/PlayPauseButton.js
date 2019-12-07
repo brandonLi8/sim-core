@@ -20,12 +20,12 @@ define( require => {
   const Polygon = require( 'SIM_CORE/scenery/Polygon' );
 
   // constants
-  const STROKE_WIDTH = 3;
-  const DEFAULT_RADIUS = 23;
-  const PAUSE_BUTTON_WIDTH = 7;
-  const PAUSE_BUTTON_HEGIHT = 26;
-  const PAUSE_BUTTON_MARGIN = 4;
-  const PLAY_BUTTON_SIDE_LENGTH = 20;
+  const STROKE_WIDTH = 2;
+  const DEFAULT_RADIUS = 28;
+  const PAUSE_BUTTON_WIDTH = 9;
+  const PAUSE_BUTTON_HEGIHT = 27;
+  const PAUSE_BUTTON_MARGIN = 2;
+  const PLAY_BUTTON_SIDE_LENGTH = 28;
 
   class PlayPauseButton extends SVGNode {
 
@@ -45,13 +45,18 @@ define( require => {
 
       // Defaults for options.
       const defaults = {
-        radius: DEFAULT_RADIUS
+        radius: DEFAULT_RADIUS,
+        stroke: '#996600',
+        style: {
+          userSelect: 'none'
+        }
       };
 
       // Rewrite options so that it overrides the defaults.
       options = { ...defaults, ...options };
       options.width = 2 * options.radius + STROKE_WIDTH;
       options.height = 2 * options.radius + STROKE_WIDTH;
+      options.style = { ...defaults.style, ...options.style };
 
       super( options );
 
@@ -64,8 +69,6 @@ define( require => {
         center: this.selfCenter,
         width: this._width,
         height: this._height,
-        fill: '#D48D00',
-        stroke: '#996600',
         strokeWidth: STROKE_WIDTH,
         onClick: () => {
           isPlayingProperty.toggle();
@@ -91,7 +94,10 @@ define( require => {
       const pauseButton = new SVGNode( {
         children: [ pauseRectangle1, pauseRectangle2 ],
         width: this._width,
-        height: this._height
+        height: this._height,
+        onClick: () => {
+          isPlayingProperty.toggle();
+        }
       } );
 
       //----------------------------------------------------------------------------------------
@@ -103,13 +109,16 @@ define( require => {
       ], {
         fill: 'white',
         width: this._width,
-        height: this._height
+        height: this._height,
+        onClick: () => {
+          isPlayingProperty.toggle();
+        }
       } );
       this.setChildren( [ button, playButton, pauseButton ] );
 
       this.mouseover = () => {
         this.addStyle( {
-          filter: 'brightness( 120% )',
+          filter: isPlayingProperty.value ? 'brightness( 130% )' : 'brightness( 90% )',
           cursor: 'pointer'
         } );
       }
@@ -123,6 +132,11 @@ define( require => {
       isPlayingProperty.link( isPlaying => {
         playButton.style.opacity = isPlaying ? 0 : 1;
         pauseButton.style.opacity = isPlaying ? 1 : 0;
+
+        button.addAttributes( {
+          fill: isPlaying ? '#D48D00' : '#FFAA00'
+        } );
+
       } );
     }
   }
