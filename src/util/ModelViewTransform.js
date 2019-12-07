@@ -91,8 +91,8 @@ define( require => {
 
     // Width/Height Transforms
     viewToModelDeltaX( x ) { return x / this.xViewToModelScale; }
-    viewToModelDeltaY( y ) { return y /this.yViewToModelScale; }
-    viewToModelDelta( point ) { return V( this.modelToViewDeltaX( point.x ), this.modelToViewDeltaY( point.y ) ); }
+    viewToModelDeltaY( y ) { return y / this.yViewToModelScale; }
+    viewToModelDelta( point ) { return V( this.viewToModelDeltaX( point.x ), this.viewToModelDeltaY( point.y ) ); }
 
     // Utilities
     viewToModelPoint( point ) { return V( this.viewToModelX( point.x ), this.viewToModelY( point.y ) ); }

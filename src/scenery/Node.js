@@ -127,6 +127,50 @@ define( require => {
         listener();
       } );
     }
+
+    /**
+     * Sets up the node to be draggable. Usually the node has to have the position
+     * "absolute" or position "fixed".
+     *
+     * Dragging events will propagate down its tree respectively.
+     * @public
+     */
+    drag( listener, closedrag ) {
+
+      let cursorViewPosition;
+      // start drag event listener
+      this.element.onmousedown = ( event ) => {
+        event = event || window.event;
+        event.preventDefault();
+        // mouse cursor
+        const globalNodeBounds = this.element.getBoundingClientRect();
+        const globalTopLeft = new Vector( globalNodeBounds.x, globalNodeBounds.y );
+        cursorViewPosition = new Vector( event.clientX, event.clientY ).subtract( globalTopLeft ).divide( this.scale );
+
+        document.onmouseup = closeDrag;
+        document.onmousemove = drag;
+      }
+      const drag = event => {
+        event = event || window.event;
+        event.preventDefault();
+
+        const globalNodeBounds = this.element.getBoundingClientRect();
+        const globalTopLeft = new Vector( globalNodeBounds.x, globalNodeBounds.y );
+        const currentViewPosition = new Vector( event.clientX, event.clientY ).subtract( globalTopLeft ).divide( this.scale );
+
+        const displacement = currentViewPosition.subtract( cursorViewPosition );
+        listener( displacement )
+      }
+
+      function closeDrag() {
+        // on the release
+        document.onmouseup = null; // remove event listeners
+        document.onmousemove = null;
+
+        closedrag();
+      }
+    }
+
     /**
      * Called when the Node layout needs to be updated, typically when the browser window is resized.
      * @private (scenery-internal)

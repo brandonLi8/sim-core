@@ -13,7 +13,7 @@ define( require => {
   const assert = require( 'SIM_CORE/util/assert' );
   const SVGNode = require( 'SIM_CORE/scenery/SVGNode' );
 
-  class Circle extends SVGNode {
+  class LineNode extends SVGNode {
 
     /**
      * @param {Vector} start
@@ -52,5 +52,5 @@ define( require => {
     }
   }
 
-  return Circle;
+  return LineNode;
 } );

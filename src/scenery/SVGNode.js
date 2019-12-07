@@ -71,6 +71,7 @@ define( require => {
      */
     layout( scale ) {
 
+      super.layout( scale );
       this.addAttributes( {
         height: `${ scale * this._height }px`,
         width: `${ scale * this._width }px`
