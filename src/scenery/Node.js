@@ -39,7 +39,14 @@ define( require => {
         center: null,
         style: {
           position: 'absolute'
-        }
+        },
+
+
+        mouseover: null,
+        mouseout: null,
+        mousedown: null,
+        mouseup: null
+
       };
 
       // Rewrite options so that it overrides the defaults.
@@ -56,6 +63,13 @@ define( require => {
       this._center = options.center;
 
       this.scale = null;
+
+
+      if ( options.mouseover ) this.mouseover = options.mouseover;
+      if ( options.mouseout ) this.mouseout = options.mouseout;
+      if ( options.mousedown ) this.mousedown = options.mousedown;
+      if ( options.mouseup ) this.mouseup = options.mouseup;
+
     }
 
 
@@ -78,8 +92,8 @@ define( require => {
 
     set mouseover( listener ) {
       this._element.addEventListener( 'mouseover', event => {
-        // stop propagation to children
         event.stopPropagation();
+        // stop propagation to children
         listener();
       } );
     }
@@ -93,24 +107,24 @@ define( require => {
     }
     set mousedown( listener ) {
       this._element.addEventListener( 'mousedown', event => {
-          event.stopPropagation();
+        event.stopPropagation();
 
-          const globalNodeBounds = this.element.getBoundingClientRect();
-          const globalPosition = new Vector( event.clientX, event.clientY );
-          const globalTopLeft = new Vector( globalNodeBounds.x, globalNodeBounds.y );
+        const globalNodeBounds = this.element.getBoundingClientRect();
+        const globalPosition = new Vector( event.clientX, event.clientY );
+        const globalTopLeft = new Vector( globalNodeBounds.x, globalNodeBounds.y );
 
-          const convertedPosition = globalPosition.copy().subtract( globalTopLeft );
+        const convertedPosition = globalPosition.copy().subtract( globalTopLeft );
 
-          const localPosition = convertedPosition.copy().divide( this.scale );
-          const globalLocalPosition = globalPosition.copy().divide( this.scale );
+        const localPosition = convertedPosition.copy().divide( this.scale );
+        const globalLocalPosition = globalPosition.copy().divide( this.scale );
 
-          listener( localPosition, globalLocalPosition );
+        listener( localPosition, globalLocalPosition );
       } );
     }
     set mouseup( listener ) {
       this._element.addEventListener( 'mouseup', event => {
-          event.stopPropagation();
-          listener();
+        event.stopPropagation();
+        listener();
       } );
     }
     /**

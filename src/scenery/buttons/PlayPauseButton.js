@@ -48,6 +48,9 @@ define( require => {
         stroke: '#996600',
         style: {
           userSelect: 'none'
+        },
+        mousedown: () => {
+          isPlayingProperty.toggle();
         }
       };
 
@@ -68,10 +71,7 @@ define( require => {
         center: this.selfCenter,
         width: this._width,
         height: this._height,
-        strokeWidth: STROKE_WIDTH,
-        onClick: () => {
-          isPlayingProperty.toggle();
-        }
+        strokeWidth: STROKE_WIDTH
       } );
 
       const pauseRectangle1 = new Rectangle( {
@@ -93,10 +93,7 @@ define( require => {
       const pauseButton = new SVGNode( {
         children: [ pauseRectangle1, pauseRectangle2 ],
         width: this._width,
-        height: this._height,
-        onClick: () => {
-          isPlayingProperty.toggle();
-        }
+        height: this._height
       } );
 
       //----------------------------------------------------------------------------------------
@@ -108,10 +105,7 @@ define( require => {
       ], {
         fill: 'white',
         width: this._width,
-        height: this._height,
-        onClick: () => {
-          isPlayingProperty.toggle();
-        }
+        height: this._height
       } );
       this.setChildren( [ button, playButton, pauseButton ] );
 

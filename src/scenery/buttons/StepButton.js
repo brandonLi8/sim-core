@@ -47,7 +47,10 @@ define( require => {
         },
         attributes: {
           'shape-rendering': 'optimizeQuality'
-        }
+        },
+        mousedown: () => {
+          listener();
+        },
       };
 
       // Rewrite options so that it overrides the defaults.
@@ -74,9 +77,6 @@ define( require => {
         width: this._width,
         height: this._height,
         strokeWidth: STROKE_WIDTH,
-        onClick: () => {
-          listener();
-        },
         shapeRendering: 'geometricPrecision'
       } );
 
@@ -86,9 +86,6 @@ define( require => {
         x: this.selfCenter.x - 2 * BAR_WIDTH,
         y: this._height / 2 - BAR_HEIGHT / 2,
         fill: 'white',
-        onClick: () => {
-          listener();
-        },
         shapeRendering: 'optimizeQuality'
       } );
 
@@ -102,9 +99,6 @@ define( require => {
         fill: 'white',
         width: this._width,
         height: this._height,
-        onClick: () => {
-          listener();
-        },
         shapeRendering: 'optimizeQuality'
       } );
       this.setChildren( [ button, rectangle, triangle ] );
