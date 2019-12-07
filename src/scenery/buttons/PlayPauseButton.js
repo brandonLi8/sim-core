@@ -17,6 +17,7 @@ define( require => {
   const Vector = require( 'SIM_CORE/util/Vector' );
   const DOMObject = require( 'SIM_CORE/core-internal/DOMObject' );
   const Rectangle = require( 'SIM_CORE/scenery/Rectangle' );
+  const Polygon = require( 'SIM_CORE/scenery/Polygon' );
 
   // constants
   const STROKE_WIDTH = 3;
@@ -24,6 +25,7 @@ define( require => {
   const PAUSE_BUTTON_WIDTH = 7;
   const PAUSE_BUTTON_HEGIHT = 26;
   const PAUSE_BUTTON_MARGIN = 4;
+  const PLAY_BUTTON_SIDE_LENGTH = 20;
 
   class PlayPauseButton extends SVGNode {
 
@@ -33,7 +35,10 @@ define( require => {
      *                             may have different options for their API. See the code where the options are set in
      *                             the early portion of the constructor for details.
      */
-    constructor( options ) {
+    constructor( isPlayingProperty, options ) {
+
+      assert( isPlayingProperty instanceof Property && typeof isPlayingProperty.value === 'boolean',
+        `invalid isPlayingProperty: ${ isPlayingProperty }` );
       assert( !options || Object.getPrototypeOf( options ) === Object.prototype,
         `Extra prototype on Options: ${ options }` );
 
@@ -61,7 +66,10 @@ define( require => {
         height: this._height,
         fill: '#D48D00',
         stroke: '#996600',
-        strokeWidth: STROKE_WIDTH
+        strokeWidth: STROKE_WIDTH,
+        onClick: () => {
+          isPlayingProperty.toggle();
+        }
       } );
 
       const pauseRectangle1 = new Rectangle( {
@@ -83,10 +91,21 @@ define( require => {
       const pauseButton = new SVGNode( {
         children: [ pauseRectangle1, pauseRectangle2 ],
         width: this._width,
-        height: this._height,
+        height: this._height
       } );
 
-      this.setChildren( [ button, pauseButton ] );
+      //----------------------------------------------------------------------------------------
+      // Play button
+      const playButton = new Polygon( [
+        this.selfCenter.copy().addXY( 2 / Math.sqrt( 3 ) * PLAY_BUTTON_SIDE_LENGTH / 2, 0 ),
+        this.selfCenter.copy().subtract( new Vector( 1 / Math.sqrt( 3 ) * PLAY_BUTTON_SIDE_LENGTH / 2, -PLAY_BUTTON_SIDE_LENGTH / 2 ) ),
+        this.selfCenter.copy().subtract( new Vector( 1 / Math.sqrt( 3 ) * PLAY_BUTTON_SIDE_LENGTH / 2, PLAY_BUTTON_SIDE_LENGTH / 2 ) )
+      ], {
+        fill: 'white',
+        width: this._width,
+        height: this._height
+      } );
+      this.setChildren( [ button, playButton, pauseButton ] );
 
       this.mouseover = () => {
         this.addStyle( {
@@ -101,6 +120,10 @@ define( require => {
         } );
       }
 
+      isPlayingProperty.link( isPlaying => {
+        playButton.style.opacity = isPlaying ? 0 : 1;
+        pauseButton.style.opacity = isPlaying ? 1 : 0;
+      } );
     }
   }
 
