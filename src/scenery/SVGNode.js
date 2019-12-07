@@ -40,7 +40,8 @@ define( require => {
         invertYAxis: true,
         fill: null,
         stroke: null,
-        strokeWidth: null
+        strokeWidth: null,
+        shapeRendering: null
       };
 
       // Rewrite options so that it overrides the defaults.
@@ -48,7 +49,11 @@ define( require => {
 
       super( options );
 
-
+      if ( options.shapeRendering ) {
+        this.addAttributes( {
+          'shape-rendering': options.shapeRendering
+        } );
+      }
       this.strokeWidth = options.strokeWidth;
       this.addAttributes( {
         fill: options.fill,
