@@ -36,7 +36,6 @@ define( require => {
         height: null,
         top: null,
         left: null,
-        onClick: null,
         center: null,
         style: {
           position: 'absolute'
@@ -57,23 +56,6 @@ define( require => {
       this._center = options.center;
 
       this.scale = null;
-
-      if ( options.onClick ) {
-        this.element.addEventListener( 'mousedown', event => {
-          event.stopPropagation();
-
-          const globalNodeBounds = this.element.getBoundingClientRect();
-          const globalPosition = new Vector( event.clientX, event.clientY );
-          const globalTopLeft = new Vector( globalNodeBounds.x, globalNodeBounds.y );
-
-          const convertedPosition = globalPosition.copy().subtract( globalTopLeft );
-
-          const localPosition = convertedPosition.copy().divide( this.scale );
-          const globalLocalPosition = globalPosition.copy().divide( this.scale );
-
-          options.onClick( localPosition, globalLocalPosition );
-        } );
-      }
     }
 
 
@@ -109,7 +91,28 @@ define( require => {
         listener();
       } );
     }
+    set mousedown( listener ) {
+      this._element.addEventListener( 'mousedown', event => {
+          event.stopPropagation();
 
+          const globalNodeBounds = this.element.getBoundingClientRect();
+          const globalPosition = new Vector( event.clientX, event.clientY );
+          const globalTopLeft = new Vector( globalNodeBounds.x, globalNodeBounds.y );
+
+          const convertedPosition = globalPosition.copy().subtract( globalTopLeft );
+
+          const localPosition = convertedPosition.copy().divide( this.scale );
+          const globalLocalPosition = globalPosition.copy().divide( this.scale );
+
+          listener( localPosition, globalLocalPosition );
+      } );
+    }
+    set mouseup( listener ) {
+      this._element.addEventListener( 'mouseup', event => {
+          event.stopPropagation();
+          listener();
+      } );
+    }
     /**
      * Called when the Node layout needs to be updated, typically when the browser window is resized.
      * @private (scenery-internal)

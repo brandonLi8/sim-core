@@ -21,7 +21,7 @@ define( require => {
 
   // constants
   const STROKE_WIDTH = 0.9;
-  const DEFAULT_RADIUS = 14;
+  const DEFAULT_RADIUS = 18;
 
   class StepButton extends SVGNode {
 
