@@ -32,7 +32,7 @@ define( require => {
         fill: 'black',
         x: 0,
         y: 0,
-        fontSize: 12,
+        fontSize: 13.5,
         fontFamily: 'Arial, sans-serif',
         cornerRadius: 5,
         attributes: {
