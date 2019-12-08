@@ -93,10 +93,11 @@ define( require => {
         width: '100%',
         padding: 0,
         margin: 0,
-        position: 'relative',
+        position: 'fixed',
         overflow: 'hidden',
         background: '#FFF',
-        touchAction: 'none'
+        touchAction: 'none',
+        webkitOverflowScrolling: 'touch'
       } );
 
     }
