@@ -160,10 +160,13 @@ define( require => {
       };
       window.requestAnimationFrame( stepper );
 
+      // prevent pinch and zoom https://stackoverflow.com/questions/37808180/disable-viewport-zooming-ios-10-safari
+      // Maybe we want to detect if passive is supportive
+      // https://developer.mozilla.org/en-US/docs/Web/API/EventTarget/addEventListener#Safely_detecting_option_support
       if ( window.isMobile ) {
         document.addEventListener( 'touchmove', event => {
           if ( event.scale !== 1 ) { event.preventDefault(); }
-        }, false );
+        }, { passive: false } );
       }
     }
   }

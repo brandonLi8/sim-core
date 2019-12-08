@@ -93,6 +93,7 @@ define( require => {
     set mouseover( listener ) {
       this._element.addEventListener( 'mouseover', event => {
         event.stopPropagation();
+        event.preventDefault();
         // stop propagation to children
         listener();
       } );
@@ -102,13 +103,14 @@ define( require => {
       // change back to original src on the mouse out
       this._element.addEventListener( 'mouseout', ( event ) => {
         event.stopPropagation();
+        event.preventDefault();
         listener();
       } );
     }
     set mousedown( listener ) {
       const onDown = event => {
         event.stopPropagation();
-
+        event.preventDefault();
         const globalNodeBounds = this.element.getBoundingClientRect();
         const globalPosition = this.getEventLocation( event );
         const globalTopLeft = new Vector( globalNodeBounds.x, globalNodeBounds.y );
@@ -125,6 +127,7 @@ define( require => {
     set mouseup( listener ) {
       this._element.addEventListener( window.isMobile ? 'touchend' : 'mouseup', event => {
         event.stopPropagation();
+        event.preventDefault();
         listener();
       } );
     }
@@ -178,7 +181,7 @@ define( require => {
             listener( displacement );
 
             scheduled = null;
-          }, 5 );
+          }, 10 );
         }
         scheduled = event;
       }
