@@ -49,7 +49,7 @@ define( require => {
         thumbStroke: 'black',
         thumbStrokeWidth: 1,
         thumbCenterLineStroke: 'white',
-        thumbCornerRadius: 2,
+        thumbCornerRadius: 3,
 
         // ticks
         includeMajorTicks: true,

@@ -36,7 +36,7 @@ define( require => {
 
         x: 0,
         y: 0,
-        cornerRadius: 5
+        cornerRadius: 0
       };
 
       // Rewrite options so that it overrides the defaults.
