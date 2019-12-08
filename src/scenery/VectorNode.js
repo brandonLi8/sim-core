@@ -46,12 +46,10 @@ define( require => {
     }
 
     set( start, end ) {
-
+      this.points = [];
       if ( start.equalsEpsilon( end ) ) {
-        this.points = [];
         return;
       }
-
 
       // create a vector representation of the arrow
       const vector = end.copy().subtract( start );
