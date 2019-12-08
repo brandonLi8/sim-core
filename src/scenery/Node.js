@@ -134,8 +134,8 @@ define( require => {
 
     getEventLocation( event ) {
       return new Vector(
-        event.clientX !== undefined ? event.clientX : event.touches[ 0 ].clientX,
-        event.clientY !== undefined ? event.clientY : event.touches[ 0 ].clientY,
+        event.clientX !== undefined ? event.clientX : event.touches[ event.touches.length - 1 ].clientX,
+        event.clientY !== undefined ? event.clientY : event.touches[ event.touches.length - 1 ].clientY,
       );
     }
 

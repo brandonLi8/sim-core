@@ -96,7 +96,7 @@ define( require => {
         position: 'fixed',
         overflow: 'hidden',
         background: '#FFF',
-        touchAction: 'manipulation',
+        touchAction: 'none',
         webkitOverflowScrolling: 'touch'
       } );
 
