@@ -64,7 +64,8 @@ define( require => {
           padding: 0,
           margin: 0,
           boxSizing: 'border-box',
-          position: 'relative'
+          position: 'relative',
+          touchAction: 'none'
         },
 
         // {string|null} - if not null, adds a text string that the object displays. See `setText()` for documentation.

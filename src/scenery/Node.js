@@ -106,11 +106,11 @@ define( require => {
       } );
     }
     set mousedown( listener ) {
-      this._element.addEventListener( 'mousedown', event => {
+      const onDown = event => {
         event.stopPropagation();
 
         const globalNodeBounds = this.element.getBoundingClientRect();
-        const globalPosition = new Vector( event.clientX, event.clientY );
+        const globalPosition = new Vector( event.clientX || event.touches[ 0 ].clientX, event.clientY || event.touches[ 0 ].clientY );
         const globalTopLeft = new Vector( globalNodeBounds.x, globalNodeBounds.y );
 
         const convertedPosition = globalPosition.copy().subtract( globalTopLeft );
@@ -119,10 +119,16 @@ define( require => {
         const globalLocalPosition = globalPosition.copy().divide( this.scale );
 
         listener( localPosition, globalLocalPosition );
-      } );
+      };
+      this._element.addEventListener( 'mousedown', onDown  );
+      this._element.addEventListener( 'touchstart', onDown );
     }
     set mouseup( listener ) {
       this._element.addEventListener( 'mouseup', event => {
+        event.stopPropagation();
+        listener();
+      } );
+      this._element.addEventListener( 'touchend', event => {
         event.stopPropagation();
         listener();
       } );
@@ -138,27 +144,34 @@ define( require => {
     drag( startdrag, listener, closedrag ) {
 
       let cursorViewPosition;
+
+
       // start drag event listener
-      this._element.addEventListener( 'mousedown', ( event ) => {
+      const onDown = ( event ) => {
         event = event || window.event;
         event.preventDefault();
         // mouse cursor
         const globalNodeBounds = this.element.getBoundingClientRect();
         const globalTopLeft = new Vector( globalNodeBounds.x, globalNodeBounds.y );
-        cursorViewPosition = new Vector( event.clientX, event.clientY ).subtract( globalTopLeft ).divide( this.scale );
+        cursorViewPosition = new Vector( event.clientX || event.touches[ 0 ].clientX, event.clientY || event.touches[ 0 ].clientY ).subtract( globalTopLeft ).divide( this.scale );
 
         startdrag();
 
-        document.onmouseup = closeDrag;
-        document.onmousemove = drag;
-      } );
+        document.addEventListener( 'mouseup', closeDrag );
+        document.addEventListener( 'touchend', closeDrag );
+        document.addEventListener( 'mousemove', drag );
+        document.addEventListener( 'touchmove', drag );
+      };
+      this._element.addEventListener( 'mousedown', onDown  );
+      this._element.addEventListener( 'touchstart', onDown );
+
       const drag = event => {
         event = event || window.event;
         event.preventDefault();
 
         const globalNodeBounds = this.element.getBoundingClientRect();
         const globalTopLeft = new Vector( globalNodeBounds.x, globalNodeBounds.y );
-        const currentViewPosition = new Vector( event.clientX, event.clientY ).subtract( globalTopLeft ).divide( this.scale );
+        const currentViewPosition = new Vector( event.clientX || event.touches[ 0 ].clientX, event.clientY || event.touches[ 0 ].clientY ).subtract( globalTopLeft ).divide( this.scale );
 
         const displacement = currentViewPosition.subtract( cursorViewPosition );
         listener( displacement )
@@ -166,8 +179,10 @@ define( require => {
 
       function closeDrag() {
         // on the release
-        document.onmouseup = null; // remove event listeners
-        document.onmousemove = null;
+        document.removeEventListener( 'mouseup', closeDrag );
+        document.removeEventListener( 'touchend', closeDrag );
+        document.removeEventListener( 'mousemove', drag );
+        document.removeEventListener( 'touchmove', drag );
 
         closedrag();
       }
