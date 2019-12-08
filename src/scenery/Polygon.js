@@ -29,7 +29,9 @@ define( require => {
       // Defaults for options.
       const defaults = {
 
-        type: 'polygon'
+        type: 'polygon',
+        shapeRendering: 'geometricPrecision'
+
       };
 
       // Rewrite options so that it overrides the defaults.
