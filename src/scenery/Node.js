@@ -110,7 +110,7 @@ define( require => {
         event.stopPropagation();
 
         const globalNodeBounds = this.element.getBoundingClientRect();
-        const globalPosition = new Vector( event.clientX || event.touches[ 0 ].clientX, event.clientY || event.touches[ 0 ].clientY );
+        const globalPosition = this.getEventLocation( event );
         const globalTopLeft = new Vector( globalNodeBounds.x, globalNodeBounds.y );
 
         const convertedPosition = globalPosition.copy().subtract( globalTopLeft );
@@ -120,18 +120,20 @@ define( require => {
 
         listener( localPosition, globalLocalPosition );
       };
-      this._element.addEventListener( 'mousedown', onDown  );
-      this._element.addEventListener( 'touchstart', onDown );
+      this._element.addEventListener( window.isMobile ? 'touchstart' : 'mousedown', onDown );
     }
     set mouseup( listener ) {
-      this._element.addEventListener( 'mouseup', event => {
+      this._element.addEventListener( window.isMobile ? 'touchend' : 'mouseup', event => {
         event.stopPropagation();
         listener();
       } );
-      this._element.addEventListener( 'touchend', event => {
-        event.stopPropagation();
-        listener();
-      } );
+    }
+
+    getEventLocation( event ) {
+      return new Vector(
+        event.clientX !== undefined ? event.clientX : event.touches[ 0 ].clientX,
+        event.clientY !== undefined ? event.clientY : event.touches[ 0 ].clientY,
+      );
     }
 
     /**
@@ -145,7 +147,6 @@ define( require => {
 
       let cursorViewPosition;
 
-
       // start drag event listener
       const onDown = ( event ) => {
         event = event || window.event;
@@ -153,36 +154,39 @@ define( require => {
         // mouse cursor
         const globalNodeBounds = this.element.getBoundingClientRect();
         const globalTopLeft = new Vector( globalNodeBounds.x, globalNodeBounds.y );
-        cursorViewPosition = new Vector( event.clientX || event.touches[ 0 ].clientX, event.clientY || event.touches[ 0 ].clientY ).subtract( globalTopLeft ).divide( this.scale );
+        cursorViewPosition = this.getEventLocation( event ).subtract( globalTopLeft ).divide( this.scale );
 
         startdrag();
 
-        document.addEventListener( 'mouseup', closeDrag );
-        document.addEventListener( 'touchend', closeDrag );
-        document.addEventListener( 'mousemove', drag );
-        document.addEventListener( 'touchmove', drag );
+        document.addEventListener( window.isMobile ? 'touchend' : 'mouseup', closeDrag );
+        document.addEventListener( window.isMobile ? 'touchmove' : 'mousemove', drag );
       };
-      this._element.addEventListener( 'mousedown', onDown  );
-      this._element.addEventListener( 'touchstart', onDown );
+      this._element.addEventListener( window.isMobile ? 'touchstart' : 'mousedown', onDown  );
 
+      let scheduled = null;
       const drag = event => {
+
         event = event || window.event;
         event.preventDefault();
+        if ( !scheduled ) {
+          setTimeout( () => {
+            const globalNodeBounds = this.element.getBoundingClientRect();
+            const globalTopLeft = new Vector( globalNodeBounds.x, globalNodeBounds.y );
+            const currentViewPosition = this.getEventLocation( event ).subtract( globalTopLeft ).divide( this.scale );
 
-        const globalNodeBounds = this.element.getBoundingClientRect();
-        const globalTopLeft = new Vector( globalNodeBounds.x, globalNodeBounds.y );
-        const currentViewPosition = new Vector( event.clientX || event.touches[ 0 ].clientX, event.clientY || event.touches[ 0 ].clientY ).subtract( globalTopLeft ).divide( this.scale );
+            const displacement = currentViewPosition.subtract( cursorViewPosition );
+            listener( displacement );
 
-        const displacement = currentViewPosition.subtract( cursorViewPosition );
-        listener( displacement )
+            scheduled = null;
+          }, 5 );
+        }
+        scheduled = event;
       }
 
       function closeDrag() {
         // on the release
-        document.removeEventListener( 'mouseup', closeDrag );
-        document.removeEventListener( 'touchend', closeDrag );
-        document.removeEventListener( 'mousemove', drag );
-        document.removeEventListener( 'touchmove', drag );
+        document.removeEventListener( window.isMobile ? 'touchend' : 'mouseup', closeDrag );
+        document.removeEventListener( window.isMobile ? 'touchmove' : 'mousemove', drag );
 
         closedrag();
       }

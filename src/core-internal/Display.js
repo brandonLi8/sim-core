@@ -95,7 +95,8 @@ define( require => {
         margin: 0,
         position: 'relative',
         overflow: 'hidden',
-        background: '#FFF'
+        background: '#FFF',
+        touchAction: 'none'
       } );
 
     }
