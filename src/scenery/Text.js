@@ -30,7 +30,6 @@ define( require => {
 
         type: 'text',
         fill: 'black',
-        stroke: 'black',
         x: 0,
         y: 0,
         fontSize: 12,
@@ -38,32 +37,34 @@ define( require => {
         cornerRadius: 5,
         attributes: {
           'text-anchor': 'middle',
-          'text-rendering': 'geometricPrecision'
-        }
+          'text-rendering': 'geometricPrecision',
+        },
+        fontWeight: 'normal'
       };
 
       // Rewrite options so that it overrides the defaults.
       options = { ...defaults, ...options };
       options.attributes = { ...defaults.attributes, ...options.attributes };
-      options.style = { ...defaults.style, ...options.style };
 
       super( options );
       this.fontSize = options.fontSize;
       this.fontFamily = options.fontFamily;
       this.x = options.x;
       this.y = options.y;
+
+      this.addAttributes( {
+        'font-weight': options.fontWeight
+      } );
     }
 
     layout( scale ) {
       super.layout( scale );
       this.addAttributes( {
         x: `${ scale * this.x }px`,
-        y: `${ scale * this.y }px`
+        y: `${ scale * this.y }px`,
+        'font-size': `${ this.fontSize * scale }px`,
+        'font-family': `${ this.fontFamily }`
       } );
-
-      this.addStyle( {
-        font: `${ this.fontSize * scale }px ${ this.fontFamily }`
-      })
     }
   }
 
