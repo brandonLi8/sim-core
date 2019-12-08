@@ -37,7 +37,7 @@ define( require => {
         cornerRadius: 5,
         attributes: {
           'text-anchor': 'middle',
-          'text-rendering': 'geometricPrecision',
+          'text-rendering': 'geometricPrecision'
         },
         fontWeight: 'normal'
       };

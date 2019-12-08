@@ -134,8 +134,8 @@ define( require => {
 
     getEventLocation( event ) {
       return new Vector(
-        event.clientX !== undefined ? event.clientX : event.touches[ event.touches.length - 1 ].clientX,
-        event.clientY !== undefined ? event.clientY : event.touches[ event.touches.length - 1 ].clientY,
+        event.clientX !== undefined ? event.clientX : event.touches[ 0 ].clientX,
+        event.clientY !== undefined ? event.clientY : event.touches[ 0 ].clientY
       );
     }
 
@@ -164,7 +164,7 @@ define( require => {
         document.addEventListener( window.isMobile ? 'touchend' : 'mouseup', closeDrag );
         document.addEventListener( window.isMobile ? 'touchmove' : 'mousemove', drag );
       };
-      this._element.addEventListener( window.isMobile ? 'touchstart' : 'mousedown', onDown  );
+      this._element.addEventListener( window.isMobile ? 'touchstart' : 'mousedown', onDown );
 
       let scheduled = null;
       const drag = event => {
@@ -184,7 +184,7 @@ define( require => {
           }, 10 );
         }
         scheduled = event;
-      }
+      };
 
       function closeDrag() {
         // on the release

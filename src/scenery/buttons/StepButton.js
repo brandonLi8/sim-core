@@ -50,7 +50,7 @@ define( require => {
         },
         mousedown: () => {
           listener();
-        },
+        }
       };
 
       // Rewrite options so that it overrides the defaults.

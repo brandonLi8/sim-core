@@ -56,7 +56,7 @@ define( require => {
         x: `${ scale * this.x }px`,
         y: `${ scale * this.y }px`,
         rx: `${ scale * this.cornerRadius }px`,
-        ry: `${ scale * this.cornerRadius }px`,
+        ry: `${ scale * this.cornerRadius }px`
       } );
     }
   }

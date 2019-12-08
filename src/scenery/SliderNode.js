@@ -71,7 +71,7 @@ define( require => {
       super( options );
 
       this._height = Math.max( options.majorTickLength, 2 * options.minorTickLength, options.thumbSize.y );
-      this._width = options.trackSize.x + options.thumbSize.x + 2 * options.thumbStrokeWidth + options.majorTickStrokeWidth;
+      this._width = options.trackSize.x + options.thumbSize.x + 2 * options.thumbStrokeWidth;
       const centerY = this._height / 2;
       const centerX = this._width / 2;
 
@@ -150,19 +150,19 @@ define( require => {
       let percentage;
       numberProperty.link( number => {
         percentage = ( number - range.x ) / ( range.y - range.x );
-        thumb.x = percentage * ( options.trackSize.x  ) - options.thumbSize.x / 2 + sliderTrack.x;
+        thumb.x = percentage * ( options.trackSize.x ) - options.thumbSize.x / 2 + sliderTrack.x;
 
         thumbLine.start.x = thumb.x + options.thumbSize.x / 2;
         thumbLine.end.x = thumb.x + options.thumbSize.x / 2;
       } );
 
-      const startDrag = () => { options.startDrag && options.startDrag(); }
+      const startDrag = () => { options.startDrag && options.startDrag(); };
       const dragListener = ( displacement ) => {
         percentage += displacement.x / ( options.trackSize.x + options.majorTickStrokeWidth );
         percentage = Util.clamp( percentage, 0, 1 );
         numberProperty.value = percentage * ( range.y - range.x ) + range.x;
       };
-      const endDrag = () => { options.endDrag && options.endDrag(); }
+      const endDrag = () => { options.endDrag && options.endDrag(); };
 
       thumb.drag( startDrag, dragListener, endDrag );
       thumbLine.drag( startDrag, dragListener, endDrag );
