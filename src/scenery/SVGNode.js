@@ -41,7 +41,8 @@ define( require => {
         fill: null,
         stroke: null,
         strokeWidth: null,
-        shapeRendering: null
+        shapeRendering: null,
+        overflow: 'visible'
       };
 
       // Rewrite options so that it overrides the defaults.
@@ -56,6 +57,7 @@ define( require => {
       }
       this.strokeWidth = options.strokeWidth;
       this.addAttributes( {
+        overflow: options.overflow,
         fill: options.fill,
         stroke: options.stroke,
         'stroke-width': options.strokeWidth

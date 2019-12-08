@@ -17,6 +17,7 @@ define( require => {
   const Rectangle = require( 'SIM_CORE/scenery/Rectangle' );
   const LineNode = require( 'SIM_CORE/scenery/LineNode' );
   const Util = require( 'SIM_CORE/util/Util' );
+  const Text = require( 'SIM_CORE/scenery/Text' );
 
   class SliderNode extends Node {
 
@@ -53,7 +54,7 @@ define( require => {
         // ticks
         includeMajorTicks: true,
         minorTickIncrement: null, // must be smaller and the range's width must be exactly divisible by this
-        majorTickLength: 40,
+        majorTickLength: 35,
         majorTickStroke: 'black',
         majorTickStrokeWidth: 1.3,
         minorTickLength: 8,
@@ -175,9 +176,23 @@ define( require => {
       };
 
       //----------------------------------------------------------------------------------------
+      // Create the Labels
+      const leftLabel = new Text( {
+        text: `${ range.x }`,
+        x: sliderTrack.x,
+        y: -10
+      } );
+
+      const rightLabel = new Text( {
+        text: `${ range.y }`,
+        x: sliderTrack.x + sliderTrack.width,
+        y: -10
+      } );
+
+      //----------------------------------------------------------------------------------------
       const sliderContent = new SVGNode( {
 
-        children: [ ...tickNodes, sliderTrack, thumb, thumbLine ],
+        children: [ ...tickNodes, sliderTrack, thumb, thumbLine, leftLabel, rightLabel ],
         width: this._width,
         height: this._height
       } );
