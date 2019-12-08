@@ -39,7 +39,7 @@ define( require => {
         trackFill: 'rgb( 100, 100, 100 )',
         trackStroke: 'black',
         trackStrokeWidth: 1.5,
-        trackSize: new Vector( 150, 2 ),
+        trackSize: new Vector( 180, 2 ),
         trackCornerRadius: 0,
 
         // thumb
