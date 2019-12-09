@@ -10,7 +10,8 @@
  *       to allow Javascript to garbage collect the Property. Not properly unlinking listeners can result in a
  *       memory leak! You can unlink listeners by:
  *          - Calling the `unlink` method and passing a reference to the function that was linked.
- *          - Calling the `unlinkAllListeners` method (nothing passed in).
+ *          - Calling the `unlinkAll` method (nothing passed in).
+ *          - Calling the `dispose` method.
  *
  *   (2) A Property can validate new values when the value changes. This should be used as often as possible!
  *       There are 3 option keys that allow for this: `type`, `validValues`, and `isValidValue`.
@@ -67,32 +68,48 @@ define( require => {
 
       //----------------------------------------------------------------------------------------
       // Validate options
-      assert( !options.type || ( options.type.prototype && options.type.prototype.constructor ) );
+      assert( !options.type || TYPEOF_STRINGS.includes( options.type ) || !!options.type.constructor );
       assert( !options.validValues || Util.isArray( options.validValues ) );
       assert( !options.isValidValue || typeof options.isValidValue === 'function' );
 
       //----------------------------------------------------------------------------------------
 
-      // @private - store the internal value and the initial value
+      // @private {*} _value - the internal value of the Property and the initial value.
       this._value = value;
 
-      // @protected - initial value
+      // @private {*} _initialValue - the initial value of the Property.
       this._initialValue = value;
 
-      // @private {function[]} - the listeners that will when the value changes
+      // @private {function[]} _listeners - the listeners that will be notified when the value changes.
       this._listeners = [];
 
-      // @private - see defaults declaration
-      this._valueType = options.type;
+      // @private {boolean} _isDisposed - indicates if the Property has been disposed.
+      this._isDisposed = false;
+
+      // @private - aliases to options. See options for documentation.
+      this._type = options.type;
       this._validValues = options.validValues;
       this._isValidValue = options.isValidValue;
 
       // validate the initial value
-      this._validateValue( this._value );
+      this._validateValue( this._initialValue );
     }
 
     /**
-     * Gets the property value.
+     * Checks for equality between this Property's VALUE to another Property's VALUE.
+     * Attempts to use the `equals` method if the current value contains one. Otherwise, `===` is used for equality.
+     * @public
+     *
+     * @param {Property.<*>} other
+     * @returns {boolean}
+     */
+    equals( other ) {
+      assert( other instanceof Property, `invalid other: ${ other }` );
+      return this._equalsValue( this._value, other.value );
+    }
+
+    /**
+     * Gets the Property value.
      * @public
      *
      * @returns {*}
@@ -101,24 +118,38 @@ define( require => {
     get value() { return this.get(); }
 
     /**
-     * Sets the value and notifies listeners.
+     * Sets the value of the Property and notifies linked listeners. NOTE: nothing happens if the value doesn't change.
      * @public
      *
      * @param {*} value
      * @returns {Property} - for chaining.
      */
     set( value ) {
-      // Validate the value based on the information given in the constructor
+      assert( !this._isDisposed, 'cannot set value of a disposed Property' );
+      if ( this._equalsValue( this.value, value ) ) return; // no-op if the value doesn't change.
+
+      // Validate the new value before setting it.
       this._validateValue( value );
 
-      // Get the older
       const oldValue = this.get();
       this._value = value;
-      this._notifyListeners( oldValue );
+
+      // Notify all linked listeners.
+      this._listeners.forEach( listener => { listener( this.get(), oldValue ); } );
       return this;
     }
     set value( value ) { this.set( value ); }
 
+    /**
+     * Modifies the value of this Property with the `!` operator. Works for booleans and non-booleans.
+     * @public
+     *
+     * @returns {Property} - for chaining.
+     */
+    toggle() {
+      this.set( !this.get() );
+      return this;
+    }
 
     /**
      * Returns the initial value of this Property.
@@ -130,7 +161,7 @@ define( require => {
     get initialValue() { return this.getInitialValue(); }
 
     /**
-     * Resets the value to the initial value.
+     * Resets the Property's value to the initial value it was given when constructed.
      * @public
      *
      * @returns {Property} - for chaining.
@@ -138,33 +169,62 @@ define( require => {
     reset() { return this.set( this._initialValue ); }
 
     /**
-     * Adds listener and calls it immediately. The initial notification provides the current value for newValue and
-     * null for oldValue.
-     * @param
+     * Registers a listener such that when this Property's value changes, the listener is called, passing both the
+     * new value and old value. This method also calls the listener immediately, passing the current value as the
+     * 'new' value. If this behavior isn't desired, see `lazyLink`.
+     * @public
      *
-     * @param {function} listener a function of the form listener( newValue, oldValue )
+     * @param {function} - listener that is called when the Property value changes, passing the new value and old value.
+     * @returns {Property} - for chaining.
      */
     link( listener ) {
       this.lazyLink( listener );
-      listener( this.get(), null );
+      listener( this.get() ); // immediately call the listener, passing the current value.
+      return this;
     }
 
     /**
-     * Add an listener to the Property, without calling it back right away. This is used when you need to register a
-     * listener without an immediate callback.
+     * Registers a listener such that when this Property's value changes, the listener is called, passing both the
+     * new value and old value. Different from the `link` method, this is used when you need to register a listener
+     * without an immediate callback.
      * @public
      *
-     * @param {function} listener - a function with a single argument, which is the current value of the Property.
+     * @param {function} - listener that is called when the Property value changes, passing the new value and old value.
+     * @returns {Property} - for chaining.
      */
     lazyLink( listener ) {
-      assert( typeof listener === 'function', `invalid listener: ${ listener }` );
-      assert( this._listeners.indexOf( listener ) === -1, 'Cannot add the same listener twice' );
-
+      assert( !this._isDisposed, 'cannot link listener of a disposed Property' );
+      assert( !this.hasListener( listener ), `cannot link the same listener twice: ${ listener }` );
       this._listeners.push( listener );
+      return this;
     }
 
     /**
-     * Checks whether a listener is registered with this Property
+     * Removes a linked listener so that it is not longer called when the Property's value changes.
+     * @public
+     *
+     * @param {function} listener
+     * @returns {Property} - for chaining.
+     */
+    unlink( listener ) {
+      assert( this.hasListener( listener ), `listener was never registered: ${ listener }` );
+      Util.arrayRemove( this._listeners, listener );
+      return this;
+    }
+
+    /**
+     * Removes all currently linked listeners.
+     * @public
+     *
+     * @returns {Property} - for chaining.
+     */
+    unlinkAll() {
+      this._listeners = [];
+      return this;
+    }
+
+    /**
+     * Checks whether a listener is registered with this Property.
      * @public
      *
      * @param {function} listener
@@ -176,104 +236,77 @@ define( require => {
     }
 
     /**
-     * Removes a listener.
-     * @public
-     *
-     * @param {function} listener
-     */
-    unlink( listener ) {
-      assert( this.hasListener( listener ), 'listener was never registered' );
-      Util.arrayRemove( this._listeners, listener );
-    }
-
-    /**
-     * Removes all listeners. If no listeners are registered, this is a no-op.
-     * @public
-     */
-    unlinkAll() {
-      this._listeners = [];
-    }
-
-    /**
-     * Links an object's named attribute to this property. Returns a handle so it can be removed using
-     * Property.unlink(); Example: modelVisibleProperty.linkAttribute( view, 'visible' );
+     * Links an Object's attribute to this Property's value. Example: visibleProperty.linkAttribute( node, 'visible' );
+     * Returns a handle function so it can be removed using the `unlink` method.
      * @public
      *
      * @param {Object} object
      * @param {string} attributeName
+     * @returns {listener} - handler function that was registered as a listener. Use this function to unlink.
      */
     linkAttribute( object, attributeName ) {
-      assert( Object.prototype.hasOwnProperty.call( object, attributeName ),
-        `object ${ object } doesn't have attribute ${ attributeName }.` );
+      assert( Object.prototype.hasOwnProperty.call( object, attributeName ) );
+
       const handle = value => { object[ attributeName ] = value; };
       this.link( handle );
       return handle;
     }
 
     /**
-     * Unlink an listener added with linkAttribute. Note: the args of linkAttribute do not match the args of
-     * unlinkAttribute: here, you must pass the listener handle returned by linkAttribute rather than object and
-     * attributeName
+     * Disposes the Property and ensures that the Property can be garbage collected.
      * @public
      *
-     * @param {function} listener
-     */
-    unlinkAttribute( listener ) {
-      this.unlink( listener );
-    }
-
-    /**
-     * Modifies the value of this Property with the ! operator.  Works for booleans and non-booleans.
-     * @public
-     */
-    toggle() {
-      this.value = !this.value;
-    }
-
-    /**
-     * Ensures that the Property can be garbage collected.
-     * @public
+     * @returns {Property} - for chaining.
      */
     dispose() {
       // remove any listeners that are still attached to this property
       this.unlinkAll();
+
+      this._isDisposed = true;
+      return this;
     }
 
     /**
-     * @param {*} oldValue
-     * @private
+     * Convenience method to check for equality between one value to another.
+     * Attempts to use the `equals` method if the both value's contain this method. Otherwise, `===` is used to check.
+     * @public
+     *
+     * @param {*} value1
+     * @param {*} value2
+     * @returns {boolean}
      */
-    _notifyListeners( oldValue ) {
-      this._listeners.forEach( listener => {
-        listener( this.get(), oldValue );
-      } );
+    _equalsValue( value1, value2 ) {
+      if ( value1 && value2 && value1.constructor === value2.constructor && !!value1.equals && !!value2.equals ) {
+        return value1.equals( value2 );
+      }
+      else {
+        return value1 === value2;
+      }
     }
 
     /**
-     * Validates a value based on the validators given in the constructor.
+     * Validates a value based on the validation options given in the constructor.
      * @public
      *
      * @param {*} value
      */
     _validateValue( value ) {
 
-      // Always validate with the function.
-      assert( !this.isValidValue || this._isValidValue( value ), `invalid value: ${ value }` );
 
-      if ( this._valueType ) {
-        if ( TYPEOF_STRINGS.includes( this._valueType ) ) {
-          assert( typeof value === this._valueType, `invalid value: ${ value }` );
-        }
-        else {
-          assert( value instanceof this._valueType, `invalid value: ${ value }` );
-        }
-      }
+      // Validate options.type
+      assert( !this._type || ( TYPEOF_STRINGS.includes( this._type ) ?
+        typeof value === this._type :
+        value instanceof this._type ),
+        `value ${ value } not of type ${ this._type }` );
 
-      if ( this._validValues ) {
-        assert( this._validValues.includes( value ), `invalid value: ${ value }` );
-      }
+      // Validate options.validValues
+      assert( !this._validValues || this._validValues.includes( value ),
+        `value ${ value } not inside the valid values: ${ this._validValues }` );
+
+      // Validate options.isValidValue
+      assert( !this.isValidValue || this.isValidValue( value ) === true,
+        `value ${ value } did not pass isValidValue: ${ this.isValidValue }` );
     }
-
   }
 
   return Property;
