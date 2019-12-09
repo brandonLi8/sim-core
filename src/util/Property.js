@@ -13,10 +13,10 @@
  *          - Calling the `unlinkAllListeners` method (nothing passed in).
  *
  *   (2) A Property can validate new values when the value changes. This should be used as often as possible!
- *       There are 3 option keys that allow for this: `valueType`, `validValues`, and `isValidValue`.
+ *       There are 3 option keys that allow for this: `type`, `validValues`, and `isValidValue`.
  *       For instance:
  *       ```
- *       const exampleProperty = new Property( 5, { valueType: 'number', isValidValue: value => value > 0 } );
+ *       const exampleProperty = new Property( 5, { type: 'number', isValidValue: value => value > 0 } );
  *
  *       exampleProperty.set( 'foo-bar' );  // Will Error!
  *       exampleProperty.set( -5 );         // Will Error!
@@ -26,7 +26,6 @@
  *
  * @author Brandon Li <brandon.li820@gmail.com>
  */
-
 
 define( require => {
   'use strict';
@@ -41,42 +40,36 @@ define( require => {
   class Property {
 
     /**
-     * @param {*} value - the initial value of the property
-     * @param {Object} [options]
+     * @param {*} value - the value of the property
+     * @param {Object} [options] - key-value pairs that control the validation of the to be set values.
+     *                             See the early portion of the constructor for details.
      */
     constructor( value, options ) {
 
-      // Defaults for options.
-      const defaults = {
+      options = {
 
-        // {constructor|string|null} type of the value.
-        // If {string}, the string must be one of the primitive types listed in TYPEOF_STRINGS.
-        // If {null}, the valueType is not checked.
-        // Examples:
-        // valueType: Vector
-        // valueType: 'string'
-        valueType: null,
+        // {string|constructor} - the type of the value. If provided, this will check that new values match this type.
+        //                        If {string}, the string must be one of the types listed in TYPEOF_STRINGS.
+        //                        If {constructor}, this will use `instanceof` to validate new values. Ex: `Vector`.
+        type: null,
 
-        // {*[]|null} valid values for this Property. Unused if null.
-        // validValues: [ 2, 3 ]
+        // {*[]} - an array of valid values for this Property. If provided, this will check that new values are in
+        //         this array. For instance: validValues: [ 2, 3 ].
         validValues: null,
 
-        // {function|null} function that validates the value. Single argument is the value, returns boolean.
-        // Unused if null.
-        // Example:
-        // isValidValue: value => Util.isInteger( value ) && value >= 0;
-        isValidValue: null
+        // {function} - custom function that validates the value. If provided, this will pass in new values and
+        //              check that the function returns true. For instance: isValidValue: value => value >= 0;
+        isValidValue: null,
+
+        // rewrite options such that it overrides the defaults above if provided.
+        ...options
       };
 
-      // Rewrite options so that it overrides the defaults.
-      options = { ...defaults, ...options };
-
-      assert( !options.valueType || typeof options.valueType === 'string',
-        `invalid valueType: ${ options.valueType }` );
-      assert( !options.validValues || Util.isArray( options.validValues ),
-        `invalid validValues: ${ options.validValues }` );
-      assert( !options.isValidValue || typeof options.isValidValue === 'function',
-        `invalid isValidValue: ${ options.isValidValue }` );
+      //----------------------------------------------------------------------------------------
+      // Validate options
+      assert( !options.type || ( options.type.prototype && options.type.prototype.constructor ) );
+      assert( !options.validValues || Util.isArray( options.validValues ) );
+      assert( !options.isValidValue || typeof options.isValidValue === 'function' );
 
       //----------------------------------------------------------------------------------------
 
@@ -90,7 +83,7 @@ define( require => {
       this._listeners = [];
 
       // @private - see defaults declaration
-      this._valueType = options.valueType;
+      this._valueType = options.type;
       this._validValues = options.validValues;
       this._isValidValue = options.isValidValue;
 
