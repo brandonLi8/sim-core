@@ -1,10 +1,32 @@
 // Copyright © 2019 Brandon Li. All rights reserved.
 
 /**
- * An observable property which notifies listeners when the value changes.
+ * A generic encapsulated Javascript property wrapper (a property is a value associated with an object field).
+ * Supports observing and type validation.
+ *
+ * ## Functionality:
+ *   (1) A Property notifies listeners when the value changes. Listeners can be "linked" by calling the `link`
+ *       method of a Property. IMPORTANT: if the object is being disposed, make sure to unlink your listeners
+ *       to allow Javascript to garbage collect the Property. Not properly unlinking listeners can result in a
+ *       memory leak! You can unlink listeners by:
+ *          - Calling the `unlink` method and passing a reference to the function that was linked.
+ *          - Calling the `unlinkAllListeners` method (nothing passed in).
+ *
+ *   (2) A Property can validate new values when the value changes. This should be used as often as possible!
+ *       There are 3 option keys that allow for this: `valueType`, `validValues`, and `isValidValue`.
+ *       For instance:
+ *       ```
+ *       const exampleProperty = new Property( 5, { valueType: 'number', isValidValue: value => value > 0 } );
+ *
+ *       exampleProperty.set( 'foo-bar' );  // Will Error!
+ *       exampleProperty.set( -5 );         // Will Error!
+ *       exampleProperty.set( 10 );         // No Error!
+ *       ```
+ *       Any combination of these options may be used. See the early portion of the constructor for more documentation.
  *
  * @author Brandon Li <brandon.li820@gmail.com>
  */
+
 
 define( require => {
   'use strict';
