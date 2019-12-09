@@ -362,7 +362,7 @@ define( require => {
      * @returns {string}
      */
     toCamelCase( str ) {
-      assert( typeof str === 'string' && str.length > 0, `invalid str: ${ str }` );
+      assert( typeof str === 'string', `invalid str: ${ str }` );
 
       return str.toLowerCase().replace( /-(.)/g, ( match, group ) => {
         return group.toUpperCase();
@@ -377,7 +377,7 @@ define( require => {
      * @returns {string}
      */
     toTitleCase( str ) {
-      assert( typeof str === 'string' && str.length > 0, `invalid str: ${ str }` );
+      assert( typeof str === 'string', `invalid str: ${ str }` );
 
       // Use Lodash's start case. See https://lodash.com/docs#startCase.
       return str.split( '-' )

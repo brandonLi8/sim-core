@@ -11,8 +11,11 @@ define( require => {
 
   // modules
   const truenit = require( 'truenit' );
+  const assert = require( 'SIM_CORE/util/assert' );
 
   //----------------------------------------------------------------------------------------
+  // enable assert
+  assert.enableAssertions();
 
   truenit.registerTest( 'Util', require( 'TESTS/util/UtilTests' ) );
   truenit.registerTest( 'Vector', require( 'TESTS/util/VectorTests' ) );

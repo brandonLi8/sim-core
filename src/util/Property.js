@@ -292,7 +292,6 @@ define( require => {
      */
     _validateValue( value ) {
 
-
       // Validate options.type
       assert( !this._type || ( TYPEOF_STRINGS.includes( this._type ) ?
         typeof value === this._type :
