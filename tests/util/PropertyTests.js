@@ -12,8 +12,26 @@ define( require => {
   // modules
   const Property = require( 'SIM_CORE/util/Property' );
   const truenit = require( 'truenit' );
+  const Vector = require( 'SIM_CORE/util/Vector' );
+
 
   const PropertyTester = () => {
+
+    //----------------------------------------------------------------------------------------
+    // Primitive Validation
+    //----------------------------------------------------------------------------------------
+    const stringProperty = new Property( 'foo', {
+      type: 'string',
+      validValues: [ 'foo', 'bar', 'tap' ]
+    } );
+
+    stringProperty.set( 'bar' );
+    truenit.ok( stringProperty.get() === 'bar' );
+
+    stringProperty.set( 'tap' );
+    truenit.ok( stringProperty.get() === 'tap' );
+
+
 
     //----------------------------------------------------------------------------------------
     // Test unlink

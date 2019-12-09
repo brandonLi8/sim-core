@@ -17,7 +17,7 @@
   },
   "devDependencies": {
     "@brandonli8/grunt-config": "0.0.0-dev.11",
-    "truenit": "^0.9.12"
+    "truenit": "^0.9.14"
   },
   "dependencies": {
     "requirejs": "^2.3.6"
