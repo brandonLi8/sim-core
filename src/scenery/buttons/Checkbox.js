@@ -34,7 +34,7 @@ define( require => {
       // Defaults for options.
       const defaults = {
         spacing: 5,
-        boxSize: 50,
+        boxSize: 19,
 
         // box
         boxStroke: 'black',
