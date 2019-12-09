@@ -97,9 +97,13 @@ define( require => {
         overflow: 'hidden',
         background: '#FFF',
         touchAction: 'none',
-        webkitOverflowScrolling: 'touch'
+        overflowScrolling: 'touch',
+        touchAction: 'none', // forward all pointer events
+        fontSmoothing: 'antialiased',
+        userDrag: 'none',
+        touchCallout: 'none',
+        tapHighlightColor: 'rgba( 0, 0, 0, 0 )'
       } );
-
     }
   }
 
