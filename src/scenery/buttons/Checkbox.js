@@ -45,7 +45,7 @@ define( require => {
         // check
         checkFill: 'black',
         checkStroke: 'white',
-        checkStrokeWidth: 0.5,
+        checkStrokeWidth: 0.8,
 
         style: {
           cursor: 'pointer'
