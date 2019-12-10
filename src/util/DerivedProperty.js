@@ -15,6 +15,7 @@ define( require => {
   // modules
   const assert = require( 'SIM_CORE/util/assert' );
   const Property = require( 'SIM_CORE/util/Property' );
+  const Util = require( 'SIM_CORE/util/Util' );
 
   class DerivedProperty extends Property {
 
@@ -27,9 +28,9 @@ define( require => {
     constructor( dependencies, derivation, options ) {
 
       assert( Util.isArray( dependencies ), `invalid dependencies: ${ dependencies }` );
-      assert( typeof callback === 'function', `invalid callback: ${ callback }` );
+      assert( typeof derivation === 'function', `invalid derivation: ${ derivation }` );
 
-      const initialValue = derivation( ...dependencies.map( property => property.value );
+      const initialValue = derivation( ...dependencies.map( property => property.value ) );
       super( initialValue, options );
 
       //----------------------------------------------------------------------------------------
@@ -39,7 +40,7 @@ define( require => {
 
       // @private listener linked to all properties
       this._listener = () => {
-        this.set( derivation( ...dependencies.map( property => property.value ) );
+        this.set( derivation( ...dependencies.map( property => property.value ) ) );
       };
 
       // DerivedProperty cannot be set, so we don't store the initial value to help prevent memory issues.

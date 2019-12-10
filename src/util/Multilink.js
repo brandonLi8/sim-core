@@ -62,4 +62,6 @@ define( require => {
       this.isDisposed = true;
     }
   }
+
+  return Multilink;
 } );
