@@ -209,8 +209,8 @@ define( require => {
       this.style.left = `${ scale * ( this._left || 0 )}px`;
 
       if ( this.center ) {
-        this.style.top = `${ scale * ( this._center.y - this.height / 2 ) }px`;
-        this.style.left = `${ scale * ( this._center.x - this.width / 2 ) }px`;
+        this.style.top = `${ scale * ( this._center.y - ( this.height ? this.height / 2 : 0 ) ) }px`;
+        this.style.left = `${ scale * ( this._center.x - ( this.width ? this.width / 2 : 0 ) ) }px`;
       }
 
       this.scale = scale;
