@@ -75,20 +75,13 @@ define( require => {
 
       super.layout( scale );
       this.addAttributes( {
-        height: `${ scale * this._height }px`,
-        width: `${ scale * this._width }px`
+        height: this.style.width,
+        width: this.style.height
       } );
-      this.style.top = `${ scale * this._top }px`;
-      this.style.left = `${ scale * this._left }px`;
-
-      if ( this.center ) {
-        this.style.top = `${ scale * ( this._center.y - this.height / 2 ) }px`;
-        this.style.left = `${ scale * ( this._center.x - this.width / 2 ) }px`;
-      }
 
       if ( this.strokeWidth ) {
         this.addAttributes( {
-          'stroke-width': this.strokeWidth * scale
+          'stroke-width': Math.max( this.strokeWidth * scale, 1 )
         } );
       }
     }

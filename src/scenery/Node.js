@@ -203,10 +203,10 @@ define( require => {
      */
     layout( scale ) {
 
-      this.style.width = `${ scale * this._width }px`;
-      this.style.height = `${ scale * this._height }px`;
-      this.style.top = `${ scale * this._top }px`;
-      this.style.left = `${ scale * this._left }px`;
+      this.style.width = `${ scale * ( this._width || 0 )}px`;
+      this.style.height = `${ scale * ( this._height || 0 )}px`;
+      this.style.top = `${ scale * ( this._top || 0 )}px`;
+      this.style.left = `${ scale * ( this._left || 0 )}px`;
 
       if ( this.center ) {
         this.style.top = `${ scale * ( this._center.y - this.height / 2 ) }px`;

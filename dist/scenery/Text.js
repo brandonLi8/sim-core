@@ -1,3 +1,4 @@
 // Copyright © 2019 Brandon Li. All rights reserved.
 
-// Minified distribution version - sim-core 0.0.0-dev.6 - MIT.
+// Minified distribution version - sim-core 0.0.0-dev.18 - MIT.
+define(require=>{"use strict";const t=require("SIM_CORE/util/assert"),e=require("SIM_CORE/scenery/SVGNode");return class extends e{constructor(e){t(!e||Object.getPrototypeOf(e)===Object.prototype,`Extra prototype on Options: ${e}`);const i={type:"text",fill:"black",x:0,y:0,fontSize:13.5,fontFamily:"Arial, sans-serif",cornerRadius:5,attributes:{"text-anchor":"middle","text-rendering":"geometricPrecision"},fontWeight:"normal"};(e={...i,...e}).attributes={...i.attributes,...e.attributes},super(e),this.fontSize=e.fontSize,this.fontFamily=e.fontFamily,this.x=e.x,this.y=e.y,this.addAttributes({"font-weight":e.fontWeight})}layout(t){super.layout(t),this.addAttributes({x:`${t*this.x}px`,y:`${t*this.y}px`,"font-size":`${this.fontSize*t}px`,"font-family":`${this.fontFamily}`})}}});

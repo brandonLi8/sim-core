@@ -1,4 +1,4 @@
 // Copyright © 2019 Brandon Li. All rights reserved.
 
-// Minified distribution version - sim-core 0.0.0-dev.6 - MIT.
+// Minified distribution version - sim-core 0.0.0-dev.18 - MIT.
 define(require=>{"use strict";const e=require("SIM_CORE/util/assert"),t=require("SIM_CORE/core-internal/DOMObject");return class extends t{constructor(t,i,l){e(!l||Object.getPrototypeOf(l)===Object.prototype,`invalid options: ${l}`);const s={name:null,style:{width:"100%",top:0,background:"white",display:"flex",justifyContent:"center",alignContent:"center",alignItems:"center"}};(l={...s,...l}).style={...s.style,...l.style},super(l),this.name=l.name,this._createModel=t,this._createView=i,this._model=null,this._view=null}initializeModel(){e(null===this._model,"there was already a model"),this._model=this._createModel()}initializeView(){e(null===this._view,"there was already a model"),e(null!==this._model,"model must be created first"),this._view=this._createView(this._model),this.addChild(this._view)}initializeModelAndView(){this.initializeModel(),this.initializeView()}}});
