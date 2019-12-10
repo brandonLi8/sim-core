@@ -79,15 +79,15 @@ define( require => {
      *
      * @returns {*} See the property declaration for documentation of the type.
      */
-    getWidth() { return this._width || this.style.width; }
+    getWidth() { return this._width; }
     get width() { return this.getWidth(); }
-    getHeight() { return this._height|| this.style.height; }
+    getHeight() { return this._height; }
     get height() { return this.getHeight(); }
-    getTop() { return this._top|| this.style.top; }
+    getTop() { return this._top; }
     get top() { return this.getTop(); }
-    getLeft() { return this._left|| this.style.left; }
+    getLeft() { return this._left; }
     get left() { return this.getLeft(); }
-    getCenter() { return this._center || this.style.center; }
+    getCenter() { return this._center; }
     get center() { return this.getCenter(); }
 
     set mouseover( listener ) {
