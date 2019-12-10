@@ -90,6 +90,10 @@ define( require => {
     getCenter() { return this._center; }
     get center() { return this.getCenter(); }
 
+    set center( center ) {
+      this._center = center;
+    }
+
     set mouseover( listener ) {
       this._element.addEventListener( 'mouseover', event => {
         event.stopPropagation();
