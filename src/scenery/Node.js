@@ -173,8 +173,22 @@ define( require => {
      * Dragging events will propagate down its tree respectively.
      * @public
      */
-    drag( startdrag, listener, closedrag ) {
+    drag( options ) {
 
+      options = {
+        // {Function|null} - Called as start( event: {Event}, listener: {DragListener} ) when the drag is started.
+        // This is preferred over passing press(), as the drag start hasn't been fully processed at that point.
+        start: null,
+
+        // {Function|null} - Called as end( listener: {DragListener} ) when the drag is ended. This is preferred over
+        // passing release(), as the drag start hasn't been fully processed at that point.
+        // NOTE: This will also be called if the drag is ended due to being interrupted or canceled.
+        end: null,
+
+        listener: null,
+
+        ...options
+      }
       let cursorViewPosition;
 
       // start drag event listener
@@ -186,7 +200,7 @@ define( require => {
         const globalTopLeft = new Vector( globalNodeBounds.x, globalNodeBounds.y );
         cursorViewPosition = this.getEventLocation( event ).subtract( globalTopLeft ).divide( this.scale );
 
-        startdrag();
+        options.start && options.start();
 
         document.addEventListener( window.isMobile ? 'touchend' : 'mouseup', closeDrag );
         document.addEventListener( window.isMobile ? 'touchmove' : 'mousemove', drag );
@@ -205,7 +219,7 @@ define( require => {
             const currentViewPosition = this.getEventLocation( event ).subtract( globalTopLeft ).divide( this.scale );
 
             const displacement = currentViewPosition.subtract( cursorViewPosition );
-            listener( displacement );
+            options.listener && options.listener( displacement );
 
             scheduled = null;
           }, 10 );
@@ -218,7 +232,7 @@ define( require => {
         document.removeEventListener( window.isMobile ? 'touchend' : 'mouseup', closeDrag );
         document.removeEventListener( window.isMobile ? 'touchmove' : 'mousemove', drag );
 
-        closedrag();
+        options.end && options.end();
       }
     }
 
