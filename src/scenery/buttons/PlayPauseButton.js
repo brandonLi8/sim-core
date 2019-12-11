@@ -64,13 +64,13 @@ define( require => {
 
       this.radius = options.radius;
 
-      this.selfCenter = new Vector( this._width / 2, this._height / 2 );
+      this.selfCenter = new Vector( this.width / 2, this.height / 2 );
       // play button
       const button = new CircleNode( {
         radius: this.radius,
         center: this.selfCenter,
-        width: this._width,
-        height: this._height,
+        width: this.width,
+        height: this.height,
         strokeWidth: STROKE_WIDTH
       } );
 
@@ -79,7 +79,7 @@ define( require => {
         width: PAUSE_BUTTON_WIDTH,
         height: PAUSE_BUTTON_HEGIHT,
         x: this.selfCenter.x - PAUSE_BUTTON_WIDTH - PAUSE_BUTTON_MARGIN,
-        y: this._height / 2 - PAUSE_BUTTON_HEGIHT / 2,
+        y: this.height / 2 - PAUSE_BUTTON_HEGIHT / 2,
         fill: 'white'
       } );
       const pauseRectangle2 = new Rectangle( {
@@ -87,13 +87,13 @@ define( require => {
         width: PAUSE_BUTTON_WIDTH,
         height: PAUSE_BUTTON_HEGIHT,
         x: this.selfCenter.x + PAUSE_BUTTON_MARGIN,
-        y: this._height / 2 - PAUSE_BUTTON_HEGIHT / 2,
+        y: this.height / 2 - PAUSE_BUTTON_HEGIHT / 2,
         fill: 'white'
       } );
       const pauseButton = new SVGNode( {
         children: [ pauseRectangle1, pauseRectangle2 ],
-        width: this._width,
-        height: this._height
+        width: this.width,
+        height: this.height
       } );
 
       //----------------------------------------------------------------------------------------
@@ -104,8 +104,8 @@ define( require => {
         this.selfCenter.copy().subtractXY( 1 / Math.sqrt( 3 ) * TRIANGLE_LENGTH / 2, TRIANGLE_LENGTH / 2 )
       ], {
         fill: 'white',
-        width: this._width,
-        height: this._height
+        width: this.width,
+        height: this.height
       } );
       this.setChildren( [ button, playButton, pauseButton ] );
 

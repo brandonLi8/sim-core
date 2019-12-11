@@ -70,10 +70,10 @@ define( require => {
 
       super( options );
 
-      this._height = Math.max( options.majorTickLength, 2 * options.minorTickLength, options.thumbSize.y );
-      this._width = options.trackSize.x + options.thumbSize.x + 2 * options.thumbStrokeWidth;
-      const centerY = this._height / 2;
-      const centerX = this._width / 2;
+      this.height = Math.max( options.majorTickLength, 2 * options.minorTickLength, options.thumbSize.y );
+      this.width = options.trackSize.x + options.thumbSize.x + 2 * options.thumbStrokeWidth;
+      const centerY = this.height / 2;
+      const centerX = this.width / 2;
 
       //----------------------------------------------------------------------------------------
       // Create the Track
@@ -152,8 +152,8 @@ define( require => {
         percentage = ( number - range.x ) / ( range.y - range.x );
         thumb.x = percentage * ( options.trackSize.x ) - options.thumbSize.x / 2 + sliderTrack.x;
 
-        thumbLine.start.x = thumb.x + options.thumbSize.x / 2;
-        thumbLine.end.x = thumb.x + options.thumbSize.x / 2;
+        thumbLine.start = thumbLine.start.setX( thumb.x + options.thumbSize.x / 2 );
+        thumbLine.end = thumbLine.end.setX( thumbLine.start.x );
       } );
 
       const startDrag = () => { options.startDrag && options.startDrag(); };
@@ -193,8 +193,8 @@ define( require => {
       const sliderContent = new SVGNode( {
 
         children: [ ...tickNodes, sliderTrack, thumb, thumbLine, leftLabel, rightLabel ],
-        width: this._width,
-        height: this._height
+        width: this.width,
+        height: this.height
       } );
 
       this.addChild( sliderContent );

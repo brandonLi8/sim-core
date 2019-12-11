@@ -55,11 +55,11 @@ define( require => {
         left: backButton.width + 2 * options.margin + playPauseButton.width
       } );
 
-      backButton._top = ( playPauseButton.radius - backButton.radius );
-      forwardsbutton._top = ( playPauseButton.radius - forwardsbutton.radius );
+      backButton.top = ( playPauseButton.radius - backButton.radius );
+      forwardsbutton.top = ( playPauseButton.radius - forwardsbutton.radius );
 
-      this._width = backButton.width + 2 * options.margin + playPauseButton.width + forwardsbutton.width;
-      this._height = playPauseButton._height;
+      this.width = backButton.width + 2 * options.margin + playPauseButton.width + forwardsbutton.width;
+      this.height = playPauseButton.height;
       this.setChildren( [ backButton, playPauseButton, forwardsbutton ] );
     }
   }

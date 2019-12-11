@@ -92,8 +92,24 @@ define( require => {
 
     set center( center ) {
       this._center = center;
+      this.layout( this.scale );
     }
-
+    set width( width ) {
+      this._width = width;
+      this.layout( this.scale );
+    }
+    set height( height ) {
+      this._height = height;
+      this.layout( this.scale );
+    }
+    set top( top ) {
+      this._top = top;
+      this.layout( this.scale );
+    }
+    set left( left ) {
+      this._left = left;
+      this.layout( this.scale );
+    }
     set mouseover( listener ) {
       this._element.addEventListener( 'mouseover', event => {
         event.stopPropagation();

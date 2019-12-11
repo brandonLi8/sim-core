@@ -47,21 +47,44 @@ define( require => {
       options.attributes = { ...defaults.attributes, ...options.attributes };
 
       super( options );
-      this.fontSize = options.fontSize;
-      this.fontFamily = options.fontFamily;
-      this.x = options.x;
-      this.y = options.y;
+      this._fontSize = options.fontSize;
+      this._fontFamily = options.fontFamily;
+      this._x = options.x;
+      this._y = options.y;
 
       this.addAttributes( {
         'font-weight': options.fontWeight
       } );
     }
 
+    get y() { return this._y; }
+    get x() { return this._x; }
+
+    set y( y ) {
+      this._y = y;
+      this.layout( this.scale );
+    }
+    set x( x ) {
+      this._x = x;
+      this.layout( this.scale );
+    }
+
+    get fontSize() { return this._fontSize; }
+    get fontFamily() { return this._fontFamily; }
+    set fontSize( fontSize ) {
+      this._fontSize = fontSize;
+      this.layout( this.scale );
+    }
+    set fontFamily( fontFamily ) {
+      this._fontFamily = fontFamily;
+      this.layout( this.scale );
+    }
+
     layout( scale ) {
       super.layout( scale );
       this.addAttributes( {
-        x: `${ scale * this.x }px`,
-        y: `${ scale * this.y }px`,
+        x: `${ scale * this._x }px`,
+        y: `${ scale * this._y }px`,
         'font-size': `${ this.fontSize * scale }px`,
         'font-family': `${ this.fontFamily }`
       } );

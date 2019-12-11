@@ -37,8 +37,22 @@ define( require => {
 
       super( options );
 
-      this.start = start;
-      this.end = end;
+      this._start = start;
+      this._end = end;
+    }
+
+    get start() { return this._start; }
+
+    set start( start ) {
+      this._start = start;
+      this.layout( this.scale );
+    }
+
+    get end() { return this._end; }
+
+    set end( end ) {
+      this._end = end;
+      this.layout( this.scale );
     }
 
     layout( scale ) {

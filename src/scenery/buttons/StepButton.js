@@ -68,14 +68,14 @@ define( require => {
       const TRIANGLE_HEIGHT = BAR_HEIGHT;
 
       this.radius = options.radius;
-      this.selfCenter = new Vector( this._width / 2, this._height / 2 );
+      this.selfCenter = new Vector( this.width / 2, this.height / 2 );
 
       // play button
       const button = new CircleNode( {
         radius: this.radius,
         center: this.selfCenter,
-        width: this._width,
-        height: this._height,
+        width: this.width,
+        height: this.height,
         strokeWidth: STROKE_WIDTH,
         shapeRendering: 'geometricPrecision'
       } );
@@ -84,7 +84,7 @@ define( require => {
         width: BAR_WIDTH,
         height: BAR_HEIGHT,
         x: this.selfCenter.x - 2 * BAR_WIDTH,
-        y: this._height / 2 - BAR_HEIGHT / 2,
+        y: this.height / 2 - BAR_HEIGHT / 2,
         fill: 'white',
         shapeRendering: 'optimizeQuality'
       } );
@@ -97,8 +97,8 @@ define( require => {
         this.selfCenter.copy().addXY( 0, TRIANGLE_HEIGHT / 2 )
       ], {
         fill: 'white',
-        width: this._width,
-        height: this._height,
+        width: this.width,
+        height: this.height,
         shapeRendering: 'optimizeQuality'
       } );
       this.setChildren( [ button, rectangle, triangle ] );

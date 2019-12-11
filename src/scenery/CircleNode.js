@@ -44,23 +44,28 @@ define( require => {
 
       super( options );
 
-      this.radius = options.radius;
+      this._radius = options.radius;
 
       this.addAttributes( {
         r: options.radius, // In percentage of the container.
         cx: options.center.x, // Center the circle
         cy: options.center.y // Center the circle
       } );
+    }
 
+    get radius() { return this._radius; }
+    set radius( radius ) {
+      this._radius = radius;
+      this.layout( this.scale );
     }
 
     layout( scale ) {
 
       super.layout( scale );
       this.addAttributes( {
-        cx: `${ scale * this._center.x }px`,
-        cy: `${ scale * this._center.y }px`,
-        r: `${ scale * this.radius }px`
+        cx: `${ scale * this.center.x }px`,
+        cy: `${ scale * this.center.y }px`,
+        r: `${ scale * this._radius }px`
       } );
     }
   }

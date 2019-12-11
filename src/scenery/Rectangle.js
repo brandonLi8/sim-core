@@ -44,11 +44,29 @@ define( require => {
 
       super( options );
 
-      this.x = options.x;
-      this.y = options.y;
-      this.cornerRadius = options.cornerRadius;
+      this._x = options.x;
+      this._y = options.y;
+      this._cornerRadius = options.cornerRadius;
     }
 
+    get y() { return this._y; }
+    get x() { return this._x; }
+
+    set y( y ) {
+      this._y = y;
+      this.layout( this.scale );
+    }
+    set x( x ) {
+      this._x = x;
+      this.layout( this.scale );
+    }
+
+    get cornerRadius() { return this._cornerRadius; }
+
+    set cornerRadius( cornerRadius ) {
+      this._cornerRadius = cornerRadius;
+      this.layout( this.scale );
+    }
     layout( scale ) {
 
       super.layout( scale );

@@ -82,6 +82,8 @@ define( require => {
       addPoint( length - headHeight, -headWidth / 2 );
       addPoint( length - headHeight, -tailWidth / 2 );
       addPoint( 0, -tailWidth / 2 );
+
+      this.layout( this.scale );
     }
   }
 

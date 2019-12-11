@@ -55,13 +55,20 @@ define( require => {
           'shape-rendering': options.shapeRendering
         } );
       }
-      this.strokeWidth = options.strokeWidth;
+      this._strokeWidth = options.strokeWidth;
       this.addAttributes( {
         overflow: options.overflow,
         fill: options.fill,
         stroke: options.stroke,
         'stroke-width': options.strokeWidth
       } );
+    }
+
+    get strokeWidth() { return this._strokeWidth; }
+
+    set strokeWidth( strokeWidth ) {
+      this._strokeWidth = strokeWidth;
+      this.layout( this.scale );
     }
 
 
@@ -81,7 +88,7 @@ define( require => {
 
       if ( this.strokeWidth ) {
         this.addAttributes( {
-          'stroke-width': Math.max( this.strokeWidth * scale, 1 )
+          'stroke-width': Math.max( this._strokeWidth * scale, 1 )
         } );
       }
     }
