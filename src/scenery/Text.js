@@ -29,7 +29,9 @@ define( require => {
       const defaults = {
 
         type: 'text',
-        fill: 'black',
+        fill: '#000000',
+        stroke: 'rgba( 0, 0, 0, 0)',
+
         x: 0,
         y: 0,
         fontSize: 13.5,
@@ -37,7 +39,9 @@ define( require => {
         cornerRadius: 5,
         attributes: {
           'text-anchor': 'middle',
-          'text-rendering': 'geometricPrecision'
+          'text-rendering': 'geometricPrecision',
+          'shape-rendering': 'geometricPrecision',
+          'text-antialiasing': true
         },
         fontWeight: 'normal'
       };

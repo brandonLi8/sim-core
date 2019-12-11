@@ -11,7 +11,6 @@ define( require => {
 
   // modules
   const assert = require( 'SIM_CORE/util/assert' );
-  const Node = require( 'SIM_CORE/scenery/Node' );
   const SVGNode = require( 'SIM_CORE/scenery/SVGNode' );
   const Vector = require( 'SIM_CORE/util/Vector' );
   const Rectangle = require( 'SIM_CORE/scenery/Rectangle' );
@@ -19,7 +18,7 @@ define( require => {
   const Util = require( 'SIM_CORE/util/Util' );
   const Text = require( 'SIM_CORE/scenery/Text' );
 
-  class SliderNode extends Node {
+  class SliderNode extends SVGNode {
 
     /**
      * @param {Vector} range

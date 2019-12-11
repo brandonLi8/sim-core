@@ -41,6 +41,8 @@ define( require => {
         fill: null,
         stroke: null,
         strokeWidth: null,
+        width: 1,
+        height: 1,
         shapeRendering: null,
         overflow: 'visible'
       };
@@ -71,6 +73,19 @@ define( require => {
       this.layout( this.scale );
     }
 
+    get x() { return this.left; }
+
+    set x( x ) {
+      this.left = x;
+      this.layout( this.scale );
+    }
+
+    get y() { return this.top; }
+
+    set y( y ) {
+      this.top = y;
+      this.layout( this.scale );
+    }
 
     /**
      * Called when the Node layout needs to be updated, typically when the browser window is resized.
@@ -83,7 +98,11 @@ define( require => {
       super.layout( scale );
       this.addAttributes( {
         height: this.style.width,
-        width: this.style.height
+        width: this.style.height,
+
+        x: `${ scale * this.x }px`,
+        y: `${ scale * this.y }px`
+
       } );
 
       if ( this.strokeWidth ) {
