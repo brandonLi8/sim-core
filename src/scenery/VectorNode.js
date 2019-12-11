@@ -26,7 +26,6 @@ define( require => {
      *                             the early portion of the constructor for details.
      */
     constructor( start, end, options ) {
-
       // Defaults for options.
       const defaults = {
         headHeight: 12,
@@ -48,6 +47,7 @@ define( require => {
     set( start, end ) {
       this.points = [];
       if ( start.equalsEpsilon( end ) ) {
+        this.layout( this.scale );
         return;
       }
 
