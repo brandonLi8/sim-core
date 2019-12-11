@@ -166,8 +166,8 @@ define( require => {
       };
       const endDrag = () => { options.endDrag && options.endDrag(); };
 
-      thumb.drag( startDrag, dragListener, endDrag );
-      thumbLine.drag( startDrag, dragListener, endDrag );
+      thumb.drag( { start: startDrag, end: endDrag, listener: dragListener } );
+      thumbLine.drag( { start: startDrag, end: endDrag, listener: dragListener } );
 
       //----------------------------------------------------------------------------------------
       // Create the logic when the track is clicked
