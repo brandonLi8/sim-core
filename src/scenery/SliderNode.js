@@ -64,6 +64,8 @@ define( require => {
         // other
         startDrag: null, // called when a drag sequence starts
         endDrag: null, // called when a drag sequence ends
+        rightLabel: null, // overrides
+        leftLabel: null,  // overrides
 
         ...options
       };
@@ -178,13 +180,13 @@ define( require => {
       //----------------------------------------------------------------------------------------
       // Create the Labels
       const leftLabel = new Text( {
-        text: `${ range.x }`,
+        text: options.leftLabel ? options.leftLabel : `${ range.x }`,
         x: sliderTrack.x,
         y: -10
       } );
 
       const rightLabel = new Text( {
-        text: `${ range.y }`,
+        text: options.rightLabel ? options.rightLabel : `${ range.y }`,
         x: sliderTrack.x + sliderTrack.width,
         y: -10
       } );
