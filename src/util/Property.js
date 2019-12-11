@@ -245,7 +245,7 @@ define( require => {
      * @returns {listener} - handler function that was registered as a listener. Use this function to unlink.
      */
     linkAttribute( object, attributeName ) {
-      assert( Object.prototype.hasOwnProperty.call( object, attributeName ) );
+      assert( object[ attributeName ], `object ${ object } must have attribute ${ attributeName }` );
 
       const handle = value => { object[ attributeName ] = value; };
       this.link( handle );

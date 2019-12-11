@@ -41,7 +41,7 @@ define( require => {
           position: 'absolute'
         },
 
-
+        visible: true,
         mouseover: null,
         mouseout: null,
         mousedown: null,
@@ -64,7 +64,7 @@ define( require => {
 
       this.scale = null;
 
-
+      this._visible = options.visible;
       if ( options.mouseover ) this.mouseover = options.mouseover;
       if ( options.mouseout ) this.mouseout = options.mouseout;
       if ( options.mousedown ) this.mousedown = options.mousedown;
@@ -110,6 +110,13 @@ define( require => {
       this._left = left;
       this.layout( this.scale );
     }
+
+    get visible() { return this._visible; }
+    set visible( visible ) {
+      this._visible = visible;
+      this.style.opacity = visible ? 1 : 0;
+    }
+
     set mouseover( listener ) {
       this._element.addEventListener( 'mouseover', event => {
         event.stopPropagation();
