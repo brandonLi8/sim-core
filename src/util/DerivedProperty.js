@@ -38,9 +38,11 @@ define( require => {
       // @private {Property[]}
       this._dependencies = dependencies;
 
+      this._isSettingInternally = false;
+
       // @private listener linked to all properties
       this._listener = () => {
-        this.set( derivation( ...dependencies.map( property => property.value ) ) );
+        super.set( derivation( ...dependencies.map( property => property.value ) ) );
       };
 
       // DerivedProperty cannot be set, so we don't store the initial value to help prevent memory issues.
