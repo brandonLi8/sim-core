@@ -85,6 +85,26 @@ define( require => {
     truenit.ok( A().intersectsBounds( new Bounds( 2, 3, 4, 5 ) ), 'intersectBounds' );
     truenit.ok( A().intersectsBounds( new Bounds( 3, 4, 5, 6 ) ), 'intersectBounds' );
     truenit.notOk( A().intersectsBounds( new Bounds( 4, 5, 6, 7 ) ), 'intersectBounds' );
+
+
+
+
+
+    // TODO: need more tests:
+
+
+    //----------------------------------------------------------------------------------------
+    // Static References Tests
+    //----------------------------------------------------------------------------------------
+    truenit.ok( Bounds.ZERO.equals( Bounds.ZERO ) );
+    truenit.ok( Bounds.ZERO.equalsEpsilon( Bounds.ZERO ) );
+    truenit.ok( Bounds.ZERO.equalsEpsilon( Bounds.ZERO.copy() ) );
+    truenit.ok( Bounds.EVERYTHING.equals( Bounds.EVERYTHING ) );
+    truenit.ok( Bounds.EVERYTHING.equals( Bounds.EVERYTHING.copy() ) );
+    truenit.notOk( Bounds.EVERYTHING.equalsEpsilon( Bounds.EVERYTHING ) );
+    truenit.notOk( Bounds.EVERYTHING.equalsEpsilon( Bounds.EVERYTHING.copy() ) );
+    truenit.notOk( Bounds.ZERO.equals( Bounds.EVERYTHING ) );
+    truenit.notOk( Bounds.ZERO.equalsEpsilon( Bounds.EVERYTHING ) );
   };
 
   return BoundsTester;
