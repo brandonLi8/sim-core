@@ -420,8 +420,17 @@ define( require => {
     return new Bounds( x, y, x + width, y + height );
   };
 
-  // @public {Bounds} Bounds.ZERO - a static Bounds that represents an empty Bounds.
+  // @public {Bounds} ZERO - a static Bounds that represents an empty Bounds with 0 width and height
   Bounds.ZERO = new Bounds( 0, 0, 0, 0 );
+
+  // @public {Bounds} EVERYTHING - a static Bounds that contains infinite width and height and contains all real numbers
+  Bounds.EVERYTHING = new Bounds(
+    Number.NEGATIVE_INFINITY,
+    Number.NEGATIVE_INFINITY,
+    Number.POSITIVE_INFINITY,
+    Number.POSITIVE_INFINITY
+  );
+
 
   return Bounds;
 } );
