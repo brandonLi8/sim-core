@@ -10,14 +10,10 @@ define( require => {
   // modules
   const assert = require( 'SIM_CORE/util/assert' );
   const SVGNode = require( 'SIM_CORE/scenery/SVGNode' );
-  const CircleNode = require( 'SIM_CORE/scenery/CircleNode' );
   const Vector = require( 'SIM_CORE/util/Vector' );
   const Rectangle = require( 'SIM_CORE/scenery/Rectangle' );
   const Polygon = require( 'SIM_CORE/scenery/Polygon' );
 
-  // constants
-  const STROKE_WIDTH = 0.9;
-  const DEFAULT_RADIUS = 18;
 
   class Checkbox extends SVGNode {
 
@@ -101,7 +97,7 @@ define( require => {
       this.mousedown = () => { toggleProperty.toggle(); };
 
       toggleProperty.link( isVisible => {
-        check.style.opacity = isVisible ? 1 : 0
+        check.style.opacity = isVisible ? 1 : 0;
       } );
     }
   }

@@ -10,8 +10,6 @@ define( require => {
   'use strict';
 
   // modules
-  const assert = require( 'SIM_CORE/util/assert' );
-  const SVGNode = require( 'SIM_CORE/scenery/SVGNode' );
   const Polygon = require( 'SIM_CORE/scenery/Polygon' );
   const Vector = require( 'SIM_CORE/util/Vector' );
 
@@ -56,9 +54,9 @@ define( require => {
       const length = vector.magnitude;
 
       // start with the dimensions specified in options
-      let headWidth = this.options.headWidth;
+      const headWidth = this.options.headWidth;
       let headHeight = this.options.headHeight;
-      let tailWidth = this.options.tailWidth;
+      const tailWidth = this.options.tailWidth;
 
       // make sure that head height is less than arrow length
       headHeight = Math.min( headHeight, 0.99 * length );

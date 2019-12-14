@@ -188,7 +188,7 @@ define( require => {
         listener: null,
 
         ...options
-      }
+      };
       let cursorViewPosition;
 
       // start drag event listener
@@ -244,10 +244,10 @@ define( require => {
      */
     layout( scale ) {
 
-      this.style.width = `${ scale * ( this._width || 0 )}px`;
-      this.style.height = `${ scale * ( this._height || 0 )}px`;
-      this.style.top = `${ scale * ( this._top || 0 )}px`;
-      this.style.left = `${ scale * ( this._left || 0 )}px`;
+      this.style.width = `${ scale * ( this._width || 0 ) }px`;
+      this.style.height = `${ scale * ( this._height || 0 ) }px`;
+      this.style.top = `${ scale * ( this._top || 0 ) }px`;
+      this.style.left = `${ scale * ( this._left || 0 ) }px`;
 
       if ( this.center ) {
         this.style.top = `${ scale * ( this._center.y - ( this.height ? this.height / 2 : 0 ) ) }px`;

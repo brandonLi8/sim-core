@@ -12,7 +12,7 @@ define( require => {
   // modules
   const Property = require( 'SIM_CORE/util/Property' );
   const truenit = require( 'truenit' );
-  const Vector = require( 'SIM_CORE/util/Vector' );
+  // const Vector = require( 'SIM_CORE/util/Vector' );
 
 
   const PropertyTester = () => {

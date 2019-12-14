@@ -12,7 +12,6 @@ define( require => {
 
   // modules
   const assert = require( 'SIM_CORE/util/assert' );
-  const Property = require( 'SIM_CORE/util/Property' );
   const Util = require( 'SIM_CORE/util/Util' );
 
   class Multilink {

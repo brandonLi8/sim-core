@@ -96,7 +96,6 @@ define( require => {
         position: 'fixed',
         overflow: 'hidden',
         background: '#FFF',
-        touchAction: 'none',
         overflowScrolling: 'touch',
         touchAction: 'none', // forward all pointer events
         fontSmoothing: 'antialiased',
