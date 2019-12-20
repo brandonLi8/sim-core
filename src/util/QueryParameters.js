@@ -41,6 +41,8 @@
  *
  * NOTE: if a query parameter is present multiple times in the Query Component, the value would be the latest declared,
  *       or the furthest to the right.
+ *
+ * @author Brandon Li <brandon.li820@gmail.com>
  */
 
 define( require => {
