@@ -1,4 +1,0 @@
-// Copyright © 2019 Brandon Li. All rights reserved.
-
-// Minified distribution version - sim-core 0.0.0-dev.22 - MIT.
-define(require=>{"use strict";const i=require("SIM_CORE/util/assert"),s=require("SIM_CORE/util/Util");return class{constructor(e,t){i(s.isArray(e),`invalid dependencies: ${e}`),i("function"==typeof t,`invalid callback: ${t}`),this._dependencies=e,this.isDisposed=!1,this._listener=()=>{this.isDisposed||t(...this._dependencies.map(i=>i.value))},e.forEach(i=>{i.lazyLink(this._listener)}),this._listener()}dispose(){i(!1===this.isDisposed,"A Multilink cannot be disposed twice."),this._dependencies.forEach(i=>{i.unlink(this._listener)}),this._dependencies=null,this._listener=null,this.isDisposed=!0}}});

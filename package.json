@@ -16,7 +16,7 @@
     "test": "node tests/sim-core-test-config.js"
   },
   "devDependencies": {
-    "@brandonli8/grunt-config": "0.0.0-dev.11",
+    "@brandonli8/grunt-config": "0.0.0-dev.14",
     "truenit": "^0.9.14"
   },
   "dependencies": {
@@ -27,6 +27,7 @@
     "email": "brandon.li820@gmail.com"
   },
   "grunt-config": "./node_modules/@brandonli8/grunt-config",
+  "homepage": "https://github.com/brandonLi8/sim-core#read-me",
   "eslintConfig": {
     "extends": "./node_modules/@brandonli8/grunt-config/eslint/.eslintrc.js"
   }

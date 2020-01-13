@@ -1,4 +1,0 @@
-// Copyright © 2019 Brandon Li. All rights reserved.
-
-// Minified distribution version - sim-core 0.0.0-dev.22 - MIT.
-define(require=>{"use strict";const t=require("SIM_CORE/scenery/Polygon"),s=require("SIM_CORE/util/Vector");return class extends t{constructor(t,s,i){super([],i={headHeight:12,headWidth:12,tailWidth:3,fill:"black",stroke:"black",strokeWidth:1,...i}),this.options=i,this.set(t,s)}set(t,i){if(this.points=[],t.equalsEpsilon(i))return void this.layout(this.scale);const o=i.copy().subtract(t),e=o.magnitude,h=this.options.headWidth;let n=this.options.headHeight;const a=this.options.tailWidth;n=Math.min(n,.99*e);const c=o.copy().normalize(),l=c.copy().rotate(Math.PI/2),r=(i,o)=>{const e=c.x*i+l.x*o+t.x,h=c.y*i+l.y*o+t.y;this.points.push(new s(e,h))};r(0,a/2),r(e-n,a/2),r(e-n,h/2),r(e,0),r(e-n,-h/2),r(e-n,-a/2),r(0,-a/2),this.layout(this.scale)}}});

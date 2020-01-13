@@ -28,8 +28,15 @@
  *
  * @author Brandon Li <brandon.li820@gmail.com>
  */
-define( require => {
+
+/* global require, XMLHttpRequest, process */
+
+define( () => {
   'use strict';
+
+  // constants
+  const IS_BROWSER_ENV = typeof process === 'undefined' && typeof XMLHttpRequest !== 'undefined';
+  const BUILD_MAP = {}; // Mapping of text module names to the parsed value. Only used if IS_BROWSER_ENV is false.
 
   return {
 
@@ -38,7 +45,7 @@ define( require => {
      * For more documentation: see https://requirejs.org/docs/plugins.html#api.
      * @public
      *
-     * @param {string} name - the name of the image resource to load. For example, 'text!bar' would have the name 'bar'
+     * @param {string} name - the name of the text resource to load. For example, 'text!bar' would have the name 'bar'
      * @param {function} parentRequire - local require function to load other modules. Contains many utilities.
      * @param {function} onload - function to call with the return value of the load.
      * @param {object} config - the requirejs configuration object
@@ -48,36 +55,73 @@ define( require => {
       // Reference the name as the true path to the raw text file.
       const textPath = parentRequire.toUrl( name );
 
-      // Create an HTTP Request via XMLHttpRequest for the given textPath.
-      const HTTPRequest = new XMLHttpRequest();
+      if ( IS_BROWSER_ENV ) { // Inside the browser
 
-      // Create a GET request to the textPath to access the raw text.
-      // See https://developer.mozilla.org/en-US/docs/Web/HTTP/Methods/GET for background.
-      // See https://stackoverflow.com/questions/247483/http-get-request-in-javascript for implementation background.
-      HTTPRequest.open( 'GET', textPath, true ); // true for asynchronous request.
+        // Create an HTTP Request via XMLHttpRequest for the given textPath.
+        const HTTPRequest = new XMLHttpRequest();
 
-      // Listen to when the asynchronous HTTP request status changes.
-      // See https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest/onreadystatechange for context.
-      HTTPRequest.onreadystatechange = () => {
+        // Create a GET request to the textPath to access the raw text.
+        // See https://developer.mozilla.org/en-US/docs/Web/HTTP/Methods/GET for background.
+        // See https://stackoverflow.com/questions/247483/http-get-request-in-javascript for implementation background.
+        HTTPRequest.open( 'GET', textPath, true ); // true for asynchronous request.
 
-        // Use status codes to check if the request was successful or not.
-        // For full documentation on all status codes, see https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html
+        // Listen to when the asynchronous HTTP request status changes.
+        // See https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest/onreadystatechange for context.
+        HTTPRequest.onreadystatechange = () => {
 
-        // If the request was successful, load the raw text.
-        if ( HTTPRequest.readyState === 4 && HTTPRequest.status === 200 ) {
-          onload( HTTPRequest.responseText );
+          // Use status codes to check if the request was successful or not.
+          // For full documentation on all status codes, see https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html
+
+          // If the request was successful, load the raw text.
+          if ( HTTPRequest.readyState === 4 && HTTPRequest.status === 200 ) {
+            onload( HTTPRequest.responseText );
+          }
+          else if ( HTTPRequest.status >= 399 && HTTPRequest.status < 600 ) {
+
+            // An unsuccessful request. Dereference this function to a null pointer so that the asynchronous HTTPRequest
+            // doesn't call this function any more.
+            HTTPRequest.onreadystatechange = null;
+
+            // Tell requirejs that a error has occurred and provide a stack trace.
+            onload.error( `Text Plugin error for "text!${ name }".${ new Error().stack.replace( 'Error', '' ) }` );
+          }
+        };
+        HTTPRequest.send( null );
+      }
+      else {  // Inside a Node.js process
+
+        // Load the node file system module.
+        const fs = require.nodeRequire( 'fs' );
+
+        if ( fs.existsSync( textPath ) ) {
+          const text = fs.readFileSync( textPath, 'utf8' );
+          BUILD_MAP[ name ] = text;
+          onload( text );
         }
-        else if ( HTTPRequest.status >= 399 && HTTPRequest.status < 600 ) {
-
-          // An unsuccessful request. Dereference this function to a null pointer so that the asynchronous HTTPRequest
-          // doesn't call this function any more.
-          HTTPRequest.onreadystatechange = null;
-
+        else {
           // Tell requirejs that a error has occurred and provide a stack trace.
           onload.error( `Text Plugin error for "text!${ name }".${ new Error().stack.replace( 'Error', '' ) }` );
         }
-      };
-      HTTPRequest.send( null );
+      }
+    },
+
+    /**
+     * Function called by the requirejs optimizer that returns the parsed text. Should only be called if
+     * IS_BROWSER_ENV = false (in node). For more documentation: see https://requirejs.org/docs/plugins.html#apiwrite.
+     * @public
+     *
+     * @param {string} pluginName - the name of the plugin. For example, 'text!bar' would be 'text'.
+     * @param {string} moduleName - the normalized name of the text resource to load. For example, 'bar'.
+     * @param {function} write - function to call with the return value of the load.
+     * @param {object} config - the requirejs configuration object
+     */
+    write( pluginName, moduleName, write, config ) {
+      if ( !IS_BROWSER_ENV && BUILD_MAP.hasOwnProperty( moduleName ) ) {
+        write.asModule( `${ pluginName }!${ moduleName }`, `define( () => \`${ BUILD_MAP[ moduleName ] }\` );\n` );
+      }
+      else {
+        throw new Error( `Text Plugin error for "text!${ name }"` );
+      }
     }
   };
 } );
