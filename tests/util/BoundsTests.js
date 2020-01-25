@@ -20,25 +20,49 @@ define( require => {
     //----------------------------------------------------------------------------------------
     // Static Bounds Creators
     //----------------------------------------------------------------------------------------
-    const A = () => { return new Bounds( 1, 2, 3, 4 ); };
-    const B = () => { return new Bounds( 0, 0, 2, 3 ); };
-    // const C = () => { return new Bounds( 1, 1, 5, 4 ); };
-    const D = () => { return new Bounds( 1.5, 1.2, 5.7, 4.8 ); };
+    const A = () => new Bounds( 1, 2, 3, 4 );
+    const B = () => new Bounds( 0, 0, 2, 3 );
+    const C = () => new Bounds( 1, 1, 5, 4 );
+    const D = () => new Bounds( 1.5, 1.2, 5.7, 4.8 );
+    const E = () => new Bounds( 0, 0, 5, Number.POSITIVE_INFINITY );
+    const F = () => new Bounds( 0, 2, 8, Number.POSITIVE_INFINITY );
 
     //----------------------------------------------------------------------------------------
-    // Basic Property Tests
+    // Basic
     //----------------------------------------------------------------------------------------
+
+    // rect
     truenit.ok( new Bounds( -2, -4, 2, 4 ).equals( Bounds.rect( -2, -4, 4, 8 ) ), 'rect' );
-    truenit.ok( A().minX === 1, 'minX' );
-    truenit.ok( A().minY === 2, 'minY' );
-    truenit.ok( A().maxX === 3, 'maxX' );
-    truenit.ok( A().maxY === 4, 'maxY' );
+
+    // properties
+    truenit.ok( A().minX === 1 && A().getMinX() === 1, 'minX' );
+    truenit.ok( A().minY === 2 && A().getMinY() === 2, 'minY' );
+    truenit.ok( A().maxX === 3 && A().getMaxX() === 3, 'maxX' );
+    truenit.ok( A().maxY === 4 && A().getMaxY() === 4, 'maxY' );
+
+    // equals
+    truenit.ok( !A().equals( B() ) && !B().equals( A() ), 'equals' );
+    truenit.ok( A().equals( A() ), 'equals' );
+    truenit.ok( Bounds.ZERO.equals( Bounds.ZERO.copy() ), 'equals' );
+    truenit.ok( Bounds.EVERYTHING.equals( Bounds.EVERYTHING ), 'equals' );
+    truenit.ok( E().equals( E() ), 'equals' );
+    truenit.ok( !F().equals( E() ) && !E().equals( F() ), 'equals' );
+
+    // equalsEpsilon
+    truenit.ok( !A().equalsEpsilon( C() ) && !C().equalsEpsilon( A() ), 'equalsEpsilon' );
+    truenit.ok( A().equalsEpsilon( A() ), 'equalsEpsilon' );
+    truenit.ok( Bounds.ZERO.equalsEpsilon( Bounds.ZERO.copy() ), 'equalsEpsilon' );
+    truenit.ok( Bounds.EVERYTHING.equalsEpsilon( Bounds.EVERYTHING.copy() ), 'equalsEpsilon' );
+    truenit.ok( !Bounds.ZERO.equalsEpsilon( Bounds.EVERYTHING ), 'equalsEpsilon' );
+    truenit.ok( E().equalsEpsilon( E() ), 'equalsEpsilon' );
+    truenit.ok( !F().equalsEpsilon( E() ) && !E().equalsEpsilon( F() ), 'equalsEpsilon' );
+
 
     //----------------------------------------------------------------------------------------
     // Location Tests
     //----------------------------------------------------------------------------------------
-    truenit.ok( A().width === 2, 'width' );
-    truenit.ok( A().height === 2, 'height' );
+    truenit.ok( A().width === 2 && A().getWidth() === 2, 'width' );
+    truenit.ok( A().height === 2 && A().getHeight() === 2, 'height' );
     truenit.ok( A().left === 1, 'left' );
     truenit.ok( A().right === 3, 'right' );
     truenit.ok( A().top === 4, 'top' );
@@ -78,7 +102,6 @@ define( require => {
     truenit.notOk( A().equals( B() ), 'equals' );
     truenit.ok( new Bounds( 0, 1, 2, 3 ).equals( new Bounds( 0, 1, 2, 3 ) ), 'equals' );
     truenit.ok( new Bounds( 0, 1, 2, 3 ).equalsEpsilon( new Bounds( 0, 1, 2, 3 ) ), 'equalsEpsilon' );
-    truenit.notOk( new Bounds( 0, 1, 2, 3 ).equalsEpsilon( new Bounds( 0, 1, 2, 5 ) ), 'equalsEpsilon' );
     truenit.ok( new Bounds( 1.5, 1.2, 5.7, 4.8 ).equalsEpsilon( D() ), 'equalsEpsilon' );
 
     // intersectsBounds
@@ -88,23 +111,6 @@ define( require => {
 
 
 
-
-
-    // TODO: need more tests:
-
-
-    //----------------------------------------------------------------------------------------
-    // Static References Tests
-    //----------------------------------------------------------------------------------------
-    truenit.ok( Bounds.ZERO.equals( Bounds.ZERO ) );
-    truenit.ok( Bounds.ZERO.equalsEpsilon( Bounds.ZERO ) );
-    truenit.ok( Bounds.ZERO.equalsEpsilon( Bounds.ZERO.copy() ) );
-    truenit.ok( Bounds.EVERYTHING.equals( Bounds.EVERYTHING ) );
-    truenit.ok( Bounds.EVERYTHING.equals( Bounds.EVERYTHING.copy() ) );
-    truenit.notOk( Bounds.EVERYTHING.equalsEpsilon( Bounds.EVERYTHING ) );
-    truenit.notOk( Bounds.EVERYTHING.equalsEpsilon( Bounds.EVERYTHING.copy() ) );
-    truenit.notOk( Bounds.ZERO.equals( Bounds.EVERYTHING ) );
-    truenit.notOk( Bounds.ZERO.equalsEpsilon( Bounds.EVERYTHING ) );
   };
 
   return BoundsTester;

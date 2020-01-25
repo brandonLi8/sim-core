@@ -51,7 +51,7 @@ define( require => {
      * @returns {boolean} - whether the two bounds are equal
      */
     equals( other ) {
-      if ( !other instanceof Bounds ) return false; // Must be type Bounds to be equal
+      if ( !( other instanceof Bounds ) ) return false; // Must be type Bounds to be equal
 
       // Check that all properties exactly match for both this instance and the other instance.
       return [ 'minX', 'minY', 'maxX', 'minY' ].every( property => other[ property ] === this[ property ] );
@@ -66,7 +66,7 @@ define( require => {
      * @returns {boolean} - whether the two bounds are within epsilon of each other
      */
     equalsEpsilon( other, epsilon = Util.EPSILON ) {
-      if ( !other instanceof Bounds ) return false; // Must be type Bounds to be equal
+      if ( !( other instanceof Bounds ) ) return false; // Must be type Bounds to be equal
 
       // Check that all properties approximately match for both this instance and the other instance.
       return [ 'minX', 'minY', 'maxX', 'minY' ].every( property => {
