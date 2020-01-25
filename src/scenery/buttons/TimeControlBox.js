@@ -12,8 +12,8 @@ define( require => {
   // modules
   const assert = require( 'SIM_CORE/util/assert' );
   const Node = require( 'SIM_CORE/scenery/Node' );
-  const StepButton = require( 'SIM_CORE/scenery/buttons/StepButton' );
   const PlayPauseButton = require( 'SIM_CORE/scenery/buttons/PlayPauseButton' );
+  const StepButton = require( 'SIM_CORE/scenery/buttons/StepButton' );
 
 
   class TimeControlBox extends Node {

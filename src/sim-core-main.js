@@ -1,8 +1,5 @@
 // Copyright © 2019-2020 Brandon Li. All rights reserved.
 
-/**
- */
-
 define( [
   'SIM_CORE/core-internal/Display',
   'SIM_CORE/core-internal/DOMObject',
@@ -39,4 +36,4 @@ define( [
 
   'SIM_CORE/Screen',
   'SIM_CORE/Sim'
-], () => {} );
+], () => { 'use strict'; } );

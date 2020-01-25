@@ -10,10 +10,10 @@ define( require => {
   'use strict';
 
   // modules
+  const Bounds = require( 'SIM_CORE/util/Bounds' );
   const ModelViewTransform = require( 'SIM_CORE/util/ModelViewTransform' );
   const truenit = require( 'truenit' );
   const Vector = require( 'SIM_CORE/util/Vector' );
-  const Bounds = require( 'SIM_CORE/util/Bounds' );
 
   const ModelViewTransformTester = () => {
 

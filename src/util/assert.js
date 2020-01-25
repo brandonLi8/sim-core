@@ -44,7 +44,7 @@ define( require => {
    */
   function assert( predicate, message ) {
     if ( assertionsEnabled ) assertFunction( predicate, message );
-  };
+  }
 
   /**
    * Function that enables future assertions in assert. Without calling this, no errors from assertions

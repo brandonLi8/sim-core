@@ -29,7 +29,7 @@
  * @author Brandon Li <brandon.li820@gmail.com>
  */
 
-/* global require, XMLHttpRequest, process */
+/* global require, XMLHttpRequest, process */ // eslint-disable-line no-redeclare
 
 define( () => {
   'use strict';
@@ -116,7 +116,7 @@ define( () => {
      * @param {object} config - the requirejs configuration object
      */
     write( pluginName, moduleName, write, config ) {
-      if ( !IS_BROWSER_ENV && BUILD_MAP.hasOwnProperty( moduleName ) ) {
+      if ( !IS_BROWSER_ENV && Object.prototype.hasOwnProperty.call( BUILD_MAP, moduleName ) ) {
         write.asModule( `${ pluginName }!${ moduleName }`, `define( () => \`${ BUILD_MAP[ moduleName ] }\` );\n` );
       }
       else {

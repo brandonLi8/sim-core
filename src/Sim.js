@@ -16,10 +16,10 @@ define( require => {
   const Display = require( 'SIM_CORE/core-internal/Display' );
   const FPSCounter = require( 'SIM_CORE/core-internal/FPSCounter' );
   const Loader = require( 'SIM_CORE/core-internal/Loader' );
-  const QueryParameters = require( 'SIM_CORE/util/QueryParameters' );
-  const Util = require( 'SIM_CORE/util/Util' );
   const NavigationBar = require( 'SIM_CORE/core-internal/NavigationBar' );
+  const QueryParameters = require( 'SIM_CORE/util/QueryParameters' );
   const Screen = require( 'SIM_CORE/Screen' );
+  const Util = require( 'SIM_CORE/util/Util' );
 
   // constants
   const PACKAGE_OBJECT = JSON.parse( require( 'text!REPOSITORY/package.json' ) );

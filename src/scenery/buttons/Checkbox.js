@@ -9,10 +9,10 @@ define( require => {
 
   // modules
   const assert = require( 'SIM_CORE/util/assert' );
+  const Polygon = require( 'SIM_CORE/scenery/Polygon' );
+  const Rectangle = require( 'SIM_CORE/scenery/Rectangle' );
   const SVGNode = require( 'SIM_CORE/scenery/SVGNode' );
   const Vector = require( 'SIM_CORE/util/Vector' );
-  const Rectangle = require( 'SIM_CORE/scenery/Rectangle' );
-  const Polygon = require( 'SIM_CORE/scenery/Polygon' );
 
 
   class Checkbox extends SVGNode {

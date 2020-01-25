@@ -13,8 +13,8 @@ define( require => {
 
   // modules
   const assert = require( 'SIM_CORE/util/assert' );
-  const DOMObject = require( 'SIM_CORE/core-internal/DOMObject' );
   const Bounds = require( 'SIM_CORE/util/Bounds' );
+  const DOMObject = require( 'SIM_CORE/core-internal/DOMObject' );
   const Node = require( 'SIM_CORE/scenery/Node' );
 
   /*

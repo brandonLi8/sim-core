@@ -10,8 +10,8 @@ define( require => {
   'use strict';
 
   // modules
-  const Vector = require( 'SIM_CORE/util/Vector' );
   const truenit = require( 'truenit' );
+  const Vector = require( 'SIM_CORE/util/Vector' );
 
   //----------------------------------------------------------------------------------------
   const VectorTester = () => {

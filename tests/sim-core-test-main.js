@@ -10,8 +10,8 @@ define( require => {
   'use strict';
 
   // modules
-  const truenit = require( 'truenit' );
   const assert = require( 'SIM_CORE/util/assert' );
+  const truenit = require( 'truenit' );
 
   //----------------------------------------------------------------------------------------
   // enable assert

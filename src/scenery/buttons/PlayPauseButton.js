@@ -11,12 +11,12 @@ define( require => {
 
   // modules
   const assert = require( 'SIM_CORE/util/assert' );
-  const SVGNode = require( 'SIM_CORE/scenery/SVGNode' );
-  const Property = require( 'SIM_CORE/util/Property' );
   const CircleNode = require( 'SIM_CORE/scenery/CircleNode' );
-  const Vector = require( 'SIM_CORE/util/Vector' );
-  const Rectangle = require( 'SIM_CORE/scenery/Rectangle' );
   const Polygon = require( 'SIM_CORE/scenery/Polygon' );
+  const Property = require( 'SIM_CORE/util/Property' );
+  const Rectangle = require( 'SIM_CORE/scenery/Rectangle' );
+  const SVGNode = require( 'SIM_CORE/scenery/SVGNode' );
+  const Vector = require( 'SIM_CORE/util/Vector' );
 
   // constants
   const STROKE_WIDTH = 2;

@@ -11,8 +11,8 @@ define( require => {
 
   // modules
   const assert = require( 'SIM_CORE/util/assert' );
-  const Vector = require( 'SIM_CORE/util/Vector' );
   const Util = require( 'SIM_CORE/util/Util' );
+  const Vector = require( 'SIM_CORE/util/Vector' );
 
   class Bounds {
 
