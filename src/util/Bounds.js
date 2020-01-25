@@ -51,7 +51,9 @@ define( require => {
      * @returns {boolean} - whether the two bounds are equal
      */
     equals( other ) {
-      if ( !other instanceof Bounds ) return false;
+      if ( !other instanceof Bounds ) return false; // Must be type Bounds to be equal
+
+      // Check that all properties exactly match for both this instance and the other instance.
       return [ 'minX', 'minY', 'maxX', 'minY' ].every( property => other[ property ] === this[ property ] );
     }
 
@@ -64,13 +66,18 @@ define( require => {
      * @returns {boolean} - whether the two bounds are within epsilon of each other
      */
     equalsEpsilon( other, epsilon = Util.EPSILON ) {
-      if ( !other instanceof Bounds ) return false;
+      if ( !other instanceof Bounds ) return false; // Must be type Bounds to be equal
 
+      // Check that all properties approximately match for both this instance and the other instance.
       return [ 'minX', 'minY', 'maxX', 'minY' ].every( property => {
-        // epsilon only applies on finite dimensions. due to JS's handling of isFinite(), it's faster to check the sum of both
-        return isFinite( this[ property ] + other[ property ] ) ?
-          Math.abs( this[ property ] - other[ property ] ) <= epsilon :
-          other[ property ] === this[ property ]
+
+        // Approximate equality only applies on finite dimensions. Otherwise, they must be strictly equal.
+        if ( isFinite( this[ property ] ) && isFinite( other[ property ] ) ) {
+          return Math.abs( this[ property ] - other[ property ] ) <= epsilon;
+        }
+        else {
+          return other[ property ] === this[ property ];
+        }
       } );
     }
 
