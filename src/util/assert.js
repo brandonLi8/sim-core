@@ -1,10 +1,9 @@
 // Copyright © 2019 Brandon Li. All rights reserved.
-/* eslint no-console: 0 */
 
 /**
  * A basic Assertion module for sim development.
  *
- * NOTE: assertions will only error with `?ea`. See `../Sim.js` for details.
+ * NOTE: assertions will only throw errors with the query parameter `?ea`. See `../Sim.js` for more details.
  *
  * @author Brandon Li <brandon.li820@gmail.com>
  */
@@ -19,7 +18,7 @@ define( require => {
    * Common assertion function.
    * @public
    *
-   * @param {boolean} predicate - only throws and error if the not truthy.
+   * @param {boolean} predicate - only throws an error if not truthy.
    * @param {string} [message] - message to throw
    */
   const assertFunction = function( predicate, message ) {
@@ -28,7 +27,7 @@ define( require => {
       // Use the default message if a message isn't provided
       message = message ? 'Assertion failed: ' + message : 'Assertion failed';
 
-      console.log( message );
+      console.log( message ); // eslint-disable-line no-console
       throw new Error( message );
     }
   };
@@ -40,10 +39,10 @@ define( require => {
    * See `assert.enableAssertions()`.
    * @public
    *
-   * @param {boolean} predicate - only throws and error if the not truthy.
+   * @param {boolean} predicate - only throws an error if not truthy.
    * @param {string} [message] - message to throw
    */
-  const assert = ( predicate, message ) => {
+  function assert( predicate, message ) {
     if ( assertionsEnabled ) assertFunction( predicate, message );
   };
 
@@ -59,7 +58,7 @@ define( require => {
    * @param {string} [message] - message to throw
    */
   assert.enableAssertions = () => {
-    console.log( 'Assertions Enabled...' );
+    console.log( 'Assertions Enabled...' ); // eslint-disable-line no-console
     assertionsEnabled = true;
   };
 
