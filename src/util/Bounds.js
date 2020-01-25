@@ -50,7 +50,10 @@ define( require => {
      * @param {Bounds} b
      * @returns {boolean} - whether the two bounds are equal
      */
-    equals( b ) { return this.minX === b.minX && this.minY === b.minY && this.maxX === b.maxX && this.maxY === b.maxY; }
+    equals( other ) {
+      if ( !other instanceof Bounds ) return false;
+      return [ 'minX', 'minY', 'maxX', 'minY' ].every( property => other[ property ] === this[ property ] );
+    }
 
     /**
      * Approximate equality comparison between this bounds and another bounds.
@@ -61,10 +64,14 @@ define( require => {
      * @returns {boolean} - whether the two bounds are within epsilon of each other
      */
     equalsEpsilon( other, epsilon = Util.EPSILON ) {
-      return Math.abs( this.minX - other.minX ) <= epsilon
-        && Math.abs( this.minY - other.minY ) <= epsilon
-        && Math.abs( this.maxX - other.maxX ) <= epsilon
-        && Math.abs( this.maxY - other.maxY ) <= epsilon;
+      if ( !other instanceof Bounds ) return false;
+
+      return [ 'minX', 'minY', 'maxX', 'minY' ].every( property => {
+        // epsilon only applies on finite dimensions. due to JS's handling of isFinite(), it's faster to check the sum of both
+        return isFinite( this[ property ] + other[ property ] ) ?
+          Math.abs( this[ property ] - other[ property ] ) <= epsilon :
+          other[ property ] === this[ property ]
+      } );
     }
 
     //========================================================================================
@@ -430,7 +437,6 @@ define( require => {
     Number.POSITIVE_INFINITY,
     Number.POSITIVE_INFINITY
   );
-
 
   return Bounds;
 } );
