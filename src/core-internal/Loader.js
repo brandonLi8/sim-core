@@ -1,4 +1,4 @@
-// Copyright © 2019 Brandon Li. All rights reserved.
+// Copyright © 2019-2020 Brandon Li. All rights reserved.
 
 /**
  * A Loader DOMObject that displays a loading page while the simulation is loading and launches the simulation.

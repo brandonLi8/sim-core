@@ -1,4 +1,4 @@
-// Copyright © 2019 Brandon Li. All rights reserved.
+// Copyright © 2019-2020 Brandon Li. All rights reserved.
 
 /**
  * Play pause button for stepping the sim. Often appears at the bottom center of the screen.

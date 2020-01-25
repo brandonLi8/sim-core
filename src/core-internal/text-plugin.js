@@ -1,4 +1,4 @@
-// Copyright © 2019 Brandon Li. All rights reserved.
+// Copyright © 2019-2020 Brandon Li. All rights reserved.
 
 /**
  * A sim-specific text plugin for requirejs that allows for the dynamic loading of raw text, parsed into a string.

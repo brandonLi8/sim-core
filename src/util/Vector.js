@@ -1,4 +1,4 @@
-// Copyright © 2019 Brandon Li. All rights reserved.
+// Copyright © 2019-2020 Brandon Li. All rights reserved.
 
 /**
  * A Vector utility class, represented as a <x, y>. Vector can also represent a coordinate point (x, y).
