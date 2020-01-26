@@ -379,10 +379,29 @@ define( require => {
     toTitleCase( str ) {
       assert( typeof str === 'string', `invalid str: ${ str }` );
 
-      // Use Lodash's start case. See https://lodash.com/docs#startCase.
       return str.split( '-' )
                 .map( word => word.length > 0 ? word[ 0 ].toUpperCase() + word.substr( 1 ).toLowerCase() : '' )
                 .join( ' ' );
+    },
+
+    /**
+     * Recursively calls Object.freeze() on an object.
+     * @public
+     *
+     * @param {Object} object
+     */
+    deepFreeze( object ) {
+      Object.freeze( object );
+
+      Object.getOwnPropertyNames( object ).forEach( property => {
+
+        // Only freeze if the property value is a object or a function type.
+        if ( Object.hasOwnProperty.call( object, property )
+                && ( typeof object[ property ] === 'object' || object[ property ] === 'function' )
+                && !( Object.isFrozen( object[ property ] ) ) ) {
+          Util.deepFreeze( object[ property ] );
+        }
+      } );
     }
   };
 

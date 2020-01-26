@@ -11,18 +11,8 @@
 define( require => {
   'use strict';
 
-  // modules
-  const assert = require( 'SIM_CORE/util/assert' );
-  const Display = require( 'SIM_CORE/core-internal/Display' );
-  const FPSCounter = require( 'SIM_CORE/core-internal/FPSCounter' );
-  const Loader = require( 'SIM_CORE/core-internal/Loader' );
-  const NavigationBar = require( 'SIM_CORE/core-internal/NavigationBar' );
   const QueryParameters = require( 'SIM_CORE/util/QueryParameters' );
-  const Screen = require( 'SIM_CORE/Screen' );
-  const Util = require( 'SIM_CORE/util/Util' );
-
-  // constants
-  const PACKAGE_OBJECT = JSON.parse( require( 'text!REPOSITORY/package.json' ) );
+  const assert = require( 'SIM_CORE/util/assert' );
   const SIM_CORE_QUERY_PARAMETERS = QueryParameters.retrieve( {
 
     /**
@@ -59,6 +49,21 @@ define( require => {
       type: 'flag'
     }
   } );
+
+  // Enable assertion if the query parameter was provided.
+  if ( SIM_CORE_QUERY_PARAMETERS.ea ) assert.enableAssertions();
+
+
+  // modules
+  const Display = require( 'SIM_CORE/core-internal/Display' );
+  const FPSCounter = require( 'SIM_CORE/core-internal/FPSCounter' );
+  const Loader = require( 'SIM_CORE/core-internal/Loader' );
+  const NavigationBar = require( 'SIM_CORE/core-internal/NavigationBar' );
+  const Screen = require( 'SIM_CORE/Screen' );
+  const Util = require( 'SIM_CORE/util/Util' );
+
+  // constants
+  const PACKAGE_OBJECT = JSON.parse( require( 'text!REPOSITORY/package.json' ) );
 
   //----------------------------------------------------------------------------------------
 
@@ -102,8 +107,6 @@ define( require => {
         console.log( `${ options.name }: v${ PACKAGE_OBJECT.version }` );
       }
 
-      // Enable assertion if the query parameter was provided.
-      if ( SIM_CORE_QUERY_PARAMETERS.ea ) assert.enableAssertions();
 
       // Initialize a display and loader
       const display = new Display();
