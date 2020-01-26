@@ -46,7 +46,7 @@ define( require => {
     constructor( keys ) {
       assert( Util.isArray( keys ) && keys.every( key => {
           return typeof key === 'string' && key.toUpperCase() === key; // ensure the key is in all caps.
-        }, `invalid keys: ${ keys }` );
+        } ), `invalid keys: ${ keys }` );
       assert( [ 'includes', 'KEYS', 'MEMBERS' ], `Keys ${ keys } contains a build-in provided value.` );
 
       //----------------------------------------------------------------------------------------
@@ -81,5 +81,5 @@ define( require => {
     }
   }
 
-  return phetCore.register( 'Enum', Enum );
+  return Enum;
 } );
