@@ -310,11 +310,9 @@ define( require => {
   // @public {Range} EVERYTHING - a static Range that contains all real numbers.
   Range.EVERYTHING = new Range( Number.NEGATIVE_INFINITY, Number.POSITIVE_INFINITY );
 
-  // If assertions are enabled, freeze Range.ZERO and Range.EVERYTHING to ensure that they are constant.
-  assert.enabled && Util.deepFreeze( Range.ZERO );
-  assert.enabled && Util.deepFreeze( Range.EVERYTHING );
-
-  Range.ZERO.min = 5;
+  // Conditionally freeze Range.ZERO and Range.EVERYTHING to ensure that they are constant.
+  Util.deepFreeze( Range.ZERO );
+  Util.deepFreeze( Range.EVERYTHING );
 
   return Range;
 } );

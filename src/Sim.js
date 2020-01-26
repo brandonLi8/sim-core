@@ -11,55 +11,14 @@
 define( require => {
   'use strict';
 
-  const QueryParameters = require( 'SIM_CORE/util/QueryParameters' );
-  const assert = require( 'SIM_CORE/util/assert' );
-  const SIM_CORE_QUERY_PARAMETERS = QueryParameters.retrieve( {
-
-    /**
-     * Enables assertions, which are disable unless this parameter is provided.
-     * See './util/assert.js' for more details.
-     * For internal testing only.
-     */
-    ea: {
-      type: 'flag'
-    },
-
-    /**
-     * Disables the fps in the top left is provided.
-     * See './core-internal/FPSCounter' for more details.
-     * For internal testing only.
-     */
-    fps: {
-      type: 'flag'
-    },
-
-    /**
-     * Logs the current version of the simulation if provided.
-     * For internal testing only.
-     */
-    version: {
-      type: 'flag'
-    },
-
-    /**
-     * Provides a border of the ScreenView instances.
-     * For internal testing only.
-     */
-    dev: {
-      type: 'flag'
-    }
-  } );
-
-  // Enable assertion if the query parameter was provided.
-  if ( SIM_CORE_QUERY_PARAMETERS.ea ) assert.enableAssertions();
-
-
   // modules
+  const assert = require( 'SIM_CORE/util/assert' );
   const Display = require( 'SIM_CORE/core-internal/Display' );
   const FPSCounter = require( 'SIM_CORE/core-internal/FPSCounter' );
   const Loader = require( 'SIM_CORE/core-internal/Loader' );
   const NavigationBar = require( 'SIM_CORE/core-internal/NavigationBar' );
   const Screen = require( 'SIM_CORE/Screen' );
+  const StandardSimQueryParameters = require( 'SIM_CORE/StandardSimQueryParameters' );
   const Util = require( 'SIM_CORE/util/Util' );
 
   // constants
@@ -103,10 +62,9 @@ define( require => {
       } );
 
       // Log the current version of the simulation if the query parameter was provided.
-      if ( SIM_CORE_QUERY_PARAMETERS.version ) {
+      if ( StandardSimQueryParameters.version ) {
         console.log( `${ options.name }: v${ PACKAGE_OBJECT.version }` );
       }
-
 
       // Initialize a display and loader
       const display = new Display();
@@ -115,7 +73,7 @@ define( require => {
       display.addChild( loader );
 
       // Add the FPSCounter if the query parameter was provided.
-      if ( SIM_CORE_QUERY_PARAMETERS.fps ) {
+      if ( StandardSimQueryParameters.fps ) {
         const counter = new FPSCounter();
         counter.start();
         display.addChild( counter );
@@ -130,7 +88,7 @@ define( require => {
       screen.initializeModelAndView();
 
 
-      if ( SIM_CORE_QUERY_PARAMETERS.dev ) {
+      if ( StandardSimQueryParameters.dev ) {
         screen._view.enableDevBorder();
       }
 

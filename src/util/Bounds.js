@@ -473,9 +473,9 @@ define( require => {
     Number.POSITIVE_INFINITY
   );
 
-  // If assertions are enabled, freeze Bounds.ZERO and Bounds.EVERYTHING to ensure that they are constant.
-  assert.enabled && Util.deepFreeze( Bounds.ZERO );
-  assert.enabled && Util.deepFreeze( Bounds.EVERYTHING );
+  // Conditionally freeze Bounds.ZERO and Bounds.EVERYTHING to ensure that they are constant.
+  Util.deepFreeze( Bounds.ZERO );
+  Util.deepFreeze( Bounds.EVERYTHING );
 
   return Bounds;
 } );

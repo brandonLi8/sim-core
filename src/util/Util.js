@@ -11,6 +11,7 @@ define( require => {
 
   // modules
   const assert = require( 'SIM_CORE/util/assert' );
+  const StandardSimQueryParameters = require( 'SIM_CORE/StandardSimQueryParameters' );
 
   const Util = {
 
@@ -385,12 +386,20 @@ define( require => {
     },
 
     /**
-     * Recursively calls Object.freeze() on an object.
+     * Recursively calls Object.freeze() on an object, ONLY if assertions are enabled with the Query Parameter ?ea.
+     * See StandardSimQueryParameters for more documentation.
      * @public
      *
      * @param {Object} object
      */
     deepFreeze( object ) {
+
+      // Ensure the standard sim query parameters have been loaded and parsed before checking if assertions are enabled.
+      assert( StandardSimQueryParameters, 'StandardSimQueryParameters must be loaded before freezing' );
+
+      // Only freezes if assertions are enabled. See Util/assert for more documentation.
+      if ( assert.enabled === false ) return;
+
       Object.freeze( object );
 
       Object.getOwnPropertyNames( object ).forEach( property => {
