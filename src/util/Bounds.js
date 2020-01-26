@@ -321,6 +321,58 @@ define( require => {
     //========================================================================================
 
     /**
+     * Sets the value of minX.
+     * @public
+     *
+     * @param {number} minX
+     * @returns {Bounds} - for chaining
+     */
+    setMinX( minX ) {
+      assert( typeof minX === 'number', `invalid minX: ${ minX }` );
+      this.minX = minX;
+      return this;
+    }
+
+    /**
+     * Sets the value of minY.
+     * @public
+     *
+     * @param {number} minY
+     * @returns {Bounds} - for chaining
+     */
+    setMinY( minY ) {
+      assert( typeof minY === 'number', `invalid minY: ${ minY }` );
+      this.minY = minY;
+      return this;
+    }
+
+    /**
+     * Sets the value of maxX.
+     * @public
+     *
+     * @param {number} maxX
+     * @returns {Bounds} - for chaining
+     */
+    setMaxX( maxX ) {
+      assert( typeof maxX === 'number', `invalid maxX: ${ maxX }` );
+      this.maxX = maxX;
+      return this;
+    }
+
+    /**
+     * Sets the value of maxY.
+     * @public
+     *
+     * @param {number} maxY
+     * @returns {Bounds} - for chaining
+     */
+    setMaxY( maxY ) {
+      assert( typeof maxY === 'number', `invalid maxY: ${ maxY }` );
+      this.maxY = maxY;
+      return this;
+    }
+
+    /**
      * Sets each value for this bounds.
      * @public
      *
@@ -331,28 +383,11 @@ define( require => {
      * @returns {Bounds} - for chaining
      */
     setAll( minX, minY, maxX, maxY ) {
-      assert( typeof minX === 'number', `invalid minX: ${ minX }` );
-      assert( typeof minY === 'number', `invalid minY: ${ minY }` );
-      assert( typeof maxX === 'number', `invalid maxX: ${ maxX }` );
-      assert( typeof maxY === 'number', `invalid maxY: ${ maxY }` );
-
-      this.minX = minX;
-      this.minY = minY;
-      this.maxX = maxX;
-      this.maxY = maxY;
+      this.setMinX( minX );
+      this.setMinY( minY );
+      this.setMaxX( maxX );
+      this.setMaxY( maxY );
       return this;
-    }
-
-    /**
-     * Sets the values of this bounds to be equal to the input bounds.
-     * @public
-     *
-     * @param {Bounds} bounds
-     * @returns {Bounds} - for chaining
-     */
-    set( bounds ) {
-      assert( bounds instanceof Bounds, `invalid bounds: ${ bounds }` );
-      return this.setAll( bounds.minX, bounds.minY, bounds.maxX, bounds.maxY );
     }
 
     /**
