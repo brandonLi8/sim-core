@@ -24,7 +24,7 @@ define( require => {
       // Use the default message if a message isn't provided
       message = message ? 'Assertion failed: ' + message : 'Assertion failed';
 
-      console.log( message ); // eslint-disable-line no-console
+      typeof process === 'undefined' && console.log( message ); // eslint-disable-line no-console
       throw new Error( message );
     }
   };

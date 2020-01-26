@@ -5,7 +5,7 @@
  * Supports observing and type validation.
  *
  * ## Functionality:
- *   (1) A Property notifies listeners when the value changes. Listeners can be "linked" by calling the `link`
+ *   (1) A Property notifies listeners when the value changes. Listeners can be "linked" by calling the `link()`
  *       method of a Property. IMPORTANT: if the object is being disposed, make sure to unlink your listeners
  *       to allow Javascript to garbage collect the Property. Not properly unlinking listeners can result in a
  *       memory leak! You can unlink listeners by:
@@ -303,8 +303,8 @@ define( require => {
         `value ${ value } not inside the valid values: ${ this._validValues }` );
 
       // Validate options.isValidValue
-      assert( !this.isValidValue || this.isValidValue( value ) === true,
-        `value ${ value } did not pass isValidValue: ${ this.isValidValue }` );
+      assert( !this._isValidValue || this._isValidValue( value ) === true,
+        `value ${ value } did not pass isValidValue: ${ this._isValidValue }` );
     }
   }
 
