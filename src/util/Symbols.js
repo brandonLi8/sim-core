@@ -46,7 +46,7 @@ define( require => {
     PLUS_OR_MINUS: '\u00B1',
     THETA: '\u03B8',
     DEGREES: '\u00B0',
-    NO_VALUE: '\u2014' // em dash
+    NO_VALUE: '\u2014', // em dash
     OMEGA: '\u03C9',
     ALPHA: '\u03B1'
 
