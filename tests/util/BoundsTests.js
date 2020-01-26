@@ -128,13 +128,13 @@ define( require => {
     truenit.ok( A().setMaxY( 5 ).maxY === 5, 'setMaxY' );
 
     // dilate/erode
-    truenit.ok( A().dilate( 1.5 ).equals( new Bounds( -0.5, 0.5, 4.5, 5,5 ) ), 'dilate' );
+    truenit.ok( A().dilate( 1.5 ).equals( new Bounds( -0.5, 0.5, 4.5, 5.5 ) ), 'dilate' );
     truenit.ok( A().erode( 0.5 ).equals( new Bounds( 1.5, 2.5, 2.5, 3.5 ) ), 'erode' );
 
     // expand
     truenit.ok( A().expand( 0, 0, 0, 0 ).equals( A() ), 'expand' );
-    truenit.ok( A().expand( 1, 2, -3, -4 ).equals( Bounds.ZERO ) , 'expand' );
-    truenit.ok( A().expand( 1, 2, 3, 4 ).equals( new Bounds( 0, 0, 6, 8 ) ) , 'expand' );
+    truenit.ok( A().expand( 1, 2, -3, -4 ).equals( Bounds.ZERO ), 'expand' );
+    truenit.ok( A().expand( 1, 2, 3, 4 ).equals( new Bounds( 0, 0, 6, 8 ) ), 'expand' );
 
     // shift
     truenit.ok( A().shift( 0, 0 ).equals( A() ), 'shift' );
