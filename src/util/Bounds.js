@@ -414,7 +414,7 @@ define( require => {
      */
     dilate( d ) {
       assert( typeof d === 'number', `invalid d: ${ d }` );
-      return this.setMinMax( this.minX - d, this.minY - d, this.maxX + d, this.maxY + d );
+      return this.expand( d, d, d, d );
     }
 
     /**
@@ -431,17 +431,17 @@ define( require => {
      * @public
      *
      * @param {number} left - Amount to expand to the left (subtracts from minX)
-     * @param {number} top - Amount to expand to the top (subtracts from minY)
+     * @param {number} bottom - Amount to expand to the bottom (subtracts from minY)
      * @param {number} right - Amount to expand to the right (adds to maxX)
-     * @param {number} bottom - Amount to expand to the bottom (adds to maxY)
+     * @param {number} top - Amount to expand to the top (adds to maxY)
      * @returns {Bounds} - for chaining
      */
-    expand( left, top, right, bottom ) {
+    expand( left, bottom, right, top ) {
       assert( typeof left === 'number', `invalid left: ${ left }` );
-      assert( typeof top === 'number', `invalid top: ${ top }` );
-      assert( typeof right === 'number', `invalid right: ${ right }` );
       assert( typeof bottom === 'number', `invalid bottom: ${ bottom }` );
-      return new Bounds( this.minX - left, this.minY - top, this.maxX + right, this.maxY + bottom );
+      assert( typeof right === 'number', `invalid right: ${ right }` );
+      assert( typeof top === 'number', `invalid top: ${ top }` );
+      return this.setAll( this.minX - left, this.minY - bottom, this.maxX + right, this.maxY + top );
     }
 
     /**
@@ -455,7 +455,7 @@ define( require => {
     shift( x, y ) {
       assert( typeof x === 'number', `invalid x: ${ x }` );
       assert( typeof y === 'number', `invalid y: ${ y }` );
-      return this.setMinMax( this.minX + x, this.minY + y, this.maxX + x, this.maxY + y );
+      return this.expand( -x, -y, x, y );
     }
   }
 
