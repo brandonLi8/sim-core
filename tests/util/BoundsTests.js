@@ -25,7 +25,7 @@ define( require => {
     const C = () => new Bounds( 1, 1, 5, 4 );
     const D = () => new Bounds( 1.5, 1.2, 5.7, 4.8 );
     const E = () => new Bounds( 0, 0, 5, Number.POSITIVE_INFINITY );
-    const F = () => new Bounds( 0, 2, 8, Number.POSITIVE_INFINITY );
+    const F = () => new Bounds( 0, 2, Number.POSITIVE_INFINITY, 8 );
 
     //----------------------------------------------------------------------------------------
     // Basic
@@ -56,17 +56,17 @@ define( require => {
     truenit.ok( !Bounds.ZERO.equalsEpsilon( Bounds.EVERYTHING ), 'equalsEpsilon' );
     truenit.ok( E().equalsEpsilon( E() ), 'equalsEpsilon' );
     truenit.ok( !F().equalsEpsilon( E() ) && !E().equalsEpsilon( F() ), 'equalsEpsilon' );
-
+    truenit.ok( new Bounds( 1.500001, 1.199999, 5.7, 4.8 ).equalsEpsilon( D() ), 'equalsEpsilon' );
 
     //----------------------------------------------------------------------------------------
-    // Location Tests
+    // Location
     //----------------------------------------------------------------------------------------
     truenit.ok( A().width === 2 && A().getWidth() === 2, 'width' );
     truenit.ok( A().height === 2 && A().getHeight() === 2, 'height' );
-    truenit.ok( A().left === 1, 'left' );
-    truenit.ok( A().right === 3, 'right' );
-    truenit.ok( A().top === 4, 'top' );
-    truenit.ok( A().bottom === 2, 'botton' );
+    truenit.ok( A().left === 1 && A().getLeft() === 1, 'left' );
+    truenit.ok( A().right === 3 && A().getRight() === 3, 'right' );
+    truenit.ok( A().top === 4 && A().getTop() === 4, 'top' );
+    truenit.ok( A().bottom === 2 && A().getBottom() === 2, 'bottom' );
 
     // Top Row
     truenit.ok( A().leftTop.equals( new Vector( 1, 4 ) ), 'leftTop' );
@@ -85,31 +85,62 @@ define( require => {
     truenit.ok( A().centerBottom.equals( new Vector( 2, 2 ) ), 'centerBottom' );
     truenit.ok( A().rightBottom.equals( new Vector( 3, 2 ) ), 'rightBottom' );
 
-
     //----------------------------------------------------------------------------------------
-    // Conversion Tests
+    // Conversion
     //----------------------------------------------------------------------------------------
 
     // containsCoordinates
     truenit.notOk( A().containsCoordinates( 0, 0 ), 'containsCoordinates' );
     truenit.notOk( A().containsCoordinates( 2, 0 ), 'containsCoordinates' );
-    truenit.notOk( A().containsCoordinates( 4, 2 ), 'containsCoordinates' );
+    truenit.notOk( A().containsPoint( new Vector( 4, 2 ) ), 'containsCoordinates' );
     truenit.ok( A().containsCoordinates( 2, 2 ), 'containsCoordinates' );
+    truenit.ok( A().containsPoint( new Vector( 2, 3 ) ), 'containsCoordinates' );
 
-    // equals
-    truenit.ok( A().equals( A() ), 'equals' );
-    truenit.notOk( A().equals( Bounds.ZERO ), 'equals' );
-    truenit.notOk( A().equals( B() ), 'equals' );
-    truenit.ok( new Bounds( 0, 1, 2, 3 ).equals( new Bounds( 0, 1, 2, 3 ) ), 'equals' );
-    truenit.ok( new Bounds( 0, 1, 2, 3 ).equalsEpsilon( new Bounds( 0, 1, 2, 3 ) ), 'equalsEpsilon' );
-    truenit.ok( new Bounds( 1.5, 1.2, 5.7, 4.8 ).equalsEpsilon( D() ), 'equalsEpsilon' );
+    // area
+    truenit.ok( A().area === 4, 'area' );
+    truenit.ok( B().area === 6, 'area' );
 
     // intersectsBounds
     truenit.ok( A().intersectsBounds( new Bounds( 2, 3, 4, 5 ) ), 'intersectBounds' );
     truenit.ok( A().intersectsBounds( new Bounds( 3, 4, 5, 6 ) ), 'intersectBounds' );
     truenit.notOk( A().intersectsBounds( new Bounds( 4, 5, 6, 7 ) ), 'intersectBounds' );
 
+    // containsBounds
+    truenit.notOk( Bounds.ZERO.containsBounds( A() ), 'containsBounds' );
+    truenit.ok( Bounds.EVERYTHING.containsBounds( A() ), 'containsBounds' );
 
+    // isEmpty
+    truenit.ok( Bounds.ZERO.isEmpty(), 'isEmpty' );
+    truenit.notOk( Bounds.EVERYTHING.isEmpty(), 'isEmpty' );
+    truenit.notOk( F().isEmpty(), 'isEmpty' );
+
+    // union/intersection
+    truenit.ok( A().union( B() ).equals( new Bounds( 0, 0, 3, 4 ) ), 'union' );
+    truenit.ok( A().intersection( B() ).equals( new Bounds( 1, 2, 2, 3 ) ), 'intersection' );
+
+    //----------------------------------------------------------------------------------------
+    // Mutators
+    //----------------------------------------------------------------------------------------
+
+    // basic
+    truenit.ok( A().setMinX( 5 ).minX === 5, 'setMinX' );
+    truenit.ok( A().setMinY( 5 ).minY === 5, 'setMinY' );
+    truenit.ok( A().setMaxX( 5 ).maxX === 5, 'setMaxX' );
+    truenit.ok( A().setMaxY( 5 ).maxY === 5, 'setMaxY' );
+
+    // dilate/erode
+    truenit.ok( A().dilate( 1.5 ).equals( new Bounds( -0.5, 0.5, 4.5, 5,5 ) ), 'dilate' );
+    truenit.ok( A().erode( 0.5 ).equals( new Bounds( 1.5, 2.5, 2.5, 3.5 ) ), 'erode' );
+
+    // expand
+    truenit.ok( A().expand( 0, 0, 0, 0 ).equals( A() ), 'expand' );
+    truenit.ok( A().expand( 1, 2, -3, -4 ).equals( Bounds.ZERO ) , 'expand' );
+    truenit.ok( A().expand( 1, 2, 3, 4 ).equals( new Bounds( 0, 0, 6, 8 ) ) , 'expand' );
+
+    // shift
+    truenit.ok( A().shift( 0, 0 ).equals( A() ), 'shift' );
+    truenit.ok( A().shift( 5, 9 ).equals( new Bounds( 6, 11, 8, 13 ) ), 'shift' );
+    truenit.ok( A().shift( -1, -2 ).equals( new Bounds( 0, 0, 2, 3 ) ), 'shift' );
 
   };
 
