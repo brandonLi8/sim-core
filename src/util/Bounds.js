@@ -1,7 +1,7 @@
 // Copyright © 2019-2020 Brandon Li. All rights reserved.
 
 /**
- * A Bounding box utility class, represented as <minX, minY, maxX, maxY>.
+ * A numerical Bounding box utility class, represented as <minX, minY, maxX, maxY>.
  *
  * @author Brandon Li <brandon.li820@gmail.com>
  */
@@ -47,7 +47,7 @@ define( require => {
      * Exact equality comparison between this bounds and another bounds.
      * @public
      *
-     * @param {Bounds} b
+     * @param {Bounds} other
      * @returns {boolean} - whether the two bounds are equal
      */
     equals( other ) {
@@ -62,7 +62,7 @@ define( require => {
      * @public
      *
      * @param {Bounds} other
-     * @param {number} epsilon
+     * @param [number] epsilon
      * @returns {boolean} - whether the two bounds are within epsilon of each other
      */
     equalsEpsilon( other, epsilon = Util.EPSILON ) {
@@ -190,7 +190,7 @@ define( require => {
     isFinite() { return [ this.minX, this.minY, this.maxX, this.maxY ].every( property => isFinite( property ) ); }
 
     /**
-     * Whether the bounds contains an area that isn't 0.
+     * Whether the bounds contains an area that is 0.
      * @public
      *
      * @returns {boolean}
