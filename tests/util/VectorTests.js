@@ -89,7 +89,6 @@ define( require => {
 
     // Copy the vectors
     const vector1Copy = vector1.copy();
-    // const vector2Copy = vector2.copy();
     const vector3Copy = vector3.copy();
     const vector4Copy = vector4.copy();
 
