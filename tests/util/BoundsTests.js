@@ -139,6 +139,6 @@ define( require => {
     // shift
     truenit.ok( A().shift( 0, 0 ).equals( A() ), 'shift' );
     truenit.ok( A().shift( 5, 9 ).equals( new Bounds( 6, 11, 8, 13 ) ), 'shift' );
-    truenit.ok( A().shift( -1, -2 ).equals( new Bounds( 0, 0, 2, 3 ) ), 'shift' );
+    truenit.ok( A().shift( -1, -2 ).equals( new Bounds( 0, 0, 2, 2 ) ), 'shift' );
   };
 } );

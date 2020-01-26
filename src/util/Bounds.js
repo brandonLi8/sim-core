@@ -11,6 +11,7 @@ define( require => {
 
   // modules
   const assert = require( 'SIM_CORE/util/assert' );
+  const Range = require( 'SIM_CORE/util/Range' );
   const Util = require( 'SIM_CORE/util/Util' );
   const Vector = require( 'SIM_CORE/util/Vector' );
 
@@ -28,11 +29,11 @@ define( require => {
       assert( typeof maxX === 'number', `invalid maxX: ${ maxX }` );
       assert( typeof maxY === 'number', `invalid maxY: ${ maxY }` );
 
-      // @public {number} - See the parameter descriptions
-      this.minX = minX;
-      this.minY = minY;
-      this.maxX = maxX;
-      this.maxY = maxY;
+      // @public (read-only) {Range} xRange - the range in the x direction.
+      this.xRange = new Range( minX, maxX );
+
+      // @public (read-only) {Range} yRange - the range in the y direction.
+      this.yRange = new Range( minY, maxY );
     }
 
     /**
@@ -52,9 +53,7 @@ define( require => {
      */
     equals( other ) {
       if ( !( other instanceof Bounds ) ) return false; // Must be type Bounds to be equal
-
-      // Check that all properties exactly match for both this instance and the other instance.
-      return [ 'minX', 'minY', 'maxX', 'minY' ].every( property => other[ property ] === this[ property ] );
+      return this.xRange.equals( other.xRange ) && this.yRange.equals( other.yRange );
     }
 
     /**
@@ -67,18 +66,7 @@ define( require => {
      */
     equalsEpsilon( other, epsilon = Util.EPSILON ) {
       if ( !( other instanceof Bounds ) ) return false; // Must be type Bounds to be equal
-
-      // Check that all properties approximately match for both this instance and the other instance.
-      return [ 'minX', 'minY', 'maxX', 'minY' ].every( property => {
-
-        // Approximate equality only applies on finite dimensions. Otherwise, they must be strictly equal.
-        if ( isFinite( this[ property ] ) && isFinite( other[ property ] ) ) {
-          return Math.abs( this[ property ] - other[ property ] ) <= epsilon;
-        }
-        else {
-          return other[ property ] === this[ property ];
-        }
-      } );
+      return this.xRange.equalsEpsilon( other.xRange, epsilon ) && this.yRange.equalsEpsilon( other.yRange, epsilon );
     }
 
     //========================================================================================
@@ -86,15 +74,19 @@ define( require => {
     //========================================================================================
 
     /**
-     * Accessors to properties.
+     * Accessors to main location properties.
      * @public
      *
-     * @returns {*} See the property declaration for documentation of the type.
+     * @returns {number}
      */
-    getMinX() { return this.minX; }
-    getMinY() { return this.minY; }
-    getMaxX() { return this.maxX; }
-    getMaxY() { return this.maxY; }
+    getMinX() { return this.xRange.min; }
+    getMinY() { return this.yRange.min; }
+    getMaxX() { return this.xRange.max; }
+    getMaxY() { return this.yRange.max; }
+    get minX() { return this.getMinX(); }
+    get minY() { return this.getMinY(); }
+    get maxX() { return this.getMaxX(); }
+    get maxY() { return this.getMaxY(); }
 
     /**
      * Gets the width/height of the bounds.
@@ -102,8 +94,8 @@ define( require => {
      *
      * @returns {number}
      */
-    getWidth() { return this.maxX - this.minX; }
-    getHeight() { return this.maxY - this.minY; }
+    getWidth() { return this.xRange.length; }
+    getHeight() { return this.yRange.length; }
     get width() { return this.getWidth(); }
     get height() { return this.getHeight(); }
 
@@ -166,8 +158,8 @@ define( require => {
      *
      * @returns {number}
      */
-    getCenterX() { return ( this.minX + this.maxX ) / 2; }
-    getCenterY() { return ( this.minY + this.maxY ) / 2; }
+    getCenterX() { return this.xRange.center; }
+    getCenterY() { return this.yRange.center; }
 
     get centerX() { return this.getCenterX(); }
     get centerY() { return this.getCenterY(); }
@@ -187,7 +179,7 @@ define( require => {
      *
      * @returns {boolean}
      */
-    isFinite() { return [ this.minX, this.minY, this.maxX, this.maxY ].every( property => isFinite( property ) ); }
+    isFinite() { return this.xRange.isFinite() && this.yRange.isFinite(); }
 
     /**
      * Whether the bounds contains an area that is 0.
@@ -208,7 +200,7 @@ define( require => {
     containsCoordinates( x, y ) {
       assert( typeof x === 'number', `invalid x: ${ x }` );
       assert( typeof y === 'number', `invalid y: ${ y }` );
-      return this.minX <= x && x <= this.maxX && this.minY <= y && y <= this.maxY;
+      return this.xRange.contains( x ) && this.yRange.contains( y );
     }
 
     /**
@@ -233,14 +225,7 @@ define( require => {
      */
     closestPointTo( location ) {
       assert( location instanceof Vector, `invalid location: ${ location }` );
-      if ( this.containsPoint( location ) ) {
-        return location.copy();
-      }
-      else {
-        const closestX = Math.max( Math.min( location.x, this.maxX ), this.minX );
-        const closestY = Math.max( Math.min( location.y, this.maxY ), this.minY );
-        return new Vector( closestX, closestY );
-      }
+      return new Vector( this.xRange.closestTo( location.x ) && this.yRange.closestTo( location.y ) );
     }
 
     /**
@@ -252,10 +237,7 @@ define( require => {
      */
     containsBounds( bounds ) {
       assert( bounds instanceof Bounds, `invalid bounds: ${ bounds }` );
-      return this.minX <= bounds.minX
-        && this.maxX >= bounds.maxX
-        && this.minY <= bounds.minY
-        && this.maxY >= bounds.maxY;
+      return this.xRange.containsRange( bounds.xRange ) && this.yRange.containsRange( bounds.yRange );
     }
 
     /**
@@ -267,11 +249,7 @@ define( require => {
      */
     intersectsBounds( bounds ) {
       assert( bounds instanceof Bounds, `invalid bounds: ${ bounds }` );
-      const minX = Math.max( this.minX, bounds.minX );
-      const minY = Math.max( this.minY, bounds.minY );
-      const maxX = Math.min( this.maxX, bounds.maxX );
-      const maxY = Math.min( this.maxY, bounds.maxY );
-      return ( maxX - minX ) >= 0 && ( maxY - minY >= 0 );
+      return this.xRange.intersects( bounds.xRange ) && this.yRange.intersects( bounds.yRange );
     }
 
     /**
@@ -291,12 +269,7 @@ define( require => {
      */
     union( bounds ) {
       assert( bounds instanceof Bounds, `invalid bounds: ${ bounds }` );
-      return new Bounds(
-        Math.min( this.minX, bounds.minX ),
-        Math.min( this.minY, bounds.minY ),
-        Math.max( this.maxX, bounds.maxX ),
-        Math.max( this.maxY, bounds.maxY )
-      );
+      return Bounds.withRanges( this.xRange.union( bounds.xRange ), this.yRange.union( bounds.yRange ) );
     }
 
     /**
@@ -308,12 +281,7 @@ define( require => {
      */
     intersection( bounds ) {
       assert( bounds instanceof Bounds, `invalid bounds: ${ bounds }` );
-      return new Bounds(
-        Math.max( this.minX, bounds.minX ),
-        Math.max( this.minY, bounds.minY ),
-        Math.min( this.maxX, bounds.maxX ),
-        Math.min( this.maxY, bounds.maxY )
-      );
+      return Bounds.withRanges( this.xRange.intersection( bounds.xRange ), this.yRange.intersection( bounds.yRange ) );
     }
 
     //========================================================================================
@@ -329,9 +297,10 @@ define( require => {
      */
     setMinX( minX ) {
       assert( typeof minX === 'number', `invalid minX: ${ minX }` );
-      this.minX = minX;
+      this.xRange.min = minX;
       return this;
     }
+    set minX( minX ) { this.setMinX( minX ); }
 
     /**
      * Sets the value of minY.
@@ -342,9 +311,10 @@ define( require => {
      */
     setMinY( minY ) {
       assert( typeof minY === 'number', `invalid minY: ${ minY }` );
-      this.minY = minY;
+      this.yRange.min = minY;
       return this;
     }
+    set minY( minY ) { this.setMinY( minY ); }
 
     /**
      * Sets the value of maxX.
@@ -355,9 +325,10 @@ define( require => {
      */
     setMaxX( maxX ) {
       assert( typeof maxX === 'number', `invalid maxX: ${ maxX }` );
-      this.maxX = maxX;
+      this.xRange.max = maxX;
       return this;
     }
+    set maxX( maxX ) { this.setMaxX( maxX ); }
 
     /**
      * Sets the value of maxY.
@@ -368,9 +339,10 @@ define( require => {
      */
     setMaxY( maxY ) {
       assert( typeof maxY === 'number', `invalid maxY: ${ maxY }` );
-      this.maxY = maxY;
+      this.yRange.max = maxY;
       return this;
     }
+    set maxY( maxY ) { this.setMaxY( maxY ); }
 
     /**
      * Sets each value for this bounds.
@@ -383,10 +355,8 @@ define( require => {
      * @returns {Bounds} - for chaining
      */
     setAll( minX, minY, maxX, maxY ) {
-      this.setMinX( minX );
-      this.setMinY( minY );
-      this.setMaxX( maxX );
-      this.setMaxY( maxY );
+      this.xRange.setMinMax( minX, maxX );
+      this.yRange.setMinMax( minY, maxY );
       return this;
     }
 
@@ -397,12 +367,9 @@ define( require => {
      * @returns {Bounds} - for chaining
      */
     roundSymmetric() {
-      return this.setAll(
-        Util.roundSymmetric( this.minX ),
-        Util.roundSymmetric( this.minY ),
-        Util.roundSymmetric( this.maxX ),
-        Util.roundSymmetric( this.maxY )
-      );
+      this.xRange.roundSymmetric();
+      this.yRange.roundSymmetric();
+      return this;
     }
 
     /**
@@ -441,7 +408,9 @@ define( require => {
       assert( typeof bottom === 'number', `invalid bottom: ${ bottom }` );
       assert( typeof right === 'number', `invalid right: ${ right }` );
       assert( typeof top === 'number', `invalid top: ${ top }` );
-      return this.setAll( this.minX - left, this.minY - bottom, this.maxX + right, this.maxY + top );
+      this.xRange.expand( left, right );
+      this.yRange.expand( bottom, top );
+      return this;
     }
 
     /**
@@ -455,7 +424,9 @@ define( require => {
     shift( x, y ) {
       assert( typeof x === 'number', `invalid x: ${ x }` );
       assert( typeof y === 'number', `invalid y: ${ y }` );
-      return this.expand( -x, -y, x, y );
+      this.xRange.shift( x );
+      this.yRange.shift( y );
+      return this;
     }
   }
 
@@ -464,7 +435,7 @@ define( require => {
   //========================================================================================
 
   /**
-   * Returns a new Bounds object, constructed with by <minX, minY, width, height>.
+   * Returns a new Bounds object, constructed with <minX, minY, width, height>.
    * @public
    *
    * @param {number} x - the minimum value of X for the bounds.
@@ -475,6 +446,20 @@ define( require => {
    */
   Bounds.rect = ( x, y, width, height ) => {
     return new Bounds( x, y, x + width, y + height );
+  };
+
+  /**
+   * Returns a new Bounds object, constructed with ranges in the form <xRange, yRange>.
+   * @public
+   *
+   * @param {Range} xRange
+   * @param {Range} yRange
+   * @returns {Bounds}
+   */
+  Bounds.withRanges = ( xRange, yRange ) => {
+    assert( xRange instanceof Range, `invalid xRange: ${ xRange }` );
+    assert( yRange instanceof Range, `invalid yRange: ${ yRange }` );
+    return new Bounds( xRange.min, yRange.min, xRange.max, yRange.max );
   };
 
   // @public {Bounds} ZERO - a static Bounds that represents an empty Bounds with 0 width and height
