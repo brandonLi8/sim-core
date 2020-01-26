@@ -52,6 +52,7 @@ define( require => {
   const assert = require( 'SIM_CORE/util/assert' ).always;
 
   // constants
+  const IS_BROWSER_ENV = typeof process === 'undefined';
   const PARSED_QUERY_PARAMETERS = parseAllQueryParameters();
   const VALID_SCHEMA_TYPES = [ 'flag', 'boolean', 'number', 'string' ];
 
@@ -160,6 +161,9 @@ define( require => {
   function parseAllQueryParameters() {
 
     const parsedQueryParameters = {};
+
+    // If it isn't a browser environment, then there aren't any query parameters.
+    if ( !IS_BROWSER_ENV ) return parsedQueryParameters;
 
     // Get the Query Component or the URI and split each argument (separated by '&') into an array.
     const queryComponents = window.location.search.substring( 1 ).split( '&' );

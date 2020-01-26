@@ -19,10 +19,10 @@ define( require => {
     //----------------------------------------------------------------------------------------
     // Define basic Vectors
     //----------------------------------------------------------------------------------------
-    const vector1 = new Vector( 4, 2, true );
-    const vector2 = new Vector( 2, 3, true );
-    const vector3 = new Vector( 5.2, 8.6, true );
-    const vector4 = new Vector( 2, 3, true );
+    const vector1 = new Vector( 4, 2 );
+    const vector2 = new Vector( 2, 3 );
+    const vector3 = new Vector( 5.2, 8.6 );
+    const vector4 = new Vector( 2, 3 );
 
     //----------------------------------------------------------------------------------------
     // Basic properties tests.
