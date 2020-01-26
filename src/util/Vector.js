@@ -11,29 +11,24 @@ define( require => {
 
   // modules
   const assert = require( 'SIM_CORE/util/assert' );
+  const Util = require( 'SIM_CORE/util/Util' );
 
   class Vector {
     /**
      * @param {number} x - x value
      * @param {number} y - y value
-     * @param {boolean} [isImmutable] - determines if the Vector is immutable or not.
      */
-    constructor( x, y, isImmutable = false ) {
+    constructor( x, y ) {
       assert( typeof x === 'number', `invalid x: ${ x }` );
       assert( typeof y === 'number', `invalid y: ${ y }` );
-      assert( typeof isImmutable === 'boolean', `invalid isImmutable: ${ isImmutable }` );
 
-      // Reminder: all properties with names that start with '_' are assumed to not be private!
-      // @private {number}
+      // @private {number} - see the argument documentation.
       this._x = x;
       this._y = y;
-
-      // @protected {boolean}
-      this._isImmutable = isImmutable;
     }
 
     /**
-     * Getters for the x and y values
+     * Getters for the x and y values.
      * @public
      *
      * @returns {number}
@@ -100,7 +95,7 @@ define( require => {
      * @param {number} [epsilon]
      * @returns {boolean} - if the other vector is within epsilon distance
      */
-    equalsEpsilon( other, epsilon=0.00005 ) {
+    equalsEpsilon( other, epsilon = Util.EPSILON ) {
       assert( other instanceof Vector && typeof epsilon === 'number' );
       return Math.max( Math.abs( this._x - other.x ), Math.abs( this._y - other.y ) ) <= epsilon;
     }
@@ -127,7 +122,7 @@ define( require => {
     }
 
     /**
-     * Gets the angle of this vector relative as a position vector relative to the origin.
+     * Gets the angle of this vector as a position vector relative to the origin, from [-PI, PI] in radians.
      * @public
      *
      * @returns {number}
@@ -144,7 +139,7 @@ define( require => {
      * @returns {string}
      */
     toString() {
-      return `<${ this._x }, ${ this._y }>`;
+      return `Vector <${ this._x }, ${ this._y }>`;
     }
 
     //========================================================================================
@@ -358,11 +353,14 @@ define( require => {
     }
   }
 
-  //========================================================================================
-  // Static References
+  //----------------------------------------------------------------------------------------
+  // Constants
 
-  // @public
-  Vector.ZERO = new Vector( 0, 0, true );
+  // @public {Vector} ZERO - represents the zero vector.
+  Vector.ZERO = new Vector( 0, 0 );
+
+  // Conditionally freeze Vector.ZERO to ensure that it is constant and not modified.
+  Util.deepFreeze( Vector.ZERO );
 
   return Vector;
 } );
