@@ -11,9 +11,6 @@
 define( require => {
   'use strict';
 
-  // flags
-  let assertionsEnabled = false;
-
   /**
    * Common assertion function.
    * @public
@@ -35,7 +32,7 @@ define( require => {
   //----------------------------------------------------------------------------------------
 
   /**
-   * Main Assertion Function (the export). Only throws an error if assertionsEnabled is true.
+   * Main Assertion Function (the export). Only throws an error if assert.enabled is true.
    * See `assert.enableAssertions()`.
    * @public
    *
@@ -43,8 +40,11 @@ define( require => {
    * @param {string} [message] - message to throw
    */
   function assert( predicate, message ) {
-    if ( assertionsEnabled ) assertFunction( predicate, message );
+    if ( assert.enabled ) assertFunction( predicate, message );
   }
+
+  // Flag that indicates if assertions have been enabled.
+  assert.enabled = false;
 
   /**
    * Function that enables future assertions in assert. Without calling this, no errors from assertions
@@ -59,7 +59,7 @@ define( require => {
    */
   assert.enableAssertions = () => {
     console.log( 'Assertions Enabled...' ); // eslint-disable-line no-console
-    assertionsEnabled = true;
+    assert.enabled = true;
   };
 
   /**
