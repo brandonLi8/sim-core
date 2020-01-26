@@ -1,4 +1,4 @@
-// Copyright © 2019-2020 Brandon Li. All rights reserved.
+// Copyright © 2020 Brandon Li. All rights reserved.
 
 /**
  * A numerical bounding Range utility class, represented as <min, max>.
@@ -12,7 +12,6 @@ define( require => {
   // modules
   const assert = require( 'SIM_CORE/util/assert' );
   const Util = require( 'SIM_CORE/util/Util' );
-  const Vector = require( 'SIM_CORE/util/Vector' );
 
   class Range {
 
@@ -91,7 +90,7 @@ define( require => {
      *
      * @returns {number}
      */
-    getLength() { return this.maxX - this.minX; }
+    getLength() { return this.max - this.min; }
     get length() { return this.getLength(); }
 
     /**
@@ -101,7 +100,7 @@ define( require => {
      * @returns {number}
      */
     getCenter() { return ( this._max + this._min ) / 2; }
-    get center { return this.getCenter(); }
+    get center() { return this.getCenter(); }
 
     /**
      * Whether our properties are all finite numbers.
@@ -109,7 +108,7 @@ define( require => {
      *
      * @returns {boolean}
      */
-    isFinite() { return isFinite( this.min ) && isFinite( this.max ) }
+    isFinite() { return isFinite( this.min ) && isFinite( this.max ); }
 
     /**
      * Whether the range contains a length that is 0.
@@ -212,7 +211,7 @@ define( require => {
      */
     setMin( min ) {
       assert( typeof min === 'number', `invalid min: ${ min }` );
-      this.min = min;
+      this._min = min;
       return this;
     }
     set min( min ) { this.setMin( min ); }
@@ -226,7 +225,7 @@ define( require => {
      */
     setMax( max ) {
       assert( typeof max === 'number', `invalid max: ${ max }` );
-      this.max = max;
+      this._max = max;
       return this;
     }
     set max( max ) { this.setMax( max ); }
@@ -251,7 +250,7 @@ define( require => {
      *
      * @returns {Range} - for chaining
      */
-    roundSymmetric() { return this.setMinMax(  Util.roundSymmetric( this.min ), Util.roundSymmetric( this.max ) ); }
+    roundSymmetric() { return this.setMinMax( Util.roundSymmetric( this.min ), Util.roundSymmetric( this.max ) ); }
 
     /**
      * Expands this range on both sides by the specified amount.
