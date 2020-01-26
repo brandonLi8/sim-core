@@ -409,22 +409,22 @@ define( require => {
      * Expands this bounds on all sides by the specified amount.
      * @public
      *
-     * @param {number} d
+     * @param {number} amount
      * @returns {Bounds} - for chaining
      */
-    dilate( d ) {
-      assert( typeof d === 'number', `invalid d: ${ d }` );
-      return this.expand( d, d, d, d );
+    dilate( amount ) {
+      assert( typeof amount === 'number', `invalid amount: ${ amount }` );
+      return this.expand( amount, amount, amount, amount );
     }
 
     /**
      * Contracts this bounds on all sides by the specified amount.
      * @public
      *
-     * @param {number} d
+     * @param {number} amount
      * @returns {Bounds} - for chaining
      */
-    erode( d ) { return this.dilate( -d ); }
+    erode( amount ) { return this.dilate( -amount ); }
 
     /**
      * Expands this bounds independently for each side (or if some offsets are negative, will contract those sides).
