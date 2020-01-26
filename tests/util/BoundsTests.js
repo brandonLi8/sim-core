@@ -14,8 +14,7 @@ define( require => {
   const truenit = require( 'truenit' );
   const Vector = require( 'SIM_CORE/util/Vector' );
 
-
-  const BoundsTester = () => {
+  return () => {
 
     //----------------------------------------------------------------------------------------
     // Static Bounds Creators
@@ -141,8 +140,5 @@ define( require => {
     truenit.ok( A().shift( 0, 0 ).equals( A() ), 'shift' );
     truenit.ok( A().shift( 5, 9 ).equals( new Bounds( 6, 11, 8, 13 ) ), 'shift' );
     truenit.ok( A().shift( -1, -2 ).equals( new Bounds( 0, 0, 2, 3 ) ), 'shift' );
-
   };
-
-  return BoundsTester;
 } );
