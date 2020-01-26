@@ -134,6 +134,10 @@ define( require => {
     truenit.ok( obj.type === 6 && p.value === 6 );
     truenit.ok( aCalls === 4 && bCalls === 3 && cCalls === 4 );
 
+    p.value = 6;
+    truenit.ok( obj.type === 6 && p.value === 6 );
+    truenit.ok( aCalls === 4 && bCalls === 3 && cCalls === 4 );
+
     // unlinkAll
     p.unlinkAll();
     truenit.notOk( p.hasListener( b ) );
