@@ -190,6 +190,14 @@ define( require => {
     isFinite() { return [ this.minX, this.minY, this.maxX, this.maxY ].every( property => isFinite( property ) ); }
 
     /**
+     * Whether the bounds contains an area that isn't 0.
+     * @public
+     *
+     * @returns {boolean}
+     */
+    isEmpty() { return this.getArea() === 0; }
+
+    /**
      * Whether the coordinates (x, y) are contained inside this bounding box.
      * @public
      *
@@ -279,7 +287,7 @@ define( require => {
      * @public
      *
      * @param {Bounds} bounds
-     * @returns {Bounds} - for chaining
+     * @returns {Bounds}
      */
     union( bounds ) {
       assert( bounds instanceof Bounds, `invalid bounds: ${ bounds }` );
