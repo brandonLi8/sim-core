@@ -62,11 +62,12 @@ define( require => {
     // IsFinite tests
     //----------------------------------------------------------------------------------------
     const nonFiniteVector1 = new Vector( 1.7976931348623157E+10308, 1.7976931348623157E+10308 );
-    // const nonFiniteVector2 = new Vector( Infinity, Infinity );
+    const nonFiniteVector2 = new Vector( Infinity, Infinity );
 
     truenit.ok( vector1.isFinite() && vector2.isFinite() && vector3.isFinite() && Vector.ZERO.isFinite() );
     truenit.notOk( nonFiniteVector1.isFinite() );
     truenit.notOk( nonFiniteVector1.isFinite() );
+    truenit.notOk( nonFiniteVector2.isFinite() );
 
     //----------------------------------------------------------------------------------------
     // Test that the above tests didn't mutate anything
