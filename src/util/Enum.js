@@ -1,4 +1,4 @@
-// Copyright © 2020 Brandon Li. All rights reserved.
+// Copyright © 2019-2020 Brandon Li. All rights reserved.
 
 /**
  * An standard Enumeration that contains a set of possible values (called members).
@@ -18,7 +18,7 @@
  * (2) If an Enum is not closely related to some class, then put the Enum in its own .js file.
  *     Do not combine multiple Enumerations into one file.
  * (3) Members of the Enum are considered instances of the Enum in documentation. For example, a method
- *     that that takes an Enum value as an argument would be documented like this:
+ *     that takes an Enum value as an argument would be documented like this:
  *
  *     // @param {ColorsEnum} color - value from Colors Enum
  *     setColor( color ) {
