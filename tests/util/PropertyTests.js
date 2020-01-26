@@ -40,7 +40,7 @@ define( require => {
 
     numberProperty.value = 4;
     truenit.ok( numberProperty.get() === 4 );
-    truenit.throws( () => { numberProperty.get() = -2; } );
+    truenit.throws( () => { numberProperty.set( -2 ); } );
     truenit.throws( () => { numberProperty.value = 1; } );
 
     //----------------------------------------------------------------------------------------
