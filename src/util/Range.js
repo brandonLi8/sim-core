@@ -301,7 +301,7 @@ define( require => {
   }
 
   //========================================================================================
-  // Static References
+  // Static Constants
   //========================================================================================
 
   // @public {Range} ZERO - a static Range that represents an empty Range with 0 length.
@@ -309,6 +309,12 @@ define( require => {
 
   // @public {Range} EVERYTHING - a static Range that contains all real numbers.
   Range.EVERYTHING = new Range( Number.NEGATIVE_INFINITY, Number.POSITIVE_INFINITY );
+
+  // If assertions are enabled, freeze Range.ZERO and Range.EVERYTHING to ensure that they are constant.
+  assert.enabled && Util.deepFreeze( Range.ZERO );
+  assert.enabled && Util.deepFreeze( Range.EVERYTHING );
+
+  Range.ZERO.min = 5;
 
   return Range;
 } );
