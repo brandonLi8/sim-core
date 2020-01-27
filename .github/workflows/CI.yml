@@ -42,7 +42,6 @@ jobs:
 
     - name: test                   # Ensure that project-defined tests pass.
       run: npm test --if-present
-      - name: npm install, make test-coverage
 
     - name: coverage               # Create the coverage report.
       run: |
