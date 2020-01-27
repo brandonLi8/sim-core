@@ -42,3 +42,14 @@ jobs:
 
     - name: test                   # Ensure that project-defined tests pass.
       run: npm test --if-present
+      - name: npm install, make test-coverage
+
+    - name: coverage               # Create the coverage report.
+      run: |
+        npm i coverage -g
+        coverage --reporter=lcov npm test
+
+    - name: coveralls              # Upload coverage report to coveralls.io
+      uses: coverallsapp/github-action@master
+      with:
+        github-token: ${{ secrets.GITHUB_TOKEN }}
