@@ -47,6 +47,7 @@ define( require => {
     truenit.ok( Bounds.EVERYTHING.equals( Bounds.EVERYTHING ), 'equals' );
     truenit.ok( E.equals( E ), 'equals' );
     truenit.ok( !F.equals( E ) && !E.equals( F ), 'equals' );
+    truenit.ok( !F.equals( false ), 'equals' );
 
     // equalsEpsilon
     truenit.ok( !A.equalsEpsilon( C ) && !C.equalsEpsilon( A ), 'equalsEpsilon' );
@@ -57,6 +58,7 @@ define( require => {
     truenit.ok( E.equalsEpsilon( E ), 'equalsEpsilon' );
     truenit.ok( !F.equalsEpsilon( E ) && !E.equalsEpsilon( F ), 'equalsEpsilon' );
     truenit.ok( new Bounds( 1.500001, 1.199999, 5.7, 4.8 ).equalsEpsilon( D ), 'equalsEpsilon' );
+    truenit.ok( !F.equalsEpsilon( new Vector( 5, 5 ) ), 'equalsEpsilon' );
 
     //----------------------------------------------------------------------------------------
     // Location
@@ -141,6 +143,8 @@ define( require => {
     truenit.ok( A.copy().setMinY( 5 ).minY === 5, 'setMinY' );
     truenit.ok( A.copy().setMaxX( 5 ).maxX === 5, 'setMaxX' );
     truenit.ok( A.copy().setMaxY( 5 ).maxY === 5, 'setMaxY' );
+    truenit.ok( A.copy().setAll( 0, 0, 0, 0 ).maxY === 0, 'setAll' );
+    truenit.ok( A.copy().setAll( 0, 0, 0, 0 ).minX === 0, 'setAll' );
 
     // dilate/erode
     truenit.ok( A.copy().dilate( 1.5 ).equals( new Bounds( -0.5, 0.5, 4.5, 5.5 ) ), 'dilate' );
