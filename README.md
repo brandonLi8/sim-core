@@ -16,6 +16,7 @@
 
 <!-- Badges go here. -->
 [![Actions Status](https://github.com/brandonLi8/sim-core/workflows/CI/badge.svg)](https://github.com/brandonLi8/sim-core/actions?query=workflow%3ACI)
+[![Coverage Status](https://coveralls.io/repos/github/brandonLi8/sim-core/badge.svg?branch=master)](https://coveralls.io/github/brandonLi8/sim-core?branch=master)
 
 <!-- Description -->
 <!-- <blockquote align="left">
