@@ -89,12 +89,20 @@ define( require => {
     // Conversion
     //----------------------------------------------------------------------------------------
 
-    // containsCoordinates
+    // closestPointTo
     truenit.notOk( A.containsCoordinates( 0, 0 ), 'containsCoordinates' );
     truenit.notOk( A.containsCoordinates( 2, 0 ), 'containsCoordinates' );
-    truenit.notOk( A.containsPoint( new Vector( 4, 2 ) ), 'containsCoordinates' );
     truenit.ok( A.containsCoordinates( 2, 2 ), 'containsCoordinates' );
+
+    // containsCoordinates
     truenit.ok( A.containsPoint( new Vector( 2, 3 ) ), 'containsCoordinates' );
+    truenit.notOk( A.containsPoint( new Vector( 4, 2 ) ), 'containsCoordinates' );
+
+    // closestsPointTo
+    truenit.ok( A.closestPointTo( new Vector( 0, 1 ) ).equals( new Vector( 1, 2 ) ), 'closestPointTo' );
+    truenit.ok( A.closestPointTo( new Vector( 5, 4 ) ).equals( new Vector( 3, 4 ) ), 'closestPointTo' );
+    truenit.ok( A.closestPointTo( new Vector( 2, 2 ) ).equals( new Vector( 2, 2 ) ), 'closestPointTo' );
+    truenit.ok( A.closestPointTo( new Vector( 2, 3 ) ).equals( new Vector( 2, 3 ) ), 'closestPointTo' );
 
     // area
     truenit.ok( A.area === 4, 'area' );

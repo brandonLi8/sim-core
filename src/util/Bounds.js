@@ -225,7 +225,7 @@ define( require => {
      */
     closestPointTo( location ) {
       assert( location instanceof Vector, `invalid location: ${ location }` );
-      return new Vector( this.xRange.closestTo( location.x ) && this.yRange.closestTo( location.y ) );
+      return new Vector( this.xRange.closestTo( location.x ), this.yRange.closestTo( location.y ) );
     }
 
     /**
