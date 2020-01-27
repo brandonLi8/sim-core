@@ -45,6 +45,7 @@ jobs:
 
     - name: coverage               # Create the coverage report.
       run: |
+        npm i coverage -g
         npm run coverage
 
     - name: coveralls              # Upload coverage report to coveralls.io
