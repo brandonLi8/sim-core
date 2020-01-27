@@ -1,7 +1,7 @@
 // Copyright © 2019-2020 Brandon Li. All rights reserved.
 
 /**
- * Unit test file for `SIM_CORE/util/Bounds`. Run `npm coverage` to see test coverage results.
+ * Unit test file for `SIM_CORE/util/Bounds`. Run `npm run coverage` to see test coverage results.
  *
  *
  * @author Brandon Li <brandon.li820@gmail.com>
