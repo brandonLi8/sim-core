@@ -13,7 +13,8 @@
     "url": "https://github.com/brandonLi8/sim-core.git"
   },
   "scripts": {
-    "test": "node tests/sim-core-test-config.js"
+    "test": "node tests/sim-core-test-config.js",
+    "coverage": "coverage --reporter=lcov npm test"
   },
   "devDependencies": {
     "@brandonli8/grunt-config": "0.0.0-dev.14",
