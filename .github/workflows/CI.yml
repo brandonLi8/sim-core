@@ -44,11 +44,9 @@ jobs:
       run: npm test --if-present
 
     - name: coverage               # Create the coverage report.
-      run: |
-        npm i coverage -g
-        npm run coverage
+      run: npm run coverage
 
-    - name: coveralls              # Upload coverage report to coveralls.io
+    - name: coveralls              # Upload the coverage report to coveralls.io
       uses: coverallsapp/github-action@master
       with:
         github-token: ${{ secrets.GITHUB_TOKEN }}
