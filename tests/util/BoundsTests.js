@@ -146,6 +146,10 @@ define( require => {
     truenit.ok( A.copy().setAll( 0, 0, 0, 0 ).maxY === 0, 'setAll' );
     truenit.ok( A.copy().setAll( 0, 0, 0, 0 ).minX === 0, 'setAll' );
 
+    // roundSymmetric
+    truenit.ok( D.copy().roundSymmetric().equals( new Bounds( 2, 1, 6, 5 ) ), 'roundSymmetric' );
+    truenit.ok( E.copy().roundSymmetric().equals( E ), 'roundSymmetric' );
+
     // dilate/erode
     truenit.ok( A.copy().dilate( 1.5 ).equals( new Bounds( -0.5, 0.5, 4.5, 5.5 ) ), 'dilate' );
     truenit.ok( A.copy().erode( 0.5 ).equals( new Bounds( 1.5, 2.5, 2.5, 3.5 ) ), 'erode' );
