@@ -14,7 +14,7 @@
   },
   "scripts": {
     "test": "node tests/sim-core-test-config.js",
-    "coverage": "c8 -x=tests/** -r=lcov -r=text npm test"
+    "coverage": "npx c8@latest -x=tests/**  -r=lcov -r=text npm test"
   },
   "devDependencies": {
     "@brandonli8/grunt-config": "0.0.0-dev.14",
