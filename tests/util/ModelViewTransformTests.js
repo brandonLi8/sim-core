@@ -130,7 +130,7 @@ define( require => {
     // viewToModelBounds
     truenit.ok( A.viewToModelBounds( new Bounds( 40, 30, 160, 120 ) ).equals( new Bounds( -10, -10, 20, 20 ) ) );
     truenit.ok( A.viewToModelBounds( new Bounds( 0, 0, 200, 150 ) ).equals( new Bounds( -20, -20, 30, 30 ) ) );
-    truenit.ok( A.viewToModelBounds( new Bounds( 80, 60, 120, 90 ) ).equals(  new Bounds( 0, 0, 10, 10 ) ) );
+    truenit.ok( A.viewToModelBounds( new Bounds( 80, 60, 120, 90 ) ).equals( new Bounds( 0, 0, 10, 10 ) ) );
 
   };
 
