@@ -51,7 +51,7 @@ define( require => {
     }
 
     //----------------------------------------------------------------------------------------
-    // @public Model => View
+    // @public Model to View transformations.
     //----------------------------------------------------------------------------------------
 
     // Coordinate transformations
@@ -69,7 +69,7 @@ define( require => {
     modelToViewBounds( b ) { return B( this.modelToViewPoint( b.leftTop ), this.modelToViewPoint( b.rightBottom ) ); }
 
     //----------------------------------------------------------------------------------------
-    // @public View => Model
+    // @public View to Model transformations.
     //----------------------------------------------------------------------------------------
 
     // Coordinate transformations
