@@ -88,6 +88,50 @@ define( require => {
     truenit.ok( A.modelToViewBounds( new Bounds( -20, -20, 30, 30 ) ).equals( new Bounds( 0, 0, 200, 150 ) ) );
     truenit.ok( A.modelToViewBounds( new Bounds( 0, 0, 10, 10 ) ).equals( new Bounds( 80, 60, 120, 90 ) ) );
 
+    //----------------------------------------------------------------------------------------
+    // View to Model
+    //----------------------------------------------------------------------------------------
+
+    // viewToModelX
+    truenit.equals( A.viewToModelX( 80 ), 0 );
+    truenit.equals( A.viewToModelX( 120 ), 10 );
+    truenit.equals( A.viewToModelX( 0 ), -20 );
+
+    // viewToModelY
+    truenit.equals( A.viewToModelY( 90 ), 0 );
+    truenit.equals( A.viewToModelY( 60 ), 10 );
+    truenit.equals( A.viewToModelY( 150 ), -20 );
+
+    // viewToModelXY
+    truenit.ok( A.viewToModelXY( 80, 90 ).equals( Vector.ZERO ) );
+    truenit.ok( A.viewToModelXY( 120, 60 ).equals( new Vector( 10, 10 ) ) );
+    truenit.ok( A.viewToModelXY( 0, 150 ).equals( new Vector( -20, -20 ) ) );
+
+    // viewToModelDeltaX
+    truenit.equals( A.viewToModelDeltaX( 0 ), 0 );
+    truenit.equals( A.viewToModelDeltaX( 200 ), 50 ); // width
+    truenit.equals( A.viewToModelDeltaX( 40 ), 10 );
+
+    // viewToModelDeltaY
+    truenit.equals( A.viewToModelDeltaY( 0 ), 0 );
+    truenit.equals( A.viewToModelDeltaY( 150 ), -50 ); // negative since y-axis is opposite for the view
+    truenit.equals( A.viewToModelDeltaY( 30 ), -10 ); // negative since y-axis is opposite for the view
+
+    // viewToModelDelta
+    truenit.ok( A.viewToModelDelta( Vector.ZERO ).equals( Vector.ZERO ) );
+    truenit.ok( A.viewToModelDelta( new Vector( 200, 150 ) ).equals( new Vector( 50, -50 ) ) ); // width-height
+    truenit.ok( A.viewToModelDelta( new Vector( 40, 30 ) ).equals( new Vector( 10, -10 ) ) );
+
+    // viewToModelPointn
+    truenit.ok( A.viewToModelPoint( new Vector( 0, 150 ) ).equals( new Vector( -20, -20 ) ) );
+    truenit.ok( A.viewToModelPoint( new Vector( 80, 90 ) ).equals( Vector.ZERO ) );
+    truenit.ok( A.viewToModelPoint( new Vector( 120, 60 ) ).equals( new Vector( 10, 10 ) ) );
+
+    // viewToModelBounds
+    truenit.ok( A.viewToModelBounds( new Bounds( 40, 30, 160, 120 ) ).equals( new Bounds( -10, -10, 20, 20 ) ) );
+    truenit.ok( A.viewToModelBounds( new Bounds( 0, 0, 200, 150 ) ).equals( new Bounds( -20, -20, 30, 30 ) ) );
+    truenit.ok( A.viewToModelBounds( new Bounds( 80, 60, 120, 90 ) ).equals(  new Bounds( 0, 0, 10, 10 ) ) );
+
   };
 
   return ModelViewTransformTester;
