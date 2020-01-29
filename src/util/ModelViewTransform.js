@@ -1,15 +1,17 @@
 // Copyright © 2019-2020 Brandon Li. All rights reserved.
 
 /**
- * Transform between model and view coordinate frames, with convenience methods for conversions.
+ * Utility for transforming between model and view coordinate frames, with convenience methods for conversions.
  *
- * Requires that the transform is "aligned", i.e., it can be built only from component-wise translation and scaling.
- * Equivalently, the output x coordinate should not depend on the input y, and the output y shouldn't depend on the
- * input x.
+ * Requires a one-to-one transformation, that can be built from just component-wise translations and scalings. The input
+ * coordinate should correlate to one and only one output transformation. Equivalently, both the view and model bounds
+ * must also be one-to-one, such that every x correlates to one and only one y.
  *
- * The convention is that the y axis is inverted for the view and that the view origin as at the top-left of the
- * ScreenView. Inverting the y axis is commonly necessary since +y is usually up in textbooks and -y is down in
- * pixel coordinates. This transform assumes that this is the case.
+ * The convention is that the y-axis is inverted for the view and that the view origin as at the top-left of the
+ * ScreenView. This transformation utility assumes that this is the case and will invert y-axis transformations.
+ * Inverting the y-axis allows for a natural and conventional model y-axis, with the positive y upwards.
+ *
+ * See `tests/util/ModelViewTransformTests` (relative to sim-core) for an example Bounds setup and usage case.
  *
  * @author Brandon Li <brandon.li820@gmail.com>
  */
@@ -22,61 +24,51 @@ define( require => {
   const Bounds = require( 'SIM_CORE/util/Bounds' );
   const Vector = require( 'SIM_CORE/util/Vector' );
 
-  // constants
-  const V = ( x, y ) => new Vector( x, y );
-
   class ModelViewTransform {
 
     /**
-     * @param modelBounds {Bounds} the reference rectangle in the model, must have area > 0
-     * @param viewBounds {Bounds} the reference rectangle in the view, must have area > 0
+     * @param {Bounds} modelBounds - Bounds of the model. Must be finite and have a positive area (width & height > 0).
+     * @param {Bounds} viewBounds - Bounds of the view. Must be finite and have a positive area (width & height > 0).
      */
     constructor( modelBounds, viewBounds ) {
+      assert( modelBounds instanceof Bounds, `invalid modelBounds: ${ modelBounds }` );
+      assert( viewBounds instanceof Bounds, `invalid viewBounds: ${ viewBounds }` );
+      assert( modelBounds.isFinite() && modelBounds.area > 0, 'modelBounds must be finite and have a positive area' );
+      assert( viewBounds.isFinite() && viewBounds.area > 0, 'viewBounds must be finite and have a positive area' );
 
-      assert( modelBounds instanceof Bounds && modelBounds.area > 0, `invalid modelBounds: ${ modelBounds }` );
-      assert( viewBounds instanceof Bounds && viewBounds.area > 0, `invalid viewBounds: ${ viewBounds }` );
+      // @private {number} - the scale of the bounds, in model units per view unit.
+      this._xScale = modelBounds.width / viewBounds.width;
+      this._yScale = -( modelBounds.height / viewBounds.height ); // negative because the view scale is inverted
 
-      // @public final (read-only) {Bounds}
-      this.modelBounds = modelBounds;
-      this.viewBounds = viewBounds;
-
-      // @private {number} xViewToModelScale (in view units per model unit)
-      this.xViewToModelScale = viewBounds.width / modelBounds.width;
-
-      // @private {number} yViewToModelScale (in view units per model unit)
-      this.yViewToModelScale = -viewBounds.height / modelBounds.height;
-
-      // @private {number} x-offset
-      this.xViewOffset = viewBounds.minX - this.xViewToModelScale * modelBounds.minX;
-      this.xModelOffset = modelBounds.minX - viewBounds.minX / this.xViewToModelScale;
-
-      // @private {number} yViewOffset
-      this.yViewOffset = viewBounds.minY - this.yViewToModelScale * modelBounds.maxY;
-      this.yModelOffset = modelBounds.minY - viewBounds.maxY / this.yViewToModelScale;
+      // @private {number} - the offsets.
+      this._xViewOffset = viewBounds.minX - modelBounds.minX / this._xScale;
+      this._yViewOffset = viewBounds.minY - modelBounds.maxY / this._yScale;
+      this._xModelOffset = modelBounds.minX - viewBounds.minX * this._xScale;
+      this._yModelOffset = modelBounds.minY - viewBounds.maxY * this._yScale;
     }
 
     //----------------------------------------------------------------------------------------
     // @public Model => View
     //----------------------------------------------------------------------------------------
 
-    // Coordinate Transforms
-    modelToViewX( x ) { return this.xViewToModelScale * x + this.xViewOffset; }
-    modelToViewY( y ) { return this.yViewToModelScale * y + this.yViewOffset; }
-    modelToViewXY( x, y ) { return V( this.modelToViewX( x ), this.modelToViewY( y ) ); }
+    // Coordinate transformations
+    modelToViewX( x ) { return x / this._xScale + this._xViewOffset; }
+    modelToViewY( y ) { return y / this._yScale + this._yViewOffset; }
+    modelToViewXY( x, y ) { return new Vector( this.modelToViewX( x ), this.modelToViewY( y ) ); }
 
-    // Width/Height Transforms
-    modelToViewDeltaX( x ) { return this.xViewToModelScale * x; }
-    modelToViewDeltaY( y ) { return this.yViewToModelScale * y; }
-    modelToViewDelta( point ) { return V( this.modelToViewDeltaX( point.x ), this.modelToViewDeltaY( point.y ) ); }
+    // Width/Height transformations
+    modelToViewDeltaX( x ) { return x / this._xScale; }
+    modelToViewDeltaY( y ) { return y / this._yScale; }
+    modelToViewDelta( pt ) { return new Vector( this.modelToViewDeltaX( pt.x ), this.modelToViewDeltaY( pt.y ) ); }
 
     // Utilities
-    modelToViewPoint( point ) { return V( this.modelToViewX( point.x ), this.modelToViewY( point.y ) ); }
-    modelToViewBounds( bounds ) {
+    modelToViewPoint( pt ) { return new Vector( this.modelToViewX( pt.x ), this.modelToViewY( pt.y ) ); }
+    modelToViewBounds( b ) {
       return new Bounds(
-        this.modelToViewX( bounds.minX ),
-        this.modelToViewY( bounds.maxY ), // inverts y
-        this.modelToViewX( bounds.maxX ),
-        this.modelToViewY( bounds.minY )
+        this.modelToViewX( b.minX ),
+        this.modelToViewY( b.maxY ),
+        this.modelToViewX( b.maxX ),
+        this.modelToViewY( b.minY )
       );
     }
 
@@ -84,18 +76,18 @@ define( require => {
     // @public View => Model
     //----------------------------------------------------------------------------------------
 
-    // Coordinate Transforms
-    viewToModelX( x ) { return x / this.xViewToModelScale + this.xModelOffset; }
-    viewToModelY( y ) { return y / this.yViewToModelScale + this.yModelOffset; }
-    viewToModelXY( x, y ) { return V( this.viewToModelX( x ), this.viewToModelY( y ) ); }
+    // Coordinate transformations
+    viewToModelX( x ) { return x * this._xScale + this._xModelOffset; }
+    viewToModelY( y ) { return y * this._yScale + this._yModelOffset; }
+    viewToModelXY( x, y ) { return new Vector( this.viewToModelX( x ), this.viewToModelY( y ) ); }
 
-    // Width/Height Transforms
-    viewToModelDeltaX( x ) { return x / this.xViewToModelScale; }
-    viewToModelDeltaY( y ) { return y / this.yViewToModelScale; }
-    viewToModelDelta( point ) { return V( this.viewToModelDeltaX( point.x ), this.viewToModelDeltaY( point.y ) ); }
+    // Width/Height transformations
+    viewToModelDeltaX( x ) { return x * this._xScale; }
+    viewToModelDeltaY( y ) { return y * this._yScale; }
+    viewToModelDelta( pt ) { return new Vector( this.viewToModelDeltaX( pt.x ), this.viewToModelDeltaY( pt.y ) ); }
 
     // Utilities
-    viewToModelPoint( point ) { return V( this.viewToModelX( point.x ), this.viewToModelY( point.y ) ); }
+    viewToModelPoint( pt ) { return new Vector( this.viewToModelX( pt.x ), this.viewToModelY( pt.y ) ); }
     viewToModelBounds( bounds ) {
       return new Bounds(
         this.viewToModelX( bounds.minX ),
