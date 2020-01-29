@@ -20,29 +20,28 @@ define( require => {
     // Define a basic ModelViewTransform - should stay static.
     const A = new ModelViewTransform( new Bounds( -20, -20, 30, 30 ), new Bounds( 0, 0, 200, 150 ) );
 
-    /**
-     * A visual representation of the model-view frame, in a conventional mathematical coordinate system for the model
-     * and a flipped coordinate system for the view.
-     *                       ∧
-     *       view:(0, 0) •┄┄┄│┄┄┄┄┄┄┄┄• model:(30, 30)
-     *                   ┊   │        ┊
-     *                   ┊   │ model:(0,0)
-     *                  <────┼─────────>
-     *                   ┊   │        ┊
-     *  model:(-20, -20) •┄┄┄│┄┄┄┄┄┄┄┄• view:(200, 150)
-     *                       ∨
-     *  |------------|----------|-----------|
-     *  |            | Model    | View      |
-     *  |------------|----------|-----------|
-     *  | Width      |  50      | 200       |
-     *  |------------|----------|-----------|
-     *  | Height     |  50      | 150       |
-     *  |------------|----------|-----------|
-     *  | Coordinate | (0, 0)   | (80, 90)  |
-     *  |------------|----------|-----------|
-     *  | Coordinate | (10, 10) | (120, 60) |
-     *  |------------|----------|-----------|
-     */
+    // A visual representation of the model-view frame, in a conventional mathematical coordinate system for the model
+    // and a flipped coordinate system for the view.
+    //                       ∧
+    //       view:(0, 0) •┄┄┄│┄┄┄┄┄┄┄┄• model:(30, 30)
+    //                   ┊   │        ┊
+    //                   ┊   │ model:(0,0)
+    //                  <────┼─────────>
+    //                   ┊   │        ┊
+    //  model:(-20, -20) •┄┄┄│┄┄┄┄┄┄┄┄• view:(200, 150)
+    //                       ∨
+    //  |------------|----------|-----------|
+    //  |            | Model    | View      |
+    //  |------------|----------|-----------|
+    //  | Width      |  50      | 200       |
+    //  |------------|----------|-----------|
+    //  | Height     |  50      | 150       |
+    //  |------------|----------|-----------|
+    //  | Coordinate | (0, 0)   | (80, 90)  |
+    //  |------------|----------|-----------|
+    //  | Coordinate | (10, 10) | (120, 60) |
+    //  |------------|----------|-----------|
+
     //----------------------------------------------------------------------------------------
     // Model to View
     //----------------------------------------------------------------------------------------
@@ -130,7 +129,6 @@ define( require => {
     truenit.ok( A.viewToModelBounds( new Bounds( 40, 30, 160, 120 ) ).equals( new Bounds( -10, -10, 20, 20 ) ) );
     truenit.ok( A.viewToModelBounds( new Bounds( 0, 0, 200, 150 ) ).equals( new Bounds( -20, -20, 30, 30 ) ) );
     truenit.ok( A.viewToModelBounds( new Bounds( 80, 60, 120, 90 ) ).equals( new Bounds( 0, 0, 10, 10 ) ) );
-
   };
 
   return ModelViewTransformTester;
