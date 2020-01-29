@@ -25,7 +25,7 @@ define( require => {
   const Vector = require( 'SIM_CORE/util/Vector' );
 
   // constants
-  const B = ( ...args ) => Bounds.withPoints( ...args );
+  const B = ( minPoint, maxPoint ) => Bounds.withPoints( minPoint, maxPoint );
 
   class ModelViewTransform {
 
