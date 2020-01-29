@@ -17,9 +17,7 @@ define( require => {
 
   return () => {
 
-    //----------------------------------------------------------------------------------------
-    // Static Bounds Creators
-    //----------------------------------------------------------------------------------------
+    // Define basic Bounds - should stay static.
     const A = new Bounds( 1, 2, 3, 4 );
     const B = new Bounds( 0, 0, 2, 3 );
     const C = new Bounds( 1, 1, 5, 4 );

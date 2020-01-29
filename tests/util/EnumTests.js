@@ -15,6 +15,7 @@ define( require => {
 
   return () => {
 
+    // Define a basic Enum - should stay static.
     const DirectionsEnum = new Enum( [ 'NORTH', 'SOUTH', 'EAST', 'WEST' ] );
 
     // basic
