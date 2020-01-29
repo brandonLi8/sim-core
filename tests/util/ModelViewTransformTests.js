@@ -24,14 +24,13 @@ define( require => {
      * A visual representation of the model-view frame, in a conventional mathematical coordinate system for the model
      * and a flipped coordinate system for the view.
      *                       ∧
-     *       view:(0, 0) •┄┄┄│┄┄┄┄┄┄┄┄• model:(30, 30)
-     *                   ┊   │        ┊
-     *                   ┊   │ model:(0,0)
-     *                  <────┼─────────>
-     *                   ┊   │        ┊
-     *  model:(-20, -20) •┄┄┄│┄┄┄┄┄┄┄┄• view:(200, 150)
+     *       view:(0, 0) •┄┄┄┃┄┄┄┄┄┄┄┄• model:(30, 30)
+     *                   ┊   ┃        ┊
+     *                   ┊   ┃ model:(0,0)
+     *                  <────╂─────────>
+     *                   ┊   ┃        ┊
+     *  model:(-20, -20) •┄┄┄┃┄┄┄┄┄┄┄┄• view:(200, 150)
      *                       ∨
-     *
      *  |------------|----------|-----------|
      *  |            | Model    | View      |
      *  |------------|----------|-----------|
