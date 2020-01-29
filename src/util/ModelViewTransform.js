@@ -24,6 +24,9 @@ define( require => {
   const Bounds = require( 'SIM_CORE/util/Bounds' );
   const Vector = require( 'SIM_CORE/util/Vector' );
 
+  // constants
+  const B = ( ...args ) => Bounds.withPoints( ...args );
+
   class ModelViewTransform {
 
     /**
@@ -63,14 +66,7 @@ define( require => {
 
     // Utilities
     modelToViewPoint( pt ) { return new Vector( this.modelToViewX( pt.x ), this.modelToViewY( pt.y ) ); }
-    modelToViewBounds( b ) {
-      return new Bounds(
-        this.modelToViewX( b.minX ),
-        this.modelToViewY( b.maxY ),
-        this.modelToViewX( b.maxX ),
-        this.modelToViewY( b.minY )
-      );
-    }
+    modelToViewBounds( b ) { return B( this.modelToViewPoint( b.leftTop ), this.modelToViewPoint( b.rightBottom ) ); }
 
     //----------------------------------------------------------------------------------------
     // @public View => Model
@@ -88,14 +84,7 @@ define( require => {
 
     // Utilities
     viewToModelPoint( pt ) { return new Vector( this.viewToModelX( pt.x ), this.viewToModelY( pt.y ) ); }
-    viewToModelBounds( bounds ) {
-      return new Bounds(
-        this.viewToModelX( bounds.minX ),
-        this.viewToModelY( bounds.maxY ), // inverts y
-        this.viewToModelX( bounds.maxX ),
-        this.viewToModelY( bounds.minY )
-      );
-    }
+    viewToModelBounds( b ) { return B( this.viewToModelPoint( b.leftTop ), this.viewToModelPoint( b.rightBottom ) ); }
   }
 
   return ModelViewTransform;

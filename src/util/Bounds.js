@@ -449,6 +449,18 @@ define( require => {
   };
 
   /**
+   * Returns a new Bounds object, constructed with points <minPoint, maxPoint>.
+   * @public
+   *
+   * @param {Vector} minPoint - the minimum point for the bounds.
+   * @param {Vector} maxPoint - the minimum point for the bounds.
+   * @returns {Bounds}
+   */
+  Bounds.withPoints = ( minPoint, maxPoint ) => {
+    return new Bounds( minPoint.x, minPoint.y, maxPoint.x, maxPoint.y );
+  };
+
+  /**
    * Returns a new Bounds object, constructed with ranges in the form <xRange, yRange>.
    * @public
    *
