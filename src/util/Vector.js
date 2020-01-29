@@ -37,6 +37,18 @@ define( require => {
     get y() { return this._y; }
 
     /**
+     * Checks for exact equality between this Vector to another Vector.
+     * @public
+     *
+     * @param {Vector} vector
+     * @returns {boolean}
+     */
+    equals( vector ) {
+      if ( !( other instanceof Vector ) ) return false; // Must be type Vector to be equal
+      return this._x === vector.x && this._y === vector.y;
+    }
+
+    /**
      * Gets the magnitude of this Vector.
      * @public
      *
@@ -73,18 +85,6 @@ define( require => {
     distanceTo( point ) {
       assert( point instanceof Vector, `invalid point: ${ point }` );
       return this.distanceToXY( point.x, point.y );
-    }
-
-    /**
-     * Checks for exact equality between this Vector to another Vector.
-     * @public
-     *
-     * @param {Vector} vector
-     * @returns {boolean}
-     */
-    equals( vector ) {
-      assert( vector instanceof Vector, `invalid vector: ${ vector }` );
-      return this._x === vector.x && this._y === vector.y;
     }
 
     /**
