@@ -44,9 +44,7 @@ define( require => {
      * @returns {boolean} - whether the two ranges are equal
      */
     equals( other ) {
-      if ( !( other instanceof Range ) ) return false; // Must be type Range to be equal
-
-      return this.min === other.min && this.max === other.max;
+      return other instanceof Range && this.min === other.min && this.max === other.max;
     }
 
     /**

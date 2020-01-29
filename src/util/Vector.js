@@ -44,8 +44,7 @@ define( require => {
      * @returns {boolean}
      */
     equals( vector ) {
-      if ( !( other instanceof Vector ) ) return false; // Must be type Vector to be equal
-      return this._x === vector.x && this._y === vector.y;
+      return vector instanceof Vector && this._x === vector.x && this._y === vector.y;
     }
 
     /**

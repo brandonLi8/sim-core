@@ -52,8 +52,7 @@ define( require => {
      * @returns {boolean} - whether the two bounds are equal
      */
     equals( other ) {
-      if ( !( other instanceof Bounds ) ) return false; // Must be type Bounds to be equal
-      return this.xRange.equals( other.xRange ) && this.yRange.equals( other.yRange );
+      return other instanceof Bounds && this.xRange.equals( other.xRange ) && this.yRange.equals( other.yRange );
     }
 
     /**
