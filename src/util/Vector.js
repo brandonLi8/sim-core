@@ -146,7 +146,7 @@ define( require => {
     }
 
     /**
-     * Gets the smallest angle between this vector and another vector, in the range [0, PI].
+     * Gets the smallest angle between this vector and another vector, in the range [0, PI] radians.
      * @public
      *
      * @param {Vector} v
@@ -160,7 +160,7 @@ define( require => {
      *
      * @returns {number}
      */
-    getAngle() { return Math.atan2( this._y, this._x ); }
+    getAngle() { return Math.atan2( this._y, this._x ); } // Always works (Math.atan2 is built with theta in [-PI, PI])
     get angle() { return this.getAngle(); }
 
     /**
@@ -217,6 +217,14 @@ define( require => {
     }
 
     /**
+     * Rounds each the edges of this range with Util.roundSymmetric.
+     * @public
+     *
+     * @returns {Range} - for chaining
+     */
+    roundSymmetric() { return this.setX( Util.roundSymmetric( this.x ) ).setY( Util.roundSymmetric( this.y ) ); }
+
+    /**
      * Multiplies this Vector by a scalar. To NOT mutate this Vector, call copy() and multiply that Vector.
      * @public
      *
@@ -229,15 +237,21 @@ define( require => {
     }
 
     /**
+     * Negates this vector (multiplies each component by -1), changing this vector.
+     * @public
+     *
+     * @returns {Vector} for chaining
+     */
+    negate() { return this.multiply( -1 ); }
+
+    /**
      * Divides this Vector by a scalar. To NOT mutate this Vector, call copy() and divide that Vector.
      * @public
      *
      * @param {number} scalar
      * @returns {Vector} - for chaining
      */
-    divide( scalar ) {
-      return this.multiply( 1 / scalar );
-    }
+    divide( scalar ) { return this.multiply( 1 / scalar ); }
 
     /**
      * Adds (x, y) to this vector. To NOT mutate this Vector, call copy() and add to that Vector.
