@@ -33,8 +33,10 @@ define( require => {
      *
      * @returns {number}
      */
-    get x() { return this._x; }
-    get y() { return this._y; }
+    getX() { return this._x; }
+    getY() { return this._y; }
+    get x() { return this.getX(); }
+    get y() { return this.getY(); }
 
     /**
      * Checks for exact equality between this Vector to another Vector.
@@ -43,22 +45,35 @@ define( require => {
      * @param {Vector} vector
      * @returns {boolean}
      */
-    equals( vector ) {
-      return vector instanceof Vector && this._x === vector.x && this._y === vector.y;
-    }
+    equals( vector ) { return vector instanceof Vector && this._x === vector.x && this._y === vector.y; }
 
     /**
-     * Gets the magnitude of this Vector.
+     * Computes the magnitude of this Vector.
      * @public
      *
      * @returns {number}
      */
-    getMagnitude() {
-      return Math.sqrt( this._x * this._x + this._y * this._y );
-    }
-    get magnitude() {
-      return this.getMagnitude();
-    }
+    getMagnitude() { return Math.sqrt( this._x * this._x + this._y * this._y ); }
+    get magnitude() { return this.getMagnitude(); }
+
+    /**
+     * Computes the dot product of this vector and another vector v.
+     * @public
+     *
+     * @param {Vector}
+     * @returns {number}
+     */
+    dot( v ) { return this.x * v.x + this.y * v.y; }
+
+    /**
+     * Computes the dot product between this vector and another vector (x, y).
+     * @public
+     *
+     * @param {number} x
+     * @param {number} y
+     * @returns {number}
+     */
+    dotXY( x, y ) { return this.x * x + this.y * y; }
 
     /**
      * The distance between this Vector (treated as a point) and a (x, y) coordinate pair.
