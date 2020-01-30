@@ -136,7 +136,7 @@ define( require => {
     // negate
     truenit.ok( A.copy().negate().equals( new Vector( -4, -2 ) ) );
     truenit.ok( Vector.ZERO.copy().negate().equals( Vector.ZERO ) );
-    truenit.ok( E.copy().negate().equals( new Vector( Number.NEGATIVE_INFINITY, Number.NEGATIVE_INFINITY) ) );
+    truenit.ok( E.copy().negate().equals( new Vector( Number.NEGATIVE_INFINITY, Number.NEGATIVE_INFINITY ) ) );
 
     // addXY
     truenit.ok( A.copy().addXY( 0, 0 ).equals( A ) );
