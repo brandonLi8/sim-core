@@ -340,7 +340,6 @@ define( require => {
     }
     set angle( angle ) { this.setAngle( angle ); }
 
-
     /**
      * Rotates by an arbitrary angle, in radians. To NOT mutate this Vector, call copy() and rotate that Vector.
      * @public
@@ -348,9 +347,7 @@ define( require => {
      * @param {number} angle - In radians
      * @returns {Vector} - for chaining
      */
-    rotate( angle ) {
-      return this.setAngle( angle + this.angle );
-    }
+    rotate( angle ) { return this.setAngle( angle + this.angle ); }
 
     /**
      * Rotates about a point (x, y), in radians. To NOT mutate this Vector, call copy() and rotate that Vector.
@@ -379,9 +376,7 @@ define( require => {
      * @param {number} angle
      * @returns {Vector} this for chaining
      */
-    rotateAboutPoint( point, angle ) {
-      return this.rotateAboutXY( point.x, point.y, angle );
-    }
+    rotateAboutPoint( point, angle ) { return this.rotateAboutXY( point.x, point.y, angle ); }
   }
 
   //----------------------------------------------------------------------------------------
