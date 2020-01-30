@@ -107,6 +107,90 @@ define( require => {
     truenit.approximate( new Vector( -1, -1 ).getAngle(), -3 * Math.PI / 4 );
     truenit.approximate( A.angle, A.angleBetween( new Vector( 1, 0 ) ) );
 
+    //----------------------------------------------------------------------------------------
+    // Mutators
+    //----------------------------------------------------------------------------------------
 
+    // basic
+    truenit.ok( A.copy().setX( 5 ).x === 5 );
+    truenit.ok( A.copy().setY( 5 ).y === 5 );
+    truenit.ok( A.copy().set( B ).equals( B ) );
+
+    // roundSymmetric
+    truenit.ok( A.copy().roundSymmetric().equals( A ) );
+    truenit.ok( E.copy().roundSymmetric().equals( E ) );
+    truenit.ok( new Vector( 5.5, 4.4 ).roundSymmetric().equals( new Vector( 6, 4 ) ) );
+
+    // multiply
+    truenit.ok( A.copy().multiply( 0 ).equals( Vector.ZERO ) );
+    truenit.ok( A.copy().multiply( 1 ).equals( A ) );
+    truenit.ok( A.copy().multiply( 3 ).equals( new Vector( 12, 6 ) ) );
+    truenit.ok( A.copy().multiply( Number.POSITIVE_INFINITY ).equals( E ) );
+
+    // divide
+    truenit.ok( A.copy().divide( 1 ).equals( A ) );
+    truenit.ok( A.copy().divide( 2 ).equals( new Vector( 2, 1 ) ) );
+    truenit.ok( A.copy().divide( Number.POSITIVE_INFINITY ).equalsEpsilon( Vector.ZERO ) );
+    truenit.ok( A.copy().divide( 0 ).equals( E ) );
+
+    // negate
+    truenit.ok( A.copy().negate().equals( new Vector( -4, -2 ) ) );
+    truenit.ok( Vector.ZERO.copy().negate().equals( Vector.ZERO ) );
+    truenit.ok( E.copy().negate().equals( new Vector( Number.NEGATIVE_INFINITY, Number.NEGATIVE_INFINITY) ) );
+
+    // addXY
+    truenit.ok( A.copy().addXY( 0, 0 ).equals( A ) );
+    truenit.ok( A.copy().addXY( 2, 2 ).equals( new Vector( 6, 4 ) ) );
+    truenit.ok( A.copy().addXY( Number.POSITIVE_INFINITY, Number.POSITIVE_INFINITY ).equals( E ) );
+
+    // add
+    truenit.ok( A.copy().add( Vector.ZERO ).equals( A ) );
+    truenit.ok( A.copy().add( new Vector( 2, 2 ) ).equals( new Vector( 6, 4 ) ) );
+    truenit.ok( A.copy().add( E ).equals( E.copy() ) );
+
+    // subtractXY
+    truenit.ok( A.copy().subtractXY( 0, 0 ).equals( A ) );
+    truenit.ok( A.copy().subtractXY( 2, 2 ).equals( new Vector( 2, 0 ) ) );
+    truenit.ok( A.copy().subtractXY( Number.POSITIVE_INFINITY, Number.POSITIVE_INFINITY ).equals( E.copy().negate() ) );
+
+    // subtract
+    truenit.ok( A.copy().subtract( Vector.ZERO ).equals( A ) );
+    truenit.ok( A.copy().subtract( new Vector( 2, 2 ) ).equals( new Vector( 2, 0 ) ) );
+    truenit.ok( A.copy().subtract( E ).equals( E.copy().negate() ) );
+
+    // normalize
+    truenit.ok( new Vector( 1, 0 ).normalize().equals( new Vector( 1, 0 ) ) );
+    truenit.ok( new Vector( 0.5, 0 ).normalize().equals( new Vector( 1, 0 ) ) );
+    truenit.ok( new Vector( 5, 0 ).normalize().equals( new Vector( 1, 0 ) ) );
+    truenit.throws( () => { Vector.ZERO.copy().normalize(); } );
+
+    // setAngle
+    truenit.ok( A.copy().setAngle( 0 ).x === A.magnitude );
+    truenit.approximate( new Vector( 1, 0 ).setAngle( Math.PI / 4 ).x, 2 ** 0.5 / 2 );
+    truenit.approximate( new Vector( 1, 0 ).setAngle( -Math.PI / 4 ).x, 2 ** 0.5 / 2 );
+    truenit.approximate( new Vector( 1, 0 ).setAngle( 7 * Math.PI / 4 ).x, 2 ** 0.5 / 2 );
+
+    // rotate
+    truenit.ok( A.copy().rotate( 0 ).equals( A ) );
+    truenit.approximate( new Vector( 1, 0 ).rotate( Math.PI / 4 ).x, 2 ** 0.5 / 2 );
+    truenit.ok( new Vector( 2 ** 0.5 / 2, 2 ** 0.5 / 2 ).rotate( Math.PI / 4 ).equalsEpsilon( new Vector( 0, 1 ) ) );
+
+    // rotateAboutXY
+    truenit.ok( A.copy().rotateAboutXY( A.x, A.y, 23 ).equals( A ) );
+    truenit.ok( Vector.ZERO.copy().rotateAboutXY( 1, 1, Math.PI ).equals( new Vector( 2, 2 ) ) );
+    truenit.approximate( new Vector( 1, 0 ).rotateAboutXY( 0, 0, Math.PI / 4 ).x, 2 ** 0.5 / 2 );
+
+    // rotateAboutPoint
+    truenit.ok( A.copy().rotateAboutPoint( A, 23 ).equals( A ) );
+    truenit.ok( Vector.ZERO.copy().rotateAboutPoint( new Vector( 1, 1 ), Math.PI ).equals( new Vector( 2, 2 ) ) );
+    truenit.approximate( new Vector( 1, 0 ).rotateAboutPoint( Vector.ZERO, Math.PI / 4 ).x, 2 ** 0.5 / 2 );
+
+    //----------------------------------------------------------------------------------------
+    // Ensure none of the static Vector's were mutated in the tests above.
+    truenit.ok( A.equals( new Vector( 4, 2 ) ) );
+    truenit.ok( B.equals( new Vector( 2, 3 ) ) );
+    truenit.ok( C.equals( new Vector( 5.2, 8.6 ) ) );
+    truenit.ok( D.equals( new Vector( 2, Number.POSITIVE_INFINITY ) ) );
+    truenit.ok( E.equals( new Vector( Number.POSITIVE_INFINITY, Number.POSITIVE_INFINITY ) ) );
   };
 } );
