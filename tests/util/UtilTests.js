@@ -14,7 +14,7 @@ define( require => {
   const Util = require( 'SIM_CORE/util/Util' );
 
 
-  const UtilTester = () => {
+  return () => {
 
     //----------------------------------------------------------------------------------------
     // Conversion Tests
@@ -200,6 +200,4 @@ define( require => {
     truenit.equals( Util.toTitleCase( '' ), '' );
     truenit.equals( Util.toTitleCase( 'f' ), 'F' );
   };
-
-  return UtilTester;
 } );

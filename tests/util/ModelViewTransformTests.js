@@ -15,7 +15,7 @@ define( require => {
   const truenit = require( 'truenit' );
   const Vector = require( 'SIM_CORE/util/Vector' );
 
-  const ModelViewTransformTester = () => {
+  return () => {
 
     // Define a basic ModelViewTransform - should stay static.
     const A = new ModelViewTransform( new Bounds( -20, -20, 30, 30 ), new Bounds( 0, 0, 200, 150 ) );
@@ -130,6 +130,4 @@ define( require => {
     truenit.ok( A.viewToModelBounds( new Bounds( 0, 0, 200, 150 ) ).equals( new Bounds( -20, -20, 30, 30 ) ) );
     truenit.ok( A.viewToModelBounds( new Bounds( 80, 60, 120, 90 ) ).equals( new Bounds( 0, 0, 10, 10 ) ) );
   };
-
-  return ModelViewTransformTester;
 } );
