@@ -39,6 +39,22 @@ define( require => {
     get y() { return this.getY(); }
 
     /**
+     * Creates a copy of this Vector.
+     * @public
+     *
+     * @returns {Vector}
+     */
+    copy() { return new Vector( this._x, this._y ); }
+
+    /**
+     * Debugging string for the Vector.
+     * @public
+     *
+     * @returns {string}
+     */
+    toString() { return `Vector[ x: ${ this._x }, y: ${ this._y } ]`; }
+
+    /**
      * Checks for exact equality between this Vector to another Vector.
      * @public
      *
@@ -48,12 +64,40 @@ define( require => {
     equals( vector ) { return vector instanceof Vector && this._x === vector.x && this._y === vector.y; }
 
     /**
+     * Checks for approximate equality between this Vector and another Vector.
+     * @public
+     *
+     * @param {Vector} other
+     * @param {number} [epsilon]
+     * @returns {boolean} - if the other vector is within epsilon distance
+     */
+    equalsEpsilon( other, epsilon = Util.EPSILON ) {
+      assert( other instanceof Vector && typeof epsilon === 'number' );
+
+      // Check that all properties approximately match for both this instance and the other instance.
+      return [ 'x', 'y' ].every( property => {
+
+        // Approximate equality only applies on finite values. Otherwise, they must be strictly equal.
+        if ( isFinite( this[ property ] ) && isFinite( other[ property ] ) ) {
+          return Math.abs( this[ property ] - other[ property ] ) <= epsilon;
+        }
+        else {
+          return other[ property ] === this[ property ];
+        }
+      } );
+    }
+
+    //----------------------------------------------------------------------------------------
+    // Computations
+    //----------------------------------------------------------------------------------------
+
+    /**
      * Computes the magnitude of this Vector.
      * @public
      *
      * @returns {number}
      */
-    getMagnitude() { return Math.sqrt( this._x * this._x + this._y * this._y ); }
+    getMagnitude() { return Math.sqrt( this.dot( this ) ); } // magnitude computed as a vector dotted with itself.
     get magnitude() { return this.getMagnitude(); }
 
     /**
@@ -63,7 +107,7 @@ define( require => {
      * @param {Vector}
      * @returns {number}
      */
-    dot( v ) { return this.x * v.x + this.y * v.y; }
+    dot( v ) { return this.dotXY( v.x, v.y ); }
 
     /**
      * Computes the dot product between this vector and another vector (x, y).
@@ -102,49 +146,13 @@ define( require => {
     }
 
     /**
-     * Checks for approximate equality between this Vector and another Vector.
+     * Gets the smallest angle between this vector and another vector, in the range [0, PI].
      * @public
      *
-     * @param {Vector} other
-     * @param {number} [epsilon]
-     * @returns {boolean} - if the other vector is within epsilon distance
+     * @param {Vector} v
+     * @returns {number}
      */
-    equalsEpsilon( other, epsilon = Util.EPSILON ) {
-      assert( other instanceof Vector && typeof epsilon === 'number' );
-
-      // Check that all properties approximately match for both this instance and the other instance.
-      return [ 'x', 'y' ].every( property => {
-
-        // Approximate equality only applies on finite values. Otherwise, they must be strictly equal.
-        if ( isFinite( this[ property ] ) && isFinite( other[ property ] ) ) {
-          return Math.abs( this[ property ] - other[ property ] ) <= epsilon;
-        }
-        else {
-          return other[ property ] === this[ property ];
-        }
-      } );
-    }
-
-    /**
-     * Checks if the Vector is finite
-     * @public
-     *
-     * @returns {boolean}
-     */
-    isFinite() {
-      return isFinite( this._x ) && isFinite( this._y );
-    }
-
-    /**
-     * Creates a copy of this Vector.
-     * @public
-     *
-     * @param {boolean} [isCopyImmutable] determines if the copy is immutable or not
-     * @returns {Vector}
-     */
-    copy( isCopyImmutable = false ) {
-      return new Vector( this._x, this._y, isCopyImmutable );
-    }
+    angleBetween( v ) { return Math.acos( this.dot( v ) / ( this.magnitude * v.magnitude ) ); }
 
     /**
      * Gets the angle of this vector as a position vector relative to the origin, from [-PI, PI] in radians.
@@ -152,20 +160,17 @@ define( require => {
      *
      * @returns {number}
      */
-    getAngle() {
-      return Math.atan2( this._y, this._x );
-    }
+    getAngle() { return Math.atan2( this._y, this._x ); }
     get angle() { return this.getAngle(); }
 
     /**
-     * Debugging string for the Vector.
+     * Checks if the Vector is finite
      * @public
      *
-     * @returns {string}
+     * @returns {boolean}
      */
-    toString() {
-      return `Vector <${ this._x }, ${ this._y }>`;
-    }
+    isFinite() { return isFinite( this._x ) && isFinite( this._y ); }
+
 
     //========================================================================================
     // Mutators
