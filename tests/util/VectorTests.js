@@ -51,6 +51,62 @@ define( require => {
     truenit.ok( new Vector( 5.2000001, 8.5999999 ).equalsEpsilon( C ) );
     truenit.ok( !C.equalsEpsilon( new Vector( 5, 5 ) ) );
 
+    //----------------------------------------------------------------------------------------
+    // Computations
+    //----------------------------------------------------------------------------------------
+
+    // magnitude
+    truenit.approximate( A.magnitude, 20 ** 0.5 );
+    truenit.approximate( B.magnitude, 13 ** 0.5 );
+    truenit.approximate( C.magnitude, ( 5.2 ** 2 + 8.6 ** 2 ) ** 0.5 );
+    truenit.ok( D.magnitude, Number.POSITIVE_INFINITY );
+    truenit.ok( E.magnitude, Number.POSITIVE_INFINITY );
+    truenit.approximate( B.magnitude, B.getMagnitude() );
+    truenit.ok( E.magnitude === E.getMagnitude() );
+
+    // dot
+    truenit.ok( A.dot( B ) === 14 && B.dot( A ) === 14 );
+    truenit.approximate( B.dot( C ), 36.2 );
+    truenit.ok( D.dot( C ) === Number.POSITIVE_INFINITY && C.dot( D ) === Number.POSITIVE_INFINITY );
+    truenit.ok( D.dot( E ) === Number.POSITIVE_INFINITY && E.dot( D ) === Number.POSITIVE_INFINITY );
+
+    // dotXY
+    truenit.ok( A.dotXY( 0, 0 ) === 0 );
+    truenit.approximate( A.dotXY( A.x, A.y ), A.magnitude ** 2 );
+    truenit.ok( A.dotXY( 5, 3 ) === 26 );
+    truenit.ok( A.dotXY( 5, Number.POSITIVE_INFINITY ) === Number.POSITIVE_INFINITY );
+
+    // distanceTo
+    truenit.approximate( A.distanceTo( C ), ( 1.2 ** 2 + 6.6 ** 2 ) ** 0.5 );
+    truenit.approximate( C.distanceTo( A ), ( 1.2 ** 2 + 6.6 ** 2 ) ** 0.5 );
+    truenit.approximate( B.distanceTo( A ), 5 ** 0.5 );
+    truenit.equals( A.distanceTo( E ), Number.POSITIVE_INFINITY );
+    truenit.ok( isNaN( D.distanceTo( E ) ) );
+
+    // distanceToXY
+    truenit.approximate( B.distanceToXY( 0, 0 ), B.getMagnitude() );
+    truenit.equals( Vector.ZERO.distanceToXY( 0, 0 ), 0 );
+    truenit.approximate( B.distanceToXY( B.x, B.y ), 0 );
+    truenit.ok( isNaN( D.distanceToXY( 0, Number.POSITIVE_INFINITY ) ) );
+    truenit.equals( D.distanceToXY( Number.POSITIVE_INFINITY, 0 ), Number.POSITIVE_INFINITY );
+
+    // isFinite
+    truenit.ok( A.isFinite() && B.isFinite() && C.isFinite() && Vector.ZERO.isFinite() );
+    truenit.notOk( D.isFinite() );
+    truenit.notOk( E.isFinite() );
+
+    // angleBetween
+    truenit.approximate( new Vector( 1, 0 ).angleBetween( new Vector( 0, 1 ) ), Math.PI / 2 );
+    truenit.approximate( A.angleBetween( A ), 0 );
+    truenit.approximate( new Vector( 1, 0 ).angleBetween( new Vector( -1, 0 ) ), Math.PI );
+    truenit.ok( isNaN( E.angleBetween( D ) ) );
+
+    // angle
+    truenit.approximate( new Vector( 1, 0 ).angle, 0 );
+    truenit.approximate( new Vector( 1, 1 ).getAngle(), Math.PI / 4 );
+    truenit.approximate( new Vector( -1, -1 ).getAngle(), -3 * Math.PI / 4 );
+    truenit.approximate( A.angle, A.angleBetween( new Vector( 1, 0 ) ) );
+
 
   };
 } );
