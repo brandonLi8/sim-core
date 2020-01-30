@@ -96,7 +96,18 @@ define( require => {
      */
     equalsEpsilon( other, epsilon = Util.EPSILON ) {
       assert( other instanceof Vector && typeof epsilon === 'number' );
-      return Math.max( Math.abs( this._x - other.x ), Math.abs( this._y - other.y ) ) <= epsilon;
+
+      // Check that all properties approximately match for both this instance and the other instance.
+      return [ 'x', 'y' ].every( property => {
+
+        // Approximate equality only applies on finite values. Otherwise, they must be strictly equal.
+        if ( isFinite( this[ property ] ) && isFinite( other[ property ] ) ) {
+          return Math.abs( this[ property ] - other[ property ] ) <= epsilon;
+        }
+        else {
+          return other[ property ] === this[ property ];
+        }
+      } );
     }
 
     /**
