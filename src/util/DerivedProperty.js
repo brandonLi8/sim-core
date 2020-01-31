@@ -43,10 +43,8 @@ define( require => {
 
       super( initialValue, options );
 
-      //----------------------------------------------------------------------------------------
-
       // @private {Multilink} - Create a multilink of the dependencies with a listener that sets the value of
-      //                        this Derived Property based on what the derivation fucntion returns. The values of the
+      //                        this DerivedProperty based on what the derivation fucntion returns. The values of the
       //                        dependencies are passed to the derivation function in the same order.
       //
       //                        A lazy Multilink is used since the value is already set to the initial derivation.
@@ -56,7 +54,7 @@ define( require => {
 
         // Use super.set since this.set throws an error. See set() or the comment at the top of the file for more doc.
         super.set( derivation( ...args ) );
-      } )
+      } );
 
       // DerivedProperty cannot be mutated, so we don't store the initial value to help prevent memory issues.
       this._initialValue = null;
