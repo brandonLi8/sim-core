@@ -1,10 +1,13 @@
 // Copyright © 2019-2020 Brandon Li. All rights reserved.
 
 /**
- * A DerivedProperty is computed Property based on other Properties.
+ * A DerivedProperty is a sub-type of Property. It's value is computed based on other Properties, called
+ * the dependencies. It's value will change when any of the dependencies change based on a derivation function that
+ * returns a new derived value. The values of the dependencies will be passed (in the same order) to the
+ * derivation function.
  *
- * Note that the setters should not be called directly, so the
- * setters (set, reset and es5 setter) throw an error if used directly.
+ * A DerivedProperty cannot be directly mutated. Setters should not be called directly, and the mutators will throw an
+ * error if used directly.
  *
  * @author Brandon Li <brandon.li820@gmail.com>
  */

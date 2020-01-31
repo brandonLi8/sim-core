@@ -49,7 +49,6 @@ define( require => {
     NO_VALUE: '\u2014', // em dash
     OMEGA: '\u03C9',
     ALPHA: '\u03B1'
-
   };
 
   return Symbols;
