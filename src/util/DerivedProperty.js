@@ -36,7 +36,12 @@ define( require => {
         `invalid dependencies: ${ dependencies }` );
       assert( typeof derivation === 'function', `invalid derivation: ${ derivation }` );
 
-      super( null, options ); // DerivedProperty cannot be mutated, so we don't store the initial value to help prevent memory issues.
+      // Derive the initial value of the Property based on what the derivation initially returns. The values of the
+      // dependencies are passed to the derivation in the same order. The initial value must be derived here instead
+      // of in the general Multilink for type validation issues.
+      const initialValue = derivation( ...dependencies.map( property => property.value ) );
+
+      super( initialValue, options );
 
       //----------------------------------------------------------------------------------------
 
@@ -47,11 +52,14 @@ define( require => {
       //                        A lazy Multilink is used since the value is already set to the initial derivation.
       //                        When any of the dependencies change, the derivation should be called and the value of
       //                        the DerivedProperty should be set.
-      this._dependenciesMultilink = new Multilink( dependencies, ( ...args ) => {
+      this._dependenciesMultilink = Multilink.lazy( dependencies, ( ...args ) => {
 
         // Use super.set since this.set throws an error. See set() or the comment at the top of the file for more doc.
         super.set( derivation( ...args ) );
-      } );
+      } )
+
+      // DerivedProperty cannot be mutated, so we don't store the initial value to help prevent memory issues.
+      this._initialValue = null;
     }
 
     /**
