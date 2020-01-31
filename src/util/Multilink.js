@@ -19,8 +19,9 @@ define( require => {
     /**
      * @param {Property[]} dependencies - array of Properties to listen to
      * @param {function} callback - function that expects args in the same order as dependencies
+     * @param {boolean} [lazy] Optional parameter that can be set to true if this should be a lazy multilink (no immediate callback)
      */
-    constructor( dependencies, callback ) {
+    constructor( dependencies, callback, lazy ) {
 
       assert( Util.isArray( dependencies ), `invalid dependencies: ${ dependencies }` );
       assert( typeof callback === 'function', `invalid callback: ${ callback }` );
@@ -46,7 +47,7 @@ define( require => {
       } );
 
       // Initial call back, only once
-      this._listener();
+      if ( !lazy ) this._listener();
     }
 
     // @public
@@ -61,6 +62,9 @@ define( require => {
       this.isDisposed = true;
     }
   }
+
+
+  Multilink.lazy = ( dependencies, callback ) => new Multilink( dependencies, callback, true );
 
   return Multilink;
 } );

@@ -18,6 +18,7 @@ define( require => {
 
   // modules
   const assert = require( 'SIM_CORE/util/assert' );
+  const Multilink = require( 'SIM_CORE/util/Multilink' );
   const Property = require( 'SIM_CORE/util/Property' );
   const Util = require( 'SIM_CORE/util/Util' );
 
@@ -43,27 +44,21 @@ define( require => {
 
       //----------------------------------------------------------------------------------------
 
-      // @private {Property[]} - reference to the dependencies array.
-      this._dependencies = dependencies;
-
-      // @private {function} - listener linked to all the dependencies that sets the value of this Property based on
-      //                       what the derivation fucntion returns. The values of the dependencies are passed to the
-      //                       derivation function in the same order.
-      this._listener = () => {
+      // @private {Multilink} - Create a multilink of the dependencies with a listener that sets the value of
+      //                        this Derived Property based on what the derivation fucntion returns. The values of the
+      //                        dependencies are passed to the derivation function in the same order.
+      //
+      //                        A lazy Multilink is used since the value is already set to the initial derivation.
+      //                        When any of the dependencies change, the derivation should be called and the value of
+      //                        the DerivedProperty should be set.
+      this._dependenciesMultilink = Multilink.lazy( dependencies, ( ...args ) => {
 
         // Use super.set since this.set throws an error. See set() or the comment at the top of the file for more doc.
-        super.set( derivation( ...dependencies.map( property => property.value ) ) );
-      };
+        super.set( derivation( ...args ) );
+      } )
 
       // DerivedProperty cannot be mutated, so we don't store the initial value to help prevent memory issues.
       this._initialValue = null;
-
-      // Lazily link the listener to each dependency since the value is already set to the initial derivation.
-      // When any of the dependencies change, the derivation should be called and the value of the DerivedProperty
-      // should be set.
-      dependencies.forEach( dependency => {
-        dependency.lazyLink( this._listener );
-      } );
     }
 
     /**
@@ -75,14 +70,8 @@ define( require => {
      */
     dispose() {
 
-      // Unlink the listener from each dependency.
-      this._dependencies.forEach( dependency => {
-        dependency.unlink( this._listener );
-      } );
-
-      this._dependencies = null;
-      this._listener = null;
-
+      // Dispose the dependenciesMultlink for garbage collection.
+      this._dependenciesMultilink.dispose();
       return super.dispose();
     }
 
