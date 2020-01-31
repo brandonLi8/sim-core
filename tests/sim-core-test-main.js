@@ -14,6 +14,7 @@ define( require => {
   const truenit = require( 'truenit' );
 
   //----------------------------------------------------------------------------------------
+
   // enable assert
   assert.enableAssertions();
 
@@ -23,6 +24,7 @@ define( require => {
   truenit.registerTest( 'Range', require( 'TESTS/util/RangeTests' ) );
   truenit.registerTest( 'ModelViewTransform', require( 'TESTS/util/ModelViewTransformTests' ) );
   truenit.registerTest( 'Property', require( 'TESTS/util/PropertyTests' ) );
+  truenit.registerTest( 'DerivedProperty', require( 'TESTS/util/DerivedPropertyTests' ) );
   truenit.registerTest( 'Enum', require( 'TESTS/util/EnumTests' ) );
 
   truenit.start();
