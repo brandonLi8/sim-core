@@ -8,7 +8,7 @@
  *
  * A DerivedProperty cannot be directly mutated. Setters should not be called directly, and the mutators will throw an
  * error if used directly. If the DerivedProperty is no longer in use, make sure to call the dispose() method to unlink
- * the internal DerivedProperty listener to avoid a memory leak.
+ * the internal Multilink listener to avoid a memory leak.
  *
  * @author Brandon Li <brandon.li820@gmail.com>
  */

@@ -77,7 +77,7 @@ define( require => {
       // @private {*} _value - the internal value of the Property and the initial value.
       this._value = value;
 
-      // @private {*} _initialValue - the initial value of the Property.
+      // @protected {*} _initialValue - the initial value of the Property.
       this._initialValue = value;
 
       // @private {function[]} _listeners - the listeners that will be notified when the value changes.
