@@ -33,7 +33,7 @@ define( require => {
         // Return the sum of A, B, C, D
         return a + b + c + d;
       }, {
-        type: 'number' // ensures that the initial value isn't set to a null value before deriving
+        type: 'number' // Ensures that the initial value isn't set to a null value before deriving.
       } );
 
     //----------------------------------------------------------------------------------------

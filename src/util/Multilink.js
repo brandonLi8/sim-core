@@ -1,9 +1,16 @@
 // Copyright © 2019-2020 Brandon Li. All rights reserved.
 
 /**
- * A Multilink is an instance that can be used to link to multiple properties. It is given an array of Properties and a
- * callback function. When any of the Properties change, all values are passed in the same order as the array.
+ * A Multilink is a utility class for linking to multiple Properties with the same callback functionality.
  *
+ * A Multilink is constructed with an array of Properties called the dependencies, and a callback function.
+ * When any of the Properties in the dependencies change, the callback function is called, with the values of the
+ * dependencies passed in (in the same order).
+ *
+ * A Multilink is not a sub-type of Property and does not contain a value. However, it does contain internal links
+ * to the dependencies. If the Multilink is no longer in use, make sure to call the dispose() method to unlink
+ * the internal listener to avoid a memory leak.
+
  * @author Brandon Li <brandon.li820@gmail.com>
  */
 
