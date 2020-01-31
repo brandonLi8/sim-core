@@ -25,7 +25,7 @@ define( require => {
     // Create the DerivedProperty based on A, B, C, D
     const SumProperty = new DerivedProperty(
       [ A, B, C, D ],
-      ( a, b, c, d  ) => {
+      ( a, b, c, d ) => {
 
         // Check that the passed in values correlate to A, B, C, D
         truenit.ok( a === A.value && b === B.value && c === C.value && d === D.value );
@@ -66,5 +66,14 @@ define( require => {
     D.reset();
     truenit.ok( SumProperty.value === 1 + 2 + 3 + 4 );
 
+    // Dispose
+    SumProperty.dispose();
+
+    // Mutate each Property and check that the value of SumProperty doesn't change.
+    A.set( 0 );
+    B.set( 0 );
+    C.set( 0 );
+    D.set( 0 );
+    truenit.ok( SumProperty.value === 1 + 2 + 3 + 4 );
   };
 } );
