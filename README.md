@@ -15,7 +15,7 @@
 # Sim Core
 
 <!-- Badges go here. -->
-![npm](https://img.shields.io/npm/v/sim-core)
+[![npm](https://img.shields.io/npm/v/sim-core)](https://www.npmjs.com/package/sim-core)
 [![Actions Status](https://github.com/brandonLi8/sim-core/workflows/CI/badge.svg)](https://github.com/brandonLi8/sim-core/actions?query=workflow%3ACI)
 [![Coverage Status](https://coveralls.io/repos/github/brandonLi8/sim-core/badge.svg?branch=master)](https://coveralls.io/github/brandonLi8/sim-core?branch=master)
 
