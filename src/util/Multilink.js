@@ -2,7 +2,7 @@
 
 /**
  * A Multilink is a utility class for linking to multiple Properties with the same callback functionality. It is
- * recommended to read the documentation in `SIM_CORE/util/Property` before working with this class.
+ * recommended to read the documentation of `SIM_CORE/util/Property` before working with this class.
  *
  * A Multilink is constructed with an array of Properties called the dependencies, and a callback function.
  * When any of the Properties in the dependencies change, the callback function is called, with the values of the
