@@ -8,7 +8,7 @@
  *
  * A DerivedProperty cannot be directly mutated. Setters should not be called directly, and the mutators will throw an
  * error if used directly. If the DerivedProperty is no longer in use, make sure to call the dispose() method to unlink
- * the internal DerivedProperty listeners to avoid a memory leak.
+ * the internal DerivedProperty listener to avoid a memory leak.
  *
  * @author Brandon Li <brandon.li820@gmail.com>
  */
@@ -46,12 +46,12 @@ define( require => {
       // @private {Property[]} - reference to the dependencies array.
       this._dependencies = dependencies;
 
-      // @private {function} - listener linked to all the dependencies that sets the value of the this Property based on
+      // @private {function} - listener linked to all the dependencies that sets the value of this Property based on
       //                       what the derivation fucntion returns. The values of the dependencies are passed to the
-      //                       derivation in the same order.
+      //                       derivation function in the same order.
       this._listener = () => {
 
-        // Use super.set since this.set throws and error. See set() or the comment at the top of the file for more doc.
+        // Use super.set since this.set throws an error. See set() or the comment at the top of the file for more doc.
         super.set( derivation( ...dependencies.map( property => property.value ) ) );
       };
 
