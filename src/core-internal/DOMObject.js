@@ -36,6 +36,20 @@ define( require => {
   // modules
   const assert = require( 'SIM_CORE/util/assert' );
 
+  // constants
+  const SVG_TYPES = [ 'svg',
+    'g',
+    'rect',
+    'circle',
+    'ellipse',
+    'line',
+    'path',
+    'polygon',
+    'text',
+    'image',
+    'radialGradient',
+    'linearGradient' ];
+
   class DOMObject {
 
     /**
@@ -54,9 +68,9 @@ define( require => {
         type: 'div',
 
         // {string} - a namespace URI - see https://developer.mozilla.org/en-US/docs/Web/API/Document/createElementNS.
-        //            If not provided (or null), `document.createElement()` will be used.
-        //            Otherwise, `document.createElementNS( options.namespace )` will be used (usually for svg).
-        namespace: null,
+        //            If the type is in SVG_TYPES, `document.createElementNS( options.XMLNamespace )` will be used.
+        //            Otherwise, `document.createElement()` will be used.
+        XMLNamespace: 'http://www.w3.org/2000/svg',
 
         // {Object} - object literal that describes its CSS style. See `addStyle()` for full documentation.
         style: {
@@ -113,13 +127,16 @@ define( require => {
       // @private {boolean} - indicates if this DOMObject has been disposed. See `dispose()`.
       this._isDisposed = false;
 
-      if ( !options.namespace ) {
+      // @public {boolean} (read-only) - indicates if this DOMObject is classified as a SVG element.
+      this.isSVG = SVG_TYPES.includes( this._type );
+
+      if ( !this.isSVG ) {
         // @private {HTMLElement} (final) - the actual DOM object. See `getElement()` for read access.
         this._element = document.createElement( this._type );
       }
       else {
-        assert( typeof options.namespace === 'string', `invalid namespace: ${ options.namespace }` );
-        this._element = document.createElementNS( options.namespace, this._type );
+        assert( typeof options.XMLNamespace === 'string', `invalid XMLNamespace: ${ options.XMLNamespace }` );
+        this._element = document.createElementNS( options.XMLNamespace, this._type );
       }
 
       // @private {HTMLTextNode} (final) - the text node of the DOM object.
@@ -435,7 +452,7 @@ define( require => {
    * @param {HTMLElement} element
    * @param {Object} style - object literal that describes the styles to override for the element.
    */
-  DOMObject.addElementStyle = ( element, styles ) => {
+  DOMObject.addElementStyle = ( element, style ) => {
     assert( element instanceof Element || element instanceof HTMLDocument, `invalid element: ${ element }` );
     assert( Object.getPrototypeOf( style ) === Object.prototype, `invalid style object: ${ style }` );
 

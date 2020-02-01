@@ -44,8 +44,6 @@ define( require => {
 
         // defaults
         type: 'svg',
-        namespace: XML_NAMESPACE,
-
         style: {
           height: '100%',
           width: '100%',
