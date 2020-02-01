@@ -25,7 +25,7 @@ define( require => {
      *                             Some options are specific to this class while others are passed to the super class.
      *                             See the early portion of the constructor for details.
      */
-    constructor( createModel, createView, options ) {
+    constructor(  options ) {
 
       assert( !options || Object.getPrototypeOf( options ) === Object.prototype, `invalid options: ${ options }` );
 
@@ -57,8 +57,8 @@ define( require => {
       this.name = options.name;
 
       // @private
-      this._createModel = createModel;
-      this._createView = createView;
+      // this._createModel = createModel;
+      // this._createView = createView;
 
       // Construction of the model and view are delayed and controlled to enable features like
       // a) faster loading when only loading certain screens

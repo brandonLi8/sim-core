@@ -1,13 +1,18 @@
 // Copyright © 2019-2020 Brandon Li. All rights reserved.
 
 /**
- * A Display represents the root DOMObject of the document object model in HTML.
+ * Before reading the documentation of this file, it is recommended to read `./DOMObject.js` for context.
  *
- * Displays have the following responsibilities:
- *  - Connects the DOMObject to the HTML Body Object.
- *  - Stylize the body and html objects for sim-specific code.
+ * A Display represents the true root DOMObject of the entire simulation. All Nodes, Screens, Navigation Bars, etc.
+ * should be in the sub-tree of a single Display. The Display is instantiated once at the start of the sim in Sim.js.
+ * Generally, Displays shouldn't be public-facing to sim-specific code. Instead, Screens should be instantiated and
+ * passed to Sim.js, which will add the Screen elements to the Display as children.
  *
- * Displays are a separate subtype of DOMObject. Nothing should subtype Display.
+ * A Display will connect its the inner DOMObject element to the HTML Body element. Thus, nothing should subtype Display
+ * as it should be the only DOMObject with a hard-coded parent element. In addition, the Display should never be
+ * disposed of as long as the simulation is running and should never disconnect from the Body element. Display will also
+ * provide CSS styles for the Body and HTML elements for sim-specific code. If you are unfamiliar with the typical
+ * Body and HTML elements in a global HTML file, visit https://www.w3.org/TR/html401/struct/global.html.
  *
  * @author Brandon Li <brandon.li820@gmail.com>
  */

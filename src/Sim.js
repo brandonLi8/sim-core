@@ -68,65 +68,65 @@ define( require => {
 
       // Initialize a display and loader
       const display = new Display();
-      const loader = new Loader();
+      // const loader = new Loader();
 
-      display.addChild( loader );
+      // display.addChild( loader );
 
-      // Add the FPSCounter if the query parameter was provided.
-      if ( StandardSimQueryParameters.fps ) {
-        const counter = new FPSCounter();
-        counter.start();
-        display.addChild( counter );
-      }
+      // // Add the FPSCounter if the query parameter was provided.
+      // if ( StandardSimQueryParameters.fps ) {
+      //   const counter = new FPSCounter();
+      //   counter.start();
+      //   display.addChild( counter );
+      // }
 
-      // Add the navigation bar
-      const navigationBar = new NavigationBar( options.name );
+      // // Add the navigation bar
+      // const navigationBar = new NavigationBar( options.name );
 
-      display.addChild( navigationBar );
+      // display.addChild( navigationBar );
 
-      display.addChild( screen );
-      screen.initializeModelAndView();
+      // display.addChild( screen );
+      // screen.initializeModelAndView();
 
 
-      if ( StandardSimQueryParameters.dev ) {
-        screen._view.enableDevBorder();
-      }
+      // if ( StandardSimQueryParameters.dev ) {
+      //   screen._view.enableDevBorder();
+      // }
 
-      window.onresize = () => {
-        const windowHeight = window.innerHeight;
-        const windowWidth = window.innerWidth;
+      // window.onresize = () => {
+      //   const windowHeight = window.innerHeight;
+      //   const windowWidth = window.innerWidth;
 
-        navigationBar.layout( windowWidth, windowHeight );
+      //   navigationBar.layout( windowWidth, windowHeight );
 
-        const screenHeight = windowHeight - parseFloat( navigationBar.style.height );
-        screen.style.height = `${ screenHeight }px`;
+      //   const screenHeight = windowHeight - parseFloat( navigationBar.style.height );
+      //   screen.style.height = `${ screenHeight }px`;
 
-        screen._view.layout( windowWidth, screenHeight );
-      };
-      window.onresize();
+      //   screen._view.layout( windowWidth, screenHeight );
+      // };
+      // window.onresize();
 
-      let lastStepTime = new Date();
+      // let lastStepTime = new Date();
 
-      const stepper = () => {
+      // const stepper = () => {
 
-        const currentTime = new Date();
-        const ellapsedTime = Util.convertFrom( currentTime - lastStepTime, Util.MILLI );
-        lastStepTime = currentTime;
+      //   const currentTime = new Date();
+      //   const ellapsedTime = Util.convertFrom( currentTime - lastStepTime, Util.MILLI );
+      //   lastStepTime = currentTime;
 
-        screen._model.step && screen._model.step( ellapsedTime );
+      //   screen._model.step && screen._model.step( ellapsedTime );
 
-        window.requestAnimationFrame( stepper );
-      };
-      window.requestAnimationFrame( stepper );
+      //   window.requestAnimationFrame( stepper );
+      // };
+      // window.requestAnimationFrame( stepper );
 
-      // prevent pinch and zoom https://stackoverflow.com/questions/37808180/disable-viewport-zooming-ios-10-safari
-      // Maybe we want to detect if passive is supportive
-      // https://developer.mozilla.org/en-US/docs/Web/API/EventTarget/addEventListener#Safely_detecting_option_support
-      if ( window.isMobile ) {
-        document.addEventListener( 'touchmove', event => {
-          if ( event.scale !== 1 ) { event.preventDefault(); }
-        }, { passive: false } );
-      }
+      // // prevent pinch and zoom https://stackoverflow.com/questions/37808180/disable-viewport-zooming-ios-10-safari
+      // // Maybe we want to detect if passive is supportive
+      // // https://developer.mozilla.org/en-US/docs/Web/API/EventTarget/addEventListener#Safely_detecting_option_support
+      // if ( window.isMobile ) {
+      //   document.addEventListener( 'touchmove', event => {
+      //     if ( event.scale !== 1 ) { event.preventDefault(); }
+      //   }, { passive: false } );
+      // }
     }
   }
 
