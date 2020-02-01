@@ -36,19 +36,6 @@ define( require => {
   // modules
   const assert = require( 'SIM_CORE/util/assert' );
 
-  // constants
-  const SVG_TYPES = [ 'svg',
-    'g',
-    'rect',
-    'circle',
-    'ellipse',
-    'line',
-    'path',
-    'polygon',
-    'text',
-    'image',
-    'radialGradient',
-    'linearGradient' ];
 
   class DOMObject {
 
@@ -128,7 +115,7 @@ define( require => {
       this._isDisposed = false;
 
       // @public {boolean} (read-only) - indicates if this DOMObject is classified as a SVG element.
-      this.isSVG = SVG_TYPES.includes( this._type );
+      this.isSVG = DOMObject.SVG_TYPES.includes( this._type );
 
       if ( !this.isSVG ) {
         // @private {HTMLElement} (final) - the actual DOM object. See `getElement()` for read access.
@@ -473,6 +460,20 @@ define( require => {
       else { assert( false, `invalid styleKey: ${ styleKey }` ); }
     } );
   }
+
+  // @public (read-only) - array of the SVG element types.
+  DOMObject.SVG_TYPES = [ 'svg',
+    'g',
+    'rect',
+    'circle',
+    'ellipse',
+    'line',
+    'path',
+    'polygon',
+    'text',
+    'image',
+    'radialGradient',
+    'linearGradient' ]
 
   return DOMObject;
 } );
