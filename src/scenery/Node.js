@@ -3,6 +3,7 @@
 /**
  * Before reading the documentation of this file, it is recommended to read `./DOMObject.js` for context.
  *
+ * ## General Description of Nodes
  * A Node is a sim-specific DOMObject for the scene graph, built on top of DOMObject for SVG groups. In general,
  * sim-specific code should use scenery Nodes for rendering simulation components and structuring the simulation
  * scene graph. Node will provide a much cleaner sim-specific API using SVG compared to DOMObject.
@@ -11,7 +12,16 @@
  * These include translation, scale, rotation, opacity, etc (or any combination). See the early portion of the constructor
  * for details. Nodes also support Events. See ./events for more documentation.
  *
- * ## Bounds Terminology
+ * ## Coordinates
+ * It is important to Node coordinates ARE NOT in pixels. The window width and height in pixels change from device to
+ * device and the window size my shrink/grow.
+ *
+ * Instead, Node uses ScreenView coordinates. ScreenView Coordinates are constant and don't depend on the window width.
+ * It is a changing scalar off the actual window size. See ScreenView.js for more documentation. All Node coordinates
+ * are in terms of these coordinates. The `layout()` method then changes the actual pixel coordinates based off the
+ * ScreenView scalar.
+ *
+ * Some helpful terminology:
  * - Global coordinate frame: View coordinate frame of the Display (specifically its local coordinate frame).
  * - Local coordinate frame: The local coordinate frame of the Node, where (0, 0) would be at the Node's origin.
  * - Parent coordinate frame: The coordinate frame of the parent of the Node. In other words, the local coordinate frame
@@ -85,6 +95,8 @@ define( require => {
         bottom: null,       // {number} - The bottom side of this Node's bounds. See setBottom() for more doc.
         centerX: null,      // {number} - The x-center of this Node's bounds. See setCenterX() for more doc.
         centerY: null,      // {number} - The y-center of this Node's bounds. See setCenterY() for more doc.
+        width: null,        // {number} - The width Node's bounds. See setWidth() for more doc.
+        height: null,       // {number} - The height Node's bounds. See setHeight() for more doc.
 
         // Rewrite options so that the passed-in options overrides the defaults.
         ...options
