@@ -21,8 +21,8 @@
  *
  * ## Usage:
  *  - In sim-specific code, the DOMObject class should RARELY be instantiated.
- *    Instead, create a new Sim and its ScreenViews and use Nodes (see ./Node.js) for structuring the scene graph.
- *    Node (a subtype) will provide a much cleaner sim-specific API compared to DOMObject.
+ *    Instead, create a new Sim and its ScreenViews and use Nodes (see ../scenery/Node.js) for structuring the scene
+ *    graph. Node (a subtype) will provide a much cleaner sim-specific API using SVG compared to DOMObject.
  *
  *  - DOMObject and its subtypes generally have the last constructor parameter reserved for the 'options' object - a
  *    key-value map that specifies relevant options that can be overridden by the user.
