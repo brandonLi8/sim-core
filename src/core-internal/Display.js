@@ -11,8 +11,8 @@
  * A Display will connect its the inner DOMObject element to the HTML Body element. Thus, nothing should subtype Display
  * as it should be the only DOMObject with a hard-coded parent element. In addition, the Display should never be
  * disposed of as long as the simulation is running and should never disconnect from the Body element. Display will also
- * provide CSS styles for the Body and HTML elements for sim-specific code. If you are unfamiliar with the typical
- * Body and HTML elements in a global HTML file, visit https://www.w3.org/TR/html401/struct/global.html.
+ * provide CSS styles for the Body elements for sim-specific code. If you are unfamiliar with the typical Body
+ * and HTML elements in a global HTML file, visit https://www.w3.org/TR/html401/struct/global.html.
  *
  * @author Brandon Li <brandon.li820@gmail.com>
  */

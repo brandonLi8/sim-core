@@ -376,10 +376,7 @@ define( require => {
     }
 
     /**
-     * Adds onto this DOMObject's CSS style. For context, see:
-     *  - https://www.w3schools.com/js/js_htmldom_css.asp
-     *  - https://www.w3schools.com/jsref/dom_obj_style.asp
-     *  - https://developer.mozilla.org/en-US/docs/Web/API/CSSStyleDeclaration
+     * Adds onto this DOMObject's CSS style. See DOMObject.addElementStyle for more documentation.
      * @public
      *
      * Styles that aren't apart of the element's CSS style object will cause an error.
@@ -388,24 +385,9 @@ define( require => {
      * @returns {DOMObject} - Returns 'this' reference, for chaining
      */
     addStyle( style ) {
-      assert( !style || Object.getPrototypeOf( style ) === Object.prototype, `invalid style object: ${ style }` );
-      // convenience references
-      const contains = styleKey => Object.prototype.hasOwnProperty.call( this._element.style, styleKey );
-      const setStyle = ( name, key ) => { this._element.style[ name ] = style[ key ]; };
+      assert( Object.getPrototypeOf( style ) === Object.prototype, `invalid style object: ${ style }` );
 
-      // Loop through each key of the style Object literal and add the style.
-      Object.keys( style ).forEach( styleKey => {
-        const camelStyleKey = styleKey.charAt( 0 ).toUpperCase() + styleKey.slice( 1 );
-
-        if ( contains( styleKey ) ) setStyle( styleKey, styleKey );
-        else if ( contains( `moz${ camelStyleKey }` ) ) setStyle( `moz${ camelStyleKey }`, styleKey );
-        else if ( contains( `Moz${ camelStyleKey }` ) ) setStyle( `Moz${ camelStyleKey }`, styleKey );
-        else if ( contains( `webkit${ camelStyleKey }` ) ) setStyle( `webkit${ camelStyleKey }`, styleKey );
-        else if ( contains( `ms${ camelStyleKey }` ) ) setStyle( `ms${ camelStyleKey }`, styleKey );
-        else if ( contains( `o${ camelStyleKey }` ) ) setStyle( `o${ camelStyleKey }`, styleKey );
-        else { assert( false, `invalid styleKey: ${ styleKey }` ); }
-
-      } );
+      DOMObject.addElementStyle( this._element, style );
       return this;
     }
 
@@ -441,6 +423,38 @@ define( require => {
       this._parent && this._parent.removeChild( this );
       return this;
     }
+  }
+
+  /**
+   * Static method that adds onto an HTMLElement's CSS style, with additional browser-support. For context, see:
+   *  - https://www.w3schools.com/js/js_htmldom_css.asp
+   *  - https://www.w3schools.com/jsref/dom_obj_style.asp
+   *  - https://developer.mozilla.org/en-US/docs/Web/API/CSSStyleDeclaration  Returns a new Bounds object, constructed with <minX, minY, width, height>.
+   * @public
+   *
+   * @param {HTMLElement} element
+   * @param {Object} style - object literal that describes the styles to override for the element.
+   */
+  DOMObject.addElementStyle = ( element, styles ) => {
+    assert( element instanceof Element || element instanceof HTMLDocument, `invalid element: ${ element }` );
+    assert( Object.getPrototypeOf( style ) === Object.prototype, `invalid style object: ${ style }` );
+
+    // convenience functions
+    const contains = styleKey => Object.prototype.hasOwnProperty.call( element.style, styleKey );
+    const setStyle = ( name, key ) => { element.style[ name ] = style[ key ]; };
+
+    // Loop through each key of the style Object literal and add the style.
+    Object.keys( style ).forEach( styleKey => {
+      const camelStyleKey = styleKey.charAt( 0 ).toUpperCase() + styleKey.slice( 1 );
+
+      if ( contains( styleKey ) ) setStyle( styleKey, styleKey );
+      else if ( contains( `moz${ camelStyleKey }` ) ) setStyle( `moz${ camelStyleKey }`, styleKey );
+      else if ( contains( `Moz${ camelStyleKey }` ) ) setStyle( `Moz${ camelStyleKey }`, styleKey );
+      else if ( contains( `webkit${ camelStyleKey }` ) ) setStyle( `webkit${ camelStyleKey }`, styleKey );
+      else if ( contains( `ms${ camelStyleKey }` ) ) setStyle( `ms${ camelStyleKey }`, styleKey );
+      else if ( contains( `o${ camelStyleKey }` ) ) setStyle( `o${ camelStyleKey }`, styleKey );
+      else { assert( false, `invalid styleKey: ${ styleKey }` ); }
+    } );
   }
 
   return DOMObject;
