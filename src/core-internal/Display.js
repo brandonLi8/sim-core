@@ -11,7 +11,7 @@
  * A Display will connect its the inner DOMObject element to the HTML Body element. Thus, nothing should subtype Display
  * as it should be the only DOMObject with a hard-coded parent element. In addition, the Display should never be
  * disposed of as long as the simulation is running and should never disconnect from the Body element. Display will also
- * provide CSS styles for the Body elements for sim-specific code. If you are unfamiliar with the typical Body
+ * provide CSS styles for the Body element for sim-specific code. If you are unfamiliar with the typical Body
  * and HTML elements in a global HTML file, visit https://www.w3.org/TR/html401/struct/global.html.
  *
  * @author Brandon Li <brandon.li820@gmail.com>
@@ -24,89 +24,83 @@ define( require => {
   const assert = require( 'SIM_CORE/util/assert' );
   const DOMObject = require( 'SIM_CORE/core-internal/DOMObject' );
 
-  // constants
-
-
   class Display extends DOMObject {
 
     /**
-     * @param {Object} [options] - Various key-value pairs that control the appearance and behavior.
-     *                             Changes the API of DOMObject. See the early portion of the constructor for details.
+     * @param {Object} [options] - Various key-value pairs that control the appearance and behavior of the Display.
+     *                             All options are passed to the super class. Some options of the super-class are
+     *                             set by Display. See the early portion of the constructor for details.
      */
     constructor( options ) {
 
-      if ( options ) {
-        assert( Object.getPrototypeOf( options ) === Object.prototype, `Extra prototype on Options: ${ options }` );
-        assert( !options.style, 'Display sets style.' );  // This class sets the style.
-        assert( !options.type, 'Display sets type.' );    // This class sets the type.
-        assert( !options.innerHTML && !options.text, 'Display should be a container' );
-        assert( !options.id && !options.class && !options.attributes, 'Display sets attributes' );
-      }
-
-      //----------------------------------------------------------------------------------------
+      // Some options are set by Display. Assert that they weren't provided.
+      assert( !options || Object.getPrototypeOf( options ) === Object.prototype, `invalid options: ${ options }` );
+      assert( !options || !options.style, 'Display sets style.' );
+      assert( !options || !options.type, 'Display sets type.' );
+      assert( !options || !options.innerHTML && !options.text, 'Display should not have text or innerHTML' );
+      assert( !options || ( !options.id && !options.class && !options.attributes ), 'Display sets attributes' );
 
       options = {
-        type: 'div',
+
+        // defaults
+        type: 'svg',
+        namespace: XML_NAMESPACE,
 
         style: {
           height: '100%',
-          position: 'relative',
-          fontFamily: 'Arial, sans-serif',
-          display: 2
+          width: '100%',
+          fontFamily: 'Arial, sans-serif'
         },
+        id: 'sim-display',
 
-        id: 'display',
+        // Rewrite options so that the passed-in options overrides the defaults.
         ...options
       };
-
       super( options );
+    }
 
-      //----------------------------------------------------------------------------------------
-      // reference the HTML and BODY objects.
+    /**
+     * Initiates the Display, which will connect its the inner DOMObject element to the HTML Body element to render
+     * the entire scene-graph. Will also provide favorable CSS styles for the Body element.
+     *
+     * @returns {Display} - for chaining
+     */
+    initiate() {
 
-      // @private {HTMLElement}
-      this.bodyObject = document.getElementsByTagName( 'body' )[ 0 ];
+      // Retrieve the HTML and BODY elements. See https://www.w3schools.com/jsref/met_document_getelementsbytagname.asp.
+      const bodyElement = document.getElementsByTagName( 'body' )[ 0 ];
+      const htmlElement = document.getElementsByTagName( 'html' )[ 0 ];
 
-      // @private {HTMLElement}
-      this.htmlObject = document.getElementsByTagName( 'html' )[ 0 ];
+      // Connect the inner DOMObject element to the HTML Body element. This will render the Display's sub-graph.
+      bodyElement.appendChild( this.element );
 
-      // connect this object to the Body object.
-      this.bodyObject.appendChild( this.element );
-      this._parent = this.bodyObject;
+      // Reference the bodyElement as the parent of the Display.
+      this._parent = bodyElement;
 
+      // Stylize the Body element with favorable CSS styles for the simulation.
+      DOMObject.addElementStyle( bodyElement, {
 
-      //----------------------------------------------------------------------------------------
-      // stylize the HTML and BODY objects
-
-      function setStyle( element, style ) {
-        Object.keys( style ).forEach( key => {
-          element.style[ key ] = style[ key ];
-        } );
-      }
-
-      setStyle( this.htmlObject, {
-        height: '100%',
-        position: 'relative',
-        padding: 0,
-        margin: 0
-      } );
-
-      setStyle( this.bodyObject, {
-        maxWidth: '100%',   // full width and height
+        // Ensure that the simulation is the full width and height in the browser window.
+        maxWidth: '100%',
         maxHeight: '100%',
         height: '100%',
         width: '100%',
         padding: 0,
         margin: 0,
-        position: 'fixed',
+
+        // Ensure that the Display page cannot scroll and the simulation is fixed.
         overflow: 'hidden',
-        background: '#FFF',
-        overflowScrolling: 'touch',
-        touchAction: 'none', // forward all pointer events
+        position: 'fixed',
+
+        // Miscellaneous
         fontSmoothing: 'antialiased',
-        userDrag: 'none',
+        touchAction: 'none', // forward all pointer events
+
+        // Safari-on-ios
+        overflowScrolling: 'touch',
+        tapHighlightColor: 'rgba( 0, 0, 0, 0 )',
         touchCallout: 'none',
-        tapHighlightColor: 'rgba( 0, 0, 0, 0 )'
+        userDrag: 'none'
       } );
     }
   }
