@@ -8,8 +8,14 @@
  * scene graph. Node will provide a much cleaner sim-specific API using SVG compared to DOMObject.
  *
  * Nodes have a large API of properties and options that affect its appearance as well as its subtree.
- * These include translation, scale, rotation, opacity, etc (or any combination). See NODE_OPTION_KEYS for details.
- * Nodes also support Events. See ./events for more documentation.
+ * These include translation, scale, rotation, opacity, etc (or any combination). See the early portion of the constructor
+ * for details. Nodes also support Events. See ./events for more documentation.
+ *
+ * ## Bounds Terminology
+ * - Global coordinate frame: View coordinate frame of the Display (specifically its local coordinate frame).
+ * - Local coordinate frame: The local coordinate frame of the Node, where (0, 0) would be at the Node's origin.
+ * - Parent coordinate frame: The coordinate frame of the parent of the Node. In other words, the local coordinate frame
+ *                            of the parent Node.
  *
  * @author Brandon Li <brandon.li820@gmail.com>
  */
@@ -26,41 +32,63 @@ define( require => {
   class Node extends DOMObject {
 
     /**
-     * @param {Object} [options] - Various key-value pairs that control the appearance and behavior. Subclasses
-     *                             may have different options for their API. See the code where the options are set in
-     *                             the early portion of the constructor for details.
+     * @param {Object} [options] - Various key-value pairs that control the appearance and behavior of the Node.
+     *                             Contains an extended API and some super-class options are constricted. Subclasses may
+     *                             have different options for their API. See the code where the options are set in the
+     *                             early portion of the constructor for details.
      */
     constructor( options ) {
       assert( !options || Object.getPrototypeOf( options ) === Object.prototype,
         `Extra prototype on Options: ${ options }` );
 
+      // Some options are set by Node. Assert that they weren't provided.
+      assert( !options || !options.style, 'Node sets style.' );
+      assert( !options || !options.innerHTML && !options.text, 'Node should not have text or innerHTML' );
+      assert( !options || !options.type || DOMObject.SVG_TYPES.includes( options.type ), 'Must be SVG sub-type.' );
 
-      // Defaults for options.
-      const defaults = {
+      options = {
 
-        // Custom to this class
-
-        // {number|null} - null means self computed height in the constructor, otherwise specifies a height.
-        width: null,
-        height: null,
-        top: null,
-        left: null,
-        center: null,
+        // Super-class options
+        type: 'g',
         style: {
           position: 'absolute'
         },
 
-        visible: true,
-        mouseover: null,
-        mouseout: null,
-        mousedown: null,
-        mouseup: null
+        // Options specific to Node
+        cursor: null,      // {string} - If provided, alias of the CSS cursor of the Node. See setCursor() for doc.
+        visible: true,     // {boolean} - Indicates if the Node is visible. See setVisible() for more doc.
+        opacity: 1,        // {number} - Alias of the CSS opacity of the Node. See setOpacity() for more doc.
+        maxWidth: null,    // {number} - If provided, constrains width of this Node. See setMaxWidth() for more doc.
+        maxHeight: null,   // {number} - If provided, constrains height of this Node. See setMaxHeight() for more doc.
 
+        // transformations
+        translation: null, // {Vector} - If provided, (x, y) translation of the Node. See setTranslation() for more doc.
+        rotation: 0,       // {number} - rotation (in radians) of the Node. See setRotation() for more doc.
+        scale: 1,          // {Vector|number} - scale of the Node. See scale() for more doc.
+
+        // {Bounds} - bounds in the local coordinate frame. See setLocalBounds() for more doc.
+        localBounds: Bounds2.ZERO.copy(),
+
+        // Sets the location of the Node, if provided.
+        leftTop: null,      // {Vector} - The upper-left corner of this Node's bounds. See setLeftTop() for more doc.
+        centerTop: null,    // {Vector} - The top-center of this Node's bounds. See setCenterTop() for more doc.
+        rightTop: null,     // {Vector} - The upper-right corner of this Node's bounds. See setRightTop() for more doc.
+        leftCenter: null,   // {Vector} - The left-center of this Node's bounds. See setLeftCenter() for more doc.
+        center: null,       // {Vector} - The center of this Node's bounds. See setCenter() for more doc.
+        rightCenter: null,  // {Vector} - The center-right of this Node's bounds. See setRightCenter() for more doc.
+        leftBottom: null,   // {Vector} - The bottom-left of this Node's bounds. See setLeftBottom() for more doc.
+        centerBottom: null, // {Vector} - The middle center of this Node's bounds. See setCenterBottom() for more doc.
+        rightBottom: null,  // {Vector} - The bottom right of this Node's bounds. See setRightBottom() for more doc.
+        left: null,         // {number} - The left side of this Node's bounds. See setLeft() for more doc.
+        right: null,        // {number} - The right side of this Node's bounds. See setRight() for more doc.
+        top: null,          // {number} - The top side of this Node's bounds. See setTop() for more doc.
+        bottom: null,       // {number} - The bottom side of this Node's bounds. See setBottom() for more doc.
+        centerX: null,      // {number} - The x-center of this Node's bounds. See setCenterX() for more doc.
+        centerY: null,      // {number} - The y-center of this Node's bounds. See setCenterY() for more doc.
+
+        // Rewrite options so that the passed-in options overrides the defaults.
+        ...options
       };
-
-      // Rewrite options so that it overrides the defaults.
-      options = { ...defaults, ...options };
-      options.style = { ...defaults.style, ...options.style };
 
       super( options );
 
