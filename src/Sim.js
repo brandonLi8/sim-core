@@ -68,6 +68,7 @@ define( require => {
 
       // Initialize a display and loader
       const display = new Display();
+      display.initiate();
       // const loader = new Loader();
 
       // display.addChild( loader );

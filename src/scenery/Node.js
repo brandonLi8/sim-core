@@ -1,7 +1,15 @@
 // Copyright © 2019-2020 Brandon Li. All rights reserved.
 
 /**
- * A sim-specific node for the scene graph, built on top of DOMObject.
+ * Before reading the documentation of this file, it is recommended to read `./DOMObject.js` for context.
+ *
+ * A Node is a sim-specific DOMObject for the scene graph, built on top of DOMObject for SVG groups. In general,
+ * sim-specific code should use scenery Nodes for rendering simulation components and structuring the simulation
+ * scene graph. Node will provide a much cleaner sim-specific API using SVG compared to DOMObject.
+ *
+ * Nodes have a large API of properties and options that affect its appearance as well as its subtree.
+ * These include translation, scale, rotation, opacity, etc (or any combination). See NODE_OPTION_KEYS for details.
+ * Nodes also support Events. See ./events for more documentation.
  *
  * @author Brandon Li <brandon.li820@gmail.com>
  */
@@ -11,6 +19,7 @@ define( require => {
 
   // modules
   const assert = require( 'SIM_CORE/util/assert' );
+  const Bounds = require( 'SIM_CORE/util/Bounds' );
   const DOMObject = require( 'SIM_CORE/core-internal/DOMObject' );
   const Vector = require( 'SIM_CORE/util/Vector' );
 
@@ -167,7 +176,7 @@ define( require => {
     }
 
     /**
-     * Sets up the node to be draggable. Usually the node has to have the position
+     * Sets up the Node to be draggable. Usually the Node has to have the position
      * "absolute" or position "fixed".
      *
      * Dragging events will propagate down its tree respectively.
