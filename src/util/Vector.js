@@ -237,6 +237,18 @@ define( require => {
     }
 
     /**
+     * Multiplies this Vector component-wise by the passed-in Vector.
+     * @public
+     *
+     * @param {Vector} vector
+     * @returns {Vector}
+     */
+    componentMultiply( vector ) {
+      assert( vector instanceof Vector, `invalid vector: ${ vector }` );
+      return this.setX( this._x * vector.x ).setY( this._y * vector.y );
+    }
+
+    /**
      * Negates this vector (multiplies each component by -1), changing this vector.
      * @public
      *
