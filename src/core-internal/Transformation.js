@@ -1,7 +1,7 @@
 // Copyright © 2019-2020 Brandon Li. All rights reserved.
 
 /**
- * A 3 by 2 transformation Matrix, for identifying 2D CSS transformations. Supports a conversion to pixels given the
+ * A standard transformation Matrix, for identifying 2D CSS transformations. Supports a conversion to pixels given the
  * ScreenView scalings.
  *
  * There are 3 main transformations that are supported:
@@ -111,4 +111,4 @@ define( require => {
   }
 
   return Transformation;
-}
+} );
