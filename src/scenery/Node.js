@@ -138,57 +138,41 @@ define( require => {
     }
 
     /**
-     * Accessors and ES5 getters of a private property of this Node. Upper locations are in terms of the visual layout,
-     * so the minY is the "upper", and maxY is the "lower".
+     * ES5 getters of properties of this Node. Traditional Accessors methods aren't included to reduce the memory
+     * footprint. Upper locations are in terms of the visual layout, so the minY is the 'upper', and maxY is the 'lower'
      * @public
      *
      * @returns {*} See the property declaration for documentation of the type.
      */
-    getBounds() { return this._bounds; }
-    getLocalBounds() { return this._localBounds; }
-    getLeftTop() { return this.getBounds().leftBottom; }
-    getCenterTop() { return this.getBounds().centerBottom; }
-    getRightTop() { return this.getBounds().rightBottom; }
-    getLeftCenter() { return this.getBounds().leftCenter; }
-    getCenter() { return this.getBounds().center; }
-    getRightCenter() { return this.getBounds().rightCenter; }
-    getLeftBottom() { return this.getBounds().leftTop; }
-    getCenterBottom() { return this.getBounds().centerTop; }
-    getRightBottom() { return this.getBounds().rightTop; }
-    getLeft() { return this.getBounds().minX; }
-    getRight() { return this.getBounds().maxX; }
-    getTop() { return this.getBounds().minY; }
-    getBottom() { return this.getBounds().maxY; }
-    getWidth() { return this.getBounds().width; }
-    getHeight() { return this.getBounds().height; }
-    getVisible() { return this._visible; }
-    getOpacity() { return this._opacity; }
-    getCursor() { return this._cursor; }
-    getMaxWidth() { return this._maxWidth; }
-    getMaxHeight() { return this._maxHeight; }
+    get bounds() { return this._bounds; }
+    get localBounds() { return this._localBounds; }
+    get leftTop() { return this._bounds.leftBottom; }
+    get centerTop() { return this._bounds.centerBottom; }
+    get rightTop() { return this._bounds.rightBottom; }
+    get leftCenter() { return this._bounds.leftCenter; }
+    get center() { return this._bounds.center; }
+    get rightCenter() { return this._bounds.rightCenter; }
+    get leftBottom() { return this._bounds.leftTop; }
+    get centerBottom() { return this._bounds.centerTop; }
+    get rightBottom() { return this._bounds.rightTop; }
+    get left() { return this._bounds.minX; }
+    get right() { return this._bounds.maxX; }
+    get top() { return this._bounds.minY; }
+    get bottom() { return this._bounds.maxY; }
+    get width() { return this._bounds.width; }
+    get height() { return this._bounds.height; }
+    get visible() { return this._visible; }
+    get opacity() { return this._opacity; }
+    get cursor() { return this._cursor; }
+    get maxWidth() { return this._maxWidth; }
+    get maxHeight() { return this._maxHeight; }
+    get scaleVector() { return this._transformation.scale; }
+    get translation() { return this._transformation.translation; }
+    get rotation() { return this._transformation.rotation; }
 
-    get bounds() { return this.getBounds(); }
-    get localBounds() { return getLocalBounds(); }
-    get leftTop() { return this.getLeftTop(); }
-    get centerTop() { return this.getCenterTop(); }
-    get rightTop() { return this.getRightTop(); }
-    get leftCenter() { return this.leftCenter(); }
-    get center() { return this.getCenter(); }
-    get rightCenter() { return this.rightCenter(); }
-    get leftBottom() { return this.leftBottom(); }
-    get centerBottom() { return this.centerBottom(); }
-    get rightBottom() { return this.rightBottom(); }
-    get left() { return this.getLeft(); }
-    get right() { return this.getRight(); }
-    get top() { return this.getTop(); }
-    get bottom() { return this.getBottom(); }
-    get width() { return this.getWidth(); }
-    get height() { return this.getHeight(); }
-    get visible() { return this.getVisible(); }
-    get opacity() { return this.getOpacity(); }
-    get cursor() { return this.getCursor(); }
-    get maxWidth() { return this.getMaxWidth(); }
-    get maxHeight() { return this.getMaxHeight(); }
+
+
+
 
 
 
@@ -220,7 +204,7 @@ define( require => {
      * @public
      *
      * @param {Node} child
-     * @returns {ScreenView} - Returns 'this' reference, for chaining
+     * @returns {Node} - Returns 'this' reference, for chaining
      */
     addChild( child ) {
       assert( child instanceof Node, `invalid child: ${ child }` );
