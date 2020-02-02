@@ -124,10 +124,8 @@ define( require => {
 
       // @private {Bounds} - Bounds representations of the Node. See comment at the top of the file for documentation
       //                     of these Bounds.
-      this._bounds = Bounds.ZERO.copy();
-      this._localBounds = Bounds.ZERO.copy();
-      this._selfBounds = Bounds.ZERO.copy();
-      this._childBounds = Bounds.ZERO.copy();
+      this._bounds = Bounds.ZERO.copy(); // Bounds for the Node and its children in the "parent" coordinate frame.
+      this._localBounds = Bounds.ZERO.copy(); // Bounds for this node and its children in the "local" coordinate frame.
 
       // Check that there are no conflicting location setters.
       assert( Node.X_LOCATION_KEYS.filter( key => options[ key ] !== undefined ).length <= 1, 'more than 1 x-mutator' );
@@ -139,99 +137,59 @@ define( require => {
       } );
     }
 
-
     /**
-     * Accessors and ES5 getters of a private property of this DOM object.
+     * Accessors and ES5 getters of a private property of this Node. Upper locations are in terms of the visual layout,
+     * so the minY is the "upper", and maxY is the "lower".
      * @public
      *
      * @returns {*} See the property declaration for documentation of the type.
      */
-    getWidth() { return this._width; }
-    get width() { return this.getWidth(); }
-    getHeight() { return this._height; }
-    get height() { return this.getHeight(); }
-    getTop() { return this._top; }
-    get top() { return this.getTop(); }
-    getLeft() { return this._left; }
-    get left() { return this.getLeft(); }
-    getCenter() { return this._center; }
+    getBounds() { return this._bounds; }
+    getLocalBounds() { return this._localBounds; }
+    getLeftTop() { return this.getBounds().leftBottom; }
+    getCenterTop() { return this.getBounds().centerBottom; }
+    getRightTop() { return this.getBounds().rightBottom; }
+    getLeftCenter() { return this.getBounds().leftCenter; }
+    getCenter() { return this.getBounds().center; }
+    getRightCenter() { return this.getBounds().rightCenter; }
+    getLeftBottom() { return this.getBounds().leftTop; }
+    getCenterBottom() { return this.getBounds().centerTop; }
+    getRightBottom() { return this.getBounds().rightTop; }
+    getLeft() { return this.getBounds().minX; }
+    getRight() { return this.getBounds().maxX; }
+    getTop() { return this.getBounds().minY; }
+    getBottom() { return this.getBounds().maxY; }
+    getWidth() { return this.getBounds().width; }
+    getHeight() { return this.getBounds().height; }
+    getVisible() { return this._visible; }
+    getOpacity() { return this._opacity; }
+    getCursour() { return this._cursor; }
+    getMaxWidth() { return this._maxWidth; }
+    getMaxHeight() { return this._maxHeight; }
+
+    get bounds() { return this.getBounds(); }
+    get localBounds() { return getLocalBounds(); }
+    get leftTop() { return this.getLeftTop(); }
+    get centerTop() { return this.getCenterTop(); }
+    get rightTop() { return this.getRightTop(); }
+    get leftCenter() { return this.leftCenter(); }
     get center() { return this.getCenter(); }
+    get rightCenter() { return this.rightCenter(); }
+    get leftBottom() { return this.leftBottom(); }
+    get centerBottom() { return this.centerBottom(); }
+    get rightBottom() { return this.rightBottom(); }
+    get left() { return this.getLeft(); }
+    get right() { return this.getRight(); }
+    get top() { return this.getTop(); }
+    get bottom() { return this.getBottom(); }
+    get width() { return this.getWidth(); }
+    get height() { return this.getHeight(); }
+    get visible() { return this.getVisible(); }
+    get opacity() { return this.getOpacity(); }
+    get cursour() { return this.getCursor(); }
+    get maxWidth() { return this.getMaxWidth(); }
+    get maxHeight() { return this.getMaxHeight(); }
 
-    set center( center ) {
-      this._center = center;
-      this.layout( this._screenViewScale );
-    }
-    set width( width ) {
-      this._width = width;
-      this.layout( this._screenViewScale );
-    }
-    set height( height ) {
-      this._height = height;
-      this.layout( this._screenViewScale );
-    }
-    set top( top ) {
-      this._top = top;
-      this.layout( this._screenViewScale );
-    }
-    set left( left ) {
-      this._left = left;
-      this.layout( this._screenViewScale );
-    }
-
-    get visible() { return this._visible; }
-    set visible( visible ) {
-      this._visible = visible;
-      this.style.opacity = visible ? 1 : 0;
-    }
-
-    set mouseover( listener ) {
-      this._element.addEventListener( 'mouseover', event => {
-        event.stopPropagation();
-        event.preventDefault();
-        // stop propagation to children
-        listener();
-      } );
-    }
-    set mouseout( listener ) {
-
-      // change back to original src on the mouse out
-      this._element.addEventListener( 'mouseout', ( event ) => {
-        event.stopPropagation();
-        event.preventDefault();
-        listener();
-      } );
-    }
-    set mousedown( listener ) {
-      const onDown = event => {
-        event.stopPropagation();
-        event.preventDefault();
-        const globalNodeBounds = this.element.getBoundingClientRect();
-        const globalPosition = this.getEventLocation( event );
-        const globalTopLeft = new Vector( globalNodeBounds.x, globalNodeBounds.y );
-
-        const convertedPosition = globalPosition.copy().subtract( globalTopLeft );
-
-        const localPosition = convertedPosition.copy().divide( this._screenViewScale );
-        const globalLocalPosition = globalPosition.copy().divide( this._screenViewScale );
-
-        listener( localPosition, globalLocalPosition );
-      };
-      this._element.addEventListener( window.isMobile ? 'touchstart' : 'mousedown', onDown );
-    }
-    set mouseup( listener ) {
-      this._element.addEventListener( window.isMobile ? 'touchend' : 'mouseup', event => {
-        event.stopPropagation();
-        event.preventDefault();
-        listener();
-      } );
-    }
-
-    getEventLocation( event ) {
-      return new Vector(
-        event.clientX !== undefined ? event.clientX : event.touches[ 0 ].clientX,
-        event.clientY !== undefined ? event.clientY : event.touches[ 0 ].clientY
-      );
-    }
 
     /**
      * Sets up the Node to be draggable. Usually the Node has to have the position
