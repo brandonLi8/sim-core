@@ -27,8 +27,8 @@
  *                           Node's origin.
  * - Parent coordinate frame: The coordinate frame of the parent of the Node. In other words, the local coordinate frame
  *                            of the parent Node.
- * - Self Coordinate frame: The coordinate frame of just the node, without its sub-tree, in the "local" coordinate frame
- * - Child Coordinate frame: Coordinate frame of just the sub-children of this node, in the "local" coordinate frame.
+ * - Self Coordinate frame: The coordinate frame of just the Node, without its sub-tree, in the "local" coordinate frame
+ * - Child Coordinate frame: Coordinate frame of just the sub-children of this Node, in the "local" coordinate frame.
  *
  * @author Brandon Li <brandon.li820@gmail.com>
  */
@@ -81,21 +81,21 @@ define( require => {
         scale: 1,                 // {Vector|number} - scale of the Node. See scale() for more doc.
 
         // Overrides the location of the Node, if provided.
-        leftTop: null,      // {Vector} - The upper-left corner of this Node's bounds. See setLeftTop() for more doc.
-        centerTop: null,    // {Vector} - The top-center of this Node's bounds. See setCenterTop() for more doc.
-        rightTop: null,     // {Vector} - The upper-right corner of this Node's bounds. See setRightTop() for more doc.
-        leftCenter: null,   // {Vector} - The left-center of this Node's bounds. See setLeftCenter() for more doc.
-        center: null,       // {Vector} - The center of this Node's bounds. See setCenter() for more doc.
-        rightCenter: null,  // {Vector} - The center-right of this Node's bounds. See setRightCenter() for more doc.
-        leftBottom: null,   // {Vector} - The bottom-left of this Node's bounds. See setLeftBottom() for more doc.
-        centerBottom: null, // {Vector} - The middle center of this Node's bounds. See setCenterBottom() for more doc.
-        rightBottom: null,  // {Vector} - The bottom right of this Node's bounds. See setRightBottom() for more doc.
-        left: null,         // {number} - The left side of this Node's bounds. See setLeft() for more doc.
-        right: null,        // {number} - The right side of this Node's bounds. See setRight() for more doc.
-        top: null,          // {number} - The top side of this Node's bounds. See setTop() for more doc.
-        bottom: null,       // {number} - The bottom side of this Node's bounds. See setBottom() for more doc.
-        centerX: null,      // {number} - The x-center of this Node's bounds. See setCenterX() for more doc.
-        centerY: null,      // {number} - The y-center of this Node's bounds. See setCenterY() for more doc.
+        leftTop: null,      // {Vector} - The upper-left corner of this Node's bounds. See setLocation() for more doc.
+        centerTop: null,    // {Vector} - The top-center of this Node's bounds. See setLocation() for more doc.
+        rightTop: null,     // {Vector} - The upper-right corner of this Node's bounds. See setLocation() for more doc.
+        leftCenter: null,   // {Vector} - The left-center of this Node's bounds. See setLocation() for more doc.
+        center: null,       // {Vector} - The center of this Node's bounds. See setLocation() for more doc.
+        rightCenter: null,  // {Vector} - The center-right of this Node's bounds. See seLocation() for more doc.
+        leftBottom: null,   // {Vector} - The bottom-left of this Node's bounds. See setLocation() for more doc.
+        centerBottom: null, // {Vector} - The middle center of this Node's bounds. See setLocation() for more doc.
+        rightBottom: null,  // {Vector} - The bottom right of this Node's bounds. See setLocation() for more doc.
+        left: null,         // {number} - The left side of this Node's bounds. See setLocation() for more doc.
+        right: null,        // {number} - The right side of this Node's bounds. See setLocation() for more doc.
+        top: null,          // {number} - The top side of this Node's bounds. See setLocation() for more doc.
+        bottom: null,       // {number} - The bottom side of this Node's bounds. See setLocation() for more doc.
+        centerX: null,      // {number} - The x-center of this Node's bounds. See setLocation() for more doc.
+        centerY: null,      // {number} - The y-center of this Node's bounds. See setLocation() for more doc.
 
         width: null,        // {number} - The width of the Node's bounds. See setWidth() for more doc.
         height: null,       // {number} - The height of the Node's bounds. See setHeight() for more doc.
@@ -125,7 +125,7 @@ define( require => {
       // @private {Bounds} - Bounds representations of the Node. See comment at the top of the file for documentation
       //                     of these Bounds.
       this._bounds = Bounds.ZERO.copy(); // Bounds for the Node and its children in the "parent" coordinate frame.
-      this._localBounds = Bounds.ZERO.copy(); // Bounds for this node and its children in the "local" coordinate frame.
+      this._localBounds = Bounds.ZERO.copy(); // Bounds for this Node and its children in the "local" coordinate frame.
 
       // Check that there are no conflicting location setters.
       assert( Node.X_LOCATION_KEYS.filter( key => options[ key ] !== undefined ).length <= 1, 'more than 1 x-mutator' );
@@ -140,6 +140,7 @@ define( require => {
     /**
      * ES5 getters of properties of this Node. Traditional Accessors methods aren't included to reduce the memory
      * footprint. Upper locations are in terms of the visual layout, so the minY is the 'upper', and maxY is the 'lower'
+     * See setLocation() for more documentation of Node locations and their names.
      * @public
      *
      * @returns {*} See the property declaration for documentation of the type.
@@ -151,6 +152,8 @@ define( require => {
     get rightTop() { return this._bounds.rightBottom; }
     get leftCenter() { return this._bounds.leftCenter; }
     get center() { return this._bounds.center; }
+    get centerX() { return this._bounds.center.x; }
+    get centerY() { return this._bounds.center.y; }
     get rightCenter() { return this._bounds.rightCenter; }
     get leftBottom() { return this._bounds.leftTop; }
     get centerBottom() { return this._bounds.centerTop; }
@@ -170,7 +173,85 @@ define( require => {
     get translation() { return this._transformation.translation; }
     get rotation() { return this._transformation.rotation; }
 
+    //----------------------------------------------------------------------------------------
+    // Mutators
+    //----------------------------------------------------------------------------------------
 
+    /**
+     * Translates the Node, in the typical view coordinate frame (where positive y is down).
+     * @public
+     *
+     * @param {Vector} translation - the translation amount, given as <xTranslation, yTranslation>.
+     * @returns {Node} - For chaining
+     */
+    translate( translation ) {
+      assert( translation instanceof Vector && translation.isFinite(), `invalid translation: ${ translation }` );
+      this._bounds.shift( translation.x, translation.y );
+      this._localBounds.shift( translation.x, translation.y );
+      this._transformation.translation = this.translation.copy().add( translation );
+      return this;
+    }
+
+    /**
+     * Convenience method that sets the one of the following locations of the Node's bounds to the specified point.
+     *                        top
+     *          ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+     *          ┃ leftTop     centerTop     rightTop    ┃
+     *    left  ┃ leftCenter  center (x,y)  rightCenter ┃  right
+     *          ┃ leftBottom  centerBottom  rightBottom ┃
+     *          ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
+     *                        bottom
+     * @public
+     * @param {string} name - the name of the location (e.g) leftTop
+     * @param {Vector|number} location - the location to set the name to. Use Vector for point locations and numbers
+     *                                   for shifting (i.e. left, top, etc.)
+     * @returns {Node} - For chaining
+     */
+    setLocation( name, location ) {
+      assert( typeof name === 'string', `invalid name: ${ name }` );
+      assert( !this._bounds.isEmpty() && this._bounds.isFinite(),
+        'Cannot set leftTop when the Node has invalid (empty/NaN/infinite) bounds.' );
+
+      // horizontal shift
+      if ( [ 'left', 'right', 'centerX' ].includes( name ) ) {
+        assert( isFinite( location ), `${ name } should be a finite.` );
+        return this.translate( new Vector( location - this[ name ], 0 ) );
+      }
+
+      // vertical shift
+      if ( [ 'top', 'bottom', 'centerY' ].includes( name ) ) {
+        assert( isFinite( location ), `${ name } should be a finite.` );
+        return this.translate( new Vector( 0, location - this[ name ] ) );
+      }
+
+      // At this point, the location must be a point location
+      assert( this[ name ] instanceof Vector, `invalid name: ${ name }` );
+      assert( location instanceof Vector && location.isFinite(), `${ name } should be a finite Vector` );
+      return this.translate( location.copy().minus( this[ name ] ) );
+    }
+
+    /**
+     * ES5 Setters of locations of this Node. Traditional Mutator methods aren't included to reduce the memory
+     * footprint. See setLocation() for more documentation of Node locations and their names.
+     * @public
+     *
+     * @param {*} * - See the property declaration for documentation of the type.
+     */
+    set leftTop( leftTop ) { this.setLocation( 'leftTop', leftTop ); }
+    set centerTop( centerTop ) { this.setLocation( 'centerTop', centerTop ); }
+    set rightTop( rightTop ) { this.setLocation( 'rightTop', rightTop ); }
+    set leftCenter( leftCenter ) { this.setLocation( 'leftCenter', leftCenter ); }
+    set center( center ) { this.setLocation( 'center', center ); }
+    set centerX( centerX ) { this.setLocation( 'centerX', centerX ); }
+    set centerY( centerY ) { this.setLocation( 'centerY', centerY ); }
+    set rightCenter( rightCenter ) { this.setLocation( 'rightCenter', rightCenter ); }
+    set leftBottom( leftBottom ) { this.setLocation( 'leftBottom', leftBottom ); }
+    set centerBottom( centerBottom ) { this.setLocation( 'centerBottom', centerBottom ); }
+    set rightBottom( rightBottom ) { this.setLocation( 'rightBottom', rightBottom ); }
+    set left( left ) { this.setLocation( 'left', left ); }
+    set right( right ) { this.setLocation( 'right', right ); }
+    set top( top ) { this.setLocation( 'top', top ); }
+    set bottom( bottom ) { this.setLocation( 'bottom', bottom ); }
 
 
 
@@ -212,12 +293,12 @@ define( require => {
     }
   }
 
-  Node.X_LOCATION_KEYS = [ 'translation', 'x', 'left', 'right',
+  Node.X_LOCATION_KEYS = [ 'translation', 'left', 'right',
                            'centerX', 'centerTop', 'rightTop',
                            'leftCenter', 'center', 'rightCenter',
                            'leftBottom', 'centerBottom', 'rightBottom' ];
 
-  Node.Y_LOCATION_KEYS = [ 'translation', 'y', 'top', 'bottom',
+  Node.Y_LOCATION_KEYS = [ 'translation', 'top', 'bottom',
                            'centerY', 'centerTop', 'rightTop',
                            'leftCenter', 'center', 'rightCenter',
                            'leftBottom', 'centerBottom', 'rightBottom' ];
