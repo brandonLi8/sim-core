@@ -40,6 +40,7 @@ define( require => {
   const assert = require( 'SIM_CORE/util/assert' );
   const Bounds = require( 'SIM_CORE/util/Bounds' );
   const DOMObject = require( 'SIM_CORE/core-internal/DOMObject' );
+  const Transformation = require( 'SIM_CORE/core-internal/Transformation' );
   const Vector = require( 'SIM_CORE/util/Vector' );
 
   class Node extends DOMObject {
@@ -75,9 +76,9 @@ define( require => {
         maxHeight: null,   // {number} - If provided, constrains height of this Node. See setMaxHeight() for more doc.
 
         // transformations
-        translation: null, // {Vector} - If provided, (x, y) translation of the Node. See setTranslation() for more doc.
-        rotation: 0,       // {number} - rotation (in radians) of the Node. See setRotation() for more doc.
-        scale: 1,          // {Vector|number} - scale of the Node. See scale() for more doc.
+        translation: Vector.ZERO, // {Vector} - (x, y) translation of the Node. See setTranslation() for more doc.
+        rotation: 0,              // {number} - rotation (in radians) of the Node. See setRotation() for more doc.
+        scale: 1,                 // {Vector|number} - scale of the Node. See scale() for more doc.
 
         // Overrides the location of the Node, if provided.
         leftTop: null,      // {Vector} - The upper-left corner of this Node's bounds. See setLeftTop() for more doc.
@@ -95,8 +96,9 @@ define( require => {
         bottom: null,       // {number} - The bottom side of this Node's bounds. See setBottom() for more doc.
         centerX: null,      // {number} - The x-center of this Node's bounds. See setCenterX() for more doc.
         centerY: null,      // {number} - The y-center of this Node's bounds. See setCenterY() for more doc.
-        width: null,        // {number} - The width Node's bounds. See setWidth() for more doc.
-        height: null,       // {number} - The height Node's bounds. See setHeight() for more doc.
+
+        width: null,        // {number} - The width of the Node's bounds. See setWidth() for more doc.
+        height: null,       // {number} - The height of the Node's bounds. See setHeight() for more doc.
 
         // Rewrite options so that the passed-in options overrides the defaults.
         ...options
@@ -104,21 +106,37 @@ define( require => {
 
       super( options );
 
-      // @protected {number} - the width and height in scenery units.
-      this._width = options.width;
-      this._height = options.height;
-      this._top = options.top;
-      this._left = options.left;
-      this._center = options.center;
+      //----------------------------------------------------------------------------------------
 
-      this.scale = null;
-
+      // @private {*} - see options declaration for documentation. Contains getters and setters.
       this._visible = options.visible;
-      if ( options.mouseover ) this.mouseover = options.mouseover;
-      if ( options.mouseout ) this.mouseout = options.mouseout;
-      if ( options.mousedown ) this.mousedown = options.mousedown;
-      if ( options.mouseup ) this.mouseup = options.mouseup;
+      this._opacity = options.opacity;
+      this._cursour = options.cursor;
+      this._maxWidth = options.maxWidth;
+      this._maxHeight = options.maxHeight;
 
+      // @protected {number} - screenViewScale in terms of global units per local unit for converting Scenery
+      //                       coordinates to pixels. Referenced as soon as the scale is known in `layout()`
+      this._screenViewScale = null;
+
+      // @protected {Transformation} - records and references the transformations of the Node.
+      this._transformation = new Transformation( options.scale, options.rotation, options.translation );
+
+      // @private {Bounds} - Bounds representations of the Node. See comment at the top of the file for documentation
+      //                     of these Bounds.
+      this._bounds = Bounds.ZERO.copy();
+      this._localBounds = Bounds.ZERO.copy();
+      this._selfBounds = Bounds.ZERO.copy();
+      this._childBounds = Bounds.ZERO.copy();
+
+      // Check that there are no conflicting location setters.
+      assert( Node.X_LOCATION_KEYS.filter( key => options[ key ] !== undefined ).length <= 1, 'more than 1 x-mutator' );
+      assert( Node.Y_LOCATION_KEYS.filter( key => options[ key ] !== undefined ).length <= 1, 'more than 1 y-mutator' );
+
+      // Call the mutators of this instance for the location options that were provided.
+      Node.X_LOCATION_KEYS.concat( Node.Y_LOCATION_KEYS ).forEach( key => {
+        if ( options[ key ] ) this[ key ] = key;
+      } );
     }
 
 
@@ -141,23 +159,23 @@ define( require => {
 
     set center( center ) {
       this._center = center;
-      this.layout( this.scale );
+      this.layout( this._screenViewScale );
     }
     set width( width ) {
       this._width = width;
-      this.layout( this.scale );
+      this.layout( this._screenViewScale );
     }
     set height( height ) {
       this._height = height;
-      this.layout( this.scale );
+      this.layout( this._screenViewScale );
     }
     set top( top ) {
       this._top = top;
-      this.layout( this.scale );
+      this.layout( this._screenViewScale );
     }
     set left( left ) {
       this._left = left;
-      this.layout( this.scale );
+      this.layout( this._screenViewScale );
     }
 
     get visible() { return this._visible; }
@@ -193,8 +211,8 @@ define( require => {
 
         const convertedPosition = globalPosition.copy().subtract( globalTopLeft );
 
-        const localPosition = convertedPosition.copy().divide( this.scale );
-        const globalLocalPosition = globalPosition.copy().divide( this.scale );
+        const localPosition = convertedPosition.copy().divide( this._screenViewScale );
+        const globalLocalPosition = globalPosition.copy().divide( this._screenViewScale );
 
         listener( localPosition, globalLocalPosition );
       };
@@ -247,7 +265,7 @@ define( require => {
         // mouse cursor
         const globalNodeBounds = this.element.getBoundingClientRect();
         const globalTopLeft = new Vector( globalNodeBounds.x, globalNodeBounds.y );
-        cursorViewPosition = this.getEventLocation( event ).subtract( globalTopLeft ).divide( this.scale );
+        cursorViewPosition = this.getEventLocation( event ).subtract( globalTopLeft ).divide( this._screenViewScale );
 
         options.start && options.start();
 
@@ -265,7 +283,7 @@ define( require => {
           setTimeout( () => {
             const globalNodeBounds = this.element.getBoundingClientRect();
             const globalTopLeft = new Vector( globalNodeBounds.x, globalNodeBounds.y );
-            const currentViewPosition = this.getEventLocation( event ).subtract( globalTopLeft ).divide( this.scale );
+            const currentViewPosition = this.getEventLocation( event ).subtract( globalTopLeft ).divide( this._screenViewScale );
 
             const displacement = currentViewPosition.subtract( cursorViewPosition );
             options.listener && options.listener( displacement );
@@ -303,7 +321,7 @@ define( require => {
         this.style.left = `${ scale * ( this._center.x - ( this.width ? this.width / 2 : 0 ) ) }px`;
       }
 
-      this.scale = scale;
+      this._screenViewScale = scale;
     }
 
     /**
@@ -319,6 +337,17 @@ define( require => {
       return super.addChild( child );
     }
   }
+
+  Node.X_LOCATION_KEYS = [ 'translation', 'x', 'left', 'right',
+                           'centerX', 'centerTop', 'rightTop',
+                           'leftCenter', 'center', 'rightCenter',
+                           'leftBottom', 'centerBottom', 'rightBottom' ];
+
+  Node.Y_LOCATION_KEYS = [ 'translation', 'y', 'top', 'bottom',
+                           'centerY', 'centerTop', 'rightTop',
+                           'leftCenter', 'center', 'rightCenter',
+                           'leftBottom', 'centerBottom', 'rightBottom' ];
+
 
   return Node;
 } );
