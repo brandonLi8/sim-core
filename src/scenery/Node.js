@@ -9,8 +9,8 @@
  * scene graph. Node will provide a much cleaner sim-specific API using SVG compared to DOMObject.
  *
  * Nodes have a large API of properties and options that affect its appearance as well as its subtree.
- * These include translation, scale, rotation, opacity, etc (or any combination). See the early portion of the constructor
- * for details. Nodes also support Events. See ./events for more documentation.
+ * These include translation, scale, rotation, opacity, etc (or any combination). See the early portion of the
+ * constructor for details. Nodes also support Events. See ./events/ for more documentation.
  *
  * ## Coordinates
  * It is important to Node coordinates ARE NOT in pixels. The window width and height in pixels change from device to

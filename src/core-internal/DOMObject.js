@@ -459,7 +459,7 @@ define( require => {
       else if ( contains( `o${ camelStyleKey }` ) ) setStyle( `o${ camelStyleKey }`, styleKey );
       else { assert( false, `invalid styleKey: ${ styleKey }` ); }
     } );
-  }
+  };
 
   // @public (read-only) - array of the SVG element types.
   DOMObject.SVG_TYPES = [ 'svg',
@@ -473,7 +473,7 @@ define( require => {
     'text',
     'image',
     'radialGradient',
-    'linearGradient' ]
+    'linearGradient' ];
 
   return DOMObject;
 } );
