@@ -32,6 +32,83 @@ define( require => {
   const Util = require( 'SIM_CORE/util/Util' );
   const Vector = require( 'SIM_CORE/util/Vector' );
 
+  class Transformation {
+
+    /**
+     * @param {Vector} scale - scaling of the transformation, given as <xScale, yScale>.
+     * @param {number} rotation - the rotation of the transformation, given in radians.
+     * @param {Vector} translation - the the translation of the translation, given as <xTranslation, yTranslation>.
+     */
+    constructor( scale, rotation, translation ) {
+      assert( scale instanceof Vector, `invalid scale: ${ scale }` );
+      assert( typeof rotation === 'number', `invalid rotation: ${ rotation }` );
+      assert( translation instanceof Vector, `invalid translation: ${ translation }` );
+
+      // @private {Vector} - see the argument documentation.
+      this._translation = translation.copy();
+      this._scale = scale.copy();
+
+      // @public {number} - the rotation of the transformation. Can by publicly mutated.
+      this.rotation = rotation;
+    }
+
+    /**
+     * Setters the scale of the Transformation, without mutating the passed in scale.
+     * @public
+     *
+     * @param {Vector} scale - scaling of the transformation, given as <xScale, yScale>.
+     */
+    set scale( scale ) { this._scale.set( scale ); }
+
+    /**
+     * Gets the scale of the Transformation.
+     * @public
+     *
+     * @returns {Vector} - scaling of the transformation, given as <xScale, yScale>.
+     */
+    get scale() { return this._scale; }
+
+    /**
+     * Setters the translation of the Transformation, without mutating the passed in translation.
+     * @public
+     *
+     * @param {Vector} translation - scaling of the transformation, given as <xTranslation, yTranslation>.
+     */
+    set translation( translation ) { this._translation.set( translation ); }
+
+    /**
+     * Gets the translation of the Transformation.
+     * @public
+     *
+     * @returns {Vector} - scaling of the transformation, given as <xTranslation, yTranslation>.
+     */
+    get translation() { return this._translation; }
+
+    /**
+     * Gets the CSS style transform string.
+     * See https://developer.mozilla.org/en-US/docs/Web/CSS/transform-function/matrix and
+     * http://www.w3.org/TR/css3-transforms/, particularly Section 13 that discusses the SVG compatibility.
+     *
+     * Will prevent numbers from being over 10 decimal places. 10 is the largest guaranteed number of digits
+     * according to https://developer.mozilla.org/en-US/docs/JavaScript/Reference/Global_Objects/Number/toFixed
+     * @public
+     *
+     * @param {number} screenViewScale - screenViewScale in terms of global units per local unit for converting Scenery
+     *                                   coordinates to pixels.
+     */
+    getCSSTransform( screenViewScale ) {
+
+      // Compute the transformation matrix values. // NOTE: the toFixed calls are inlined for performance reasons.
+      const scaleX = ( Math.cos( this.rotation ) * this.scale.x ).toFixed( 10 );
+      const scaleY = ( Math.cos( this.rotation ) * this.scale.y ).toFixed( 10 );
+      const skewX = ( -1 * Math.sin( this.rotation ) * this.scale.x ).toFixed( 10 );
+      const skewY = ( Math.sin( this.rotation ) * this.scale.y ).toFixed( 10 );
+      const translateX = ( this.translate.x * screenViewScale ).toFixed( 10 );
+      const translateY = ( this.translate.y * screenViewScale ).toFixed( 10 );
+
+      return `matrix(${ scaleX },${ skewY },${ skewX },${ scaleY },${ translateX },${ translateY })`;
+    }
+  }
 
   return Transformation;
 }
