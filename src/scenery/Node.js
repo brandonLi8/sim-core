@@ -17,15 +17,18 @@
  * device and the window size my shrink/grow.
  *
  * Instead, Node uses ScreenView coordinates. ScreenView Coordinates are constant and don't depend on the window width.
- * It is a changing scalar off the actual window size. See ScreenView.js for more documentation. All Node coordinates
- * are in terms of these coordinates. The `layout()` method then changes the actual pixel coordinates based off the
- * ScreenView scalar.
+ * It is a changing scalar off the actual window size. All Node coordinates are in terms of these coordinates.
+ * The `layout()` method then changes the actual pixel coordinates based off the ScreenView scale. See ScreenView.js for
+ * more documentation.
  *
  * Some helpful terminology:
- * - Global coordinate frame: View coordinate frame of the Display (specifically its local coordinate frame).
- * - Local coordinate frame: The local coordinate frame of the Node, where (0, 0) would be at the Node's origin.
+ * - Global coordinate frame: View coordinate frame relative to the Display (specifically its local coordinate frame).
+ * - Local coordinate frame: The local coordinate frame of the Node and its sub-tree, where (0, 0) would be at the
+ *                           Node's origin.
  * - Parent coordinate frame: The coordinate frame of the parent of the Node. In other words, the local coordinate frame
  *                            of the parent Node.
+ * - Self Coordinate frame: The coordinate frame of just the node, without its sub-tree, in the "local" coordinate frame
+ * - Child Coordinate frame: Coordinate frame of just the sub-children of this node, in the "local" coordinate frame.
  *
  * @author Brandon Li <brandon.li820@gmail.com>
  */
@@ -76,10 +79,7 @@ define( require => {
         rotation: 0,       // {number} - rotation (in radians) of the Node. See setRotation() for more doc.
         scale: 1,          // {Vector|number} - scale of the Node. See scale() for more doc.
 
-        // {Bounds} - bounds in the local coordinate frame. See setLocalBounds() for more doc.
-        localBounds: Bounds2.ZERO.copy(),
-
-        // Sets the location of the Node, if provided.
+        // Overrides the location of the Node, if provided.
         leftTop: null,      // {Vector} - The upper-left corner of this Node's bounds. See setLeftTop() for more doc.
         centerTop: null,    // {Vector} - The top-center of this Node's bounds. See setCenterTop() for more doc.
         rightTop: null,     // {Vector} - The upper-right corner of this Node's bounds. See setRightTop() for more doc.
