@@ -111,7 +111,7 @@ define( require => {
       // @private {*} - see options declaration for documentation. Contains getters and setters.
       this._visible = options.visible;
       this._opacity = options.opacity;
-      this._cursour = options.cursor;
+      this._cursor = options.cursor;
       this._maxWidth = options.maxWidth;
       this._maxHeight = options.maxHeight;
 
@@ -163,7 +163,7 @@ define( require => {
     getHeight() { return this.getBounds().height; }
     getVisible() { return this._visible; }
     getOpacity() { return this._opacity; }
-    getCursour() { return this._cursor; }
+    getCursor() { return this._cursor; }
     getMaxWidth() { return this._maxWidth; }
     getMaxHeight() { return this._maxHeight; }
 
@@ -186,80 +186,12 @@ define( require => {
     get height() { return this.getHeight(); }
     get visible() { return this.getVisible(); }
     get opacity() { return this.getOpacity(); }
-    get cursour() { return this.getCursor(); }
+    get cursor() { return this.getCursor(); }
     get maxWidth() { return this.getMaxWidth(); }
     get maxHeight() { return this.getMaxHeight(); }
 
 
-    /**
-     * Sets up the Node to be draggable. Usually the Node has to have the position
-     * "absolute" or position "fixed".
-     *
-     * Dragging events will propagate down its tree respectively.
-     * @public
-     */
-    drag( options ) {
 
-      options = {
-        // {Function|null} - Called as start( event: {Event}, listener: {DragListener} ) when the drag is started.
-        // This is preferred over passing press(), as the drag start hasn't been fully processed at that point.
-        start: null,
-
-        // {Function|null} - Called as end( listener: {DragListener} ) when the drag is ended. This is preferred over
-        // passing release(), as the drag start hasn't been fully processed at that point.
-        // NOTE: This will also be called if the drag is ended due to being interrupted or canceled.
-        end: null,
-
-        listener: null,
-
-        ...options
-      };
-      let cursorViewPosition;
-
-      // start drag event listener
-      const onDown = ( event ) => {
-        event = event || window.event;
-        event.preventDefault();
-        // mouse cursor
-        const globalNodeBounds = this.element.getBoundingClientRect();
-        const globalTopLeft = new Vector( globalNodeBounds.x, globalNodeBounds.y );
-        cursorViewPosition = this.getEventLocation( event ).subtract( globalTopLeft ).divide( this._screenViewScale );
-
-        options.start && options.start();
-
-        document.addEventListener( window.isMobile ? 'touchend' : 'mouseup', closeDrag );
-        document.addEventListener( window.isMobile ? 'touchmove' : 'mousemove', drag );
-      };
-      this._element.addEventListener( window.isMobile ? 'touchstart' : 'mousedown', onDown );
-
-      let scheduled = null;
-      const drag = event => {
-
-        event = event || window.event;
-        event.preventDefault();
-        if ( !scheduled ) {
-          setTimeout( () => {
-            const globalNodeBounds = this.element.getBoundingClientRect();
-            const globalTopLeft = new Vector( globalNodeBounds.x, globalNodeBounds.y );
-            const currentViewPosition = this.getEventLocation( event ).subtract( globalTopLeft ).divide( this._screenViewScale );
-
-            const displacement = currentViewPosition.subtract( cursorViewPosition );
-            options.listener && options.listener( displacement );
-
-            scheduled = null;
-          }, 10 );
-        }
-        scheduled = event;
-      };
-
-      function closeDrag() {
-        // on the release
-        document.removeEventListener( window.isMobile ? 'touchend' : 'mouseup', closeDrag );
-        document.removeEventListener( window.isMobile ? 'touchmove' : 'mousemove', drag );
-
-        options.end && options.end();
-      }
-    }
 
     /**
      * Called when the Node layout needs to be updated, typically when the browser window is resized.

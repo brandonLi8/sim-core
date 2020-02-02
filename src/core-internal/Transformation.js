@@ -93,8 +93,7 @@ define( require => {
      * according to https://developer.mozilla.org/en-US/docs/JavaScript/Reference/Global_Objects/Number/toFixed
      * @public
      *
-     * @param {number} screenViewScale - screenViewScale in terms of global units per local unit for converting Scenery
-     *                                   coordinates to pixels.
+     * @param {number} screenViewScale - screenViewScale in terms of window pixels per Scenery coordinates.
      */
     getCSSTransform( screenViewScale ) {
 
