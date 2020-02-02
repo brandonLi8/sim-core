@@ -127,6 +127,11 @@ define( require => {
     truenit.ok( A.copy().multiply( 3 ).equals( new Vector( 12, 6 ) ) );
     truenit.ok( A.copy().multiply( Number.POSITIVE_INFINITY ).equals( E ) );
 
+    // componentMultiply
+    truenit.ok( A.copy().componentMultiply( Vector.ZERO ).equals( Vector.ZERO ) );
+    truenit.ok( A.copy().componentMultiply( B ).equals( new Vector( 8, 6 ) ) );
+    truenit.ok( A.copy().componentMultiply( E ).equals( E ) );
+
     // divide
     truenit.ok( A.copy().divide( 1 ).equals( A ) );
     truenit.ok( A.copy().divide( 2 ).equals( new Vector( 2, 1 ) ) );
