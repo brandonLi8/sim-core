@@ -37,6 +37,7 @@ define( require => {
 
       options = {
 
+        type: 'svg',
         // {Bounds} the bounds that are safe to draw in on all supported platforms
         viewBounds: DEFAULT_VIEW_BOUNDs.copy(),
 

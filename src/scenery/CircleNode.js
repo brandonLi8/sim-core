@@ -1,3 +1,4 @@
+
 // Copyright © 2019-2020 Brandon Li. All rights reserved.
 
 /**
@@ -11,13 +12,12 @@ define( require => {
 
   // modules
   const assert = require( 'SIM_CORE/util/assert' );
-  const SVGNode = require( 'SIM_CORE/scenery/SVGNode' );
+  const Node = require( 'SIM_CORE/scenery/Node' );
   const Vector = require( 'SIM_CORE/util/Vector' );
 
   // constants
-  const XML_NAMESPACE = 'http://www.w3.org/2000/svg';
 
-  class Circle extends SVGNode {
+  class Circle extends Node {
 
     /**
      * @param {Object} [options] - Various key-value pairs that control the appearance and behavior. Subclasses
@@ -28,15 +28,11 @@ define( require => {
       assert( !options || Object.getPrototypeOf( options ) === Object.prototype,
         `Extra prototype on Options: ${ options }` );
 
-
       // Defaults for options.
       const defaults = {
 
         type: 'circle',
-        namespace: XML_NAMESPACE,
-
-        radius: 0,
-        center: Vector.ZERO
+        radius: 0
       };
 
       // Rewrite options so that it overrides the defaults.
@@ -45,26 +41,28 @@ define( require => {
       super( options );
 
       this._radius = options.radius;
+      this.radius = this._radius;
 
-      this.addAttributes( {
-        r: options.radius, // In percentage of the container.
-        cx: options.center.x, // Center the circle
-        cy: options.center.y // Center the circle
-      } );
     }
 
     get radius() { return this._radius; }
     set radius( radius ) {
       this._radius = radius;
-      this.layout( this.scale );
+      const center = this.center.copy();
+      this.width = this._radius * 2;
+      this.height = this._radius * 2;
+      this.center = center;
+      this.layout( this._screenViewScale  );
     }
 
     layout( scale ) {
 
       super.layout( scale );
-      this.addAttributes( {
-        cx: `${ scale * this.center.x }px`,
-        cy: `${ scale * this.center.y }px`,
+      const globalBounds = this._computeGlobalBounds();
+
+     globalBounds && this.addAttributes( {
+        cx: `${ scale * globalBounds.centerX }px`,
+        cy: `${ scale * globalBounds.centerY }px`,
         r: `${ scale * this._radius }px`
       } );
     }
