@@ -4,31 +4,31 @@
  * Before reading the documentation of this file, it is recommended to read `./DOMObject.js` for context.
  *
  * ## General Description of Nodes
- * A Node is a sim-specific DOMObject for the scene graph, built on top of DOMObject for SVG groups. In general,
+ * A Node is a sim-specific DOMObject for the scene graph, built specifically for SVG groups. In general,
  * sim-specific code should use scenery Nodes for rendering simulation components and structuring the simulation
  * scene graph. Node will provide a much cleaner sim-specific API using SVG compared to DOMObject.
  *
- * Nodes have a large API of properties and options that affect its appearance as well as its subtree.
- * These include translation, scale, rotation, opacity, etc (or any combination). See the early portion of the
- * constructor for details. Nodes also support Events. See ./events/ for more documentation.
+ * Nodes have a large API of properties and options that affect its appearance and location as well as its subtree.
+ * These include translation, scale, rotation, opacity, etc (or any combination of these). See the early portion of the
+ * constructor for details. Nodes also support pointer Events. See ./events/ for details.
  *
  * ## Coordinates
- * It is important to Node coordinates ARE NOT in pixels. The window width and height in pixels change from device to
+ * It is important to Node coordinates ARE NOT in pixels. The browser width and height (in pixels) change from device to
  * device and the window size my shrink/grow.
  *
  * Instead, Node uses ScreenView coordinates. ScreenView Coordinates are constant and don't depend on the window width.
  * It is a changing scalar off the actual window size. All Node coordinates are in terms of these coordinates.
- * The `layout()` method then changes the actual pixel coordinates based off the ScreenView scale. See ScreenView.js for
- * more documentation.
+ * The layout() method then changes the actual CSS pixel coordinates based off the ScreenView scale. See ScreenView.js
+ * for more documentation.
  *
- * Some helpful terminology:
- * - Global coordinate frame: View coordinate frame relative to the Display (specifically its local coordinate frame).
- * - Local coordinate frame: The local coordinate frame of the Node and its sub-tree, where (0, 0) would be at the
- *                           Node's origin.
- * - Parent coordinate frame: The coordinate frame of the parent of the Node. In other words, the local coordinate frame
- *                            of the parent Node.
- * - Self Coordinate frame: The coordinate frame of just the Node, without its sub-tree, in the "local" coordinate frame
- * - Child Coordinate frame: Coordinate frame of just the sub-children of this Node, in the "local" coordinate frame.
+ * It is also important to note that coordinates for all view-related objects have the origin at the top-left and the
+ * positive-y downwards.
+ *
+ * ## Terminology:
+ * - Window coordinates: Coordinate frame relative to the browser, in pixels. This is used mainly for Event listeners.
+ * - Global coordinates: Coordinate frame relative to the ScreenView (specifically its local coordinate frame).
+ * - Local coordinates: Coordinate frame relative to ** each ** Node, where (0, 0) would be at the Node's origin.
+ * - Parent coordinates: Coordinate frame relative to the parent of each Node. (local coordinate frame of the parent).
  *
  * @author Brandon Li <brandon.li820@gmail.com>
  */
