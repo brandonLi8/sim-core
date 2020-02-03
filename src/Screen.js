@@ -25,7 +25,7 @@ define( require => {
      *                             Some options are specific to this class while others are passed to the super class.
      *                             See the early portion of the constructor for details.
      */
-    constructor(  options ) {
+    constructor( createView, options ) {
 
       assert( !options || Object.getPrototypeOf( options ) === Object.prototype, `invalid options: ${ options }` );
 
@@ -58,7 +58,7 @@ define( require => {
 
       // @private
       // this._createModel = createModel;
-      // this._createView = createView;
+      this._createView = createView;
 
       // Construction of the model and view are delayed and controlled to enable features like
       // a) faster loading when only loading certain screens
@@ -84,15 +84,15 @@ define( require => {
      */
     initializeView() {
       assert( this._view === null, 'there was already a model' );
-      assert( this._model !== null, 'model must be created first' );
-      this._view = this._createView( this._model );
+      // assert( this._model !== null, 'model must be created first' );
+      this._view = this._createView( );
 
       this.addChild( this._view );
     }
 
     // Initialize both the model and view
     initializeModelAndView() {
-      this.initializeModel();
+      // this.initializeModel();
       this.initializeView();
     }
   }

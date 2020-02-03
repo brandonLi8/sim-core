@@ -69,42 +69,46 @@ define( require => {
       // Initialize a display and loader
       const display = new Display();
       display.initiate();
+
       // const loader = new Loader();
 
       // display.addChild( loader );
 
-      // // Add the FPSCounter if the query parameter was provided.
-      // if ( StandardSimQueryParameters.fps ) {
-      //   const counter = new FPSCounter();
-      //   counter.start();
-      //   display.addChild( counter );
-      // }
+      // Add the FPSCounter if the query parameter was provided.
+      if ( StandardSimQueryParameters.fps ) {
+        const counter = new FPSCounter();
+        counter.start();
+        display.addChild( counter );
+      }
 
-      // // Add the navigation bar
-      // const navigationBar = new NavigationBar( options.name );
+      // Add the navigation bar
+      const navigationBar = new NavigationBar( options.name );
 
-      // display.addChild( navigationBar );
+      display.addChild( navigationBar );
 
-      // display.addChild( screen );
-      // screen.initializeModelAndView();
+      display.addChild( screen );
+      screen.initializeModelAndView();
 
 
-      // if ( StandardSimQueryParameters.dev ) {
-      //   screen._view.enableDevBorder();
-      // }
+      if ( StandardSimQueryParameters.dev ) {
+        screen._view.enableDevBorder();
+      }
 
-      // window.onresize = () => {
-      //   const windowHeight = window.innerHeight;
-      //   const windowWidth = window.innerWidth;
+      window.onresize = () => {
+        const windowHeight = window.innerHeight;
+        const windowWidth = window.innerWidth;
 
-      //   navigationBar.layout( windowWidth, windowHeight );
+        navigationBar.layout( windowWidth, windowHeight );
 
-      //   const screenHeight = windowHeight - parseFloat( navigationBar.style.height );
-      //   screen.style.height = `${ screenHeight }px`;
 
-      //   screen._view.layout( windowWidth, screenHeight );
-      // };
-      // window.onresize();
+        const screenHeight = windowHeight - parseFloat( navigationBar.style.height );
+        screen.style.height = `${ screenHeight }px`;
+
+        screen._view.layout( windowWidth, screenHeight );
+      };
+      window.onresize();
+
+
 
       // let lastStepTime = new Date();
 
