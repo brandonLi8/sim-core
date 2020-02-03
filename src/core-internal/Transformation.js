@@ -116,7 +116,7 @@ define( require => {
     set rotatation( rotation ) { this._rotation = rotation; }
 
     /**
-     * Gets the CSS style transform string.
+     * Generates the CSS style transform string.
      * See https://developer.mozilla.org/en-US/docs/Web/CSS/transform-function/matrix and
      * http://www.w3.org/TR/css3-transforms/, particularly Section 13 that discusses the SVG compatibility.
      *
@@ -124,9 +124,9 @@ define( require => {
      * according to https://developer.mozilla.org/en-US/docs/JavaScript/Reference/Global_Objects/Number/toFixed
      * @public
      *
-     * @param {number} screenViewScale - screenViewScale in terms of window pixels per Scenery coordinates.
+     * @param {number} screenViewScale - screenViewScale in terms of window pixels per Scenery coordinate.
      */
-    getCSSTransform( screenViewScale ) {
+    generateCSSTransformString( screenViewScale ) {
 
       // Compute the transformation matrix values. // NOTE: the toFixed calls are inlined for performance reasons.
       const scaleX = ( Math.cos( this.rotation ) * this.scale.x ).toFixed( 10 );

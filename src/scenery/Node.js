@@ -485,7 +485,7 @@ define( require => {
           this.style.left = `${ scale * ( globalBounds.minX ) }px`;
         }
       }
-      this.style.transform = this._transformation.getCSSTransform( scale );
+      this.style.transform = this._transformation.generateCSSTransformString( scale );
 
       this._screenViewScale = scale;
     }
