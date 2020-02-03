@@ -32,8 +32,7 @@ define( require => {
      *                             the early portion of the constructor for details.
      */
     constructor( listener, options ) {
-      assert( !options || Object.getPrototypeOf( options ) === Object.prototype,
-        `Extra prototype on Options: ${ options }` );
+      assert( !options || Object.getPrototypeOf( options ) === Object.prototype, `invalid options: ${ options }` );
 
 
       // Defaults for options.

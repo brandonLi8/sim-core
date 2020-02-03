@@ -15,7 +15,6 @@ define( require => {
   const assert = require( 'SIM_CORE/util/assert' );
   const Bounds = require( 'SIM_CORE/util/Bounds' );
   const DOMObject = require( 'SIM_CORE/core-internal/DOMObject' );
-  const Node = require( 'SIM_CORE/scenery/Node' );
 
   /*
    * Default width and height for iPad2, iPad3, iPad4 running Safari with default tabs and decorations
@@ -59,7 +58,7 @@ define( require => {
      * @returns {ScreenView} - Returns 'this' reference, for chaining
      */
     addChild( child ) {
-      assert( child instanceof Node, `invalid child: ${ child }` );
+      assert( child instanceof require( 'SIM_CORE/scenery/Node' ), `invalid child: ${ child }` );
       return super.addChild( child );
     }
 

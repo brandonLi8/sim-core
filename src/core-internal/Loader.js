@@ -64,7 +64,7 @@ define( require => {
 
       if ( options ) {
         // Changes to the API means excluding some of the options.
-        assert( Object.getPrototypeOf( options ) === Object.prototype, `Extra prototype on Options: ${ options }` );
+        assert( Object.getPrototypeOf( options ) === Object.prototype, `invalid options: ${ options }` );
         assert( !options.style, 'Loader sets options.style.' );
         assert( !options.type, 'Loader sets options.type.' );
         assert( !options.innerHTML && !options.text, 'Loader should be a container with no inner content.' );

@@ -40,6 +40,7 @@ define( require => {
   const assert = require( 'SIM_CORE/util/assert' );
   const Bounds = require( 'SIM_CORE/util/Bounds' );
   const DOMObject = require( 'SIM_CORE/core-internal/DOMObject' );
+  const ScreenView = require( 'SIM_CORE/scenery/ScreenView' );
   const Transformation = require( 'SIM_CORE/core-internal/Transformation' );
   const Vector = require( 'SIM_CORE/util/Vector' );
 
@@ -52,8 +53,7 @@ define( require => {
      *                             early portion of the constructor for details.
      */
     constructor( options ) {
-      assert( !options || Object.getPrototypeOf( options ) === Object.prototype,
-        `Extra prototype on Options: ${ options }` );
+      assert( !options || Object.getPrototypeOf( options ) === Object.prototype, `invalid options: ${ options }` );
 
       // Some options are set by Node. Assert that they weren't provided.
       assert( !options || !options.style, 'Node sets style.' );
@@ -448,7 +448,7 @@ define( require => {
     _computeGlobalBounds() {
 
       const traverser = ( currentNode ) => {
-        if ( currentNode instanceof require( 'SIM_CORE/scenery/ScreenView' ) ) {
+        if ( currentNode instanceof ScreenView ) {
           return currentNode.viewBounds;
         }
         else if ( !currentNode.parent || !( currentNode.parent instanceof DOMObject ) ) {

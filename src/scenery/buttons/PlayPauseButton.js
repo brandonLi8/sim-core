@@ -38,8 +38,7 @@ define( require => {
 
       assert( isPlayingProperty instanceof Property && typeof isPlayingProperty.value === 'boolean',
         `invalid isPlayingProperty: ${ isPlayingProperty }` );
-      assert( !options || Object.getPrototypeOf( options ) === Object.prototype,
-        `Extra prototype on Options: ${ options }` );
+      assert( !options || Object.getPrototypeOf( options ) === Object.prototype, `invalid options: ${ options }` );
 
 
       // Defaults for options.
