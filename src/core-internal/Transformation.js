@@ -102,8 +102,8 @@ define( require => {
       const scaleY = ( Math.cos( this.rotation ) * this.scale.y ).toFixed( 10 );
       const skewX = ( -1 * Math.sin( this.rotation ) * this.scale.x ).toFixed( 10 );
       const skewY = ( Math.sin( this.rotation ) * this.scale.y ).toFixed( 10 );
-      const translateX = ( this.translate.x * screenViewScale ).toFixed( 10 );
-      const translateY = ( this.translate.y * screenViewScale ).toFixed( 10 );
+      const translateX = ( this.translation.x * screenViewScale ).toFixed( 10 );
+      const translateY = ( this.translation.y * screenViewScale ).toFixed( 10 );
 
       return `matrix(${ scaleX },${ skewY },${ skewX },${ scaleY },${ translateX },${ translateY })`;
     }

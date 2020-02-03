@@ -43,7 +43,7 @@ define( require => {
       options = {
 
         // defaults
-        type: 'svg',
+        type: 'div',
         style: {
           height: '100%',
           width: '100%',

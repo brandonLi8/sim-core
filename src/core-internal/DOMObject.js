@@ -457,7 +457,6 @@ define( require => {
       else if ( contains( `webkit${ camelStyleKey }` ) ) setStyle( `webkit${ camelStyleKey }`, styleKey );
       else if ( contains( `ms${ camelStyleKey }` ) ) setStyle( `ms${ camelStyleKey }`, styleKey );
       else if ( contains( `o${ camelStyleKey }` ) ) setStyle( `o${ camelStyleKey }`, styleKey );
-      else { assert( false, `invalid styleKey: ${ styleKey }` ); }
     } );
   };
 
