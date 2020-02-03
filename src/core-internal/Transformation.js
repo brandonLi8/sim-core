@@ -35,18 +35,18 @@ define( require => {
   class Transformation {
 
     /**
-     * @param {Vector} scale - scaling of the transformation, given as <xScale, yScale>.
+     * @param {Vector|number} scale - scaling of the transformation, given as <xScale, yScale> or just scale.
      * @param {number} rotation - the rotation of the transformation, given in radians.
      * @param {Vector} translation - the the translation of the translation, given as <xTranslation, yTranslation>.
      */
     constructor( scale, rotation, translation ) {
-      assert( scale instanceof Vector, `invalid scale: ${ scale }` );
+      assert( scale instanceof Vector || typeof scale === 'number', `invalid scale: ${ scale }` );
       assert( typeof rotation === 'number', `invalid rotation: ${ rotation }` );
       assert( translation instanceof Vector, `invalid translation: ${ translation }` );
 
       // @private {Vector} - see the argument documentation.
       this._translation = translation.copy();
-      this._scale = scale.copy();
+      this._scale = typeof scale === 'number' ? new Vector( scale, sclae ) : scale.copy();
 
       // @public {number} - the rotation of the transformation. Can by publicly mutated.
       this.rotation = rotation;
@@ -56,12 +56,12 @@ define( require => {
      * Setters the scale of the Transformation, without mutating the passed in scale.
      * @public
      *
-     * @param {Vector} scale - scaling of the transformation, given as <xScale, yScale>.
+     * @param {Vector|number} scale - scaling of the transformation, given as <xScale, yScale> or just scale.
      */
-    set scale( scale ) { this._scale.set( scale ); }
+    set scale( scale ) { scale instanceof Vector ? this._scale.set( scale ) : this._scale.setX( scale ).setY( scale ); }
 
     /**
-     * Gets the scale of the Transformation.
+     * Gets the scale of the Transformation as a Vector.
      * @public
      *
      * @returns {Vector} - scaling of the transformation, given as <xScale, yScale>.

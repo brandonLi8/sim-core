@@ -40,7 +40,6 @@ define( require => {
   const assert = require( 'SIM_CORE/util/assert' );
   const Bounds = require( 'SIM_CORE/util/Bounds' );
   const DOMObject = require( 'SIM_CORE/core-internal/DOMObject' );
-  const ScreenView = require( 'SIM_CORE/scenery/ScreenView' );
   const Transformation = require( 'SIM_CORE/core-internal/Transformation' );
   const Vector = require( 'SIM_CORE/util/Vector' );
 
@@ -56,29 +55,30 @@ define( require => {
       assert( !options || Object.getPrototypeOf( options ) === Object.prototype, `invalid options: ${ options }` );
 
       // Some options are set by Node. Assert that they weren't provided.
-      assert( !options || !options.style, 'Node sets style.' );
+      assert( !options || !options.style || !options.style.position, 'Node sets position' );
       assert( !options || !options.innerHTML && !options.text, 'Node should not have text or innerHTML' );
-      assert( !options || !options.type || DOMObject.SVG_TYPES.includes( options.type ), 'Must be SVG sub-type.' );
+      assert( !options || !options.type || DOMObject.SVG_TYPES.includes( options.type ), 'Must be an SVG sub-type.' );
 
-      options = {
+      // Defaults for options.
+      const defaults = {
 
         // Super-class options
         type: 'g',
         style: {
-          position: 'absolute' // Ensure that every Node is relative to the Display
+          position: 'absolute' // Ensure that every Node is relative to the ScreenView
         },
 
         // Options specific to Node
-        cursor: null,      // {string} - If provided, alias of the CSS cursor of the Node. See set cursor() for doc.
-        visible: true,     // {boolean} - Indicates if the Node is visible. See set visible() for more doc.
-        opacity: 1,        // {number} - Alias of the CSS opacity of the Node. See set opacity() for more doc.
-        maxWidth: null,    // {number} - If provided, constrains width of this Node. See set maxWidth() for more doc.
-        maxHeight: null,   // {number} - If provided, constrains height of this Node. See set maxHeight() for more doc.
+        cursor: null,    // {string} - Alias of the CSS cursor of the Node. See set cursor() for doc.
+        visible: true,   // {boolean} - Indicates if the Node is visible. See set visible() for more doc.
+        opacity: 1,      // {number} - Alias of the CSS opacity of the Node. See set opacity() for more doc.
+        maxWidth: null,  // {number} - If provided, constrains width of this Node. See set maxWidth() for more doc.
+        maxHeight: null, // {number} - If provided, constrains height of this Node. See set maxHeight() for more doc.
 
         // transformations
         translation: null,         // {Vector} - (x, y) translation of the Node. See set translation() for more doc.
         rotation: 0,               // {number} - rotation (in radians) of the Node. See set rotation() for more doc.
-        scale: new Vector( 1, 1 ), // {Vector|number} - scale of the Node. See scale() for more doc.
+        scale: 1, // {Vector|number} - scale of the Node. See scale() for more doc.
 
         // Overrides the location of the Node, if provided.
         leftTop: null,      // {Vector} - The upper-left corner of this Node's bounds. See setLocation() for more doc.
@@ -98,11 +98,12 @@ define( require => {
         centerY: null,      // {number} - The y-center of this Node's bounds. See setLocation() for more doc.
 
         width: null,        // {number} - The width of the Node's bounds.
-        height: null,       // {number} - The height of the Node's bounds. See setHeight() for more doc.
-
-        // Rewrite options so that the passed-in options overrides the defaults.
-        ...options
+        height: null        // {number} - The height of the Node's bounds. See setHeight() for more doc.
       };
+
+      // Rewrite options so that it overrides the defaults.
+      options = { ...defaults, ...options };
+      options.style = { ...defaults.style, ...options.style };
 
       super( options );
 
@@ -440,15 +441,15 @@ define( require => {
     }
 
     /**
-     * Returns a bounding box for this Node (and its sub-tree) in the global coordinate frame. Must have Display
+     * Returns a bounding box for this Node (and its sub-tree) in the global coordinate frame. Must have ScreenView
      * as one of its ancestors.
      * @protected
-     * @returns {Bounds|null} - will return null if the Node isn't in the sub-tree of Display.
+     * @returns {Bounds|null} - will return null if the Node isn't in the sub-tree of ScreenView.
      */
     _computeGlobalBounds() {
 
       const traverser = ( currentNode ) => {
-        if ( currentNode instanceof ScreenView ) {
+        if ( currentNode instanceof require( 'SIM_CORE/scenery/ScreenView' ) ) {
           return currentNode.viewBounds;
         }
         else if ( !currentNode.parent || !( currentNode.parent instanceof DOMObject ) ) {
