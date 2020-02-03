@@ -1,25 +1,23 @@
 // Copyright © 2019-2020 Brandon Li. All rights reserved.
 
 /**
- * A standard transformation Matrix, for identifying 2D CSS transformations. Supports a conversion to pixels given the
- * ScreenView scalings.
+ * A standard affine transformation Matrix, for identifying 2D CSS transformations.
+ * Supports a conversion to pixels given the ScreenView scale. See `SCENERY/Node` and `SCENERY/ScreenView` for details.
+ * See https://developer.mozilla.org/en-US/docs/Web/CSS/transform-function/matrix for context.
  *
- * There are 3 main transformations that are supported:
+ * Generally, there are 3 main transformations:
+  * ## Translation:
+ *  Translation is a shift in position of the element, relative to the original or original position. It is given in
+ *  scenery coordinates (see `SCENERY/Node`), and is represented as a Vector <xTranslation, yTranslation>.
+ *
  * ### Scaling:
- *  Scaling works by multiplying the current width and height by a scalar value. There are generally 2 scalar values:
- *  one for x-scaling and one for y-scaling. Scale factors can by any number, including negatives and decimals.
- *  Negative scaling has the the effect of flipping the element about the respective axis. See setScale() for more doc.
+ *  Scaling works by multiplying the original or original width and height by a scalar value. It can be represented as a
+ *  single scale factor or as a vector <xScale, yScale>. Scale factors can by any number, including negatives and
+ *  decimals. Negative scaling has the the effect of flipping the element about the respective axis.
  *
  * ### Rotation:
- *  Rotation is the amount of rotation of the element. Positive rotations are clockwise and negative rotations are
- *  counter-clockwise. Rotation are in radians. See setRotation() for more information.
- *
- * ## Translation:
- *  Translation is a shift in position of the element, relative to the original position. It is given in
- *  scenery coordinates (see Node.js for more information), and is represented in a Vector (x, y). See setTranslation()
- *  for more documentation.
- *
- * See https://developer.mozilla.org/en-US/docs/Web/CSS/transform-function/matrix for context.
+ *  Rotation is a turning about the center of the element. Positive rotations are clockwise and negative rotations are
+ *  counter-clockwise. Rotations are in radians.
  *
  * @author Brandon Li <brandon.li820@gmail.com>
  */
@@ -35,54 +33,87 @@ define( require => {
   class Transformation {
 
     /**
-     * @param {Vector|number} scale - scaling of the transformation, given as <xScale, yScale> or just scale.
-     * @param {number} rotation - the rotation of the transformation, given in radians.
-     * @param {Vector} translation - the the translation of the translation, given as <xTranslation, yTranslation>.
+     * Constructs the Transformation with no transformations. Assumes the configuration:
+     *  - translation: Vector.ZERO
+     *  - rotation: 0
+     *  - scale: 1
+     *
+     * Use the mutators below this method to start transformations.
      */
-    constructor( scale, rotation, translation ) {
-      assert( scale instanceof Vector || typeof scale === 'number', `invalid scale: ${ scale }` );
-      assert( typeof rotation === 'number', `invalid rotation: ${ rotation }` );
-      assert( translation instanceof Vector, `invalid translation: ${ translation }` );
+    constructor() {
 
-      // @private {Vector} - see the argument documentation.
-      this._translation = translation.copy();
-      this._scale = typeof scale === 'number' ? new Vector( scale, sclae ) : scale.copy();
+      // @private {Vector} - the translation, relative to the ORIGNAL position, as <xTranslation, yTranslation>.
+      this._translation = Vector.ZERO.copy();
 
-      // @public {number} - the rotation of the transformation. Can by publicly mutated.
-      this.rotation = rotation;
+      // @private {Vector} - the scalar, relative to the ORIGNAL scale, as <xScale, yScale>.
+      this._scalar = new Vector( 1, 1 );
+
+      // @private {number} - the rotation of the transformation, relative to the ORIGNAL rotation, in radians.
+      this._rotation = 0;
     }
 
     /**
-     * Setters the scale of the Transformation, without mutating the passed in scale.
+     * ES5 getters of properties of this Transformation. Traditional Accessors methods aren't included to reduce
+     * the memory footprint.
      * @public
      *
-     * @param {Vector|number} scale - scaling of the transformation, given as <xScale, yScale> or just scale.
+     * @returns {*} See the property declaration for documentation of the type.
      */
-    set scale( scale ) { scale instanceof Vector ? this._scale.set( scale ) : this._scale.setX( scale ).setY( scale ); }
+    get translation() { return this._translation; }
+    get scalar() { return this._scalar; }
+    get rotation() { return this._rotation; }
+
+    //----------------------------------------------------------------------------------------
+    // Mutators
+    //----------------------------------------------------------------------------------------
 
     /**
-     * Gets the scale of the Transformation as a Vector.
+     * Translates, relative to the **CURRENT** translation, without mutating the passed in translation.
      * @public
      *
-     * @returns {Vector} - scaling of the transformation, given as <xScale, yScale>.
+     * @param {Vector} translation - the translation amount, given as <xTranslation, yTranslation>.
      */
-    get scale() { return this._scale; }
+    translate( translation ) { this._translation.add( translation ); }
 
     /**
-     * Setters the translation of the Transformation, without mutating the passed in translation.
+     * Sets the translation, relative to the **ORIGNAL** position, without mutating the passed in translation.
      * @public
      *
-     * @param {Vector} translation - scaling of the transformation, given as <xTranslation, yTranslation>.
+     * @param {Vector} translation - the translation, given as <xTranslation, yTranslation>.
      */
     set translation( translation ) { this._translation.set( translation ); }
 
     /**
-     * Gets the translation of the Transformation.
+     * Scales, relative to the **CURRENT** scale, as either a single scalar or as <xScale, yScale>
      * @public
      *
-     * @returns {Vector} - scaling of the transformation, given as <xTranslation, yTranslation>.
+     * @param {Vector|number} scale - given as either a single scalar or as <xScale, yScale>
      */
-    get translation() { return this._translation; }
+    scale( scale ) { scale instanceof Vector ? this._scale.componentMultiply( scale ) : this._scale.multiply( scale ); }
+
+    /**
+     * Sets the scale, relative to the **ORIGINAl** scale, as either a single scalar or as <xScale, yScale>
+     * @public
+     *
+     * @param {Vector|number} s - given as either a single scalar or as <xScale, yScale>
+     */
+    set scalar( s ) { s instanceof Vector ? this._scale.set( s ) : this._scale.setX( s ).setY( s ); }
+
+    /**
+     * Rotates, relative to the **CURRENT** rotation, in radians.
+     * @public
+     *
+     * @param {number} rotation - rotation, in radians
+     */
+    rotate( rotation ) { this._rotation += rotation; }
+
+    /**
+     * Sets the rotation, relative to the **ORIGINAL** rotation, in radians.
+     * @public
+     *
+     * @param {number} rotation - rotation, in radians
+     */
+    set rotatation( rotation ) { this._rotation = rotation; }
 
     /**
      * Gets the CSS style transform string.

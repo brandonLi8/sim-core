@@ -124,7 +124,7 @@ define( require => {
       this._screenViewScale = null;
 
       // @protected {Transformation} - records and references the transformations of the Node.
-      this._transformation = new Transformation( options.scale, options.rotation, options.translation || Vector.ZERO );
+      this._transformation = new Transformation( options.scale, options.rotation, options.translation );
 
       // @private {Bounds} - // Bounds for the Node and its children in the "parent" coordinate frame.
       this._bounds = Bounds.ZERO.copy(); // Bounds for the Node and its children in the "parent" coordinate frame.
