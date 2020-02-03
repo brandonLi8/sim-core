@@ -42,7 +42,7 @@ define( require => {
      *
      * @returns {string}
      */
-    toString() { return `Bounds[ min:( ${ this.minX }, ${ this.minY } ), max:( ${ this.minY }, ${ this.maxY }) ]`; }
+    toString() { return `Bounds[ min:( ${ this.minX }, ${ this.minY } ), max:( ${ this.maxX }, ${ this.maxY }) ]`; }
 
     /**
      * Exact equality comparison between this bounds and another bounds.
