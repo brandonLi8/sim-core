@@ -36,7 +36,6 @@ define( require => {
 
       // Rewrite options so that it overrides the defaults.
       options = { ...defaults, ...options };
-
       super( options );
 
       this._radius = options.radius;
@@ -47,9 +46,12 @@ define( require => {
     get radius() { return this._radius; }
     set radius( radius ) {
       this._radius = radius;
+
       const center = this.center.copy();
       this.width = this._radius * 2;
+
       this.height = this._radius * 2;
+
       this.center = center;
       this.layout( this._screenViewScale  );
     }

@@ -89,7 +89,7 @@ define( require => {
      *
      * @param {Vector|number} scale - given as either a single scalar or as <xScale, yScale>
      */
-    scale( scale ) { scale instanceof Vector ? this._scale.componentMultiply( scale ) : this._scale.multiply( scale ); }
+    scale( scale ) { scale instanceof Vector ? this._scalar.componentMultiply( scale ) : this._scalar.multiply( scale ); }
 
     /**
      * Sets the scale, relative to the **ORIGINAl** scale, as either a single scalar or as <xScale, yScale>
@@ -97,7 +97,7 @@ define( require => {
      *
      * @param {Vector|number} s - given as either a single scalar or as <xScale, yScale>
      */
-    set scalar( s ) { s instanceof Vector ? this._scale.set( s ) : this._scale.setX( s ).setY( s ); }
+    set scalar( s ) { s instanceof Vector ? this._scalar.set( s ) : this._scalar.setX( s ).setY( s ); }
 
     /**
      * Rotates, relative to the **CURRENT** rotation, in radians.
@@ -113,7 +113,7 @@ define( require => {
      *
      * @param {number} rotation - rotation, in radians
      */
-    set rotatation( rotation ) { this._rotation = rotation; }
+    set rotation( rotation ) { this._rotation = rotation; }
 
     /**
      * Generates the CSS style transform string.
@@ -127,14 +127,21 @@ define( require => {
      * @param {number} screenViewScale - screenViewScale in terms of window pixels per Scenery coordinate.
      */
     generateCSSTransformString( screenViewScale ) {
+      const r = this.rotation;
+      const sx = this.scalar.x;
+      const sy = this.scalar.y;
+      const tx = this.translation.x;
+      const ty = this.translation.y;
+      const cx = this.translation.x;
+      const cy = this.translation.y;
 
       // Compute the transformation matrix values. // NOTE: the toFixed calls are inlined for performance reasons.
-      const scaleX = ( Math.cos( this.rotation ) * this.scale.x ).toFixed( 10 );
-      const scaleY = ( Math.cos( this.rotation ) * this.scale.y ).toFixed( 10 );
-      const skewX = ( -1 * Math.sin( this.rotation ) * this.scale.x ).toFixed( 10 );
-      const skewY = ( Math.sin( this.rotation ) * this.scale.y ).toFixed( 10 );
-      const translateX = ( this.translation.x * screenViewScale ).toFixed( 10 );
-      const translateY = ( this.translation.y * screenViewScale ).toFixed( 10 );
+      const scaleX = ( Math.cos( r ) * sx ).toFixed( 10 );
+      const scaleY = ( Math.cos( r ) * sy ).toFixed( 10 );
+      const skewX = ( -1 * Math.sin( r ) * sx ).toFixed( 10 );
+      const skewY = ( Math.sin( r ) * sy ).toFixed( 10 );
+      const translateX = ( (-cx * Math.cos(r) + cy * Math.sin(r) + cx) * sx + tx ).toFixed( 10 ) * screenViewScale;
+      const translateY = ( (-cx * Math.sin(r) - cy * Math.cos(r) + cy) * sy + ty ).toFixed( 10 ) * screenViewScale;
 
       return `matrix(${ scaleX },${ skewY },${ skewX },${ scaleY },${ translateX },${ translateY })`;
     }

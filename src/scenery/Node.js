@@ -69,16 +69,16 @@ define( require => {
         },
 
         // Options specific to Node
-        cursor: null,    // {string} - Alias of the CSS cursor of the Node. See set cursor() for doc.
-        visible: true,   // {boolean} - Indicates if the Node is visible. See set visible() for more doc.
-        opacity: 1,      // {number} - Alias of the CSS opacity of the Node. See set opacity() for more doc.
-        maxWidth: null,  // {number} - If provided, constrains width of this Node. See set maxWidth() for more doc.
-        maxHeight: null, // {number} - If provided, constrains height of this Node. See set maxHeight() for more doc.
+        cursor: null,       // {string} - Alias of the CSS cursor of the Node. See set cursor() for doc.
+        visible: true,      // {boolean} - Indicates if the Node is visible. See set visible() for more doc.
+        opacity: 1,         // {number} - Alias of the CSS opacity of the Node. See set opacity() for more doc.
+        maxWidth: null,     // {number} - If provided, constrains width of this Node. See set maxWidth() for more doc.
+        maxHeight: null,    // {number} - If provided, constrains height of this Node. See set maxHeight() for more doc.
 
         // transformations
-        translation: null,         // {Vector} - (x, y) translation of the Node. See set translation() for more doc.
-        rotation: 0,               // {number} - rotation (in radians) of the Node. See set rotation() for more doc.
-        scale: 1, // {Vector|number} - scale of the Node. See scale() for more doc.
+        translation: null,  // {Vector} - If provided, (x, y) translation of the Node. See set translation() for more doc.
+        rotation: 0,        // {number} - rotation (in radians) of the Node. See set rotation() for more doc.
+        scale: 1,           // {Vector|number} - scale of the Node. See scale() for more doc.
 
         // Overrides the location of the Node, if provided.
         leftTop: null,      // {Vector} - The upper-left corner of this Node's bounds. See setLocation() for more doc.
@@ -124,7 +124,7 @@ define( require => {
       this._screenViewScale = null;
 
       // @protected {Transformation} - records and references the transformations of the Node.
-      this._transformation = new Transformation( options.scale, options.rotation, options.translation );
+      this._transformation = new Transformation();
 
       // @private {Bounds} - // Bounds for the Node and its children in the "parent" coordinate frame.
       this._bounds = Bounds.ZERO.copy(); // Bounds for the Node and its children in the "parent" coordinate frame.
@@ -134,8 +134,18 @@ define( require => {
       assert( Node.Y_LOCATION_KEYS.filter( key => !!options[ key ] ).length <= 1, 'more than 1 y-mutator' );
 
       // Call the mutators of this instance for the location options that were provided.
-      Node.X_LOCATION_KEYS.concat( Node.Y_LOCATION_KEYS ).forEach( key => {
-        if ( options[ key ] ) this[ key ] = options[ key ];
+      Object.keys( options ).forEach( key => {
+        if ( options[ key ] ) {
+          const descriptor = Object.getOwnPropertyDescriptor( Node.prototype, key );
+
+          // if the key refers to a function that is not ES5 writable, it will execute that function with the single argument
+          if ( descriptor && typeof descriptor.value === 'function' ) {
+            this[ key ]( options[ key ] );
+          }
+          if ( descriptor && typeof descriptor.set === 'function' ) {
+            this[ key ] = options[ key ];
+          }
+        }
       } );
 
       this._updateMaxDimension();
@@ -173,7 +183,7 @@ define( require => {
     get cursor() { return this._cursor; }
     get maxWidth() { return this._maxWidth; }
     get maxHeight() { return this._maxHeight; }
-    get scaleVector() { return this._transformation.scale; }
+    get scalar() { return this._transformation.scalar; }
     get translation() { return this._transformation.translation; }
     get rotation() { return this._transformation.rotation; }
 
@@ -251,7 +261,7 @@ define( require => {
     set visible( visible ) {
       assert( typeof visible === 'boolean', `invaid visible: ${ visible }` );
       this._visible = visible;
-      this._style.opacity = this._visible ? this._opacity : 0; // Update our CSS style.
+      this.style.opacity = this._visible ? this._opacity : 0; // Update our CSS style.
     }
 
     /**
@@ -263,7 +273,7 @@ define( require => {
     set opacity( opacity ) {
       assert( typeof opacity === 'number' && opacity >= 0 && opacity <= 1, `invaid opacity: ${ opacity }` );
       this._opacity = opacity;
-      this._style.opacity = this._visible ? this._opacity : 0; // Update our CSS style.
+      this.style.opacity = this._visible ? this._opacity : 0; // Update our CSS style.
     }
 
     /**
@@ -276,7 +286,7 @@ define( require => {
     set cursor( cursor ) {
       assert( typeof cursor === 'string' || cursor === null, `invalid cursor: ${ cursor }` );
       this._cursor = cursor === 'auto' ? null : cursor;
-      this._style.cursor = this._cursor; // Update our CSS style.
+      this.style.cursor = this._cursor; // Update our CSS style.
     }
 
     /**
@@ -344,7 +354,7 @@ define( require => {
     scale( a ) {
       if ( a instanceof Vector ) {
         assert( a.isFinite(), `invalid scale: ${ a }` );
-        this.scaleMagnitude = this.scaleVector.copy().componentMultiply( a );
+        this.scalar = this.scalar.copy().componentMultiply( a );
       }
       else {
         assert( isFinite( a ), `invalid scale: ${ a }` );
@@ -354,7 +364,7 @@ define( require => {
 
     /**
      * Scales the Node's Transformation. NOTE: May scale larger than the maxWidth or maxHeight. Scale is relative to
-     * ORIGNAL width and height, see set scaleMagnitude();
+     * ORIGNAL width and height, see set scalar();
      * @public
      *
      * This method is overloaded and has 2 method signatures:
@@ -363,17 +373,19 @@ define( require => {
      * OR:
      * @param {number} vector - Scales in each direction, as <xScale, yScale>
      */
-    set scaleMagnitude( a ) {
+    set scalar( a ) {
       if ( a instanceof Vector ) {
         assert( a.isFinite(), `invalid scale: ${ a }` );
-        this._transformation.scale = a;
+        this._transformation.scalar = a;
         const xExpansion = this.width * a.x - this.width;
         const yExpansion = this.height * a.y - this.height;
-        this._bounds.expand( xExpansion / 2, yExpansion / 2, xExpansion / 2, yExpansion / 2 );
+        this._bounds.expand( 0, 0, xExpansion, yExpansion );
+
+        this.layout( this._screenViewScale );
       }
       else {
         assert( isFinite( a ), `invalid scale: ${ a }` );
-        this.scaleMagnitude = new Vector( a, a );
+        this.scalar = new Vector( a, a );
       }
     }
 
@@ -387,7 +399,7 @@ define( require => {
     translate( translation ) {
       assert( translation instanceof Vector && translation.isFinite(), `invalid translation: ${ translation }` );
       this._bounds.shift( translation.x, translation.y );
-      this._transformation.translation = this.translation.copy().add( translation );
+      this.layout( this._screenViewScale );
     }
 
     /**
@@ -420,6 +432,7 @@ define( require => {
     set rotation( rotation ) {
       assert( typeof rotation === 'number' && isFinite( rotation ), `invalid rotation: ${ rotation }` );
       this._transformation.rotation = rotation;
+      this.layout( this._screenViewScale );
     }
 
     /**
@@ -480,9 +493,8 @@ define( require => {
         const globalBounds = this._computeGlobalBounds();
 
         if ( globalBounds ) {
-          console.log( this, globalBounds.toString() )
-          this.style.top = `${ scale * ( globalBounds.minY  ) }px`;
-          this.style.left = `${ scale * ( globalBounds.minX ) }px`;
+          this.style.top = `${ scale * ( globalBounds.minY  ) / this.scalar.x * 0 }px`;
+          this.style.left = `${ scale * ( globalBounds.minX ) / this.scalar.y * 0 }px`;
         }
       }
       this.style.transform = this._transformation.generateCSSTransformString( scale );
@@ -501,7 +513,8 @@ define( require => {
     addChild( child ) {
       assert( child instanceof Node, `invalid child: ${ child }` );
       super.addChild( child );
-      this._bounds = this._bounds.union( child.localBounds );
+      const childBounds = child.bounds.copy().shift( this.left, this.top );
+      this._bounds = this._bounds.union( childBounds );
       return this;
     }
   }
