@@ -77,7 +77,6 @@ define( require => {
 
       this.style.height = `${ screenViewHeight }px`;
       this.style.width = `${ screenViewWidth }px`;
-
       const layoutChildren = ( children ) => {
         children.forEach( ( child ) => {
           child.layout( scale );

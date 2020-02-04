@@ -61,10 +61,10 @@ define( require => {
       super.layout( scale );
       const globalBounds = this._computeGlobalBounds();
 
-     globalBounds && this.addAttributes( {
-        cx: `${ scale * globalBounds.centerX }px`,
-        cy: `${ scale * globalBounds.centerY }px`,
-        r: `${ scale * this._radius }px`
+      globalBounds && this.addAttributes( {
+        r: `${ scale * this._radius }px`,
+        cx: `${ this._radius * scale }`,
+        cy: `${ this._radius * scale }`,
       } );
     }
   }

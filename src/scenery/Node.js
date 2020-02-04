@@ -115,6 +115,8 @@ define( require => {
       this._cursor = options.cursor;
       this._maxWidth = options.maxWidth;
       this._maxHeight = options.maxHeight;
+      this._rotation = options.rotation;
+      this._scalar = typeof options.scale === 'number' ? new Vector( options.scale, options.scale ) : options.scale;
 
       // @private {number} - Scale applied due to the maximum width and height constraints.
       this._appliedScaleFactor = 1;
@@ -122,9 +124,6 @@ define( require => {
       // @protected {number} - screenViewScale in terms of global units per local unit for converting Scenery
       //                       coordinates to pixels. Referenced as soon as the scale is known in `layout()`
       this._screenViewScale = null;
-
-      // @protected {Transformation} - records and references the transformations of the Node.
-      this._transformation = new Transformation();
 
       // @private {Bounds} - // Bounds for the Node and its children in the "parent" coordinate frame.
       this._bounds = Bounds.ZERO.copy(); // Bounds for the Node and its children in the "parent" coordinate frame.
@@ -147,8 +146,6 @@ define( require => {
           }
         }
       } );
-
-      this._updateMaxDimension();
     }
 
     /**
@@ -183,9 +180,9 @@ define( require => {
     get cursor() { return this._cursor; }
     get maxWidth() { return this._maxWidth; }
     get maxHeight() { return this._maxHeight; }
-    get scalar() { return this._transformation.scalar; }
-    get translation() { return this._transformation.translation; }
-    get rotation() { return this._transformation.rotation; }
+    get scalar() { return this._scalar; }
+    get translation() { return this.leftTop; }
+    get rotation() { return this._rotation; }
 
     //----------------------------------------------------------------------------------------
     // Mutators
@@ -376,11 +373,10 @@ define( require => {
     set scalar( a ) {
       if ( a instanceof Vector ) {
         assert( a.isFinite(), `invalid scale: ${ a }` );
-        this._transformation.scalar = a;
+        this._scalar = a;
         const xExpansion = this.width * a.x - this.width;
         const yExpansion = this.height * a.y - this.height;
-        this._bounds.expand( 0, 0, xExpansion, yExpansion );
-
+        this._bounds.expand( xExpansion / 2, yExpansion / 2, xExpansion / 2, yExpansion / 2 );
         this.layout( this._screenViewScale );
       }
       else {
@@ -431,7 +427,7 @@ define( require => {
      */
     set rotation( rotation ) {
       assert( typeof rotation === 'number' && isFinite( rotation ), `invalid rotation: ${ rotation }` );
-      this._transformation.rotation = rotation;
+      this._rotation = rotation;
       this.layout( this._screenViewScale );
     }
 
@@ -489,15 +485,34 @@ define( require => {
      * @param {number} scale - scale in terms of global units per local unit
      */
     layout( scale ) {
+      if ( !scale ) return
+
       if ( this.bounds.isFinite() ) {
         const globalBounds = this._computeGlobalBounds();
 
+
         if ( globalBounds ) {
-          this.style.top = `${ scale * ( globalBounds.minY  ) / this.scalar.x * 0 }px`;
-          this.style.left = `${ scale * ( globalBounds.minX ) / this.scalar.y * 0 }px`;
+
+          console.log( globalBounds.toString(), this.constructor.name )
+          const r = this.rotation;
+          const sx = this.scalar.x;
+          const sy = this.scalar.y;
+          const tx = globalBounds.leftBottom.x;
+          const ty = globalBounds.leftBottom.y;
+          const cx = this.center.x;
+          const cy = this.center.y;
+
+          // Compute the transformation matrix values. // NOTE: the toFixed calls are inlined for performance reasons.
+          const scaleX = ( Math.cos( r ) * sx ).toFixed( 10 );
+          const scaleY = ( Math.cos( r ) * sy ).toFixed( 10 );
+          const skewX = ( -1 * Math.sin( r ) * sx ).toFixed( 10 );
+          const skewY = ( Math.sin( r ) * sy ).toFixed( 10 );
+          const translateX = ( (-cx * Math.cos(r) + cy * Math.sin(r) + cx) * sx + tx ).toFixed( 10 ) * scale;
+          const translateY = ( (-cx * Math.sin(r) - cy * Math.cos(r) + cy) * sy + ty ).toFixed( 10 ) * scale;
+          this.style.transform = `matrix(${ scaleX },${ skewY },${ skewX },${ scaleY },${ translateX },${ translateY })`;
+
         }
       }
-      this.style.transform = this._transformation.generateCSSTransformString( scale );
 
       this._screenViewScale = scale;
     }
