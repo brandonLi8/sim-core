@@ -6,29 +6,29 @@
  * ## General Description of Nodes
  * A Node is a sim-specific DOMObject for the scene graph, built specifically for SVG groups. In general,
  * sim-specific code should use scenery Nodes for rendering simulation components and structuring the simulation
- * scene graph. Node will provide a much cleaner sim-specific API using SVG compared to DOMObject.
+ * scene graph. Node will provide a much cleaner sim-specific API compared to DOMObject.
  *
- * Nodes have a large API of properties and options that affect its appearance and location as well as its subtree.
- * These include translation, scale, rotation, opacity, etc (or any combination of these). See the early portion of the
- * constructor for details. Nodes also support pointer Events. See ./events/ for details.
+ * Nodes have a large API of properties and options that affect its appearance and location. These include translation,
+ * scale, rotation, opacity, etc (or any combination of these). These modifications will propagate down its subtree.
+ * See the early portion of the constructor for details. Nodes also support pointer Events. See ./events/ for details.
  *
  * ## Coordinates
- * It is important to Node coordinates ARE NOT in pixels. The browser width and height (in pixels) change from device to
- * device and the window size my shrink/grow.
+ * It is important to Node coordinates ARE NOT in pixels. The browser width and height (which are in pixels) change
+ * from device to device and the window size may shrink or grow.
  *
  * Instead, Node uses ScreenView coordinates. ScreenView Coordinates are constant and don't depend on the window width.
  * It is a changing scalar off the actual window size. All Node coordinates are in terms of these coordinates.
  * The layout() method then changes the actual CSS pixel coordinates based off the ScreenView scale. See ScreenView.js
  * for more documentation.
  *
- * It is also important to note that coordinates for all view-related objects have the origin at the top-left and the
- * positive-y downwards.
+ * It is also important to note that coordinates for all view-related objects have the origin at the top-left of its
+ * bounds and the positive-y downwards.
  *
  * ## Terminology:
- * - Window coordinates: Coordinate frame relative to the browser, in pixels. This is used mainly for Event listeners.
- * - Global coordinates: Coordinate frame relative to the ScreenView (specifically its local coordinate frame).
- * - Local coordinates: Coordinate frame relative to ** each ** Node, where (0, 0) would be at the Node's origin.
- * - Parent coordinates: Coordinate frame relative to the parent of each Node. (local coordinate frame of the parent).
+ * - Window coordinates: Coordinate frame of a node relative to the browser, in pixels.
+ * - Global coordinates: Coordinate frame of a node relative to the ScreenView (specifically in its local coordinates).
+ * - Parent coordinates: Coordinate frame of a node relative to the parent of each Node's local bounds.
+ * - Local coordinates: Coordinate frame of a node relative to itself, where (0, 0) would be at the Node's origin.
  *
  * @author Brandon Li <brandon.li820@gmail.com>
  */
@@ -40,7 +40,6 @@ define( require => {
   const assert = require( 'SIM_CORE/util/assert' );
   const Bounds = require( 'SIM_CORE/util/Bounds' );
   const DOMObject = require( 'SIM_CORE/core-internal/DOMObject' );
-  const Transformation = require( 'SIM_CORE/core-internal/Transformation' );
   const Vector = require( 'SIM_CORE/util/Vector' );
 
   class Node extends DOMObject {
