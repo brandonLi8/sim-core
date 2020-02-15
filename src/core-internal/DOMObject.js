@@ -36,7 +36,7 @@ define( require => {
   // modules
   const assert = require( 'SIM_CORE/util/assert' );
 
-  class DOMObject{
+  class DOMObject {
 
     /**
      * @param {Object} [options] - Various key-value pairs that control the appearance and behavior. Subclasses
@@ -391,7 +391,7 @@ define( require => {
         else if ( contains( `ms${ camelStyleKey }` ) ) setStyle( `ms${ camelStyleKey }`, styleKey );
         else if ( contains( `o${ camelStyleKey }` ) ) setStyle( `o${ camelStyleKey }`, styleKey );
       } );
-    };
+    }
   }
 
   /*----------------------------------------------------------------------------*
