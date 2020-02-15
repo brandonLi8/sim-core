@@ -10,8 +10,8 @@
  *
  * A Display will connect its the inner DOMObject element to the HTML Body element. Thus, nothing should subtype Display
  * as it should be the only DOMObject with a hard-coded parent element. In addition, the Display should never be
- * disposed of as long as the simulation is running and should never disconnect from the Body element. Display will also
- * provide CSS styles for the Body element for sim-specific code. If you are unfamiliar with the typical Body
+ * disposed of as long as the simulation is running and should never disconnected from the Body element. Display will
+ * also provide CSS styles for the Body element for sim-specific code. If you are unfamiliar with the typical Body
  * and HTML elements in a global HTML file, visit https://www.w3.org/TR/html401/struct/global.html.
  *
  * @author Brandon Li <brandon.li820@gmail.com>
@@ -37,8 +37,8 @@ define( require => {
       assert( !options || Object.getPrototypeOf( options ) === Object.prototype, `invalid options: ${ options }` );
       assert( !options || !options.style, 'Display sets style.' );
       assert( !options || !options.type, 'Display sets type.' );
-      assert( !options || !options.innerHTML && !options.text, 'Display should not have text or innerHTML' );
-      assert( !options || ( !options.id && !options.class && !options.attributes ), 'Display sets attributes' );
+      assert( !options || !options.text, 'Display should not have text' );
+      assert( !options || !options.id || !options.class || !options.attributes, 'Display sets attributes' );
 
       options = {
 
@@ -49,7 +49,7 @@ define( require => {
           width: '100%',
           fontFamily: 'Arial, sans-serif'
         },
-        id: 'sim-display',
+        id: 'display',
 
         // Rewrite options so that the passed-in options overrides the defaults.
         ...options
@@ -58,16 +58,16 @@ define( require => {
     }
 
     /**
-     * Initiates the Display, which will connect its the inner DOMObject element to the HTML Body element to render
-     * the entire scene-graph. Will also provide favorable CSS styles for the Body element.
+     * Initiates the Display, which will connect the inner DOMObject of the Display element to the HTML Body element to
+     * initiate rendering of the entire scene-graph. Will also provide favorable CSS styles for the Body element.
+     * @public
      *
      * @returns {Display} - for chaining
      */
     initiate() {
 
-      // Retrieve the HTML and BODY elements. See https://www.w3schools.com/jsref/met_document_getelementsbytagname.asp.
+      // Retrieve the HTML element. See https://www.w3schools.com/jsref/met_document_getelementsbytagname.asp.
       const bodyElement = document.getElementsByTagName( 'body' )[ 0 ];
-      const htmlElement = document.getElementsByTagName( 'html' )[ 0 ];
 
       // Connect the inner DOMObject element to the HTML Body element. This will render the Display's sub-graph.
       bodyElement.appendChild( this.element );
@@ -86,7 +86,7 @@ define( require => {
         padding: 0,
         margin: 0,
 
-        // Ensure that the Display page cannot scroll and the simulation is fixed.
+        // Ensure that the Display page cannot scroll and the simulation is fixed in the window.
         overflow: 'hidden',
         position: 'fixed',
 
