@@ -92,7 +92,7 @@ define( require => {
      * @public
      */
     enableDevBorder() {
-      this.addStyle( {
+      this.addStyles( {
         border: '2px solid red'
       } );
     }

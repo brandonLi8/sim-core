@@ -109,13 +109,13 @@ define( require => {
       this.setChildren( [ button, playButton, pauseButton ] );
 
       this.mouseover = () => {
-        this.addStyle( {
+        this.addStyles( {
           filter: isPlayingProperty.value ? 'brightness( 130% )' : 'brightness( 90% )',
           cursor: 'pointer'
         } );
       };
       this.mouseout = () => {
-        this.addStyle( {
+        this.addStyles( {
           filter: 'none',
           cursor: 'default'
         } );

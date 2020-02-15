@@ -10,7 +10,7 @@
  *
  *  - DOM objects are only displayed in the browser if their 'parent' (the DOM object that links to it) is displayed.
  *    In other words, if a DOMObject is displayed, its 'children' (what it links to) are also displayed. At the top of
- *    the scene graph, there is a root object that is displayed, allowing everything else to be displayed.
+ *    the scene graph, there is a root object that is displayed, allowing its entire sub-tree to be displayed.
  *
  *  - While code comments attempt to describe the implementation clearly, fully understanding it may require some
  *    general background. Some useful references include:
@@ -21,8 +21,8 @@
  *
  * ## Usage:
  *  - In sim-specific code, the DOMObject class should RARELY be instantiated.
- *    Instead, create a new Sim and its ScreenViews and use Nodes (see ../scenery/Node.js) for structuring the scene
- *    graph. Node (a subtype) will provide a much cleaner sim-specific API using SVG compared to DOMObject.
+ *    Instead, create a new Sim and its ScreenViews and use scenery Nodes (see ../scenery/Node.js) for structuring the
+ *    scene graph. Node (a subtype) will provide a much cleaner sim-specific API using SVG compared to DOMObject.
  *
  *  - DOMObject and its subtypes generally have the last constructor parameter reserved for the 'options' object - a
  *    key-value map that specifies relevant options that can be overridden by the user.
@@ -36,8 +36,7 @@ define( require => {
   // modules
   const assert = require( 'SIM_CORE/util/assert' );
 
-
-  class DOMObject {
+  class DOMObject{
 
     /**
      * @param {Object} [options] - Various key-value pairs that control the appearance and behavior. Subclasses
@@ -53,12 +52,7 @@ define( require => {
         // {string} - the DOM object type: 'div', 'img', 'a', 'path', 'svg', etc.
         type: 'div',
 
-        // {string} - a namespace URI - see https://developer.mozilla.org/en-US/docs/Web/API/Document/createElementNS.
-        //            If the type is in SVG_TYPES, `document.createElementNS( options.XMLNamespace )` will be used.
-        //            Otherwise, `document.createElement()` will be used.
-        XMLNamespace: 'http://www.w3.org/2000/svg',
-
-        // {Object} - object literal that describes its CSS style. See `addStyle()` for full documentation.
+        // {Object} - object literal that describes its CSS style. See `addStyles()` for full documentation.
         style: {
           padding: 0,
           margin: 0,
@@ -69,13 +63,9 @@ define( require => {
         // {string|null} - if not null, adds a text string that the object displays. See `setText()` for documentation.
         text: null,
 
-        // {string|null} - if provided, adds innerHTML. See `setInnerHTML()` for documentation and context.
-        innerHTML: null,
-
         // {DOMObject[]} - ordered array of the children of the DOM object. See `setChildren()` for documentation.
         children: [],
 
-        //----------------------------------------------------------------------------------------
         // Attributes
         id: null,     // {string|null} adds the id attribute for the object. See `setID()` for documentation.
         class: null,  // {string|null} adds the class attribute for the object. See `setClass()` for documentation.
@@ -106,23 +96,15 @@ define( require => {
       this._src = options.src;
       this._href = options.href;
       this._text = options.text;
-      this._innerHTML = options.innerHTML;
       this._children = [];
 
       // @private {boolean} - indicates if this DOMObject has been disposed. See `dispose()`.
       this._isDisposed = false;
 
-      // @public {boolean} (read-only) - indicates if this DOMObject is classified as a SVG element.
-      this.isSVG = DOMObject.SVG_TYPES.includes( this._type );
-
-      if ( !this.isSVG ) {
-        // @private {HTMLElement} (final) - the actual DOM object. See `getElement()` for read access.
-        this._element = document.createElement( this._type );
-      }
-      else {
-        assert( typeof options.XMLNamespace === 'string', `invalid XMLNamespace: ${ options.XMLNamespace }` );
-        this._element = document.createElementNS( options.XMLNamespace, this._type );
-      }
+      // @private {HTMLElement} (final) - the actual DOM object. See `getElement()` for read access.
+      this._element = DOMObject.SVG_TYPES.includes( this._type ) ?
+                        document.createElementNS( DOMObject.SVG_NAMESPACE, this._type ) :
+                        document.createElement( this._type );
 
       // @private {HTMLTextNode} (final) - the text node of the DOM object.
       this._textNode = document.createTextNode( this._text || '' );
@@ -133,16 +115,15 @@ define( require => {
 
       // Set the attributes and styles if provided in options, which validates the options
       options.attributes && this.addAttributes( options.attributes );
-      options.style && this.addStyle( options.style );
+      options.style && this.addStyles( options.style );
 
       //----------------------------------------------------------------------------------------
-      this.setID( this._id );                // validates options.id and sets the id.
-      this.setClass( this._class );          // validates options.class and sets the class.
-      this.setText( this._text );            // validates options.text and sets the text.
-      this.setSrc( this._src );              // validates options.src and sets the src only if this._type is a image.
-      this.setHref( this._href );            // validates options.href and sets the href only if this._type is a link.
-      this._innerHTML && this.setInnerHTML( this._innerHTML );  // validates options.innerHTML and sets the inner HTML.
-      this.setChildren( options.children );  // validates options.children and sets the children.
+      this.setAttribute( 'id', this._id );        // validates options.id and sets the id.
+      this.setAttribute( 'class', this._class );  // validates options.class and sets the class.
+      this.setText( this._text );                 // validates options.text and sets the text.
+      this.setAttribute( 'src', this._src );      // validates options.src and sets the src, if this._type is a image.
+      this.setAttribute( 'href', this._href );    // validates options.href and sets the href, if this._type is a link.
+      this.setChildren( options.children );       // validates options.children and sets the children.
     }
 
     //========================================================================================
@@ -150,61 +131,38 @@ define( require => {
     //========================================================================================
 
     /**
-     * Accessors and ES5 getters of a private property of this DOM object.
+     * ES5 getters of a private property of this DOM object. Traditional accessors not included to reduce the
+     * memory footprint of this class.
      * @public
      *
      * @returns {*} See the property declaration for documentation of the type.
      */
-    getElement() { return this._element; }
-    getType() { return this._type; }
-    getID() { return this._id; }
-    getClass() { return this._class; }
-    getText() { return this._text; }
-    getSrc() { return this._src; }
-    getHref() { return this._href; }
-    getInnerHTML() { return this._innerHTML; }
-    getChildren() { return this._children; }
-    getParent() { return this._parent; }
-
-    get element() { return this.getElement(); }
-    get type() { return this.getType(); }
-    get id() { return this.getID(); }
-    get class() { return this.getClass(); }
-    get text() { return this.getText(); }
-    get src() { return this.getSrc(); }
-    get href() { return this.getHref(); }
-    get innerHTML() { return this.getInnerHTML(); }
-    get children() { return this.getChildren(); }
-    get parent() { return this.getParent(); }
+    get element() { return this._element; }
+    get type() { return this._type; }
+    get id() { return this._id; }
+    get class() { return this._class; }
+    get text() { return this._text; }
+    get src() { return this._src; }
+    get href() { return this._href; }
+    get children() { return this._children; }
+    get parent() { return this._parent; }
     get isDisposed() { return this._isDisposed; }
 
     /**
      * Gets the reference to the CSS Style Declaration Object literal. Modifying this object
-     * WILL affect this DOM object. See `addStyle()` for further documentation on this Object.
+     * WILL affect this DOM object. See `addStyles()` for further documentation on this Object.
      * @public
      *
      * @returns {CSSStyleDeclaration}
      */
-    getStyle() { return this._element.style; }
-    get style() { return this.getStyle(); }
-
-    /**
-     * Gets a attribute based on its name.
-     *
-     * @param {string} attribute
-     * @returns {*}
-     */
-    getAttribute( attribute ) {
-      const attributeContainer = this._element.attributes.getNamedItem( attribute );
-      return attributeContainer ? attributeContainer.value : null;
-    }
+    get style() { return this._element.style; }
 
     //========================================================================================
     // Mutators
     //========================================================================================
 
     /**
-     * Sets an attribute of this DOMObject, updating this object's properties.
+     * Sets an attribute of this DOMObject, updating this Object's properties.
      * @public
      *
      * @param {string} name - the name of the attribute
@@ -229,41 +187,33 @@ define( require => {
     }
 
     /**
-     * Sets the id attribute of this DOMObject. DOMObjects can only have one class at a time.
+     * Sets the id attribute of this DOMObject. DOMObjects can only have one id at a time.
      *
      * @param {string|null} id - null means no id
-     * @returns {DOMObject} - Returns 'this' reference, for chaining
      */
-    setID( id ) { return this.setAttribute( 'id', id ); }
-    set id( id ) { this.setID( id ); }
+    set id( id ) { this.setAttribute( 'id', id ); }
 
     /**
      * Sets the class attribute of this DOMObject. Can have multiple classes; just pass in a string with a space
      * separating the classes (e.g, setClass( 'class1 class2' )).
      *
      * @param {string|null} class - null means no class
-     * @returns {DOMObject} - Returns 'this' reference, for chaining
      */
-    setClass( className ) { return this.setAttribute( 'class', className ); }
-    set class( className ) { this.setClass( className ); }
+    set class( className ) { this.setAttribute( 'class', className ); }
 
     /**
-     * Sets the 'src' attribute of this DOM object. Errors if this objects type isn't 'img'.
+     * Sets the 'src' attribute of this DOM object. Errors if this DOMObject's type isn't 'img'.
      *
      * @param {string} src
-     * @returns {DOMObject} - Returns 'this' reference, for chaining
      */
-    setSrc( src ) { return this.setAttribute( 'src', src ); }
-    set src( src ) { this.setSrc( src ); }
+    set src( src ) { this.setAttribute( 'src', src ); }
 
     /**
-     * Sets the 'href' attribute of this DOM object. Errors if this objects type isn't 'a'.
+     * Sets the 'href' attribute of this DOM object. Errors if this DOMObject's type isn't 'a'.
      *
      * @param {string} href
-     * @returns {DOMObject} - Returns 'this' reference, for chaining
      */
-    setHref( href ) { return this.setAttribute( 'href', href ); }
-    set href( href ) { this.setHref( href ); }
+    set href( href ) { this.setAttribute( 'href', href ); }
 
     /**
      * Sets the text of the TextNode of this DOMObject. If this DOMObject is visible, the text will be displayed inside.
@@ -280,24 +230,6 @@ define( require => {
       return this;
     }
     set text( text ) { this.setText( text ); }
-
-
-    /**
-     * Sets the innerHTML (which isn't an attribute) of this DOM object. For background, see:
-     *  - https://developer.mozilla.org/en-US/docs/Web/API/Element/innerHTML
-     *  - See https://www.w3schools.com/jsref/prop_html_innerhtml.asp
-     * @public
-     *
-     * @param {string|null} innerHTML - if null, the innerHTML is set to nothing
-     * @returns {DOMObject} - Returns 'this' reference, for chaining
-     */
-    setInnerHTML( innerHTML ) {
-      assert( !innerHTML || typeof innerHTML === 'string', `invalid innerHTML: ${ innerHTML }` );
-      this._innerHTML = innerHTML;
-      this._element.innerHTML = innerHTML;
-      return this;
-    }
-    set innerHTML( innerHTML ) { this.setInnerHTML( innerHTML ); }
 
     /**
      * Appends a child DOMObject to our list of children.
@@ -336,6 +268,7 @@ define( require => {
       children.forEach( child => this.addChild( child ) );
       return this;
     }
+    set children( children ) { this.setChildren( children ); }
 
     /**
      * Removes a child DOMObject from our list of children. Will fail an assertion if the Object is not currently one of
@@ -378,7 +311,7 @@ define( require => {
     }
 
     /**
-     * Adds onto this DOMObject's CSS style. See DOMObject.addElementStyle for more documentation.
+     * Adds onto this DOMObject's CSS style. See DOMObject.addElementStyles for more documentation.
      * @public
      *
      * Styles that aren't apart of the element's CSS style object will cause an error.
@@ -386,10 +319,10 @@ define( require => {
      * @param {Object} style - object literal that describes the styles to override for the element
      * @returns {DOMObject} - Returns 'this' reference, for chaining
      */
-    addStyle( style ) {
+    addStyles( style ) {
       assert( Object.getPrototypeOf( style ) === Object.prototype, `invalid style object: ${ style }` );
 
-      DOMObject.addElementStyle( this._element, style );
+      DOMObject.addElementStyles( this._element, style );
       return this;
     }
 
@@ -425,40 +358,47 @@ define( require => {
       this._parent && this._parent.removeChild( this );
       return this;
     }
+
+    /*----------------------------------------------------------------------------*
+     * Static Constants
+     *----------------------------------------------------------------------------*/
+    /**
+     * Static method that adds onto an HTMLElement's CSS style, with additional browser-support. For context, see:
+     *  - https://www.w3schools.com/js/js_htmldom_css.asp
+     *  - https://www.w3schools.com/jsref/dom_obj_style.asp
+     *  - https://developer.mozilla.org/en-US/docs/Web/API/CSSStyleDeclaration
+     * @public
+     *
+     * @param {HTMLElement} element
+     * @param {Object} style - object literal that describes the styles to override for the element.
+     */
+    static addElementStyles( element, style ) {
+      assert( element instanceof Element || element instanceof HTMLDocument, `invalid element: ${ element }` );
+      assert( Object.getPrototypeOf( style ) === Object.prototype, `invalid style object: ${ style }` );
+
+      // convenience functions
+      const contains = styleKey => Object.prototype.hasOwnProperty.call( element.style, styleKey );
+      const setStyle = ( name, key ) => { element.style[ name ] = style[ key ]; };
+
+      // Loop through each key of the style Object literal and add the style.
+      Object.keys( style ).forEach( styleKey => {
+        const camelStyleKey = styleKey.charAt( 0 ).toUpperCase() + styleKey.slice( 1 );
+
+        if ( contains( styleKey ) ) setStyle( styleKey, styleKey );
+        else if ( contains( `moz${ camelStyleKey }` ) ) setStyle( `moz${ camelStyleKey }`, styleKey );
+        else if ( contains( `Moz${ camelStyleKey }` ) ) setStyle( `Moz${ camelStyleKey }`, styleKey );
+        else if ( contains( `webkit${ camelStyleKey }` ) ) setStyle( `webkit${ camelStyleKey }`, styleKey );
+        else if ( contains( `ms${ camelStyleKey }` ) ) setStyle( `ms${ camelStyleKey }`, styleKey );
+        else if ( contains( `o${ camelStyleKey }` ) ) setStyle( `o${ camelStyleKey }`, styleKey );
+      } );
+    };
   }
 
-  /**
-   * Static method that adds onto an HTMLElement's CSS style, with additional browser-support. For context, see:
-   *  - https://www.w3schools.com/js/js_htmldom_css.asp
-   *  - https://www.w3schools.com/jsref/dom_obj_style.asp
-   *  - https://developer.mozilla.org/en-US/docs/Web/API/CSSStyleDeclaration  Returns a new Bounds object, constructed with <minX, minY, width, height>.
-   * @public
-   *
-   * @param {HTMLElement} element
-   * @param {Object} style - object literal that describes the styles to override for the element.
-   */
-  DOMObject.addElementStyle = ( element, style ) => {
-    assert( element instanceof Element || element instanceof HTMLDocument, `invalid element: ${ element }` );
-    assert( Object.getPrototypeOf( style ) === Object.prototype, `invalid style object: ${ style }` );
+  /*----------------------------------------------------------------------------*
+   * Static Constants
+   *----------------------------------------------------------------------------*/
 
-    // convenience functions
-    const contains = styleKey => Object.prototype.hasOwnProperty.call( element.style, styleKey );
-    const setStyle = ( name, key ) => { element.style[ name ] = style[ key ]; };
-
-    // Loop through each key of the style Object literal and add the style.
-    Object.keys( style ).forEach( styleKey => {
-      const camelStyleKey = styleKey.charAt( 0 ).toUpperCase() + styleKey.slice( 1 );
-
-      if ( contains( styleKey ) ) setStyle( styleKey, styleKey );
-      else if ( contains( `moz${ camelStyleKey }` ) ) setStyle( `moz${ camelStyleKey }`, styleKey );
-      else if ( contains( `Moz${ camelStyleKey }` ) ) setStyle( `Moz${ camelStyleKey }`, styleKey );
-      else if ( contains( `webkit${ camelStyleKey }` ) ) setStyle( `webkit${ camelStyleKey }`, styleKey );
-      else if ( contains( `ms${ camelStyleKey }` ) ) setStyle( `ms${ camelStyleKey }`, styleKey );
-      else if ( contains( `o${ camelStyleKey }` ) ) setStyle( `o${ camelStyleKey }`, styleKey );
-    } );
-  };
-
-  // @public (read-only) - array of the SVG element types.
+  // @public (read-only) {string[]} - array of SVG-specific DOMObject element types.
   DOMObject.SVG_TYPES = [ 'svg',
     'g',
     'rect',
@@ -471,6 +411,10 @@ define( require => {
     'image',
     'radialGradient',
     'linearGradient' ];
+
+  // @public (read-only) {string} - the namespace used in `document.createElementNS()` for SVG element types. See
+  //                                https://developer.mozilla.org/en-US/docs/Web/API/Document/createElementNS.
+  DOMObject.SVG_NAMESPACE = 'http://www.w3.org/2000/svg';
 
   return DOMObject;
 } );

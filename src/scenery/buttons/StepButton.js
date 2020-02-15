@@ -103,13 +103,13 @@ define( require => {
       this.setChildren( [ button, rectangle, triangle ] );
 
       this.mouseover = () => {
-        this.addStyle( {
+        this.addStyles( {
           filter: 'brightness( 90% )',
           cursor: 'pointer'
         } );
       };
       this.mouseout = () => {
-        this.addStyle( {
+        this.addStyles( {
           filter: 'none',
           cursor: 'default'
         } );

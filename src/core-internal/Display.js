@@ -76,7 +76,7 @@ define( require => {
       this._parent = bodyElement;
 
       // Stylize the Body element with favorable CSS styles for the simulation.
-      DOMObject.addElementStyle( bodyElement, {
+      DOMObject.addElementStyles( bodyElement, {
 
         // Ensure that the simulation is the full width and height in the browser window.
         maxWidth: '100%',
