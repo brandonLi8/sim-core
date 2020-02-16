@@ -22,7 +22,7 @@
  *
  * ## Usage
  *  - The FPSCounter should be instantiated in Sim.js and added as a direct child of the Display. Then, in the
- *    simulation animation loop, Sim.js should call the `recordNewFrame()` method, passing in the time since the
+ *    simulation animation loop, Sim.js should call the `registerNewFrame()` method, passing in the time since the
  *    last call.
  *
  * The counter is designed to be minimally invasive, so it won't significantly alter the simulation's performance.
@@ -70,6 +70,12 @@ define( require => {
         },
         id: 'fps-counter'
       } );
+
+      // @private {number} - flags to keep track of, which are updated on every frame.
+      this._totalFrames = 0;
+      this._timeSinceLastCycle = 0;
+      this._minInstantFPS = null; // the lowest instantaneous FPS in the last cycle
+      this._maxInstantFPS = null; // the highest instantaneous FPS in the last cycle
     }
 
     /**
@@ -96,7 +102,43 @@ define( require => {
       this.setText( `${ fps } FPS [ ${ DOWN_ARROW }${ min } - ${ UP_ARROW }${ max } ] ~ ${ msPerFrame } ms/frame` );
     }
 
+    /**
+     * Called on each frame in the animation loop in Sim.js. Every cycle, it will record
+     *   (1) the average FPS
+     *   (2) the lowest instantaneous FPS
+     *   (3) the highest instantaneous FPS
+     * @public
+     *
+     * @param {number} dt - the time since the last frame, in seconds.
+     */
+    registerNewFrame( dt ) {
 
+      // Update flags
+      this._totalFrames++;
+      this._timeSinceLastCycle += dt;
+
+      // Compute the instantaneous FPS
+      const instantaneousFPS = 1 / dt;
+
+      // Update the min/max instantaneous FPS flags if applicable
+      this._minInstantFPS = Math.min( this._minInstantFPS || 0, instantaneousFPS );
+      this._maxInstantFPS = Math.max( this._maxInstantFPS || 0, instantaneousFPS );
+
+      // If this frame is the end of a cycle.
+      if ( this._totalFrames % FRAMES_PER_CYCYLE === 0 ) {
+
+        // Compute the average FPS in the last cycle
+        const averageFPS = FRAMES_PER_CYCYLE / this._timeSinceLastCycle;
+
+        // Update the FPS counter display content
+        this._updateFPSCounterText( averageFPS, this._minInstantFPS, this._maxInstantFPS );
+
+        // Reset flags
+        this._timeSinceLastCycle = 0;
+        this._minInstantFPS = null;
+        this._maxInstantFPS = null;
+      }
+    }
     /**
      * Gets the current time via the Javascript Date API in seconds.
      * See https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date.
