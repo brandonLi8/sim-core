@@ -121,8 +121,8 @@ define( require => {
       const instantaneousFPS = 1 / dt;
 
       // Update the min/max instantaneous FPS flags if applicable
-      this._minInstantFPS = Math.min( this._minInstantFPS || 0, instantaneousFPS );
-      this._maxInstantFPS = Math.max( this._maxInstantFPS || 0, instantaneousFPS );
+      this._minInstantFPS = Math.min( this._minInstantFPS || instantaneousFPS, instantaneousFPS );
+      this._maxInstantFPS = Math.max( this._maxInstantFPS || instantaneousFPS, instantaneousFPS );
 
       // If this frame is the end of a cycle.
       if ( this._totalFrames % FRAMES_PER_CYCYLE === 0 ) {
@@ -138,70 +138,6 @@ define( require => {
         this._minInstantFPS = null;
         this._maxInstantFPS = null;
       }
-    }
-    /**
-     * Gets the current time via the Javascript Date API in seconds.
-     * See https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date.
-     * @public
-     *
-     * @returns {number} - time in seconds
-     */
-    get currentTime() {
-      return Util.convertFrom( Date.now(), Util.MILLI ); // convert from milliseconds to seconds
-    }
-    /**
-     * Starts the counter; begins updating the DOMObject to display the content described in the
-     * comment at the top of the file.
-     * @public
-     */
-    start() {
-
-      // Create the flags to keep track of the data.
-      let frameStartTime = this.currentTime;
-      let frameEndTime;
-      let cycleStartTime = this.currentTime;
-      let minInstantFPS; // the lowest the instantaneous FPS hit in the last cycle
-      let maxInstantFPS; // the highest the instantaneous FPS hit in the last cycle
-      let framesDisplayed = 0;
-
-      // Declare the function that executes the logic of the FPSCounter.
-      const frameListener = () => {
-        framesDisplayed++;
-
-        frameEndTime = this.currentTime;
-
-        // compute the time since the last frame
-        const timeSinceLastFrame = frameEndTime - frameStartTime;
-        frameStartTime = frameEndTime;
-
-        // compute the instantaneous FPS
-        const instantaneousFPS = 1 / timeSinceLastFrame;
-
-        // Update the min and/or/xor max instantaneous FPS flags if applicable
-        minInstantFPS = ( !minInstantFPS || instantaneousFPS < minInstantFPS ) ? instantaneousFPS : minInstantFPS;
-        maxInstantFPS = ( !maxInstantFPS || instantaneousFPS > maxInstantFPS ) ? instantaneousFPS : maxInstantFPS;
-
-        if ( framesDisplayed % FRAMES_PER_CYCYLE === 0 ) {
-          // compute the time since the last cycle
-          const timeSinceLastCycle = frameEndTime - cycleStartTime;
-          cycleStartTime = frameEndTime;
-
-          // compute the average FPS in the last cycle
-          const averageFPS = FRAMES_PER_CYCYLE / timeSinceLastCycle;
-
-          // Update the FPS counter display content
-          this._updateFPSCounterText( averageFPS, minInstantFPS, maxInstantFPS );
-
-          // reset the min and max instantaneous FPS flags
-          minInstantFPS = null;
-          maxInstantFPS = null;
-        }
-        window.requestAnimationFrame( frameListener );
-      };
-      window.requestAnimationFrame( frameListener );
- //      _requestAnimationFrame = window.requestAnimationFrame || window.webkitRequestAnimationFrame
- // 6101:                                       || window.mozRequestAnimationFrame || window.msRequestAnimationFrame;
- // 6102
     }
   }
 

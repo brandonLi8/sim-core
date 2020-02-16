@@ -74,12 +74,15 @@ define( require => {
 
       // display.addChild( loader );
 
+      let counter;
       // Add the FPSCounter if the query parameter was provided.
       if ( StandardSimQueryParameters.fps ) {
-        const counter = new FPSCounter();
-        counter.start();
+        counter = new FPSCounter();
         display.addChild( counter );
       }
+
+      const _requestAnimationFrame = window.requestAnimationFrame || window.webkitRequestAnimationFrame
+                                       || window.mozRequestAnimationFrame || window.msRequestAnimationFrame;
 
       // Add the navigation bar
       const navigationBar = new NavigationBar( options.name );
@@ -110,19 +113,20 @@ define( require => {
 
 
 
-      // let lastStepTime = new Date();
+      let lastStepTime = Date.now();
 
-      // const stepper = () => {
+      const stepper = () => {
 
-      //   const currentTime = new Date();
-      //   const ellapsedTime = Util.convertFrom( currentTime - lastStepTime, Util.MILLI );
-      //   lastStepTime = currentTime;
+        const currentTime = Date.now();
+        const ellapsedTime = Util.convertFrom( currentTime - lastStepTime, Util.MILLI );
+        lastStepTime = currentTime;
 
-      //   screen._model.step && screen._model.step( ellapsedTime );
+        // screen._model.step && screen._model.step( ellapsedTime );
 
-      //   window.requestAnimationFrame( stepper );
-      // };
-      // window.requestAnimationFrame( stepper );
+        counter && counter.registerNewFrame( ellapsedTime );
+        _requestAnimationFrame( stepper );
+      };
+      _requestAnimationFrame( stepper );
 
       // // prevent pinch and zoom https://stackoverflow.com/questions/37808180/disable-viewport-zooming-ios-10-safari
       // // Maybe we want to detect if passive is supportive
