@@ -15,10 +15,10 @@
  *      (4) the average milliseconds per frame for the last cycle
  *
  *    The format that is displayed is:
- *      `FPS [ {{DOWN_ARROW}}low {{UP_ARROW}}high ] -- ~ms/frame`
+ *      `FPS [ {{DOWN_ARROW}}low - {{UP_ARROW}}high ] ~ ms/frame`
  *
  *    For instance:
- *      `64.4 FPS [ {{DOWN_ARROW}}50.2 {{UP_ARROW}}69.3 ] -- ~15.5 ms/frame`
+ *      `64.4 FPS [ {{DOWN_ARROW}}50.2 - {{UP_ARROW}}69.3 ] ~ 15.5 ms/frame`
  *
  * ## Usage
  *  - The FPSCounter should be instantiated in Sim.js and added as a direct child of the Display. Then, in the
@@ -96,24 +96,27 @@ define( require => {
     }
 
     /**
-     * Updates the FPSCounter text to match the template described in the comment at the top of the screen
-     * and rounds the results.
+     * Updates the FPSCounter text to match the template described in the comment at the top of the file.
      * @public
      *
      * @param {number} averageFPS
      * @param {number} minInstantFPS
      * @param {number} maxInstantFPS
      */
-    update( averageFPS, minInstantFPS, maxInstantFPS ) {
-      // convert from frames per second to milliseconds per frame
-      const msPerFrame = Util.convertTo( 1 / averageFPS, Util.MILLI ).toFixed( DECIMAL_PLACES );
+    updateFPSCounterText( averageFPS, minInstantFPS, maxInstantFPS ) {
 
-      // round the values
+      /*----------------------------------------------------------------------------*
+       * NOTE: the `toFixed` calls are inlined meaning the built-in `toFixed` is used
+       *       instead of `Util.toFixed`. This is done for performance reasons to
+       *       keep the FPSCounter minimally invasive, and results won't be affected
+       *       as all rounded values are positive.
+       *----------------------------------------------------------------------------*/
+      const msPerFrame = Util.convertTo( 1 / averageFPS, Util.MILLI ).toFixed( DECIMAL_PLACES ); // SPF = 1 / FPS
       const fps = averageFPS.toFixed( DECIMAL_PLACES );
       const min = minInstantFPS.toFixed( DECIMAL_PLACES );
       const max = maxInstantFPS.toFixed( DECIMAL_PLACES );
 
-      this.setText( `${ fps } FPS [ ${ DOWN_ARROW }${ min } - ${ UP_ARROW }${ max } ] ~${ msPerFrame } ms/frame` );
+      this.setText( `${ fps } FPS [ ${ DOWN_ARROW }${ min } - ${ UP_ARROW }${ max } ] ~ ${ msPerFrame } ms/frame` );
     }
 
     /**
@@ -157,7 +160,7 @@ define( require => {
           const averageFPS = FRAMES_PER_CYCYLE / timeSinceLastCycle;
 
           // Update the FPS counter display content
-          this.update( averageFPS, minInstantFPS, maxInstantFPS );
+          this.updateFPSCounterText( averageFPS, minInstantFPS, maxInstantFPS );
 
           // reset the min and max instantaneous FPS flags
           minInstantFPS = null;
