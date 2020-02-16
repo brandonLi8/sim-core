@@ -49,19 +49,12 @@ define( require => {
   class FPSCounter extends DOMObject {
 
     /**
-     * @param {Object} [options] - Various key-value pairs that control the appearance and behavior.
-     *                             See the early portion of the constructor for details.
+     * As of now, there are no parameters to the FPSCounter as all options are written and finalized in the constructor.
+     * In addition, the FPSCounter isn't public facing to sim-specific code, so all changes to the super-class options
+     * can be made here.
      */
-    constructor( options ) {
-
-      // Some options are set by FPSCounter. Assert that they weren't provided.
-      assert( !options || Object.getPrototypeOf( options ) === Object.prototype, `invalid options: ${ options }` );
-      assert( !options || !options.type, 'FPSCounter sets type.' );
-      assert( !options || !options.text, 'FPSCounter should not have text' );
-      assert( !options || !options.id || !options.class || !options.attributes, 'FPSCounter sets attributes' );
-      assert( !options || !options.children, 'FPSCounter shouldn\'t have children.' );
-
-      const defaults = {
+    constructor() {
+      super( {
         type: 'div',
         style: {
           zIndex: 99999999,
@@ -76,34 +69,18 @@ define( require => {
           cursor: 'default'
         },
         id: 'fps-counter'
-      };
-
-      // Rewrite options so that it overrides the defaults.
-      options = { ...defaults, ...options };
-      options.style = { ...defaults.style, ...options.style };
-      super( options );
-    }
-
-    /**
-     * Gets the current time via the Javascript Date API in seconds.
-     * See https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date.
-     * @public
-     *
-     * @returns {number} - time in seconds
-     */
-    get currentTime() {
-      return Util.convertFrom( Date.now(), Util.MILLI ); // convert from milliseconds to seconds
+      } );
     }
 
     /**
      * Updates the FPSCounter text to match the template described in the comment at the top of the file.
-     * @public
+     * @private
      *
      * @param {number} averageFPS
      * @param {number} minInstantFPS
      * @param {number} maxInstantFPS
      */
-    updateFPSCounterText( averageFPS, minInstantFPS, maxInstantFPS ) {
+    _updateFPSCounterText( averageFPS, minInstantFPS, maxInstantFPS ) {
 
       /*----------------------------------------------------------------------------*
        * NOTE: the `toFixed` calls are inlined meaning the built-in `toFixed` is used
@@ -119,6 +96,17 @@ define( require => {
       this.setText( `${ fps } FPS [ ${ DOWN_ARROW }${ min } - ${ UP_ARROW }${ max } ] ~ ${ msPerFrame } ms/frame` );
     }
 
+
+    /**
+     * Gets the current time via the Javascript Date API in seconds.
+     * See https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date.
+     * @public
+     *
+     * @returns {number} - time in seconds
+     */
+    get currentTime() {
+      return Util.convertFrom( Date.now(), Util.MILLI ); // convert from milliseconds to seconds
+    }
     /**
      * Starts the counter; begins updating the DOMObject to display the content described in the
      * comment at the top of the file.
@@ -160,7 +148,7 @@ define( require => {
           const averageFPS = FRAMES_PER_CYCYLE / timeSinceLastCycle;
 
           // Update the FPS counter display content
-          this.updateFPSCounterText( averageFPS, minInstantFPS, maxInstantFPS );
+          this._updateFPSCounterText( averageFPS, minInstantFPS, maxInstantFPS );
 
           // reset the min and max instantaneous FPS flags
           minInstantFPS = null;
