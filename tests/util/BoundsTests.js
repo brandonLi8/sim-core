@@ -69,21 +69,21 @@ define( require => {
     truenit.ok( A.bottom === 2 && A.getBottom() === 2, 'bottom' );
 
     // Top Row
-    truenit.ok( A.leftTop.equals( new Vector( 1, 4 ) ), 'leftTop' );
-    truenit.ok( A.centerTop.equals( new Vector( 2, 4 ) ), 'centerTop' );
-    truenit.ok( A.rightTop.equals( new Vector( 3, 4 ) ), 'rightTop' );
+    truenit.ok( A.topLeft.equals( new Vector( 1, 4 ) ), 'topLeft' );
+    truenit.ok( A.topCenter.equals( new Vector( 2, 4 ) ), 'topCenter' );
+    truenit.ok( A.topRight.equals( new Vector( 3, 4 ) ), 'topRight' );
 
     // Center Row Tests
     truenit.ok( A.centerX === 2, 'centerX' );
     truenit.ok( A.centerY === 3, 'centerY' );
     truenit.ok( A.center.equals( new Vector( 2, 3 ) ), 'center' );
-    truenit.ok( A.leftCenter.equals( new Vector( 1, 3 ) ), 'leftCenter' );
-    truenit.ok( A.rightCenter.equals( new Vector( 3, 3 ) ), 'rightCenter' );
+    truenit.ok( A.centerLeft.equals( new Vector( 1, 3 ) ), 'centerLeft' );
+    truenit.ok( A.centerRight.equals( new Vector( 3, 3 ) ), 'centerRight' );
 
     // Bottom Row
-    truenit.ok( A.leftBottom.equals( new Vector( 1, 2 ) ), 'leftBottom' );
-    truenit.ok( A.centerBottom.equals( new Vector( 2, 2 ) ), 'centerBottom' );
-    truenit.ok( A.rightBottom.equals( new Vector( 3, 2 ) ), 'rightBottom' );
+    truenit.ok( A.bottomLeft.equals( new Vector( 1, 2 ) ), 'bottomLeft' );
+    truenit.ok( A.bottomCenter.equals( new Vector( 2, 2 ) ), 'bottomCenter' );
+    truenit.ok( A.bottomRight.equals( new Vector( 3, 2 ) ), 'bottomRight' );
 
     //----------------------------------------------------------------------------------------
     // Conversion

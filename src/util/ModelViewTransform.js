@@ -66,7 +66,7 @@ define( require => {
 
     // Utilities
     modelToViewPoint( pt ) { return new Vector( this.modelToViewX( pt.x ), this.modelToViewY( pt.y ) ); }
-    modelToViewBounds( b ) { return B( this.modelToViewPoint( b.leftTop ), this.modelToViewPoint( b.rightBottom ) ); }
+    modelToViewBounds( b ) { return B( this.modelToViewPoint( b.topLeft ), this.modelToViewPoint( b.bottomRight ) ); }
 
     //----------------------------------------------------------------------------------------
     // @public View to Model transformations.
@@ -84,7 +84,7 @@ define( require => {
 
     // Utilities
     viewToModelPoint( pt ) { return new Vector( this.viewToModelX( pt.x ), this.viewToModelY( pt.y ) ); }
-    viewToModelBounds( b ) { return B( this.viewToModelPoint( b.leftTop ), this.viewToModelPoint( b.rightBottom ) ); }
+    viewToModelBounds( b ) { return B( this.viewToModelPoint( b.topLeft ), this.viewToModelPoint( b.bottomRight ) ); }
   }
 
   return ModelViewTransform;

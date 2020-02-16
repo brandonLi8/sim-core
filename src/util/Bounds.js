@@ -102,9 +102,9 @@ define( require => {
      * Location getters, in terms of the conventional mathematical coordinate system.
      *                        centerX                maxX
      *          ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓ maxY
-     *          ┃ leftTop     centerTop     rightTop    ┃
-     * centerY  ┃ leftCenter  center        rightCenter ┃
-     *          ┃ leftBottom  centerBottom  rightBottom ┃
+     *          ┃ topLeft     topCenter     topRight    ┃
+     * centerY  ┃ centerLeft  center        centerRight ┃
+     *          ┃ bottomLeft  bottomCenter  bottomRight ┃
      *    minY  ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
      *          minX
      */
@@ -131,24 +131,24 @@ define( require => {
      *
      * @returns {Vector}
      */
-    getLeftTop() { return new Vector( this.minX, this.maxY ); }
-    getCenterTop() { return new Vector( this.getCenterX(), this.maxY ); }
-    getRightTop() { return new Vector( this.maxX, this.maxY ); }
-    getLeftCenter() { return new Vector( this.minX, this.getCenterY() ); }
-    getRightCenter() { return new Vector( this.maxX, this.getCenterY() ); }
-    getLeftBottom() { return new Vector( this.minX, this.minY ); }
-    getCenterBottom() { return new Vector( this.getCenterX(), this.minY ); }
-    getRightBottom() { return new Vector( this.maxX, this.minY ); }
+    getTopLeft() { return new Vector( this.minX, this.maxY ); }
+    getTopCenter() { return new Vector( this.getCenterX(), this.maxY ); }
+    getTopRight() { return new Vector( this.maxX, this.maxY ); }
+    getCenterLeft() { return new Vector( this.minX, this.getCenterY() ); }
+    getCenterRight() { return new Vector( this.maxX, this.getCenterY() ); }
+    getBottomLeft() { return new Vector( this.minX, this.minY ); }
+    getBottomCenter() { return new Vector( this.getCenterX(), this.minY ); }
+    getBottomRight() { return new Vector( this.maxX, this.minY ); }
     getCenter() { return new Vector( this.getCenterX(), this.getCenterY() ); }
 
-    get leftTop() { return this.getLeftTop(); }
-    get centerTop() { return this.getCenterTop(); }
-    get rightTop() { return this.getRightTop(); }
-    get leftCenter() { return this.getLeftCenter(); }
-    get rightCenter() { return this.getRightCenter(); }
-    get leftBottom() { return this.getLeftBottom(); }
-    get centerBottom() { return this.getCenterBottom(); }
-    get rightBottom() { return this.getRightBottom(); }
+    get topLeft() { return this.getTopLeft(); }
+    get topCenter() { return this.getTopCenter(); }
+    get topRight() { return this.getTopRight(); }
+    get centerLeft() { return this.getCenterLeft(); }
+    get centerRight() { return this.getCenterRight(); }
+    get bottomLeft() { return this.getBottomLeft(); }
+    get bottomCenter() { return this.getBottomCenter(); }
+    get bottomRight() { return this.getBottomRight(); }
     get center() { return this.getCenter(); }
 
     /**

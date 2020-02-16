@@ -107,6 +107,7 @@ define( require => {
      *   (1) the average FPS
      *   (2) the lowest instantaneous FPS
      *   (3) the highest instantaneous FPS
+     * If called, this will assume that the ?fps query parameter was supplied.
      * @public
      *
      * @param {number} dt - the time since the last frame, in seconds.
