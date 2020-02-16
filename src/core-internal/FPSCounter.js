@@ -4,25 +4,30 @@
  * A DOMObject that displays the frames per second (fps) along with other performance data of the simulation while
  * running in real time. For context, see https://en.wikipedia.org/wiki/Frame_rate.
  *
- * The counter is designed to be minimally invasive, so it won't alter the simulation's performance significantly.
+ * ## Output
+ *  - The output is displayed in the upper-left corner of the browser window and only is displayed with the
+ *    query parameter `?fps`. See `../StandardSimQueryParameters.js` for more documentation.
+ *
+ *  - The FPSCounter will update its text every 'cycle', which is just FRAMES_PER_CYCYLE frames. It will display:
+ *      (1) the average FPS for the last cycle
+ *      (2) the lowest instantaneous FPS in the last cycle
+ *      (3) the highest instantaneous FPS in the last cycle
+ *      (4) the average milliseconds per frame for the last cycle
+ *
+ *    The format that is displayed is:
+ *      `FPS [ {{DOWN_ARROW}}low {{UP_ARROW}}high ] -- ~ms/frame`
+ *
+ *    For instance:
+ *      `64.4 FPS [ {{DOWN_ARROW}}50.2 {{UP_ARROW}}69.3 ] -- ~15.5 ms/frame`
+ *
+ * ## Usage
+ *  - The FPSCounter should be instantiated in Sim.js and added as a direct child of the Display. Then, in the
+ *    simulation animation loop, Sim.js should call the `recordNewFrame()` method, passing in the time since the
+ *    last call.
+ *
+ * The counter is designed to be minimally invasive, so it won't significantly alter the simulation's performance.
  * It is used to help quantify one aspect of the simulation's performance. However, that's NOT to say that FPS
  * should be the only way to determine if a simulation has acceptable performance.
- *
- * The output is displayed in the upper-left corner of the browser window.
- * It only is displayed with the query parameter `?fps`. See `../Sim.js`. This DOMObject should be added as a child of
- * the root element.
- *
- * It updates every COUNTER_CYCLE frames and displays:
- *   (1) the average FPS for the last cycle
- *   (2) the average milliseconds per frame for the last cycle
- *   (3) the lowest the instantaneous FPS hit in the last cycle
- *   (4) the highest the instantaneous FPS hit in the last cycle
- *
- * The format that is displayed is:
- * `FPS [ {{DOWN_ARROW}}low {{UP_ARROW}}high ] -- ~ms/frame`
- *
- * For instance:
- * `64.4 FPS [ {{DOWN_ARROW}}50.2 {{UP_ARROW}}69.3 ] -- ~15.5 ms/frame`
  *
  * @author Brandon Li <brandon.li820@gmail.com>
  */
@@ -36,11 +41,10 @@ define( require => {
   const Util = require( 'SIM_CORE/util/Util' );
 
   // constants
-  const COUNTER_CYCLE = 60; // In frames. See the comment at the top of the file for context.
-  const DOWN_ARROW = '\u21A1';
-  const UP_ARROW = '\u219F';
-  const DECIMAL_PLACES = 2;
-
+  const FRAMES_PER_CYCYLE = 60; // Number of frames in a 'cycle'. See the comment at the top of the file for context.
+  const DECIMAL_PLACES = 2; // Number of decimals for each number in the result text.
+  const DOWN_ARROW = '\u2193';
+  const UP_ARROW = '\u2191';
 
   class FPSCounter extends DOMObject {
 
@@ -50,18 +54,17 @@ define( require => {
      */
     constructor( options ) {
 
-      if ( options ) {
-        // Changes to the API means excluding some of the options.
-        assert( !options.type, 'FPSCounter sets options.type.' );
-        assert( !options.innerHTML && !options.text, 'FPSCounter sets inner content.' );
-        assert( !options.id && !options.class && !options.attributes, 'FPSCounter sets options.attributes' );
-        assert( !options.children, 'FPSCounter sets children.' );
-      }
+      // Some options are set by FPSCounter. Assert that they weren't provided.
+      assert( !options || Object.getPrototypeOf( options ) === Object.prototype, `invalid options: ${ options }` );
+      assert( !options || !options.type, 'FPSCounter sets type.' );
+      assert( !options || !options.text, 'FPSCounter should not have text' );
+      assert( !options || !options.id || !options.class || !options.attributes, 'FPSCounter sets attributes' );
+      assert( !options || !options.children, 'FPSCounter shouldn\'t have children.' );
 
       const defaults = {
         type: 'div',
         style: {
-          'z-index': 99999999,
+          zIndex: 99999999,
           position: 'absolute',
           color: 'red',
           left: '10px',
@@ -79,7 +82,6 @@ define( require => {
       options = { ...defaults, ...options };
       options.style = { ...defaults.style, ...options.style };
       super( options );
-
     }
 
     /**
@@ -104,14 +106,14 @@ define( require => {
      */
     update( averageFPS, minInstantFPS, maxInstantFPS ) {
       // convert from frames per second to milliseconds per frame
-      const msPerFrame = Util.toFixed( Util.convertTo( 1 / averageFPS, Util.MILLI ), DECIMAL_PLACES );
+      const msPerFrame = Util.convertTo( 1 / averageFPS, Util.MILLI ).toFixed( DECIMAL_PLACES );
 
       // round the values
-      const fps = Util.toFixed( averageFPS, DECIMAL_PLACES );
-      const min = Util.toFixed( minInstantFPS, DECIMAL_PLACES );
-      const max = Util.toFixed( maxInstantFPS, DECIMAL_PLACES );
+      const fps = averageFPS.toFixed( DECIMAL_PLACES );
+      const min = minInstantFPS.toFixed( DECIMAL_PLACES );
+      const max = maxInstantFPS.toFixed( DECIMAL_PLACES );
 
-      this.setText( `${ fps } FPS [ ${ DOWN_ARROW }${ min } ${ UP_ARROW }${ max } ] -- ~${ msPerFrame } ms/frame` );
+      this.setText( `${ fps } FPS [ ${ DOWN_ARROW }${ min } - ${ UP_ARROW }${ max } ] ~${ msPerFrame } ms/frame` );
     }
 
     /**
@@ -146,13 +148,13 @@ define( require => {
         minInstantFPS = ( !minInstantFPS || instantaneousFPS < minInstantFPS ) ? instantaneousFPS : minInstantFPS;
         maxInstantFPS = ( !maxInstantFPS || instantaneousFPS > maxInstantFPS ) ? instantaneousFPS : maxInstantFPS;
 
-        if ( framesDisplayed % COUNTER_CYCLE === 0 ) {
+        if ( framesDisplayed % FRAMES_PER_CYCYLE === 0 ) {
           // compute the time since the last cycle
           const timeSinceLastCycle = frameEndTime - cycleStartTime;
           cycleStartTime = frameEndTime;
 
           // compute the average FPS in the last cycle
-          const averageFPS = COUNTER_CYCLE / timeSinceLastCycle;
+          const averageFPS = FRAMES_PER_CYCYLE / timeSinceLastCycle;
 
           // Update the FPS counter display content
           this.update( averageFPS, minInstantFPS, maxInstantFPS );
@@ -164,6 +166,9 @@ define( require => {
         window.requestAnimationFrame( frameListener );
       };
       window.requestAnimationFrame( frameListener );
+ //      _requestAnimationFrame = window.requestAnimationFrame || window.webkitRequestAnimationFrame
+ // 6101:                                       || window.mozRequestAnimationFrame || window.msRequestAnimationFrame;
+ // 6102
     }
   }
 

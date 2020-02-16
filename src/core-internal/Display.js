@@ -6,7 +6,7 @@
  * A Display represents the true root DOMObject of the entire simulation. All Nodes, Screens, Navigation Bars, etc.
  * should be in the sub-tree of a single Display. The Display is instantiated once at the start of the sim in Sim.js.
  * Generally, Displays shouldn't be public-facing to sim-specific code. Instead, Screens should be instantiated and
- * passed to Sim.js, which will add the Screen elements to the Display as children.
+ * passed to Sim.js, which will add the Screen elements to the sub-tree of Display.
  *
  * A Display will connect its the inner DOMObject element to the HTML Body element. Thus, nothing should subtype Display
  * as it should be the only DOMObject with a hard-coded parent element. In addition, the Display should never be
