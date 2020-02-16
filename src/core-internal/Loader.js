@@ -154,7 +154,7 @@ define( require => {
         foregroundCircle.setAttribute( 'd', getCirclePathData( loadedPercentage ) );
       };
 
-      const startLoadingTime = new Date();
+      const startLoadingTime = Date.now();
 
 
       const finishDom = () => {
@@ -166,7 +166,7 @@ define( require => {
           window.setTimeout( () => {
             foregroundCircle.setAttribute( 'd', getCirclePathData( loadedPercentage ) );
             window.setTimeout( () => this.dispose(), 400 );
-          }, Math.max( ( new Date() - startLoadingTime ) * DOM_LOADING_BANDWIDTH / 100 * ( Math.random() * 3 ), 100 ) );
+          }, Math.max( ( Date.now() - startLoadingTime ) * DOM_LOADING_BANDWIDTH / 100 * ( Math.random() * 3 ), 100 ) );
         } );
       };
       if ( window.simImages ) {
@@ -177,7 +177,7 @@ define( require => {
           const image = simImage.image;
           const imagePath = simImage.src;
 
-          const dt = new Date();
+          const dt = Date.now();
 
           image.element.onload = () => {
             loadedImages++;
@@ -185,7 +185,7 @@ define( require => {
             incrementImageLoad( loadedImages );
             i++;
             if ( loadedImages !== window.simImages.length ) {
-              window.setTimeout( step, Math.max( ( new Date() - dt ) * 4.5, 80 ) );
+              window.setTimeout( step, Math.max( ( Date.now() - dt ) * 4.5, 80 ) );
             }
             else {
               finishDom();
