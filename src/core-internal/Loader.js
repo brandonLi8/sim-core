@@ -148,7 +148,7 @@ define( require => {
       let loadedImages = 0;
       let loadedPercentage = 0;
 
-      const incrementImageLoad = () => {
+      const tw = () => {
         const percentage = 1 / window.simImages.length * IMAGE_LOADING_BANDWIDTH;
         loadedPercentage += percentage;
         foregroundCircle.setAttribute( 'd', getCirclePathData( loadedPercentage ) );
@@ -182,7 +182,7 @@ define( require => {
           image.element.onload = () => {
             loadedImages++;
             assert( isImageOK( image.element ), 'error while loading image' );
-            incrementImageLoad( loadedImages );
+            tw( loadedImages );
             i++;
             if ( loadedImages !== window.simImages.length ) {
               window.setTimeout( step, Math.max( ( Date.now() - dt ) * 4.5, 80 ) );
