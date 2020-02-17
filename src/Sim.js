@@ -1,5 +1,4 @@
 // Copyright © 2019-2020 Brandon Li. All rights reserved.
-/* eslint no-console: 0 */
 
 /**
  * Main class encapsulation for a simulation. Provides:
@@ -21,80 +20,88 @@ define( require => {
   const StandardSimQueryParameters = require( 'SIM_CORE/StandardSimQueryParameters' );
   const Util = require( 'SIM_CORE/util/Util' );
 
-  // constants
-  const PACKAGE_OBJECT = JSON.parse( require( 'text!REPOSITORY/package.json' ) );
+  const Sim = {
 
-  //----------------------------------------------------------------------------------------
+    // @private {boolean} - indicates if the simulation has already been initiated and launched.
+    _initiated: false,
 
-  class Sim {
+    // @private {boolean} - indicates if the current window is running on a mobile device.
+    _isMobile: ( () => /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i
+                .test( navigator.userAgent || navigator.vendor || window.opera ) )(),
+
+    // @private {function} - scans through potential default `requestAnimationFrame` functions
+    _requestAnimationFrame: ( window.requestAnimationFrame
+                                || window.webkitRequestAnimationFrame
+                                || window.mozRequestAnimationFrame
+                                || window.msRequestAnimationFrame
+                                || ( ( callback ) => { window.setTimeout( callback, 1000 / 60 ); } )
+                            ).bind( window ),
 
     /**
-     * @param {Screen} screen - the screen to display
-     * @param {Object} [options] - Various key-value pairs that control the appearance and behavior of this class.
-     *                             All options are specific to this class. See below details.
+     * Starting point of the sim: initiates and launches the simulation. Will throw an error if called more than once.
+     * @public
+     *
+     * @param {Object} config - required object literal that provides configuration information for the simulation.
+     *                          See the early portion of this static method for details.
      */
-    constructor( screen, options ) {
+    start( config ) {
+      assert.always( !Sim._initiated, 'Sim has already been launched.' ); // Ensure that the sim hasn't been launched
+      assert( Object.getPrototypeOf( config ) === Object.prototype, `invalid config: ${ config }` );
 
-      assert( screen instanceof Screen, `invalid screen: ${ screen }` );
-      assert( !options || Object.getPrototypeOf( options ) === Object.prototype, `invalid options: ${ options }` );
+      config = {
 
-      options = {
+        // {Screens[]} - all screens to the sim, in order that they will appear in the home-screen and navigation-bar.
+        screens: config.screens,
 
-        // {string} - the name of the simulation. Defaults to an attempted title case conversion from the package name.
-        name: PACKAGE_OBJECT.name ? Util.toTitleCase( PACKAGE_OBJECT.name ) : '',
+        // {string} - the name to the simulation, displayed in the navigation-bar and home-screen
+        name: config.name,
 
-        // override
-        ...options
+        // {number} (optional) - maximum delta-time in the animation loop. Used to prevent sudden dt bursts when the
+        //                       user comes back to the tab after a while or unminimizes the browser.
+        maxDT: config.maxDT || 0.5,
       };
 
-      window.isMobile = ( () => {
-        return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i
-          .test( navigator.userAgent || navigator.vendor || window.opera );
-      } )();
+      assert( Util.isArray( config.screens ), `invalid screens: ${ config.screens }` );
+      assert( config.screens.every( screen => screen instanceof Screen ), 'All items in screens must be a Screen type.' );
+      assert( typeof config.name === 'string', `invalid name: ${ config.name }` );
+      assert( typeof config.maxDT === 'number' && config.maxDT > 0, `invalid maxDT: ${ config.maxDT }` );
+      Sim._initiated = true; // Indicate that the simulation has been initiated and launched.
 
       //----------------------------------------------------------------------------------------
+
       // If the page is loaded from the back-forward cache, then reload the page to avoid bugginess,
       // see https://stackoverflow.com/questions/8788802/prevent-safari-loading-from-cache-when-back-button-is-clicked
-      window.addEventListener( 'pageshow', function( event ) {
-        if ( event.persisted ) {
-          window.location.reload();
-        }
-      } );
+      window.addEventListener( 'pageshow', event => { if ( event.persisted ) window.location.reload(); } );
 
-      // Log the current version of the simulation if the query parameter was provided.
+      // Log the current version of the simulation if the query parameter ?version was provided.
       if ( StandardSimQueryParameters.version ) {
-        console.log( `${ options.name }: v${ PACKAGE_OBJECT.version }` );
+
+        // eslint-disable-next-line no-console
+        console.log( `${ config.name }: v${ JSON.parse( require( 'text!REPOSITORY/package.json' ) ).version }` );
       }
 
-      // Initialize a display and loader
-      const display = new Display();
-      display.initiate();
+      // Initialize a display to attach to the browser window.
+      const display = new Display().initiate();
 
-      // const loader = new Loader();
-
-      // display.addChild( loader );
-
-      let counter;
-      // Add the FPSCounter if the query parameter was provided.
+      // Initialize a fps-counter if the ?fps query parameter was provided
+      let fpsCounter;
       if ( StandardSimQueryParameters.fps ) {
-        counter = new FPSCounter();
-        display.addChild( counter );
+        fpsCounter = new FPSCounter();
+        display.addChild( fpsCounter );
       }
 
-      const _requestAnimationFrame = window.requestAnimationFrame || window.webkitRequestAnimationFrame
-                                       || window.mozRequestAnimationFrame || window.msRequestAnimationFrame;
 
       // Add the navigation bar
-      const navigationBar = new NavigationBar( options.name );
+      const navigationBar = new NavigationBar( config.name );
 
       display.addChild( navigationBar );
 
-      display.addChild( screen );
-      screen.initializeModelAndView();
+      display.addChild( config.screens[ 0 ] );
+      config.screens[ 0 ].initializeModelAndView();
 
 
       if ( StandardSimQueryParameters.dev ) {
-        screen._view.enableDevBorder();
+        config.screens[ 0 ]._view.enableDevBorder();
       }
 
       window.onresize = () => {
@@ -105,28 +112,28 @@ define( require => {
 
 
         const screenHeight = windowHeight - parseFloat( navigationBar.style.height );
-        screen.style.height = `${ screenHeight }px`;
+        config.screens[ 0 ].style.height = `${ screenHeight }px`;
 
-        screen._view.layout( windowWidth, screenHeight );
+        config.screens[ 0 ]._view.layout( windowWidth, screenHeight );
       };
       window.onresize();
 
 
 
       let lastStepTime = Date.now();
-
+      console.log( Sim._requestAnimationFrame )
       const stepper = () => {
 
         const currentTime = Date.now();
         const ellapsedTime = Util.convertFrom( currentTime - lastStepTime, Util.MILLI );
         lastStepTime = currentTime;
 
-        // screen._model.step && screen._model.step( ellapsedTime );
+        // config.screens[ 0 ]._model.step && screen._model.step( ellapsedTime );
 
-        counter && counter.registerNewFrame( ellapsedTime );
-        _requestAnimationFrame( stepper );
+        fpsCounter && fpsCounter.registerNewFrame( ellapsedTime );
+        Sim._requestAnimationFrame( stepper );
       };
-      _requestAnimationFrame( stepper );
+      Sim._requestAnimationFrame( stepper );
 
       // // prevent pinch and zoom https://stackoverflow.com/questions/37808180/disable-viewport-zooming-ios-10-safari
       // // Maybe we want to detect if passive is supportive

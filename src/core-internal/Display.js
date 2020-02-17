@@ -100,6 +100,7 @@ define( require => {
         touchCallout: 'none',
         userDrag: 'none'
       } );
+      return this;
     }
   }
 
