@@ -17,6 +17,7 @@ define( require => {
   const Loader = require( 'SIM_CORE/core-internal/Loader' );
   const NavigationBar = require( 'SIM_CORE/core-internal/NavigationBar' );
   const Screen = require( 'SIM_CORE/Screen' );
+  const ScreenView = require( 'SIM_CORE/scenery/ScreenView' );
   const StandardSimQueryParameters = require( 'SIM_CORE/StandardSimQueryParameters' );
   const Util = require( 'SIM_CORE/util/Util' );
 
@@ -103,9 +104,7 @@ define( require => {
       // display.addChild( config.screens[ 0 ] );
 
 
-      // if ( StandardSimQueryParameters.dev ) {
-      //   config.screens[ 0 ]._view.enableDevBorder();
-      // }
+      if ( StandardSimQueryParameters.dev ) { ScreenView.enableDevBorder(); }
 
       window.onresize = () => {
         const windowHeight = window.innerHeight;

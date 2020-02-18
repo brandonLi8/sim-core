@@ -45,6 +45,7 @@ define( require => {
 
       super( options );
 
+      ScreenView.instances.push( this );
       // @public (read-only)
       this.viewBounds = options.viewBounds;
     }
@@ -91,12 +92,17 @@ define( require => {
      * Called if ?dev was provided as a Query Parameter. See Sim.js for more information.
      * @public
      */
-    enableDevBorder() {
-      this.addStyles( {
-        border: '2px solid red'
+    static enableDevBorder() {
+      ScreenView.instances.forEach( screenView => {
+        screenView.addStyles( {
+          border: '2px solid red'
+        } );
       } );
     }
   }
+
+  // @public (read-only) {ScreenView[]} - array of all instances of this class
+  ScreenView.instances = [];
 
   return ScreenView;
 } );
