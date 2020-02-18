@@ -7,13 +7,16 @@
  * This is shown as a progress circle while launching the simulation and is removed once finished.
  *
  * Loading tasks include:
+ *  (1) Synchronously initializing the entire model and view hierarchies of the sim-specific code for every screen.
+ *      This ensures that the simulation source code has been loaded and instantiated. This process is defined to be
+ *      SIM_SOURCE_LOADING_BANDWIDTH% of the loading bandwidth. There must be at least one screen to load.
  *
- *  (1) Synchronously loading registered images from the global window object (see ../util/image-plugin).
+ *  (2) Synchronously loading registered images from the global window object (see ../util/image-plugin).
  *      Each image loaded adds a percentage amount depending on how many images are loaded. This process is defined
  *      to be IMAGE_LOADING_BANDWIDTH% of the loading bandwidth, even if there are 0 images to load (which would
  *      launch really quickly). This portion of the loading will be sped up with cached images.
  *
- *  (2) Synchronously ensuring that the DOM is fully loaded and ready to be manipulated with all simulation rendering
+ *  (3) Synchronously ensuring that the DOM is fully loaded and ready to be manipulated with all simulation rendering
  *      ready. This is defined as DOM_LOADING_BANDWIDTH% of the loading bandwidth, even if the DOM is fully ready
  *      already. This portion of the loading should not be greatly affected by caching.
  *
