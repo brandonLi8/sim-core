@@ -88,7 +88,11 @@ define( require => {
       display.addChild( loader );
 
       // Initialize a fps-counter if the ?fps query parameter was provided
-      if ( StandardSimQueryParameters.fps ) display.addChild( new FPSCounter() );
+      if ( StandardSimQueryParameters.fps ) {
+        const fpsCounter = new FPSCounter();
+        display.addChild( fpsCounter );
+        Sim.addStepSimulationListener( fpsCounter.registerNewFrame.bind( fpsCounter ) );
+      }
 
 
       // // Add the navigation bar
@@ -123,8 +127,8 @@ define( require => {
         lastStepTime = currentTime;
 
         // config.screens[ 0 ]._model.step && screen._model.step( ellapsedTime );
+        Sim._stepSimulationListeners.forEach( listener => { listener( ellapsedTime ); } );
 
-        // fpsCounter && fpsCounter.registerNewFrame( ellapsedTime );
         Sim._requestAnimationFrame( stepper );
       };
       Sim._requestAnimationFrame( stepper );
@@ -150,7 +154,7 @@ define( require => {
       assert( Sim.initiated, 'Sim must be initiated to add listener' );
       assert( typeof listener === 'function', `invalid listener: ${ listener }` );
       Sim._resizeListeners.push( listener );
-      listener( window.innerHeight, window.innerWidth ); // Immediately call the listener
+      listener( window.innerWidth, window.innerHeight ); // Immediately call the listener
     },
 
     /**
@@ -165,7 +169,6 @@ define( require => {
       assert( Sim.initiated, 'Sim must be initiated to add listener' );
       assert( typeof listener === 'function', `invalid listener: ${ listener }` );
       Sim._stepSimulationListeners.push( listener );
-      listener( window.innerHeight, window.innerWidth ); // Immediately call the listener
     },
 
     /**

@@ -106,6 +106,8 @@ define( require => {
       this._screenView = new ScreenView( { id: 'screen-view' } );
       this._screenView.enableDevBorder();
       this.addChild( this._screenView );
+
+      require( 'SIM_CORE/Sim' ).addResizeListener( this._screenView.layout.bind( this._screenView ) );
     }
 
 
