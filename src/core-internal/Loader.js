@@ -31,30 +31,27 @@ define( require => {
   const DOMObject = require( 'SIM_CORE/core-internal/DOMObject' );
   const Vector = require( 'SIM_CORE/util/Vector' );
 
-  //----------------------------------------------------------------------------------------
   // constants
-  const XML_NAMESPACE = 'http://www.w3.org/2000/svg';
+  const SIM_SOURCE_LOADING_BANDWIDTH = 35 + Math.random() * 10; // Random number from 35 to 45
+  const IMAGE_LOADING_BANDWIDTH = 20 + Math.random() * 15; // Random number from 20 to 35
+  const DOM_LOADING_BANDWIDTH = 100 - IMAGE_LOADING_BANDWIDTH - SIM_SOURCE_LOADING_BANDWIDTH;
 
-  // Relative size of all loader circles, as a percent.
-  const LOADER_CIRCLE_RELATIVE = 100;
-  const LOADER_RADIUS = LOADER_CIRCLE_RELATIVE / 2;
 
-  // Relative view box for the loader circle content, with the origin at the center: <minX, minY, width, height>.
-  const LOADER_CIRCLE_VIEW_BOX = `-${ LOADER_RADIUS } `.repeat( 2 ) + `${ LOADER_CIRCLE_RELATIVE } `.repeat( 2 );
+  // // Relative size of all loader circles, as a percent.
+  // const LOADER_CIRCLE_RELATIVE = 100;
+  // const LOADER_RADIUS = LOADER_CIRCLE_RELATIVE / 2;
 
-  // Width of loader circle (which would match pixels with the height) relative to the window.
-  const LOADER_CIRCLE_WIDTH = '13%';
-  const LOADER_CIRCLE_MAX_SIZE = 120; // the largest possible loader circle size, in pixels.
-  const LOADER_CIRCLE_MIN_SIZE = 80; // the smallest possible loader circle size, in pixels.
+  // // Relative view box for the loader circle content, with the origin at the center: <minX, minY, width, height>.
+  // const LOADER_CIRCLE_VIEW_BOX = `-${ LOADER_RADIUS } `.repeat( 2 ) + `${ LOADER_CIRCLE_RELATIVE } `.repeat( 2 );
 
-  // Stroke of the loader circle in percentage relative to LOADER_CIRCLE_RELATIVE.
-  const LOADER_STROKE_WIDTH = 12;
-  const LOADER_CIRCLE_INNER_RADIUS = ( LOADER_CIRCLE_RELATIVE - LOADER_STROKE_WIDTH ) / 2; // in percentage
+  // // Width of loader circle (which would match pixels with the height) relative to the window.
+  // const LOADER_CIRCLE_WIDTH = '13%';
+  // const LOADER_CIRCLE_MAX_SIZE = 120; // the largest possible loader circle size, in pixels.
+  // const LOADER_CIRCLE_MIN_SIZE = 80; // the smallest possible loader circle size, in pixels.
 
-  // Loading bandwidths. See comment at the top of the file for more context.
-  const IMAGE_LOADING_BANDWIDTH = 65 + Math.random() * 15;
-  const DOM_LOADING_BANDWIDTH = 100 - IMAGE_LOADING_BANDWIDTH;
-
+  // // Stroke of the loader circle in percentage relative to LOADER_CIRCLE_RELATIVE.
+  // const LOADER_STROKE_WIDTH = 12;
+  // const LOADER_CIRCLE_INNER_RADIUS = ( LOADER_CIRCLE_RELATIVE - LOADER_STROKE_WIDTH ) / 2; // in percentage
 
   class Loader extends DOMObject {
 
