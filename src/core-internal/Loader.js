@@ -56,153 +56,172 @@ define( require => {
   class Loader extends DOMObject {
 
     /**
+     * @param {string[]} screens - all screens to the simulation
+     * @param {string} name - the name of the simulation, displayed in the Loader
      * @param {Object} [options] - Various key-value pairs that control the appearance and behavior of this class.
      *                             Some options are specific to this class while others are passed to the super class.
      *                             See the early portion of the constructor for details.
      */
     constructor( options ) {
 
-      if ( options ) {
-        // Changes to the API means excluding some of the options.
-        assert( Object.getPrototypeOf( options ) === Object.prototype, `invalid options: ${ options }` );
-        assert( !options.style, 'Loader sets options.style.' );
-        assert( !options.type, 'Loader sets options.type.' );
-        assert( !options.innerHTML && !options.text, 'Loader should be a container with no inner content.' );
-        assert( !options.id && !options.class && !options.attributes, 'Loader sets options.attributes' );
-        assert( !options.children, 'Loader sets children.' );
-      }
+      // Some options are set by Loader. Assert that they weren't provided.
+      assert( !options || Object.getPrototypeOf( options ) === Object.prototype, `invalid options: ${ options }` );
+      assert( !options || !options.style, 'Loader sets style.' );
+      assert( !options || !options.type, 'Loader sets type.' );
+      assert( !options || !options.text, 'Loader sets text.' );
+      assert( !options || !options.id || !options.class || !options.attributes, 'Loader sets attributes' );
+      assert( !options || !options.children, 'Loader sets children.' );
 
-      options = {
+      // Defaults for options.
+      const defaults = {
+
+        // Options specific to this class
+        backgroundColor: '#0f0f0f',  // {string} - the backdrop color of the loader
+        loaderCircleBg: '#A5A5A5',   // {string} - the background color of the loader circle
+        loaderCircleFg: '#2974b2',   // {string} - the foreground color of the loader circle
+        loaderTitleColor: '#F1F1F1', // {string} - the font color of the text of the sim name near the top of the Loader
+        loaderCircleInnerRadius: 12, // {number} - the inner-radius of the loader circle, in the standard scenery frame
+        loaderCircleStrokeWidth: 12, // {number} - the stroke-width of the loader circle, in the standard scenery frame
+
+        // Options specific to the super-class
         id: 'loader',
         style: {
-          background: 'rgb( 15, 15, 15 )',
           height: '100%',
-          display: 'flex', // use a centered flex box to center the loader circle
-          'justify-content': 'center',
+          display: 'flex',
+          justifyContent: 'center',
+          alignContent: 'center',
+          alignItems: 'center',
           zIndex: 999999
-        },
-        ...options
+        }
       };
 
-      //----------------------------------------------------------------------------------------
-      // To create the loading progress circle, overlay 2 circles on top of each other.
-      // First, create the circle in the background. The circle has no fill (hollow) but has a stroke and is a complete
-      // circle arc.
-      const backgroundCircle = new DOMObject( {
-        type: 'circle',
-        namespace: XML_NAMESPACE,
-        attributes: {
-          fill: 'none',
-          r: LOADER_CIRCLE_INNER_RADIUS, // In percentage of the container.
-          cx: Vector.ZERO.x, // Center the circle
-          cy: Vector.ZERO.y, // Center the circle
-          'stroke-width': LOADER_STROKE_WIDTH,
-          'shape-rendering': 'geometricPrecision', // Use geometricPrecision for aesthetic accuracy.
-          stroke: '#A5A5A5' // light colored
-        }
-      } );
-
-      //----------------------------------------------------------------------------------------
-      // Create the circle (as a path) in the foreground. The circle has no fill (hollow) but has a stroke.
-      // This represents the percentage of bandwidth loaded (see comment at the top of the file).
-      // For now, initialize with arc length 0.
-      const foregroundCircle = new DOMObject( {
-        type: 'path',
-        namespace: XML_NAMESPACE,
-        style: {
-          fill: 'none',
-          'stroke-width': LOADER_STROKE_WIDTH,
-          stroke: '#2974b2'
-        },
-        attributes: {
-          'shape-rendering': 'geometricPrecision' // Use geometricPrecision for aesthetic accuracy.
-        }
-      } );
-
-      //----------------------------------------------------------------------------------------
-      // Create the container of the background and foreground circles, using an SVG DOMObject.
-      // See https://developer.mozilla.org/en-US/docs/Web/SVG/Element/svg for more details.
-      const loaderCircleContainer = new DOMObject( {
-        type: 'svg',
-        namespace: XML_NAMESPACE,
-        attributes: {
-          viewBox: LOADER_CIRCLE_VIEW_BOX,
-          'shape-rendering': 'geometricPrecision' // Use geometricPrecision for aesthetic accuracy.
-        },
-        style: {
-          width: LOADER_CIRCLE_WIDTH,
-          maxWidth: LOADER_CIRCLE_MAX_SIZE,
-          minWidth: LOADER_CIRCLE_MIN_SIZE,
-          transform: 'scale( 1, -1 )'  // Invert the y-axis to match traditional cartesian coordinates.
-        }
-      } );
-
-      //----------------------------------------------------------------------------------------
-      // Set up the initial Loader scene graph.
-      options.children = [ loaderCircleContainer.setChildren( [ backgroundCircle, foregroundCircle ] ) ];
+      // Rewrite options so that it overrides the defaults.
+      options = { ...defaults, ...options };
+      options.style = { ...defaults.style, ...options.style };
 
       super( options );
-
-      //----------------------------------------------------------------------------------------
-
-      let loadedImages = 0;
-      let loadedPercentage = 0;
-
-      const tw = () => {
-        const percentage = 1 / window.simImages.length * IMAGE_LOADING_BANDWIDTH;
-        loadedPercentage += percentage;
-        foregroundCircle.setAttribute( 'd', getCirclePathData( loadedPercentage ) );
-      };
-
-      const startLoadingTime = Date.now();
-
-
-      const finishDom = () => {
-        foregroundCircle.setAttribute( 'd', getCirclePathData( IMAGE_LOADING_BANDWIDTH ) );
-
-        isReady( () => {
-
-          loadedPercentage = 99.99;
-          window.setTimeout( () => {
-            foregroundCircle.setAttribute( 'd', getCirclePathData( loadedPercentage ) );
-            window.setTimeout( () => this.dispose(), 400 );
-          }, Math.max( ( Date.now() - startLoadingTime ) * DOM_LOADING_BANDWIDTH / 100 * ( Math.random() * 3 ), 100 ) );
-        } );
-      };
-      if ( window.simImages ) {
-        let i = 0;
-
-        const step = () => {
-          const simImage = window.simImages[ i ];
-          const image = simImage.image;
-          const imagePath = simImage.src;
-
-          const dt = Date.now();
-
-          image.element.onload = () => {
-            loadedImages++;
-            assert( isImageOK( image.element ), 'error while loading image' );
-            tw( loadedImages );
-            i++;
-            if ( loadedImages !== window.simImages.length ) {
-              window.setTimeout( step, Math.max( ( Date.now() - dt ) * 4.5, 80 ) );
-            }
-            else {
-              finishDom();
-            }
-          };
-          image.src = imagePath;
-        };
-        step();
-      }
-      else {
-        window.setTimeout( () => {
-          foregroundCircle.setAttribute( 'd', getCirclePathData( 30.9 ) );
-
-          window.setTimeout( finishDom, 800 );
-        }, 500 );
-      }
+      this.style.backgroundColor = options.backgroundColor;
     }
+
+
+    //   //----------------------------------------------------------------------------------------
+    //   // To create the loading progress circle, overlay 2 circles on top of each other.
+    //   // First, create the circle in the background. The circle has no fill (hollow) but has a stroke and is a complete
+    //   // circle arc.
+    //   const backgroundCircle = new DOMObject( {
+    //     type: 'circle',
+    //     namespace: XML_NAMESPACE,
+    //     attributes: {
+    //       fill: 'none',
+    //       r: LOADER_CIRCLE_INNER_RADIUS, // In percentage of the container.
+    //       cx: Vector.ZERO.x, // Center the circle
+    //       cy: Vector.ZERO.y, // Center the circle
+    //       'stroke-width': LOADER_STROKE_WIDTH,
+    //       'shape-rendering': 'geometricPrecision', // Use geometricPrecision for aesthetic accuracy.
+    //       stroke: '#A5A5A5' // light colored
+    //     }
+    //   } );
+
+    //   //----------------------------------------------------------------------------------------
+    //   // Create the circle (as a path) in the foreground. The circle has no fill (hollow) but has a stroke.
+    //   // This represents the percentage of bandwidth loaded (see comment at the top of the file).
+    //   // For now, initialize with arc length 0.
+    //   const foregroundCircle = new DOMObject( {
+    //     type: 'path',
+    //     namespace: XML_NAMESPACE,
+    //     style: {
+    //       fill: 'none',
+    //       'stroke-width': LOADER_STROKE_WIDTH,
+    //       stroke: '#2974b2'
+    //     },
+    //     attributes: {
+    //       'shape-rendering': 'geometricPrecision' // Use geometricPrecision for aesthetic accuracy.
+    //     }
+    //   } );
+
+    //   //----------------------------------------------------------------------------------------
+    //   // Create the container of the background and foreground circles, using an SVG DOMObject.
+    //   // See https://developer.mozilla.org/en-US/docs/Web/SVG/Element/svg for more details.
+    //   const loaderCircleContainer = new DOMObject( {
+    //     type: 'svg',
+    //     namespace: XML_NAMESPACE,
+    //     attributes: {
+    //       viewBox: LOADER_CIRCLE_VIEW_BOX,
+    //       'shape-rendering': 'geometricPrecision' // Use geometricPrecision for aesthetic accuracy.
+    //     },
+    //     style: {
+    //       width: LOADER_CIRCLE_WIDTH,
+    //       maxWidth: LOADER_CIRCLE_MAX_SIZE,
+    //       minWidth: LOADER_CIRCLE_MIN_SIZE,
+    //       transform: 'scale( 1, -1 )'  // Invert the y-axis to match traditional cartesian coordinates.
+    //     }
+    //   } );
+
+    //   //----------------------------------------------------------------------------------------
+    //   // Set up the initial Loader scene graph.
+    //   options.children = [ loaderCircleContainer.setChildren( [ backgroundCircle, foregroundCircle ] ) ];
+
+
+    //   //----------------------------------------------------------------------------------------
+
+    //   let loadedImages = 0;
+    //   let loadedPercentage = 0;
+
+    //   const tw = () => {
+    //     const percentage = 1 / window.simImages.length * IMAGE_LOADING_BANDWIDTH;
+    //     loadedPercentage += percentage;
+    //     foregroundCircle.setAttribute( 'd', getCirclePathData( loadedPercentage ) );
+    //   };
+
+    //   const startLoadingTime = Date.now();
+
+
+    //   const finishDom = () => {
+    //     foregroundCircle.setAttribute( 'd', getCirclePathData( IMAGE_LOADING_BANDWIDTH ) );
+
+    //     isReady( () => {
+
+    //       loadedPercentage = 99.99;
+    //       window.setTimeout( () => {
+    //         foregroundCircle.setAttribute( 'd', getCirclePathData( loadedPercentage ) );
+    //         window.setTimeout( () => this.dispose(), 400 );
+    //       }, Math.max( ( Date.now() - startLoadingTime ) * DOM_LOADING_BANDWIDTH / 100 * ( Math.random() * 3 ), 100 ) );
+    //     } );
+    //   };
+    //   if ( window.simImages ) {
+    //     let i = 0;
+
+    //     const step = () => {
+    //       const simImage = window.simImages[ i ];
+    //       const image = simImage.image;
+    //       const imagePath = simImage.src;
+
+    //       const dt = Date.now();
+
+    //       image.element.onload = () => {
+    //         loadedImages++;
+    //         assert( isImageOK( image.element ), 'error while loading image' );
+    //         tw( loadedImages );
+    //         i++;
+    //         if ( loadedImages !== window.simImages.length ) {
+    //           window.setTimeout( step, Math.max( ( Date.now() - dt ) * 4.5, 80 ) );
+    //         }
+    //         else {
+    //           finishDom();
+    //         }
+    //       };
+    //       image.src = imagePath;
+    //     };
+    //     step();
+    //   }
+    //   else {
+    //     window.setTimeout( () => {
+    //       foregroundCircle.setAttribute( 'd', getCirclePathData( 30.9 ) );
+
+    //       window.setTimeout( finishDom, 800 );
+    //     }, 500 );
+    //   }
+    // }
   }
 
   //----------------------------------------------------------------------------------------

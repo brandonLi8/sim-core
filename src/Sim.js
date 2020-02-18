@@ -22,8 +22,8 @@ define( require => {
 
   const Sim = {
 
-    // @private {boolean} - indicates if the simulation has already been initiated and launched.
-    _initiated: false,
+    // @public {boolean} (read-only) - indicates if the simulation has already been initiated and launched.
+    initiated: false,
 
     // @private {boolean} - indicates if the current window is running on a mobile device.
     _isMobile: ( () => /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i
@@ -45,7 +45,7 @@ define( require => {
      *                          See the early portion of this static method for details.
      */
     start( config ) {
-      assert.always( !Sim._initiated, 'Sim has already been launched.' ); // Ensure that the sim hasn't been launched
+      assert.always( !Sim.initiated, 'Sim has already been launched.' ); // Ensure that the sim hasn't been launched
       assert( Object.getPrototypeOf( config ) === Object.prototype, `invalid config: ${ config }` );
 
       config = {
@@ -53,14 +53,14 @@ define( require => {
         // {Screens[]} - all screens to the sim, in order that they will appear in the home-screen and navigation-bar.
         screens: config.screens,
 
-        // {string} - the name to the simulation, displayed in the navigation-bar and home-screen
+        // {string} - the name to the simulation, displayed in the navigation-bar, loader, and home-screen
         name: config.name
       };
 
       assert( Util.isArray( config.screens ), `invalid screens: ${ config.screens }` );
       assert( config.screens.every( screen => screen instanceof Screen ), `invalid screens: ${ config.screens }` );
       assert( typeof config.name === 'string', `invalid name: ${ config.name }` );
-      Sim._initiated = true; // Indicate that the simulation has been initiated and launched.
+      Sim.initiated = true; // Indicate that the simulation has been initiated and launched.
 
       //----------------------------------------------------------------------------------------
 
@@ -92,12 +92,11 @@ define( require => {
       display.addChild( navigationBar );
 
       display.addChild( config.screens[ 0 ] );
-      config.screens[ 0 ].initializeModelAndView();
 
 
-      if ( StandardSimQueryParameters.dev ) {
-        config.screens[ 0 ]._view.enableDevBorder();
-      }
+      // if ( StandardSimQueryParameters.dev ) {
+      //   config.screens[ 0 ]._view.enableDevBorder();
+      // }
 
       window.onresize = () => {
         const windowHeight = window.innerHeight;
@@ -107,9 +106,7 @@ define( require => {
 
 
         const screenHeight = windowHeight - parseFloat( navigationBar.style.height );
-        config.screens[ 0 ].style.height = `${ screenHeight }px`;
 
-        config.screens[ 0 ]._view.layout( windowWidth, screenHeight );
       };
       window.onresize();
 
