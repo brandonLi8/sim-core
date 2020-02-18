@@ -29,6 +29,7 @@ define( require => {
   // modules
   const assert = require( 'SIM_CORE/util/assert' );
   const DOMObject = require( 'SIM_CORE/core-internal/DOMObject' );
+  const ScreenView = require( 'SIM_CORE/scenery/ScreenView' );
   const Vector = require( 'SIM_CORE/util/Vector' );
 
   // constants
@@ -56,13 +57,13 @@ define( require => {
   class Loader extends DOMObject {
 
     /**
-     * @param {string[]} screens - all screens to the simulation
-     * @param {string} name - the name of the simulation, displayed in the Loader
+     * @param {string[]} simScreens - all screens to the simulation
+     * @param {string} simName - the name of the simulation, displayed in the Loader
      * @param {Object} [options] - Various key-value pairs that control the appearance and behavior of this class.
      *                             Some options are specific to this class while others are passed to the super class.
      *                             See the early portion of the constructor for details.
      */
-    constructor( options ) {
+    constructor( simScreens, simName, options ) {
 
       // Some options are set by Loader. Assert that they weren't provided.
       assert( !options || Object.getPrototypeOf( options ) === Object.prototype, `invalid options: ${ options }` );
@@ -98,9 +99,13 @@ define( require => {
       // Rewrite options so that it overrides the defaults.
       options = { ...defaults, ...options };
       options.style = { ...defaults.style, ...options.style };
+      options.style.backgroundColor = options.backgroundColor;
 
       super( options );
-      this.style.backgroundColor = options.backgroundColor;
+
+      this._screenView = new ScreenView( { id: 'screen-view' } );
+      this._screenView.enableDevBorder();
+      this.addChild( this._screenView );
     }
 
 
