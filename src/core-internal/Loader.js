@@ -30,6 +30,7 @@ define( require => {
   const assert = require( 'SIM_CORE/util/assert' );
   const DOMObject = require( 'SIM_CORE/core-internal/DOMObject' );
   const ScreenView = require( 'SIM_CORE/scenery/ScreenView' );
+  const Text = require( 'SIM_CORE/scenery/Text' );
   const Vector = require( 'SIM_CORE/util/Vector' );
 
   // constants
@@ -106,6 +107,14 @@ define( require => {
       // @private {ScreenView} - the screen view of the loader, for resizing purposes.
       this._screenView = new ScreenView( { id: 'loader-screen-view' } );
       this.addChild( this._screenView );
+
+      this._titleLabel = new Text( {
+        text: simName,
+        center: this._screenView.viewBounds.center.subtractXY( 0, 150 ),
+        fill: 'white',
+        fontSize: 30
+      } );
+      this._screenView.addChild( this._titleLabel );
     }
 
     layout( width, height ) {

@@ -1,7 +1,7 @@
 // Copyright © 2019-2020 Brandon Li. All rights reserved.
 
 /**
- * A sim-specific Text node for SVG (scalable vector graphics).
+ * A sim-specific Text Node for scenery.
  *
  * @author Brandon Li <brandon.li820@gmail.com>
  */
@@ -11,9 +11,9 @@ define( require => {
 
   // modules
   const assert = require( 'SIM_CORE/util/assert' );
-  const SVGNode = require( 'SIM_CORE/scenery/SVGNode' );
+  const Node = require( 'SIM_CORE/scenery/Node' );
 
-  class Text extends SVGNode {
+  class Text extends Node {
 
     /**
      * @param {Object} [options] - Various key-value pairs that control the appearance and behavior. Subclasses
@@ -21,8 +21,11 @@ define( require => {
      *                             the early portion of the constructor for details.
      */
     constructor( options ) {
-      assert( !options || Object.getPrototypeOf( options ) === Object.prototype, `invalid options: ${ options }` );
 
+      // Some options are set by Text. Assert that they weren't provided.
+      assert( !options || Object.getPrototypeOf( options ) === Object.prototype, `invalid options: ${ options }` );
+      assert( !options || !options.type, 'Text sets type.' );
+      assert( !options || !options.id || !options.class || !options.attributes, 'Text sets attributes' );
 
       // Defaults for options.
       const defaults = {
@@ -52,25 +55,14 @@ define( require => {
       super( options );
       this._fontSize = options.fontSize;
       this._fontFamily = options.fontFamily;
-      this._x = options.x;
-      this._y = options.y;
 
       this.addAttributes( {
-        'font-weight': options.fontWeight
+        'font-weight': options.fontWeight,
+        'fill': options.fill
       } );
     }
 
-    get y() { return this._y; }
-    get x() { return this._x; }
 
-    set y( y ) {
-      this._y = y;
-      this.layout( this.scale );
-    }
-    set x( x ) {
-      this._x = x;
-      this.layout( this.scale );
-    }
 
     get fontSize() { return this._fontSize; }
     get fontFamily() { return this._fontFamily; }
@@ -86,8 +78,7 @@ define( require => {
     layout( scale ) {
       super.layout( scale );
       this.addAttributes( {
-        x: `${ scale * this._x }px`,
-        y: `${ scale * this._y }px`,
+
         'font-size': `${ this.fontSize * scale }px`,
         'font-family': `${ this.fontFamily }`
       } );

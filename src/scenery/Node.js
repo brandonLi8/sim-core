@@ -55,7 +55,6 @@ define( require => {
 
       // Some options are set by Node. Assert that they weren't provided.
       assert( !options || !options.style || !options.style.position, 'Node sets position' );
-      assert( !options || !options.innerHTML && !options.text, 'Node should not have text or innerHTML' );
       assert( !options || !options.type || DOMObject.SVG_TYPES.includes( options.type ), 'Must be an SVG sub-type.' );
 
       // Defaults for options.
