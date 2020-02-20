@@ -60,7 +60,7 @@ define( require => {
      */
     resizeThrottle: {
       type: 'number',
-      isValidValue: value => ( value > 0 && value <= 100 ),
+      isValidValue: value => value >= 0,
       defaultValue: 25
     }
   } );

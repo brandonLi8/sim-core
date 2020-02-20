@@ -113,6 +113,7 @@ define( require => {
       // window.onresize();
 
       let throttled = false;
+      let backupTimeoutScheduled = false;
       function resizeFunction() {
         const windowHeight = window.innerHeight;
         const windowWidth = window.innerWidth;
@@ -120,12 +121,15 @@ define( require => {
         if ( !loader.isDisposed ) loader.layout( windowWidth, windowHeight );
       };
 
-      // On resize, run the function and reset the timeout
-      // 250 is the delay in milliseconds. Change as you see fit.
       window.onresize = () => {
-        if ( !throttled ) {
+        if ( !throttled && !backupTimeoutScheduled ) {
           throttled = true;
-          setTimeout( () => { throttled = false; resizeFunction(); }, StandardSimQueryParameters.resizeThrottle );
+          resizeFunction();
+          setTimeout( () => { throttled = false; }, StandardSimQueryParameters.resizeThrottle );
+        }
+        if ( throttled && !backupTimeoutScheduled ) {
+          backupTimeoutScheduled = true;
+          setTimeout( () => { resizeFunction(); backupTimeoutScheduled = false; }, 2 * StandardSimQueryParameters.resizeThrottle );
         }
       };
       resizeFunction();
