@@ -145,7 +145,7 @@ define( require => {
      * @returns {Shape} - 'this' reference, for chaining
      */
     verticalLineTo( y ) {
-     assert( typeof y === 'number' && isFinite( y ), `invalid y: ${ y }` );
+      assert( typeof y === 'number' && isFinite( y ), `invalid y: ${ y }` );
       this._subPaths.push( `V ${ y }` );
       return this;
     }
@@ -159,7 +159,56 @@ define( require => {
      */
     verticalLineToRelative( y ) { return this.lineToRelative( 0, y ); }
 
+    /**
+     * Adds a straight line from the current position back to the first point of the shape.
+     * @public
+     *
+     * @returns {Shape} - 'this' reference, for chaining
+     */
 
+    close() { this._subPaths.push( 'Z' ); return this; }
+
+    /**
+     * Makes an arc, revolved around the current position.
+     * @public
+     *
+     * @param {number} radius - How far from the center the arc will be
+     * @param {number} startAngle - Angle (radians) of the start of the arc, relative to the horizontal
+     * @param {number} endAngle - Angle (radians) of the end of the arc, relative to the horizontal
+     * @param {boolean} [clockwise=true] - Decides which direction the arc takes around the center
+     * @returns {Shape} - 'this' reference, for chaining
+     */
+    arc( radius, startAngle, endAngle, clockwise = true ) {
+
+      // Get the starting and end Vectors as points.
+      const endVector = new Vector( 0, radius ).setAngle( endAngle );
+      const startVector = new Vector( 0, radius ).setAngle( startAngle);
+      const deltaAngle = endAngle - startAngle;
+
+      const largeArcFlag = Math.abs( deltaAngle ) > Math.PI ? 1 : 0;
+      const sweepFlag = clockwise ? 1 : 0;
+      this.moveToPoint( startVector );
+      this._subPaths.push( `A ${ radius } ${ radius } 0 ${ largeArcFlag } ${ sweepFlag } ${ endVector.x } ${ endVector.y }` );
+      return this;
+    }
+
+    /**
+     * Creates a polygon by drawing lines to an array of verticies.
+     * @public
+     *
+     * @param {Vector[]} vertices
+     * @returns {Shape} - 'this' reference, for chaining
+     */
+    polygon( vertices ) {
+      const length = vertices.length;
+      if ( length > 0 ) {
+        this.moveToPoint( vertices[ 0 ] );
+        for ( let i = 1; i < length; i++ ) {
+          this.lineToPoint( vertices[ i ] );
+        }
+      }
+      return this.close();
+    }
   }
 
   return Shape;
