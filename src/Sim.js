@@ -55,12 +55,18 @@ define( require => {
         screens: config.screens,
 
         // {string} - the name to the simulation, displayed in the navigation-bar, loader, and home-screen
-        name: config.name
+        name: config.name,
+
+        // {number} (optional) - maximum delta-time in the animation loop. Used to prevent sudden dt bursts when the
+        //                       user comes back to the tab after a while or unminimizes the browser.
+        maxDT: config.maxDT || 0.5,
+        ...config
       };
 
       assert( Util.isArray( config.screens ), `invalid screens: ${ config.screens }` );
       assert( config.screens.every( screen => screen instanceof Screen ), `invalid screens: ${ config.screens }` );
       assert( typeof config.name === 'string', `invalid name: ${ config.name }` );
+      assert( typeof config.maxDT === 'number' && config.maxDT > 0, `invalid maxDT: ${ config.maxDT }` );
       Sim.initiated = true; // Indicate that the simulation has been initiated and launched.
 
       //----------------------------------------------------------------------------------------
@@ -139,7 +145,7 @@ define( require => {
       const stepper = () => {
 
         const currentTime = Date.now();
-        const ellapsedTime = Util.convertFrom( currentTime - lastStepTime, Util.MILLI );
+        const ellapsedTime = Math.min( Util.convertFrom( currentTime - lastStepTime, Util.MILLI ), config.maxDT );
         lastStepTime = currentTime;
         fpsCounter.registerNewFrame( ellapsedTime );
         // config.screens[ 0 ]._model.step && screen._model.step( ellapsedTime );
