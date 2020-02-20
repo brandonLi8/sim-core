@@ -108,6 +108,7 @@ define( require => {
       this._screenView = new ScreenView( { id: 'loader-screen-view' } );
       this.addChild( this._screenView );
 
+      // @private
       this._titleLabel = new Text( {
         text: simName,
         center: this._screenView.viewBounds.center.subtractXY( 0, 150 ),
