@@ -50,6 +50,18 @@ define( require => {
      */
     dev: {
       type: 'flag'
+    },
+
+    /**
+     * Throttle amount for the main resize layout listener in Sim.js. Throttling works by limiting how often the
+     * resize handler will be called by setting a timeout between calls, giving a more reasonable rate of calls.
+     * This query parameter controls the timeout time for the timeout call in between resize calls.
+     * Currently, this is intended for internal testing only.
+     */
+    resizeThrottle: {
+      type: 'number',
+      isValidValue: value => ( value > 0 && value <= 100 ),
+      defaultValue: 25
     }
   } );
 

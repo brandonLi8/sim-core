@@ -124,9 +124,8 @@ define( require => {
       // 250 is the delay in milliseconds. Change as you see fit.
       window.onresize = () => {
         if ( !throttled ) {
-          resizeFunction();
           throttled = true;
-          setTimeout( () => { throttled = false; }, 20 );
+          setTimeout( () => { throttled = false; resizeFunction(); }, StandardSimQueryParameters.resizeThrottle );
         }
       };
       resizeFunction();
