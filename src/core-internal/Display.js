@@ -93,6 +93,7 @@ define( require => {
         // Miscellaneous
         fontSmoothing: 'antialiased',
         touchAction: 'none', // forward all pointer events
+        contentZooming: 'none',
 
         // Safari-on-ios
         overflowScrolling: 'touch',
