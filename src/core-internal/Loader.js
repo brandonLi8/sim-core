@@ -103,10 +103,13 @@ define( require => {
 
       super( options );
 
-      this._screenView = new ScreenView( { id: 'screen-view' } );
+      // @private {ScreenView} - the screen view of the loader, for resizing purposes.
+      this._screenView = new ScreenView( { id: 'loader-screen-view' } );
       this.addChild( this._screenView );
+    }
 
-      require( 'SIM_CORE/Sim' ).addResizeListener( this._screenView.layout.bind( this._screenView ) );
+    layout( width, height ) {
+      this._screenView.layout( width, height );
     }
 
 
