@@ -176,8 +176,8 @@ define( require => {
     arc( radius, startAngle, endAngle, clockwise = true ) {
 
       // Get the starting and end Vectors as points.
-      const endVector = new Vector( 0, radius ).setAngle( endAngle );
-      const startVector = new Vector( 0, radius ).setAngle( startAngle);
+      const endVector = this._lastPoint.copy().add( new Vector( 0, radius ).setAngle( endAngle ) );
+      const startVector = this._lastPoint.copy().add( new Vector( 0, radius ).setAngle( startAngle ) );
       const deltaAngle = endAngle - startAngle;
 
       const largeArcFlag = Math.abs( deltaAngle ) > Math.PI ? 1 : 0;
@@ -215,7 +215,7 @@ define( require => {
       let result = '';
       this._subPaths.forEach( subpath => {
         if ( [ 'M', 'L', 'A' ].includes( subpath.cmd ) ) {
-          result += `${ subpath.cmd } ${ subpath.args.join( ' ' ) } `;
+          result += `${ subpath.cmd } ${ subpath.args.map( num => Util.toFixed( num, 10 ) ).join( ' ' ) } `;
         }
         else if ( subpath.cmd === 'Z' ) {
           result += 'Z ';
@@ -226,6 +226,13 @@ define( require => {
       } );
       return result.trim();
     }
+  }
+
+  // we need to prevent the numbers from being in an exponential toString form, since the CSS transform does not support that
+  function svgNumber( number ) {
+    // Largest guaranteed number of digits according to https://developer.mozilla.org/en-US/docs/JavaScript/Reference/Global_Objects/Number/toFixed
+    // See https://github.com/phetsims/dot/issues/36
+    return number.toFixed( 20 );
   }
 
   return Shape;
