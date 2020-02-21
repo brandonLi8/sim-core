@@ -427,6 +427,21 @@ define( require => {
       this.yRange.shift( y );
       return this;
     }
+
+    /**
+     * Modifies this bounds such that it is smallest bounds that contains this bounds and the point (x,y).
+     * @public
+     *
+     * @param {Vector} point - the point to include in the bounds
+     */
+    includePoint( point ) {
+      assert( point instanceof Vector && point.isFinite(), `invalid point: ${ point }` );
+      return this.setAll(
+        Math.min( this.minX, point.x ),
+        Math.min( this.minY, point.y ),
+        Math.max( this.maxX, point.x ),
+        Math.max( this.maxY, point.y ) );
+    }
   }
 
   //========================================================================================

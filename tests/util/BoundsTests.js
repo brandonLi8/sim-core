@@ -161,5 +161,11 @@ define( require => {
     truenit.ok( A.copy().shift( 0, 0 ).equals( A.copy() ), 'shift' );
     truenit.ok( A.copy().shift( 5, 9 ).equals( new Bounds( 6, 11, 8, 13 ) ), 'shift' );
     truenit.ok( A.copy().shift( -1, -2 ).equals( new Bounds( 0, 0, 2, 2 ) ), 'shift' );
+
+    // includePoint
+    truenit.ok( A.copy().includePoint( new Vector( 1, 2 ) ).equals( A ), 'includePoint' );
+    truenit.ok( A.copy().includePoint( new Vector( 2, 3 ) ).equals( A ), 'includePoint' );
+    truenit.ok( A.copy().includePoint( new Vector( 6, 6 ) ).equals( new Bounds( 1, 2, 6, 6 ) ), 'includePoint' );
+    truenit.ok( A.copy().includePoint( Vector.ZERO ).equals( new Bounds( 0, 0, 3, 4 ) ), 'includePoint' );
   };
 } );
