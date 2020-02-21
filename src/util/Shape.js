@@ -17,6 +17,8 @@ define( require => {
   class Shape {
     constructor() {
       this._subPaths = [];
+      this._lastPoint = Vector.ZERO.copy();
+      this._firstPoint;
       this._bounds = Bounds.ZERO.copy();
     }
 
@@ -32,6 +34,9 @@ define( require => {
       assert( typeof x === 'number' && isFinite( x ), `invalid x: ${ x }` );
       assert( typeof y === 'number' && isFinite( y ), `invalid y: ${ y }` );
       this._subPaths.push( `M ${ x } ${ y }` );
+      this._firstPoint = this._firstPoint || new Vector( x, y );
+      this._lastPoint.setX( x ).setY( y );
+      this._bounds.includePoint( this._lastPoint );
       return this;
     }
 
@@ -52,12 +57,7 @@ define( require => {
      * @param {number} y
      * @returns {Shape} - 'this' reference, for chaining
      */
-    moveToRelative( x, y ) {
-      assert( typeof x === 'number' && isFinite( x ), `invalid x: ${ x }` );
-      assert( typeof y === 'number' && isFinite( y ), `invalid y: ${ y }` );
-      this._subPaths.push( `m ${ x } ${ y }` );
-      return this;
-    }
+    moveToRelative( x, y ) { return this.moveTo( this._lastPoint.x + x, this._lastPoint.y + y ); }
 
     /**
      * Moves a relative passed-in point displacement.
@@ -79,7 +79,11 @@ define( require => {
     lineTo( x, y ) {
       assert( typeof x === 'number' && isFinite( x ), `invalid x: ${ x }` );
       assert( typeof y === 'number' && isFinite( y ), `invalid y: ${ y }` );
+      assert( this._firstPoint, 'Cant call lineTo before moveTo' );
       this._subPaths.push( `L ${ x } ${ y }` );
+
+      this._lastPoint.setX( x ).setY( y );
+      this._bounds.includePoint( this._lastPoint );
       return this;
     }
 
@@ -100,12 +104,7 @@ define( require => {
      * @param {number} y - vertical displacement
      * @returns {Shape} - 'this' reference, for chaining
      */
-    lineToRelative( x, y ) {
-      assert( typeof x === 'number' && isFinite( x ), `invalid x: ${ x }` );
-      assert( typeof y === 'number' && isFinite( y ), `invalid y: ${ y }` );
-      this._subPaths.push( `l ${ x } ${ y }` );
-      return this;
-    }
+    lineToRelative( x, y ) { return this.lineTo( this._lastPoint.x + x, this._lastPoint.y + y ); }
 
     /**
      * Makes a straight line a relative displacement by the passed-in point.
@@ -123,11 +122,7 @@ define( require => {
      * @param {number} x
      * @returns {Shape} - 'this' reference, for chaining
      */
-    horizontalLineTo( x ) {
-      assert( typeof x === 'number' && isFinite( x ), `invalid x: ${ x }` );
-      this._subPaths.push( `H ${ x }` );
-      return this;
-    }
+    horizontalLineTo( x ) { return this.lineTo( x, 0 ); }
 
     /**
      * Adds a horizontal line with the given x-displacement
@@ -136,7 +131,7 @@ define( require => {
      * @param {number} x
      * @returns {Shape} - 'this' reference, for chaining
      */
-    horizontalLineToRelative( x ) { return this.lineToRelative( x, 0 ); }
+    horizontalLineToRelative( x ) { return this.lineTo( this._lastPoint.x + x, 0 ); }
 
     /**
      * Adds a vertical line (y represents the y-coordinate of the end point)
@@ -145,11 +140,7 @@ define( require => {
      * @param {number} y
      * @returns {Shape} - 'this' reference, for chaining
      */
-    verticalLineTo( y ) {
-      assert( typeof y === 'number' && isFinite( y ), `invalid y: ${ y }` );
-      this._subPaths.push( `V ${ y }` );
-      return this;
-    }
+    verticalLineTo( y ) { return this.lineTo( 0, y ); }
 
     /**
      * Adds a vertical line with the given y-displacement
@@ -158,7 +149,7 @@ define( require => {
      * @param {number} y
      * @returns {Shape} - 'this' reference, for chaining
      */
-    verticalLineToRelative( y ) { return this.lineToRelative( 0, y ); }
+    verticalLineToRelative( y ) { return this.lineTo( 0, this._lastPoint.y + y ); }
 
     /**
      * Adds a straight line from the current position back to the first point of the shape.
@@ -166,8 +157,11 @@ define( require => {
      *
      * @returns {Shape} - 'this' reference, for chaining
      */
-
-    close() { this._subPaths.push( 'Z' ); return this; }
+    close() {
+      this._subPaths.push( 'Z' );
+      this._lastPoint.setX( this._firstPoint.x ).setY( this._firstPoint.y );
+      return this;
+    }
 
     /**
      * Makes an arc, revolved around the current position.
@@ -190,6 +184,8 @@ define( require => {
       const sweepFlag = clockwise ? 1 : 0;
       this.moveToPoint( startVector );
       this._subPaths.push( `A ${ radius } ${ radius } 0 ${ largeArcFlag } ${ sweepFlag } ${ endVector.x } ${ endVector.y }` );
+      this._lastPoint = endVector;
+      this._bounds.includePoint( this._lastPoint );
       return this;
     }
 
