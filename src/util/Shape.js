@@ -33,7 +33,7 @@ define( require => {
     moveTo( x, y ) {
       assert( typeof x === 'number' && isFinite( x ), `invalid x: ${ x }` );
       assert( typeof y === 'number' && isFinite( y ), `invalid y: ${ y }` );
-      this._subPaths.push( `M ${ x } ${ y }` );
+      this._subPaths.push( { cmd: 'M', args: [ x, y ] } );
       this._firstPoint = this._firstPoint || new Vector( x, y );
       this._lastPoint.setX( x ).setY( y );
       this._bounds.includePoint( this._lastPoint );
@@ -80,8 +80,7 @@ define( require => {
       assert( typeof x === 'number' && isFinite( x ), `invalid x: ${ x }` );
       assert( typeof y === 'number' && isFinite( y ), `invalid y: ${ y }` );
       assert( this._firstPoint, 'Cant call lineTo before moveTo' );
-      this._subPaths.push( `L ${ x } ${ y }` );
-
+      this._subPaths.push( { cmd: 'L', args: [ x, y ] } );
       this._lastPoint.setX( x ).setY( y );
       this._bounds.includePoint( this._lastPoint );
       return this;
@@ -158,7 +157,7 @@ define( require => {
      * @returns {Shape} - 'this' reference, for chaining
      */
     close() {
-      this._subPaths.push( 'Z' );
+      this._subPaths.push( { cmd: 'Z' } );
       this._lastPoint.setX( this._firstPoint.x ).setY( this._firstPoint.y );
       return this;
     }
@@ -183,7 +182,8 @@ define( require => {
       const largeArcFlag = Math.abs( deltaAngle ) > Math.PI ? 1 : 0;
       const sweepFlag = clockwise ? 1 : 0;
       this.moveToPoint( startVector );
-      this._subPaths.push( `A ${ radius } ${ radius } 0 ${ largeArcFlag } ${ sweepFlag } ${ endVector.x } ${ endVector.y }` );
+      this._subPaths.push( { cmd: 'A', args: [ radius, radius, 0, largeArcFlag, sweepFlag, endVector.x, endVector.y ] } );
+
       this._lastPoint = endVector;
       this._bounds.includePoint( this._lastPoint );
       return this;
@@ -205,6 +205,25 @@ define( require => {
         }
       }
       return this.close();
+    }
+
+    /**
+     * Gets the SVG d attribute
+     */
+    getSVGPath() {
+      let result = '';
+      this._subPaths.forEach( subpath => {
+        if ( [ 'M', 'L', 'A' ].includes( subpath.cmd ) ) {
+          result += `${ subpath.cmd } ${ subpath.args.join( ' ' ) } `;
+        }
+        else if ( subpath.cmd === 'Z' ) {
+          result += 'Z ';
+        }
+        else {
+          assert( false );
+        }
+      } );
+      return result.trim();
     }
   }
 
