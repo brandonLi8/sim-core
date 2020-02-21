@@ -27,6 +27,7 @@ define( require => {
   truenit.registerTest( 'Multilink', require( 'TESTS/util/MultilinkTests' ) );
   truenit.registerTest( 'DerivedProperty', require( 'TESTS/util/DerivedPropertyTests' ) );
   truenit.registerTest( 'Enum', require( 'TESTS/util/EnumTests' ) );
+  truenit.registerTest( 'Shape', require( 'TESTS/util/ShapeTests' ) );
 
   truenit.start();
 } );
