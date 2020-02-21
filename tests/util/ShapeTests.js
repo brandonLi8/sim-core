@@ -47,5 +47,15 @@ define( require => {
     truenit.equals( C.getSVGPath(), 'M 0 0 L 3 4 M 8 9 M 8 9 L 11 12 L 9 2 Z' );
     truenit.ok( C._bounds.equals( new Bounds( 0, 0, 11, 12 ) ) );
 
+    const D = new Shape()
+      .lineTo( 5, 5 )
+      .horizontalLineTo( 10 )
+      .verticalLineTo( 10 )
+      .horizontalLineToRelative( -20 )
+      .verticalLineToRelative( -15 )
+      .close();
+    truenit.equals( D.getSVGPath(), 'L 5 5 L 10 5 L 10 10 L -10 10 L -10 -5 Z' );
+    truenit.ok( D._bounds.equals( new Bounds( -10, -5, 10, 10 ) ) );
+
   };
 } );

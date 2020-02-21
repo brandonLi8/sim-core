@@ -79,8 +79,9 @@ define( require => {
     lineTo( x, y ) {
       assert( typeof x === 'number' && isFinite( x ), `invalid x: ${ x }` );
       assert( typeof y === 'number' && isFinite( y ), `invalid y: ${ y }` );
-      assert( this._firstPoint, 'Cant call lineTo before moveTo' );
       this._subPaths.push( { cmd: 'L', args: [ x, y ] } );
+      this._firstPoint = this._firstPoint || Vector.ZERO.copy();
+      this._lastPoint.setX( x ).setY( y );
       this._lastPoint.setX( x ).setY( y );
       this._bounds.includePoint( this._lastPoint );
       return this;
@@ -121,7 +122,7 @@ define( require => {
      * @param {number} x
      * @returns {Shape} - 'this' reference, for chaining
      */
-    horizontalLineTo( x ) { return this.lineTo( x, 0 ); }
+    horizontalLineTo( x ) { return this.lineTo( x, this._lastPoint.y ); }
 
     /**
      * Adds a horizontal line with the given x-displacement
@@ -130,7 +131,7 @@ define( require => {
      * @param {number} x
      * @returns {Shape} - 'this' reference, for chaining
      */
-    horizontalLineToRelative( x ) { return this.lineTo( this._lastPoint.x + x, 0 ); }
+    horizontalLineToRelative( x ) { return this.horizontalLineTo( this._lastPoint.x + x ); }
 
     /**
      * Adds a vertical line (y represents the y-coordinate of the end point)
@@ -139,7 +140,7 @@ define( require => {
      * @param {number} y
      * @returns {Shape} - 'this' reference, for chaining
      */
-    verticalLineTo( y ) { return this.lineTo( 0, y ); }
+    verticalLineTo( y ) { return this.lineTo( this._lastPoint.x, y ); }
 
     /**
      * Adds a vertical line with the given y-displacement
@@ -148,7 +149,7 @@ define( require => {
      * @param {number} y
      * @returns {Shape} - 'this' reference, for chaining
      */
-    verticalLineToRelative( y ) { return this.lineTo( 0, this._lastPoint.y + y ); }
+    verticalLineToRelative( y ) { return this.verticalLineTo( this._lastPoint.y + y ); }
 
     /**
      * Adds a straight line from the current position back to the first point of the shape.
