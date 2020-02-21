@@ -19,7 +19,7 @@ define( require => {
       this._subPaths = [];
       this._lastPoint = Vector.ZERO.copy();
       this._firstPoint;
-      this._bounds = Bounds.ZERO.copy();
+      this._bounds;
     }
 
     /**
@@ -35,6 +35,7 @@ define( require => {
       assert( typeof y === 'number' && isFinite( y ), `invalid y: ${ y }` );
       this._subPaths.push( { cmd: 'M', args: [ x, y ] } );
       this._firstPoint = this._firstPoint || new Vector( x, y );
+      this._bounds = this._bounds || new Bounds( x, y, x, y );
       this._lastPoint.setX( x ).setY( y );
       this._bounds.includePoint( this._lastPoint );
       return this;
@@ -81,6 +82,8 @@ define( require => {
       assert( typeof y === 'number' && isFinite( y ), `invalid y: ${ y }` );
       this._subPaths.push( { cmd: 'L', args: [ x, y ] } );
       this._firstPoint = this._firstPoint || Vector.ZERO.copy();
+      this._bounds = this._bounds || Bounds.ZERO.copy();
+
       this._lastPoint.setX( x ).setY( y );
       this._lastPoint.setX( x ).setY( y );
       this._bounds.includePoint( this._lastPoint );
