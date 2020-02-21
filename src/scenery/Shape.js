@@ -193,7 +193,7 @@ define( require => {
     }
 
     /**
-     * Creates a polygon by drawing lines to an array of verticies.
+     * Creates a polygon by drawing lines to an array of vertices.
      * @public
      *
      * @param {Vector[]} vertices

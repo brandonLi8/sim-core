@@ -17,6 +17,7 @@ define( require => {
   class Shape {
     constructor() {
       this._subPaths = [];
+      this._bounds = Bounds.ZERO.copy();
     }
 
     /**

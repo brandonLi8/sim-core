@@ -165,7 +165,12 @@ define( require => {
     // includePoint
     truenit.ok( A.copy().includePoint( new Vector( 1, 2 ) ).equals( A ), 'includePoint' );
     truenit.ok( A.copy().includePoint( new Vector( 2, 3 ) ).equals( A ), 'includePoint' );
-    truenit.ok( A.copy().includePoint( new Vector( 6, 6 ) ).equals( new Bounds( 1, 2, 6, 6 ) ), 'includePoint' );
-    truenit.ok( A.copy().includePoint( Vector.ZERO ).equals( new Bounds( 0, 0, 3, 4 ) ), 'includePoint' );
+    truenit.ok( Bounds.ZERO.copy().includePoint( new Vector( 2, 3 ) ).equals( B ), 'includePoint' );
+
+    // includeCoordinate
+    truenit.ok( A.copy().includeCoordinate( 6, 6 ).equals( new Bounds( 1, 2, 6, 6 ) ), 'includeCoordinate' );
+    truenit.ok( A.copy().includeCoordinate( 0, 0 ).equals( new Bounds( 0, 0, 3, 4 ) ), 'includeCoordinate' );
+    truenit.ok( Bounds.ZERO.copy().includeCoordinate( 2, 3 ).equals( B ), 'includeCoordinate' );
+
   };
 } );
