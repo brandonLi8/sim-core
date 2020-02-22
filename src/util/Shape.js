@@ -75,7 +75,7 @@ define( require => {
         // Update the unknown references that are now known, centered around the passed-in coordinate.
         this._firstPoint = new Vector( x, y );
         this._currentPoint = new Vector( x, y );
-        this._firstPoint = new Bounds( x, y, x, y );
+        this._bounds = new Bounds( x, y, x, y );
 
         // This Shape is no longer degenerate as it has at least one sub-path and a finite Bounds.
         this.isDegenerate = false;
@@ -90,7 +90,7 @@ define( require => {
     }
 
     /**
-     * Moves to the given point.
+     * Moves the current position to a the passed-in point (x, y).
      * @public
      *
      * @param {Vector} point
@@ -99,26 +99,27 @@ define( require => {
     moveToPoint( point ) { return this.moveTo( point.x, point.y ); }
 
     /**
-     * Moves a relative displacement (x, y)
+     * Moves the current position a relative displacement (dx, dy) relative to the last known position.
      * @public
      *
      * @param {number} x
      * @param {number} y
      * @returns {Shape} - 'this' reference, for chaining
      */
-    moveToRelative( x, y ) { return this.moveTo( this._currentPoint.x + x, this._currentPoint.y + y ); }
+    moveToRelative( dx, dy ) { return this.moveTo( this._currentPoint.x + dx, this._currentPoint.y + dy ); }
 
     /**
-     * Moves a relative passed-in point displacement.
+     * Moves the current position a relative displacement (dx, dy) relative to the last known position.
      * @public
      *
-     * @param {Vector} point - a displacement
+     * @param {Vector} displacement
      * @returns {Shape} - 'this' reference, for chaining
      */
-    moveToPointRelative( point ) { return this.moveToRelative( point.x, point.y ); }
+    moveToPointRelative( displacement ) { return this.moveToRelative( displacement.x, displacement.y ); }
 
     /**
-     * Makes a straight line to the given coordinate (x, y)
+     * 'Draws' a straight line from the current position to the given coordinate (x, y).
+     * If the Shape doesn't have a first point defined, it will draw a line from (0, 0) to the specified coordinate.
      * @public
      *
      * @param {number} x
@@ -128,11 +129,14 @@ define( require => {
     lineTo( x, y ) {
       assert( typeof x === 'number' && isFinite( x ), `invalid x: ${ x }` );
       assert( typeof y === 'number' && isFinite( y ), `invalid y: ${ y }` );
-      this._subpaths.push( { cmd: 'L', args: [ x, y ] } );
-      this._firstPoint = this._firstPoint || Vector.ZERO.copy();
-      this._bounds = this._bounds || Bounds.ZERO.copy();
 
-      this._currentPoint.setX( x ).setY( y );
+      // If the shape is degenerate (implies no first point defined yet), move to the origin first.
+      this.isDegenerate && this.moveTo( 0, 0 );
+
+      // Create a sub-path that creates a line to the end point based off the path spec.
+      this._subpaths.push( { cmd: 'L', args: [ x, y ] } );
+
+      // Update the _currentPoint and _bounds to match the passed-in end coordinate of the line.
       this._currentPoint.setX( x ).setY( y );
       this._bounds.includePoint( this._currentPoint );
       return this;

@@ -54,7 +54,7 @@ define( require => {
       .horizontalLineToRelative( -20 )
       .verticalLineToRelative( -15 )
       .close();
-    truenit.equals( D.getSVGPath(), 'L 5 5 L 10 5 L 10 10 L -10 10 L -10 -5 Z' );
+    truenit.equals( D.getSVGPath(), 'M 0 0 L 5 5 L 10 5 L 10 10 L -10 10 L -10 -5 Z' );
     truenit.ok( D._bounds.equals( new Bounds( -10, -5, 10, 10 ) ) );
 
     const E = new Shape()
