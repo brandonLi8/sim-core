@@ -1,17 +1,17 @@
 // Copyright © 2019-2020 Brandon Li. All rights reserved.
 
 /**
- * A utility for handling/creating shapes, for rendering in scenery/Path. As of now, Shape supports any combination of
- * lines, translations (for multiple bodies), and/or circular arcs. There are plans to expand this to support the full
- * SVG path spec in the future.
+ * A utility for creating/manipulating shapes, for rendering in scenery/Path. As of now, Shape supports any combination
+ * of lines, translations (for multiple bodies), and/or circular arcs. There are plans to expand this to support the
+ * full SVG path spec in the future.
  *
- * After creating and describing a Shape with its methods, the shape is passed to a Path instance. Path will then
+ * After creating and manipulating a Shape with its methods, the shape is passed to a Path instance. Path will then
  * call the getSVGPath() method, which will compute the path d-attribute. See
- * https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/d for more details.
+ * https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/d for context.
  *
- * Keep in mind, when passing the Shape to the Path, it will be drawn in its standard localBounds, with the positive
+ * NOTE: when passing the Shape to the Path, it will be drawn in its standard localBounds, with the positive
  * y-axis downwards. However, Shape supports conversions from model to view coordinates or vise versa with
- * ModelViewTransform, which will internally call Shape's transformToModel() and transformToView() methods.
+ * util/ModelViewTransform, which will internally call Shape's transformToModel() and transformToView() methods.
  *
  * While code comments attempt to describe the implementation clearly, fully understanding it may require some
  * general background. Some useful references include:
