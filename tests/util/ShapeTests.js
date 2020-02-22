@@ -64,5 +64,15 @@ define( require => {
     truenit.equals( E.getSVGPath(), 'M 5 5 M 15 5 A 10 10 0 0 1 5 15 Z' );
     truenit.ok( E._bounds.equals( new Bounds( 5, 5, 15, 15 ) ) );
 
+    const F = new Shape()
+      .polygon( [
+        new Vector( 5, 5 ),
+        new Vector( 2, 9 ),
+        new Vector( 9, 12 ),
+        new Vector( 1, 1 )
+      ] );
+    truenit.equals( F.getSVGPath(), 'M 5 5 L 2 9 L 9 12 L 1 1 Z' );
+    truenit.ok( F._bounds.equals( new Bounds( 1, 1, 9, 12 ) ) );
+
   };
 } );
