@@ -1,6 +1,27 @@
 // Copyright © 2019-2020 Brandon Li. All rights reserved.
 
 /**
+ * A utility for handling shapes for SVG paths. Currently supports moving (for multiple bodies), lines, and
+ * circular arcs, but there are plans to expand this to the full SVG path spec in the future.
+ *
+ * After creating and describing the shape with its methods, the path d-attribute can be computed with the getSVGPath()
+ * method. This attribute can be used with scenery/Path.js to display the scene graph. See
+ * https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/d for more details.
+ *
+ * Shape also keeps track of the Shape's bounds, which contain the entire shape, for use in Path.js However, when
+ * passing the Shape to the Path, it will be drawn in its standard localBounds, with the positive y-axis downwards.
+ * Shape supports conversions to a model or a view coordinate frame with the transformToModel() and transformToView()
+ * methods.
+ *
+ * Although Shape supports relative placements (moveToRelative, lineToRelative ...), the getSVGPath() d-attribute string
+ * will only use the base upper-case commands and not the lower-case relative commands.
+ *
+ * While code comments attempt to describe the implementation clearly, fully understanding it may require some
+ * general background. Some useful references include:
+ *   - https://www.w3.org/TR/SVG11/paths.html
+ *   - https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/d
+ *   - https://developer.mozilla.org/en-US/docs/Web/SVG/Tutorial/Paths
+ *   - https://www.w3.org/TR/SVG/paths.html#PathDataEllipticalArcCommands
  *
  * @author Brandon Li <brandon.li820@gmail.com>
  */
@@ -10,12 +31,13 @@ define( require => {
 
   // modules
   const assert = require( 'SIM_CORE/util/assert' );
+  const Bounds = require( 'SIM_CORE/util/Bounds' );
+  const ModelViewTransform = require( 'SIM_CORE/util/ModelViewTransform' );
   const Util = require( 'SIM_CORE/util/Util' );
   const Vector = require( 'SIM_CORE/util/Vector' );
-  const Bounds = require( 'SIM_CORE/util/Bounds' );
 
   class Shape {
-    constructor() {
+    constructor( subpaths ) {
       this._subPaths = [];
       this._lastPoint = Vector.ZERO.copy();
       this._firstPoint;
