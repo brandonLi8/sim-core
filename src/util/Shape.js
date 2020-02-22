@@ -1,20 +1,17 @@
 // Copyright © 2019-2020 Brandon Li. All rights reserved.
 
 /**
- * A utility for handling shapes for SVG paths. Currently supports moving (for multiple bodies), lines, and
- * circular arcs, but there are plans to expand this to the full SVG path spec in the future.
+ * A utility for handling/creating shapes, for rendering in scenery/Path. As of now, Shape supports any combination of
+ * lines, translations (for multiple bodies), and/or circular arcs. There are plans to expand this to support the full
+ * SVG path spec in the future.
  *
- * After creating and describing the shape with its methods, the path d-attribute can be computed with the getSVGPath()
- * method. This attribute can be used with scenery/Path.js to display the scene graph. See
+ * After creating and describing a Shape with its methods, the shape is passed to a Path instance. Path will then
+ * call the getSVGPath() method, which will compute the path d-attribute. See
  * https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/d for more details.
  *
- * Shape also keeps track of the Shape's bounds, which contain the entire shape, for use in Path.js However, when
- * passing the Shape to the Path, it will be drawn in its standard localBounds, with the positive y-axis downwards.
- * Shape supports conversions to a model or a view coordinate frame with the transformToModel() and transformToView()
- * methods.
- *
- * Although Shape supports relative placements (moveToRelative, lineToRelative ...), the getSVGPath() d-attribute string
- * will only use the base upper-case commands and not the lower-case relative commands.
+ * Keep in mind, when passing the Shape to the Path, it will be drawn in its standard localBounds, with the positive
+ * y-axis downwards. However, Shape supports conversions to a model or a view coordinate frame with ModelViewTransform,
+ * which will call the transformToModel() and transformToView() methods.
  *
  * While code comments attempt to describe the implementation clearly, fully understanding it may require some
  * general background. Some useful references include:
@@ -235,6 +232,8 @@ define( require => {
 
     /**
      * Gets the SVG d attribute
+     *  * Although Shape supports relative placements (moveToRelative, lineToRelative ...), the getSVGPath() d-attribute string
+ * will only use the base upper-case commands and not the lower-case relative commands.
      */
     getSVGPath() {
       let result = '';
