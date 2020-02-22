@@ -10,8 +10,8 @@
  * https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/d for more details.
  *
  * Keep in mind, when passing the Shape to the Path, it will be drawn in its standard localBounds, with the positive
- * y-axis downwards. However, Shape supports conversions to a model or a view coordinate frame with ModelViewTransform,
- * which will call the transformToModel() and transformToView() methods.
+ * y-axis downwards. However, Shape supports conversions from model to view coordinates or vise versa with
+ * ModelViewTransform, which will internally call Shape's transformToModel() and transformToView() methods.
  *
  * While code comments attempt to describe the implementation clearly, fully understanding it may require some
  * general background. Some useful references include:
