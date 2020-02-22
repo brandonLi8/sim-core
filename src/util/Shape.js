@@ -34,15 +34,30 @@ define( require => {
   const Vector = require( 'SIM_CORE/util/Vector' );
 
   class Shape {
-    constructor( subpaths ) {
-      this._subPaths = [];
-      this._lastPoint = Vector.ZERO.copy();
+
+    constructor() {
+
+      // @private {Array.<Object>} - array of the paths that make up the shape. The path Object literal has 2 mappings:
+      //                               (1) cmd: {string} the d-attribute command letter.
+      //                               (2) args: {number[]} the arguments to the cmd, in the correct ordering.
+      this._subpaths = [];
+
+      // @private {Vector|null} - the current position of the path. Null means unknown, and must be set in moveTo().
+      this._currentPoint;
+
+      // @private {Vector|null} - the first known position of the path. Null means unknown, and will be set in moveTo().
       this._firstPoint;
+
+      // @private {Bounds|null} - defined as the smallest Bounds that contains the entire Shape. Null means unknown.
       this._bounds;
+
+      // @public (read-only) - indicates if the Shape is empty or not, meaning if has at least one sub-path and a known
+      //                       bounds. Must not be degenerate for use in Path and ModelViewTransform.
+      this.isDegenerate = true;
     }
 
     /**
-     * Moves to a the coordinate (x, y)
+     * Moves the current position to a the coordinate (x, y).
      * @public
      *
      * @param {number} x
@@ -52,11 +67,25 @@ define( require => {
     moveTo( x, y ) {
       assert( typeof x === 'number' && isFinite( x ), `invalid x: ${ x }` );
       assert( typeof y === 'number' && isFinite( y ), `invalid y: ${ y }` );
-      this._subPaths.push( { cmd: 'M', args: [ x, y ] } );
-      this._firstPoint = this._firstPoint || new Vector( x, y );
-      this._bounds = this._bounds || new Bounds( x, y, x, y );
-      this._lastPoint.setX( x ).setY( y );
-      this._bounds.includePoint( this._lastPoint );
+
+      // Create a sub-path that moves the current position based off the path spec.
+      this._subpaths.push( { cmd: 'M', args: [ x, y ] } );
+
+      if ( this.isDegenerate ) {
+        // Update the unknown references that are now known, centered around the passed-in coordinate.
+        this._firstPoint = new Vector( x, y );
+        this._currentPoint = new Vector( x, y );
+        this._firstPoint = new Bounds( x, y, x, y );
+
+        // This Shape is no longer degenerate as it has at least one sub-path and a finite Bounds.
+        this.isDegenerate = false;
+      }
+      else {
+        // The Shape wasn't degenerate before, and already contains a _firstPoint reference.
+        // Update the _currentPoint and _bounds to match the passed-in coordinate.
+        this._currentPoint.setX( x ).setY( y );
+        this._bounds.includePoint( this._currentPoint );
+      }
       return this;
     }
 
@@ -77,7 +106,7 @@ define( require => {
      * @param {number} y
      * @returns {Shape} - 'this' reference, for chaining
      */
-    moveToRelative( x, y ) { return this.moveTo( this._lastPoint.x + x, this._lastPoint.y + y ); }
+    moveToRelative( x, y ) { return this.moveTo( this._currentPoint.x + x, this._currentPoint.y + y ); }
 
     /**
      * Moves a relative passed-in point displacement.
@@ -99,13 +128,13 @@ define( require => {
     lineTo( x, y ) {
       assert( typeof x === 'number' && isFinite( x ), `invalid x: ${ x }` );
       assert( typeof y === 'number' && isFinite( y ), `invalid y: ${ y }` );
-      this._subPaths.push( { cmd: 'L', args: [ x, y ] } );
+      this._subpaths.push( { cmd: 'L', args: [ x, y ] } );
       this._firstPoint = this._firstPoint || Vector.ZERO.copy();
       this._bounds = this._bounds || Bounds.ZERO.copy();
 
-      this._lastPoint.setX( x ).setY( y );
-      this._lastPoint.setX( x ).setY( y );
-      this._bounds.includePoint( this._lastPoint );
+      this._currentPoint.setX( x ).setY( y );
+      this._currentPoint.setX( x ).setY( y );
+      this._bounds.includePoint( this._currentPoint );
       return this;
     }
 
@@ -126,7 +155,7 @@ define( require => {
      * @param {number} y - vertical displacement
      * @returns {Shape} - 'this' reference, for chaining
      */
-    lineToRelative( x, y ) { return this.lineTo( this._lastPoint.x + x, this._lastPoint.y + y ); }
+    lineToRelative( x, y ) { return this.lineTo( this._currentPoint.x + x, this._currentPoint.y + y ); }
 
     /**
      * Makes a straight line a relative displacement by the passed-in point.
@@ -144,7 +173,7 @@ define( require => {
      * @param {number} x
      * @returns {Shape} - 'this' reference, for chaining
      */
-    horizontalLineTo( x ) { return this.lineTo( x, this._lastPoint.y ); }
+    horizontalLineTo( x ) { return this.lineTo( x, this._currentPoint.y ); }
 
     /**
      * Adds a horizontal line with the given x-displacement
@@ -153,7 +182,7 @@ define( require => {
      * @param {number} x
      * @returns {Shape} - 'this' reference, for chaining
      */
-    horizontalLineToRelative( x ) { return this.horizontalLineTo( this._lastPoint.x + x ); }
+    horizontalLineToRelative( x ) { return this.horizontalLineTo( this._currentPoint.x + x ); }
 
     /**
      * Adds a vertical line (y represents the y-coordinate of the end point)
@@ -162,7 +191,7 @@ define( require => {
      * @param {number} y
      * @returns {Shape} - 'this' reference, for chaining
      */
-    verticalLineTo( y ) { return this.lineTo( this._lastPoint.x, y ); }
+    verticalLineTo( y ) { return this.lineTo( this._currentPoint.x, y ); }
 
     /**
      * Adds a vertical line with the given y-displacement
@@ -171,7 +200,7 @@ define( require => {
      * @param {number} y
      * @returns {Shape} - 'this' reference, for chaining
      */
-    verticalLineToRelative( y ) { return this.verticalLineTo( this._lastPoint.y + y ); }
+    verticalLineToRelative( y ) { return this.verticalLineTo( this._currentPoint.y + y ); }
 
     /**
      * Adds a straight line from the current position back to the first point of the shape.
@@ -180,8 +209,8 @@ define( require => {
      * @returns {Shape} - 'this' reference, for chaining
      */
     close() {
-      this._subPaths.push( { cmd: 'Z' } );
-      this._lastPoint.setX( this._firstPoint.x ).setY( this._firstPoint.y );
+      this._subpaths.push( { cmd: 'Z' } );
+      this._currentPoint.setX( this._firstPoint.x ).setY( this._firstPoint.y );
       return this;
     }
 
@@ -198,17 +227,17 @@ define( require => {
     arc( radius, startAngle, endAngle, clockwise = true ) {
 
       // Get the starting and end Vectors as points.
-      const endVector = this._lastPoint.copy().add( new Vector( 0, radius ).setAngle( endAngle ) );
-      const startVector = this._lastPoint.copy().add( new Vector( 0, radius ).setAngle( startAngle ) );
+      const endVector = this._currentPoint.copy().add( new Vector( 0, radius ).setAngle( endAngle ) );
+      const startVector = this._currentPoint.copy().add( new Vector( 0, radius ).setAngle( startAngle ) );
       const deltaAngle = endAngle - startAngle;
 
       const largeArcFlag = Math.abs( deltaAngle ) > Math.PI ? 1 : 0;
       const sweepFlag = clockwise ? 1 : 0;
       this.moveToPoint( startVector );
-      this._subPaths.push( { cmd: 'A', args: [ radius, radius, 0, largeArcFlag, sweepFlag, endVector.x, endVector.y ] } );
+      this._subpaths.push( { cmd: 'A', args: [ radius, radius, 0, largeArcFlag, sweepFlag, endVector.x, endVector.y ] } );
 
-      this._lastPoint = endVector;
-      this._bounds.includePoint( this._lastPoint );
+      this._currentPoint = endVector;
+      this._bounds.includePoint( this._currentPoint );
       return this;
     }
 
@@ -237,7 +266,7 @@ define( require => {
      */
     getSVGPath() {
       let result = '';
-      this._subPaths.forEach( subpath => {
+      this._subpaths.forEach( subpath => {
         if ( [ 'M', 'L', 'A' ].includes( subpath.cmd ) ) {
           result += `${ subpath.cmd } ${ subpath.args.map( num => Util.toFixed( num, 10 ) ).join( ' ' ) } `;
         }
