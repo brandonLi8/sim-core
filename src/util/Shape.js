@@ -471,43 +471,5 @@ define( require => {
     return endAngle >= startAngle ? endAngle : endAngle + 2 * Math.PI;
   };
 
-  // /**
-  //  * Helper function that gets the difference between 2 angles depending on if the arc goes clockwise or not.
-  //  *
-  //  * @param {number} startAngle
-  //  * @param {number} endAngle
-  //  * @param {boolean} clockwise
-  //  * @returns {number} - the difference
-  //  */
-  // function getAngleDifference( startAngle, endAngle, clockwise ) {
-  //   if ( !clockwise ) {
-  //     if ( endAngle < startAngle ) return Math.PI * 2 + endAngle - startAngle
-  //     else return endAngle - startAngle;
-  //   }
-  //   else {
-  //     if ( startAngle < endAngle ) return Math.PI * 2 - ( endAngle - startAngle )
-  //     else return endAngle - startAngle;
-  //   }
-  // }
-
-  // *
-  //  * Helper function that returns whether the given angle is contained by the arc's start and endAngle
-  //  *
-  //  * @param {number} angle
-  //  * @param {number} startAngle
-  //  * @param {number} endAngle
-  //  * @param {boolean} clockwise
-  //  * @returns {boolean}
-
-  // function containsAngle( angle, startAngle, endAngle, clockwise ) {
-  //   if ( !clockwise ) {
-  //     if ( endAngle < startAngle ) return angle >= endAngle && angle <= startAngle;
-  //     else return angle <= endAngle && angle >= startAngle;
-  //   }
-  //   else {
-  //     if ( endAngle < startAngle ) return angle >= endAngle && angle <= startAngle;
-  //     else return angle <= endAngle && angle >= startAngle;
-  //   }
-  // }
   return Shape;
 } );
