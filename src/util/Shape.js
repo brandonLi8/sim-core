@@ -35,25 +35,36 @@ define( require => {
 
   class Shape {
 
-    constructor() {
+    /**
+     * NOTE: Arguments are used for the copy() method and are optional.
+     *       If used, ensure that all arguments are consistent with subpaths.
+     *       Otherwise, create a Shape by constructing with no arguments and use the methods to describe the shape.
+     *
+     * @param {Array.<Object>} [subpaths] - for use in the copy() method only.
+     * @param {Vector} [currentPoint] - for use in the copy() method only.
+     * @param {Vector} [firstPoint] - for use in the copy() method only.
+     * @param {Bounds} [bounds] - for use in the copy() method only.
+     * @param {boolean} [isDegenerate] - for use in the copy() method only.
+     */
+    constructor( subpaths, currentPoint, firstPoint, bounds, isDegenerate ) {
 
       // @private {Array.<Object>} - array of the paths that make up the shape. The path Object literal has 2 mappings:
       //                               (1) cmd: {string} the d-attribute command letter.
       //                               (2) args: {number[]} the arguments to the cmd, in the correct ordering.
-      this._subpaths = [];
+      this._subpaths = subpaths || [];
 
       // @private {Vector} - the current position of the path. Null means unknown, and must be set in moveTo().
-      this._currentPoint;
+      this._currentPoint = currentPoint || null;
 
       // @private {Vector} - the first known position of the path. Null means unknown, and will be set in moveTo().
-      this._firstPoint;
+      this._firstPoint = firstPoint || null;
 
       // @public (read-only) {Bounds} - the smallest Bounds that contains the entire drawn Shape. Null means unknown.
-      this.bounds;
+      this.bounds = bounds || null;
 
       // @public (read-only) - indicates if the Shape is empty or not, meaning if has at least one sub-path and a known
       //                       bounds. Must not be degenerate for use in Path and ModelViewTransform.
-      this.isDegenerate = true;
+      this.isDegenerate = isDegenerate || true;
     }
 
     /**
@@ -337,6 +348,8 @@ define( require => {
       } );
       return result.trim();
     }
+
+
   }
 
   /**
