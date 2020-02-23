@@ -103,7 +103,6 @@ define( require => {
     truenit.ok( copy.bounds.equals( new Bounds( 2, 2, 8, 9 ) ) );
     truenit.ok( copy.currentPoint.equals( new Vector( 8, 9 ) ) );
 
-
     //----------------------------------------------------------------------------------------
     // Test 7: Counter-Clockwise Normal Angles Arc
     const G = new Shape()
@@ -115,12 +114,21 @@ define( require => {
     truenit.ok( G.bounds.equalsEpsilon( new Bounds( -5, -2.0710678119, 12.0710678119, 15 ) ) );
     truenit.ok( G.currentPoint.equalsEpsilon( new Vector( 12.0710678119, 12.0710678119 ) ) );
 
+    //----------------------------------------------------------------------------------------
+    // Test 8: Counter-Clockwise non-normal angles Arc
+    const H = new Shape()
+      .moveTo( 5, 5 )
+      .arc( 10, 19 * Math.PI / 4, -16 * Math.PI / 4 ); // equivalent: 3PI/4 to 0
+
+    truenit.equals( H.getSVGPath(), 'M 5 5 M -2.0710678119 12.0710678119 A 10 10 0 1 1 15 5' );
+    truenit.ok( H.bounds.equalsEpsilon( new Bounds( -5, -5, 15, 12.0710678119 ) ) );
+    truenit.ok( H.currentPoint.equalsEpsilon( new Vector( 15, 5 ) ) );
 
 
-    // const F = new Shape()
+    // const a = new Shape()
     //   .arc( 10, 0, 5 * Math.PI / 4, true )
-    // truenit.equals( F.getSVGPath(), 'M 0 0 M 10 0 A 10 10 0 0 0 -7.0710678119 -7.0710678119' );
-    // truenit.ok( F.bounds.equalsEpsilon( new Bounds( -7.0710678119, -7.0710678119, 10, 0 ) ) );
+    // truenit.equals( a.getSVGPath(), 'M 0 0 M 10 0 A 10n 10 0 0 0 -7.0710678119 -7.0710678119' );
+    // truenit.ok( a.bounnds.equalsEpsilon( new Bounds( -7.0710678119, -7.0710678119, 10, 0 ) ) );
 
 
     //     // Create a MVT for testing.

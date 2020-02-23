@@ -270,7 +270,7 @@ define( require => {
       assert( !this.isClosed, 'Shape has already been closed' );
 
       startAngle = normalizeAngle( startAngle );
-      endAngle = normalizeAngle( endAngle );
+      endAngle = computeActualEndAngle( startAngle, normalizeAngle( endAngle ) );
 
       // If the shape is degenerate (implies no first point defined yet), move to the origin first.
       this.isDegenerate && this.moveTo( 0, 0 );
@@ -292,7 +292,7 @@ define( require => {
       this.moveToPoint( startPoint );
 
       // Compute the largeArcFlag and sweepFlag. See https://www.w3.org/TR/SVG/paths.html#PathDataEllipticalArcCommands.
-      const largeArcFlag = Math.abs( endAngle - startAngle ) > Math.PI ? 1 : 0;
+      const largeArcFlag = endAngle - startAngle > Math.PI ? 1 : 0;
       const sweepFlag = clockwise ? 0 : 1;
 
       // Create and add the arc sub-path.
@@ -442,6 +442,9 @@ define( require => {
     }
   }
 
+  /*----------------------------------------------------------------------------*
+   * Helper Functions
+   *----------------------------------------------------------------------------*/
   /**
    * Helper function that 'normalizes' an angle (in radians) to be in the range [0, 2PI). For instance,
    * normalizeAngle( -10 * PI / 2 ) would return PI.
@@ -455,5 +458,56 @@ define( require => {
     return angle;
   }
 
+  /**
+   * Helper function that determines the actual end angle relative to the start angle such that endAngle
+   * is always greater than startAngle.
+   * @public
+   *
+   * @param {number} startAngle - must be a normalized angle
+   * @param {number} endAngle - must be a normalized angle
+   * @returns {number}
+   */
+  function computeActualEndAngle( startAngle, endAngle ) {
+    return endAngle >= startAngle ? endAngle : endAngle + 2 * Math.PI;
+  };
+
+  // /**
+  //  * Helper function that gets the difference between 2 angles depending on if the arc goes clockwise or not.
+  //  *
+  //  * @param {number} startAngle
+  //  * @param {number} endAngle
+  //  * @param {boolean} clockwise
+  //  * @returns {number} - the difference
+  //  */
+  // function getAngleDifference( startAngle, endAngle, clockwise ) {
+  //   if ( !clockwise ) {
+  //     if ( endAngle < startAngle ) return Math.PI * 2 + endAngle - startAngle
+  //     else return endAngle - startAngle;
+  //   }
+  //   else {
+  //     if ( startAngle < endAngle ) return Math.PI * 2 - ( endAngle - startAngle )
+  //     else return endAngle - startAngle;
+  //   }
+  // }
+
+  // *
+  //  * Helper function that returns whether the given angle is contained by the arc's start and endAngle
+  //  *
+  //  * @param {number} angle
+  //  * @param {number} startAngle
+  //  * @param {number} endAngle
+  //  * @param {boolean} clockwise
+  //  * @returns {boolean}
+
+  // function containsAngle( angle, startAngle, endAngle, clockwise ) {
+  //   if ( !clockwise ) {
+  //     if ( endAngle < startAngle ) return angle >= endAngle && angle <= startAngle;
+  //     else return angle <= endAngle && angle >= startAngle;
+  //   }
+  //   else {
+  //     if ( endAngle < startAngle ) return angle >= endAngle && angle <= startAngle;
+  //     else return angle <= endAngle && angle >= startAngle;
+  //   }
+  // }
   return Shape;
 } );
