@@ -349,7 +349,78 @@ define( require => {
       return result.trim();
     }
 
+    /**
+     * Returns an exact defensible copy of this Shape.
+     * @public
+     *
+     * @returns {Shape}
+     */
+    copy() {
+      return new Shape(
+        this._subpaths.slice(),
+        this._currentPoint.copy(),
+        this._firstPoint.copy(),
+        this.bounds.copy(),
+        this.isDegenerate );
+    }
 
+    /**
+     * Transforms this Shape from view coordinates to model coordinates, effectively scaling and flipping the Shape.
+     * See ModelViewTransform and the comment at the top of the file for context. This is for use in sim-core only.
+     * @public (sim-core internal)
+     *
+     * @param {ModelViewTransform} modelViewTransform
+     */
+    transformToModel( modelViewTransform ) {
+
+      // Transform subpaths first.
+      this._subpaths.forEach( subpath => {
+        if ( subpath.cmd === 'M' || subpath.cmd === 'L' ) {
+          subpath.args[ 0 ] = modelViewTransform.viewToModelX( subpath.args[ 0 ] );
+          subpath.args[ 1 ] = modelViewTransform.viewToModelY( subpath.args[ 1 ] );
+        }
+        else if ( subpath.cmd === 'A' ) {
+          subpath.args[ 0 ] = modelViewTransform.viewToModelDeltaX( subpath.args[ 0 ] );
+          subpath.args[ 1 ] = modelViewTransform.viewToModelDeltaY( subpath.args[ 1 ] );
+          subpath.args[ 5 ] = modelViewTransform.viewToModelX( subpath.args[ 5 ] );
+          subpath.args[ 6 ] = modelViewTransform.viewToModelY( subpath.args[ 6 ] );
+        }
+      } );
+
+      // Transform points and bounds.
+      if ( this._currentPoint ) this._currentPoint = modelViewTransform.viewToModelPoint( this._currentPoint );
+      if ( this._firstPoint ) this._firstPoint = modelViewTransform.viewToModelPoint( this._firstPoint );
+      if ( this._bounds ) this._bounds = modelViewTransform.viewToModelBounds( this._bounds );
+    }
+
+    /**
+     * Transforms this Shape from model coordinates to view coordinates, effectively scaling and flipping the Shape.
+     * See ModelViewTransform and the comment at the top of the file for context. This is for use in sim-core only.
+     * @public (sim-core internal)
+     *
+     * @param {ModelViewTransform} modelViewTransform
+     */
+    transformToView( modelViewTransform ) {
+
+      // Transform subpaths first.
+      this._subpaths.forEach( subpath => {
+        if ( subpath.cmd === 'M' || subpath.cmd === 'L' ) {
+          subpath.args[ 0 ] = modelViewTransform.modelToViewX( subpath.args[ 0 ] );
+          subpath.args[ 1 ] = modelViewTransform.modelToViewY( subpath.args[ 1 ] );
+        }
+        else if ( subpath.cmd === 'A' ) {
+          subpath.args[ 0 ] = modelViewTransform.modelToViewDeltaX( subpath.args[ 0 ] );
+          subpath.args[ 1 ] = modelViewTransform.modelToViewDeltaY( subpath.args[ 1 ] );
+          subpath.args[ 5 ] = modelViewTransform.modelToViewX( subpath.args[ 5 ] );
+          subpath.args[ 6 ] = modelViewTransform.modelToViewY( subpath.args[ 6 ] );
+        }
+      } );
+
+      // Transform points and bounds.
+      if ( this._currentPoint ) this._currentPoint = modelViewTransform.modelToViewPoint( this._currentPoint );
+      if ( this._firstPoint ) this._firstPoint = modelViewTransform.modelToViewPoint( this._firstPoint );
+      if ( this._bounds ) this._bounds = modelViewTransform.modelToViewBounds( this._bounds );
+    }
   }
 
   /**
