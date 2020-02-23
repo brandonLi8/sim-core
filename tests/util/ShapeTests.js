@@ -65,14 +65,19 @@ define( require => {
     truenit.ok( E._bounds.equals( new Bounds( 5, 5, 15, 15 ) ) );
 
     const F = new Shape()
+      .arc( 10, 0, 5 * Math.PI / 4, true )
+    truenit.equals( F.getSVGPath(), 'M 0 0 M 10 0 A 10 10 0 0 0 -7.0710678119 -7.0710678119' );
+    truenit.ok( F._bounds.equalsEpsilon( new Bounds( -7.0710678119, -7.0710678119, 10, 0 ) ) );
+
+    const H = new Shape()
       .polygon( [
         new Vector( 5, 5 ),
         new Vector( 2, 9 ),
         new Vector( 9, 12 ),
         new Vector( 1, 1 )
       ] );
-    truenit.equals( F.getSVGPath(), 'M 5 5 L 2 9 L 9 12 L 1 1 Z' );
-    truenit.ok( F._bounds.equals( new Bounds( 1, 1, 9, 12 ) ) );
+    truenit.equals( H.getSVGPath(), 'M 5 5 L 2 9 L 9 12 L 1 1 Z' );
+    truenit.ok( H._bounds.equals( new Bounds( 1, 1, 9, 12 ) ) );
 
   };
 } );

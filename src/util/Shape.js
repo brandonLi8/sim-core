@@ -240,16 +240,18 @@ define( require => {
      *                                     endAngle or counter-clockwise
      * @returns {Shape} - 'this' reference, for chaining
      */
-    arc( radius, startAngle, endAngle, clockwise = true ) {
+    arc( radius, startAngle, endAngle, clockwise = false ) {
       assert( typeof radius === 'number' && isFinite( radius ), `invalid radius: ${ radius }` );
       assert( typeof startAngle === 'number' && isFinite( startAngle ), `invalid startAngle: ${ startAngle }` );
       assert( typeof endAngle === 'number' && isFinite( endAngle ), `invalid endAngle: ${ endAngle }` );
       assert( typeof clockwise === 'boolean', `invalid clockwise: ${ clockwise }` );
-
-      const center = this._currentPoint.copy(); // Reference the _currentPoint as the center before moving.
+      startAngle = normalizeAngle( startAngle );
+      endAngle = normalizeAngle( endAngle );
 
       // If the shape is degenerate (implies no first point defined yet), move to the origin first.
       this.isDegenerate && this.moveTo( 0, 0 );
+
+      const center = this._currentPoint.copy(); // Reference the _currentPoint as the center before moving.
 
       // Create a Vector that will be rotated to compute coordinates at specific angles, relative to the origin.
       const angleVector = new Vector( 0, radius );
@@ -257,14 +259,14 @@ define( require => {
       // Compute the starting and end points.
       const endPoint = center.copy().add( angleVector.setAngle( endAngle ) );
       const startPoint = center.copy().add( angleVector.setAngle( startAngle ) );
-      const deltaAngle = clockwise ? endAngle - startAngle : startAngle - endAngle;
+      const deltaAngle = clockwise ? Math.PI * 2 - endAngle - startAngle : endAngle - startAngle;
 
       // Move the shape to the starting point, from where the arc will start.
       this.moveToPoint( startPoint );
 
       // Compute the largeArcFlag and sweepFlag. See https://www.w3.org/TR/SVG/paths.html#PathDataEllipticalArcCommands.
       const largeArcFlag = Math.abs( deltaAngle ) > Math.PI ? 1 : 0;
-      const sweepFlag = clockwise ? 1 : 0;
+      const sweepFlag = clockwise ? 0 : 1;
 
       // Create and add the arc sub-path.
       this._subpaths.push( { cmd: 'A', args: [ radius, radius, 0, largeArcFlag, sweepFlag, endPoint.x, endPoint.y ] } );
@@ -278,7 +280,7 @@ define( require => {
 
       // Function that updates _bounds to include a point at a specific angle on the arc, if the arc contains that angle
       const includeBoundsAtAngle = angle => {
-        if ( clockwise ? angle <= endAngle && angle >= startAngle : angle >= endAngle && angle <= startAngle ) {
+        if ( clockwise ? angle >= endAngle && angle <= startAngle : angle <= endAngle && angle >= startAngle ) {
           this._bounds.includePoint( center.copy().add( angleVector.setAngle( angle ) ) );
         }
       };
@@ -331,6 +333,11 @@ define( require => {
     }
   }
 
+  function normalizeAngle( angle ) {
+    while ( angle < 0 ) angle += 2 * Math.PI;
+    while ( angle > 2 * Math.PI) angle -= 2 * Math.PI;
+    return angle;
+  }
   // we need to prevent the numbers from being in an exponential toString form, since the CSS transform does not support that
   function svgNumber( number ) {
     // Largest guaranteed number of digits according to https://developer.mozilla.org/en-US/docs/JavaScript/Reference/Global_Objects/Number/toFixed
