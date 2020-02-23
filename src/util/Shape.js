@@ -298,7 +298,7 @@ define( require => {
     }
 
     /**
-     * Creates a polygon by drawing lines to an array of verticies.
+     * Creates a polygon by drawing lines to an array of vertices.
      * @public
      *
      * @param {Vector[]} vertices
@@ -316,37 +316,40 @@ define( require => {
     }
 
     /**
-     * Gets the SVG d attribute
-     *  * Although Shape supports relative placements (moveToRelative, lineToRelative ...), the getSVGPath() d-attribute string
- * will only use the base upper-case commands and not the lower-case relative commands.
+     * Gets the SVG d-attribute string for the Shape. See https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/d.
+     * @public
+     *
+     * Although Shape supports relative placements (moveToRelative, lineToRelative ...), the getSVGPath() d-attribute
+     * string will only use the base absolute upper-case commands and not the lower-case relative commands.
+     *
+     * @returns {string}
      */
     getSVGPath() {
       let result = '';
       this._subpaths.forEach( subpath => {
         if ( [ 'M', 'L', 'A' ].includes( subpath.cmd ) ) {
-          result += `${ subpath.cmd } ${ subpath.args.map( num => Util.toFixed( num, 10 ) ).join( ' ' ) } `;
+          // Round each number in the subpaths to a maximum of 10 numbers to prevent exponentials.
+          const argsString = subpath.args.map( num => parseFloat( num.toFixed( 10 ) ) ).join( ' ' );
+          result += `${ subpath.cmd } ${ argsString } `;
         }
-        else if ( subpath.cmd === 'Z' ) {
-          result += 'Z ';
-        }
-        else {
-          assert( false );
-        }
+        else if ( subpath.cmd === 'Z' ) { result += 'Z '; }
+        else { assert( false, `unrecognized command: ${ subpath.cmd }` ); }
       } );
       return result.trim();
     }
   }
 
+  /**
+   * Helper function that 'normalizes' an angle (in radians) to be in the range [0, 2PI). For instance,
+   * normalizeAngle( -10 * PI / 2 ) would return PI.
+   *
+   * @param {number} angle - in radians
+   * @returns {number} - the 'normalized' angle
+   */
   function normalizeAngle( angle ) {
     while ( angle < 0 ) angle += 2 * Math.PI;
     while ( angle > 2 * Math.PI) angle -= 2 * Math.PI;
     return angle;
-  }
-  // we need to prevent the numbers from being in an exponential toString form, since the CSS transform does not support that
-  function svgNumber( number ) {
-    // Largest guaranteed number of digits according to https://developer.mozilla.org/en-US/docs/JavaScript/Reference/Global_Objects/Number/toFixed
-    // See https://github.com/phetsims/dot/issues/36
-    return number.toFixed( 20 );
   }
 
   return Shape;
