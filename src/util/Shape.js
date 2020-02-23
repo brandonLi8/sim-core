@@ -270,7 +270,7 @@ define( require => {
       assert( !this.isClosed, 'Shape has already been closed' );
 
       startAngle = normalizeAngle( startAngle );
-      endAngle = computeActualEndAngle( startAngle, normalizeAngle( endAngle ) );
+      endAngle = computeActualEndAngle( startAngle, normalizeAngle( endAngle ), clockwise );
 
       // If the shape is degenerate (implies no first point defined yet), move to the origin first.
       this.isDegenerate && this.moveTo( 0, 0 );
@@ -292,7 +292,7 @@ define( require => {
       this.moveToPoint( startPoint );
 
       // Compute the largeArcFlag and sweepFlag. See https://www.w3.org/TR/SVG/paths.html#PathDataEllipticalArcCommands.
-      const largeArcFlag = endAngle - startAngle > Math.PI ? 1 : 0;
+      const largeArcFlag = ( clockwise ? startAngle - endAngle : endAngle - startAngle ) > Math.PI ? 1 : 0;
       const sweepFlag = clockwise ? 0 : 1;
 
       // Create and add the arc sub-path.
@@ -459,16 +459,19 @@ define( require => {
   }
 
   /**
-   * Helper function that determines the actual end angle relative to the start angle such that endAngle
-   * is always greater than startAngle.
+   * Helper function that determines the actual end angle relative to the start angle such that
+   *    (1) if counter-clockwise, endAngle is always greater than startAngle.
+   *    (2) if clockwise, startAngle is always greater than endAngle.
    * @public
    *
    * @param {number} startAngle - must be a normalized angle
    * @param {number} endAngle - must be a normalized angle
+   * @param {boolean} clockwise
    * @returns {number}
    */
-  function computeActualEndAngle( startAngle, endAngle ) {
-    return endAngle >= startAngle ? endAngle : endAngle + 2 * Math.PI;
+  function computeActualEndAngle( startAngle, endAngle, clockwise ) {
+    if ( !clockwise ) return endAngle >= startAngle ? endAngle : endAngle + 2 * Math.PI;
+    else return startAngle >= endAngle ? endAngle : endAngle - 2 * Math.PI;
   };
 
   return Shape;
