@@ -252,7 +252,7 @@ define( require => {
 
     /**
      * Draws an arc, revolved around the current position. If the current position isn't defined, will draw the arc
-     * around (0, 0).
+     * around (0, 0). Angles will be normalized.
      * @public
      *
      * @param {number} radius - how far from the center the arc will be
@@ -285,7 +285,6 @@ define( require => {
       // Compute the starting and end points.
       const endPoint = center.copy().add( angleVector.setAngle( endAngle ) );
       const startPoint = center.copy().add( angleVector.setAngle( startAngle ) );
-      const deltaAngle = clockwise ? Math.PI * 2 - endAngle - startAngle : endAngle - startAngle;
 
       if ( !this._firstPoint ) this._firstPoint = startPoint.copy();
 
@@ -293,7 +292,7 @@ define( require => {
       this.moveToPoint( startPoint );
 
       // Compute the largeArcFlag and sweepFlag. See https://www.w3.org/TR/SVG/paths.html#PathDataEllipticalArcCommands.
-      const largeArcFlag = Math.abs( deltaAngle ) > Math.PI ? 1 : 0;
+      const largeArcFlag = Math.abs( endAngle - startAngle ) > Math.PI ? 1 : 0;
       const sweepFlag = clockwise ? 0 : 1;
 
       // Create and add the arc sub-path.
