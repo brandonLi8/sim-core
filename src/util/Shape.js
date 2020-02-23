@@ -45,19 +45,20 @@ define( require => {
      * @param {Vector} [firstPoint] - for use in the copy() method only.
      * @param {Bounds} [bounds] - for use in the copy() method only.
      * @param {boolean} [isDegenerate] - for use in the copy() method only.
+     * @param {boolean} [isClosed] - for use in the copy() method only.
      */
-    constructor( subpaths, currentPoint, firstPoint, bounds, isDegenerate ) {
+    constructor( subpaths, currentPoint, firstPoint, bounds, isDegenerate, isClosed ) {
 
       // @private {Array.<Object>} - array of the paths that make up the shape. The path Object literal has 2 mappings:
       //                               (1) cmd: {string} the d-attribute command letter.
       //                               (2) args: {number[]} the arguments to the cmd, in the correct ordering.
       this._subpaths = subpaths || [];
 
-      // @private {Vector} - the current position of the path. Null means unknown, and must be set in moveTo().
-      this._currentPoint = currentPoint || null;
-
       // @private {Vector} - the first known position of the path. Null means unknown, and will be set in moveTo().
       this._firstPoint = firstPoint || null;
+
+      // @public (read-only) {Vector} - the current position of the path. Null means unknown, and must be set in moveTo().
+      this.currentPoint = currentPoint || null;
 
       // @public (read-only) {Bounds} - the smallest Bounds that contains the entire drawn Shape. Null means unknown.
       this.bounds = bounds || null;
@@ -65,6 +66,10 @@ define( require => {
       // @public (read-only) - indicates if the Shape is empty or not, meaning if has at least one sub-path and a known
       //                       bounds. Must not be degenerate for use in Path and ModelViewTransform.
       this.isDegenerate = isDegenerate || true;
+
+      // @public (read-only) - indicates if the Shape close() method has been called, meaning the Shape is no longer
+      //                       mutable.
+      this.isClosed = isClosed || false;
     }
 
     /**
@@ -83,16 +88,16 @@ define( require => {
       this._subpaths.push( { cmd: 'M', args: [ x, y ] } );
 
       if ( this.isDegenerate ) {
-        // Update the _currentPoint which is now known, centered around the passed-in coordinate.
-        this._currentPoint = new Vector( x, y );
+        // Update the currentPoint which is now known, centered around the passed-in coordinate.
+        this.currentPoint = new Vector( x, y );
 
         // This Shape is no longer degenerate as it has at least one sub-path and a finite Bounds.
         this.isDegenerate = false;
       }
       else {
-        // The Shape wasn't degenerate before, and already contains a _firstPoint reference. Update the _currentPoint.
+        // The Shape wasn't degenerate before, and already contains a _firstPoint reference. Update the currentPoint.
         // Moving to a position doesn't update the bounds unless something is drawn, so the bounds isn't touched.
-        this._currentPoint.setX( x ).setY( y );
+        this.currentPoint.setX( x ).setY( y );
       }
       return this;
     }
@@ -114,7 +119,7 @@ define( require => {
      * @param {number} y
      * @returns {Shape} - 'this' reference, for chaining
      */
-    moveToRelative( dx, dy ) { return this.moveTo( this._currentPoint.x + dx, this._currentPoint.y + dy ); }
+    moveToRelative( dx, dy ) { return this.moveTo( this.currentPoint.x + dx, this.currentPoint.y + dy ); }
 
     /**
      * Moves the current position a relative displacement (dx, dy) relative to the last known position.
@@ -137,22 +142,23 @@ define( require => {
     lineTo( x, y ) {
       assert( typeof x === 'number' && isFinite( x ), `invalid x: ${ x }` );
       assert( typeof y === 'number' && isFinite( y ), `invalid y: ${ y }` );
+      assert( !this.isClosed, 'Shape has already been closed' );
 
       // If the shape is degenerate (implies no first point defined yet), move to the origin first.
       this.isDegenerate && this.moveTo( 0, 0 );
 
-      if ( !this._firstPoint ) this._firstPoint = this._currentPoint.copy();
-      if ( !this.bounds ) this.bounds = Bounds.withPoints( this._currentPoint, this._currentPoint );
+      if ( !this._firstPoint ) this._firstPoint = this.currentPoint.copy();
+      if ( !this.bounds ) this.bounds = Bounds.withPoints( this.currentPoint, this.currentPoint );
 
-      // Update bounds to include the _currentPoint, which is the starting point of the line here.
-      this.bounds.includePoint( this._currentPoint );
+      // Update bounds to include the currentPoint, which is the starting point of the line here.
+      this.bounds.includePoint( this.currentPoint );
 
       // Create a sub-path that creates a line to the end point based off the path spec.
       this._subpaths.push( { cmd: 'L', args: [ x, y ] } );
 
-      // Update the _currentPoint and bounds to match the passed-in end coordinate of the line.
-      this._currentPoint.setX( x ).setY( y );
-      this.bounds.includePoint( this._currentPoint );
+      // Update the currentPoint and bounds to match the passed-in end coordinate of the line.
+      this.currentPoint.setX( x ).setY( y );
+      this.bounds.includePoint( this.currentPoint );
       return this;
     }
 
@@ -175,7 +181,7 @@ define( require => {
      * @param {number} dy - vertical displacement
      * @returns {Shape} - 'this' reference, for chaining
      */
-    lineToRelative( dx, dy ) { return this.lineTo( this._currentPoint.x + dx, this._currentPoint.y + dy ); }
+    lineToRelative( dx, dy ) { return this.lineTo( this.currentPoint.x + dx, this.currentPoint.y + dy ); }
 
     /**
      * Draws a straight line from the current position to another position determined by displacement (dx, dy).
@@ -194,7 +200,7 @@ define( require => {
      * @param {number} x
      * @returns {Shape} - 'this' reference, for chaining
      */
-    horizontalLineTo( x ) { return this.lineTo( x, this._currentPoint.y ); }
+    horizontalLineTo( x ) { return this.lineTo( x, this.currentPoint.y ); }
 
     /**
      * Draws a horizontal line from the current position to the passed-in dx displacement of the end point.
@@ -203,7 +209,7 @@ define( require => {
      * @param {number} dx
      * @returns {Shape} - 'this' reference, for chaining
      */
-    horizontalLineToRelative( dx ) { return this.horizontalLineTo( this._currentPoint.x + dx ); }
+    horizontalLineToRelative( dx ) { return this.horizontalLineTo( this.currentPoint.x + dx ); }
 
     /**
      * Draws a vertical line from the current position to the passed-in y of the end point.
@@ -212,7 +218,7 @@ define( require => {
      * @param {number} y
      * @returns {Shape} - 'this' reference, for chaining
      */
-    verticalLineTo( y ) { return this.lineTo( this._currentPoint.x, y ); }
+    verticalLineTo( y ) { return this.lineTo( this.currentPoint.x, y ); }
 
     /**
      * Draws a vertical line from the current position to the passed-in dy displacement of the end point.
@@ -221,7 +227,7 @@ define( require => {
      * @param {number} dy
      * @returns {Shape} - 'this' reference, for chaining
      */
-    verticalLineToRelative( dy ) { return this.verticalLineTo( this._currentPoint.y + dy ); }
+    verticalLineToRelative( dy ) { return this.verticalLineTo( this.currentPoint.y + dy ); }
 
     /**
      * Closes the shape by drawing a straight line from the current position back to the first point of the shape.
@@ -236,9 +242,11 @@ define( require => {
       // Create the sub-path argument.
       this._subpaths.push( { cmd: 'Z' } );
 
-      // Update the _currentPoint and bounds to match the end point.
-      this._currentPoint.setX( this._firstPoint.x ).setY( this._firstPoint.y );
-      this.bounds.includePoint( this._currentPoint );
+      // Update the currentPoint and bounds to match the end point.
+      this.currentPoint.setX( this._firstPoint.x ).setY( this._firstPoint.y );
+      this.bounds.includePoint( this.currentPoint );
+
+      this.isClosed = true;
       return this;
     }
 
@@ -259,16 +267,17 @@ define( require => {
       assert( typeof startAngle === 'number' && isFinite( startAngle ), `invalid startAngle: ${ startAngle }` );
       assert( typeof endAngle === 'number' && isFinite( endAngle ), `invalid endAngle: ${ endAngle }` );
       assert( typeof clockwise === 'boolean', `invalid clockwise: ${ clockwise }` );
+      assert( !this.isClosed, 'Shape has already been closed' );
+
       startAngle = normalizeAngle( startAngle );
       endAngle = normalizeAngle( endAngle );
 
       // If the shape is degenerate (implies no first point defined yet), move to the origin first.
       this.isDegenerate && this.moveTo( 0, 0 );
 
-      if ( !this._firstPoint ) this._firstPoint = this._currentPoint.copy();
-      if ( !this.bounds ) this.bounds = Bounds.withPoints( this._currentPoint, this._currentPoint );
+      if ( !this.bounds ) this.bounds = Bounds.withPoints( this.currentPoint, this.currentPoint );
 
-      const center = this._currentPoint.copy(); // Reference the _currentPoint as the center before moving.
+      const center = this.currentPoint.copy(); // Reference the currentPoint as the center before moving.
 
       // Create a Vector that will be rotated to compute coordinates at specific angles, relative to the origin.
       const angleVector = new Vector( 0, radius );
@@ -277,6 +286,8 @@ define( require => {
       const endPoint = center.copy().add( angleVector.setAngle( endAngle ) );
       const startPoint = center.copy().add( angleVector.setAngle( startAngle ) );
       const deltaAngle = clockwise ? Math.PI * 2 - endAngle - startAngle : endAngle - startAngle;
+
+      if ( !this._firstPoint ) this._firstPoint = startPoint.copy();
 
       // Move the shape to the starting point, from where the arc will start.
       this.moveToPoint( startPoint );
@@ -288,8 +299,8 @@ define( require => {
       // Create and add the arc sub-path.
       this._subpaths.push( { cmd: 'A', args: [ radius, radius, 0, largeArcFlag, sweepFlag, endPoint.x, endPoint.y ] } );
 
-      // Update the _currentPoint to the endPoint now that the arc has been added.
-      this._currentPoint = endPoint;
+      // Update the currentPoint to the endPoint now that the arc has been added.
+      this.currentPoint = endPoint;
 
       // Update the bounds so that it includes both the startPoint and endPoint.
       this.bounds.includePoint( startPoint );
@@ -318,6 +329,8 @@ define( require => {
      * @returns {Shape} - 'this' reference, for chaining
      */
     polygon( vertices ) {
+      assert( !this.isClosed, 'Shape has already been closed' );
+
       const length = vertices.length;
       if ( length > 0 ) {
         this.moveToPoint( vertices[ 0 ] );
@@ -359,11 +372,12 @@ define( require => {
      */
     copy() {
       return new Shape(
-        this._subpaths.slice(),
-        this._currentPoint.copy(),
-        this._firstPoint.copy(),
-        this.bounds.copy(),
-        this.isDegenerate );
+        this._subpaths.map( subpath => { return { cmd: subpath.cmd, args: subpath.args.slice() }; } ),
+        this.currentPoint ? this.currentPoint.copy() : null,
+        this._firstPoint ? this._firstPoint.copy() : null,
+        this.bounds ? this.bounds.copy() : null,
+        this.isDegenerate,
+        this.isClosed );
     }
 
     /**
@@ -372,6 +386,7 @@ define( require => {
      * @public (sim-core internal)
      *
      * @param {ModelViewTransform} modelViewTransform
+     * @returns {Shape} 'this' reference, for chaining.
      */
     transformToModel( modelViewTransform ) {
 
@@ -390,9 +405,10 @@ define( require => {
       } );
 
       // Transform points and bounds.
-      if ( this._currentPoint ) this._currentPoint = modelViewTransform.viewToModelPoint( this._currentPoint );
+      if ( this.currentPoint ) this.currentPoint = modelViewTransform.viewToModelPoint( this.currentPoint );
       if ( this._firstPoint ) this._firstPoint = modelViewTransform.viewToModelPoint( this._firstPoint );
-      if ( this._bounds ) this._bounds = modelViewTransform.viewToModelBounds( this._bounds );
+      if ( this.bounds ) this.bounds = modelViewTransform.viewToModelBounds( this.bounds );
+      return this;
     }
 
     /**
@@ -401,6 +417,7 @@ define( require => {
      * @public (sim-core internal)
      *
      * @param {ModelViewTransform} modelViewTransform
+     * @returns {Shape} 'this' reference, for chaining.
      */
     transformToView( modelViewTransform ) {
 
@@ -419,9 +436,10 @@ define( require => {
       } );
 
       // Transform points and bounds.
-      if ( this._currentPoint ) this._currentPoint = modelViewTransform.modelToViewPoint( this._currentPoint );
+      if ( this.currentPoint ) this.currentPoint = modelViewTransform.modelToViewPoint( this.currentPoint );
       if ( this._firstPoint ) this._firstPoint = modelViewTransform.modelToViewPoint( this._firstPoint );
-      if ( this._bounds ) this._bounds = modelViewTransform.modelToViewBounds( this._bounds );
+      if ( this.bounds ) this.bounds = modelViewTransform.modelToViewBounds( this.bounds );
+      return this;
     }
   }
 
