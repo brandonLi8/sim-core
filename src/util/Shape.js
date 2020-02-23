@@ -42,14 +42,14 @@ define( require => {
       //                               (2) args: {number[]} the arguments to the cmd, in the correct ordering.
       this._subpaths = [];
 
-      // @private {Vector|null} - the current position of the path. Null means unknown, and must be set in moveTo().
+      // @private {Vector} - the current position of the path. Null means unknown, and must be set in moveTo().
       this._currentPoint;
 
-      // @private {Vector|null} - the first known position of the path. Null means unknown, and will be set in moveTo().
+      // @private {Vector} - the first known position of the path. Null means unknown, and will be set in moveTo().
       this._firstPoint;
 
-      // @private {Bounds|null} - the smallest Bounds that contains the entire drawn Shape. Null means unknown.
-      this._bounds;
+      // @public (read-only) {Bounds} - the smallest Bounds that contains the entire drawn Shape. Null means unknown.
+      this.bounds;
 
       // @public (read-only) - indicates if the Shape is empty or not, meaning if has at least one sub-path and a known
       //                       bounds. Must not be degenerate for use in Path and ModelViewTransform.
@@ -74,14 +74,14 @@ define( require => {
       if ( this.isDegenerate ) {
         // Update the unknown references that are now known, centered around the passed-in coordinate.
         this._currentPoint = new Vector( x, y );
-        this._bounds = new Bounds( x, y, x, y );
+        this.bounds = new Bounds( x, y, x, y );
 
         // This Shape is no longer degenerate as it has at least one sub-path and a finite Bounds.
         this.isDegenerate = false;
       }
       else {
         // The Shape wasn't degenerate before, and already contains a _firstPoint reference. Update the _currentPoint.
-        // Moving to a position doesn't update the _bounds unless something is drawn, so the _bounds isn't touched.
+        // Moving to a position doesn't update the bounds unless something is drawn, so the bounds isn't touched.
         this._currentPoint.setX( x ).setY( y );
       }
       return this;
@@ -131,17 +131,17 @@ define( require => {
       // If the shape is degenerate (implies no first point defined yet), move to the origin first.
       this.isDegenerate && this.moveTo( 0, 0 );
 
-      // Update _bounds to include the _currentPoint, which is the starting point of the line here.
-      this._bounds.includePoint( this._currentPoint );
+      // Update bounds to include the _currentPoint, which is the starting point of the line here.
+      this.bounds.includePoint( this._currentPoint );
 
       if ( !this._firstPoint ) this._firstPoint = this._currentPoint.copy();
 
       // Create a sub-path that creates a line to the end point based off the path spec.
       this._subpaths.push( { cmd: 'L', args: [ x, y ] } );
 
-      // Update the _currentPoint and _bounds to match the passed-in end coordinate of the line.
+      // Update the _currentPoint and bounds to match the passed-in end coordinate of the line.
       this._currentPoint.setX( x ).setY( y );
-      this._bounds.includePoint( this._currentPoint );
+      this.bounds.includePoint( this._currentPoint );
       return this;
     }
 
@@ -225,9 +225,9 @@ define( require => {
       // Create the sub-path argument.
       this._subpaths.push( { cmd: 'Z' } );
 
-      // Update the _currentPoint and _bounds to match the end point.
+      // Update the _currentPoint and bounds to match the end point.
       this._currentPoint.setX( this._firstPoint.x ).setY( this._firstPoint.y );
-      this._bounds.includePoint( this._currentPoint );
+      this.bounds.includePoint( this._currentPoint );
       return this;
     }
 
@@ -278,18 +278,18 @@ define( require => {
       // Update the _currentPoint to the endPoint now that the arc has been added.
       this._currentPoint = endPoint;
 
-      // Update the _bounds so that it includes both the startPoint and endPoint.
-      this._bounds.includePoint( startPoint );
-      this._bounds.includePoint( endPoint );
+      // Update the bounds so that it includes both the startPoint and endPoint.
+      this.bounds.includePoint( startPoint );
+      this.bounds.includePoint( endPoint );
 
-      // Function that updates _bounds to include a point at a specific angle on the arc, if the arc contains that angle
+      // Function that updates bounds to include a point at a specific angle on the arc, if the arc contains that angle
       const includeBoundsAtAngle = angle => {
         if ( clockwise ? angle >= endAngle && angle <= startAngle : angle <= endAngle && angle >= startAngle ) {
-          this._bounds.includePoint( center.copy().add( angleVector.setAngle( angle ) ) );
+          this.bounds.includePoint( center.copy().add( angleVector.setAngle( angle ) ) );
         }
       };
 
-      // Update _bounds to include all extreme points to ensure that the _bounds contains the max/min points on the arc.
+      // Update bounds to include all extreme points to ensure that the bounds contains the max/min points on the arc.
       includeBoundsAtAngle( 0 );
       includeBoundsAtAngle( Math.PI / 2 );
       includeBoundsAtAngle( Math.PI );
