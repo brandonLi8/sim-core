@@ -134,6 +134,16 @@ define( require => {
     truenit.ok( I.bounds.equalsEpsilon( new Bounds( 5, -5, 15, 12.0710678119, ) ) );
     truenit.ok( I.currentPoint.equalsEpsilon( new Vector( 12.0710678119, 12.0710678119 ) ) );
 
+    //----------------------------------------------------------------------------------------
+    // Test 10: Clockwise non-normal angles Arc
+    const J = new Shape()
+      .moveTo( 5, 5 )
+      .arc( 10, 19 * Math.PI / 4, 20 * Math.PI / 4, true ); // equivalent: 3PI/4 to PI clockwise
+
+    truenit.equals( J.getSVGPath(), 'M 5 5 M -2.0710678119 12.0710678119 A 10 10 0 1 0 -5 5' );
+    truenit.ok( J.bounds.equalsEpsilon( new Bounds( -5, -5, 15, 15 ) ) );
+    truenit.ok( J.currentPoint.equalsEpsilon( new Vector( -5, 5 ) ) );
+
 
     // const a = new Shape()
     //   .arc( 10, 0, 5 * Math.PI / 4, true )

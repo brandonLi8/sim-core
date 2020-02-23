@@ -285,6 +285,7 @@ define( require => {
       // Compute the starting and end points.
       const endPoint = center.copy().add( angleVector.setAngle( endAngle ) );
       const startPoint = center.copy().add( angleVector.setAngle( startAngle ) );
+      const deltaAngle = clockwise ? startAngle - endAngle : endAngle - startAngle;
 
       if ( !this._firstPoint ) this._firstPoint = startPoint.copy();
 
@@ -292,7 +293,7 @@ define( require => {
       this.moveToPoint( startPoint );
 
       // Compute the largeArcFlag and sweepFlag. See https://www.w3.org/TR/SVG/paths.html#PathDataEllipticalArcCommands.
-      const largeArcFlag = ( clockwise ? startAngle - endAngle : endAngle - startAngle ) > Math.PI ? 1 : 0;
+      const largeArcFlag = deltaAngle > Math.PI ? 1 : 0;
       const sweepFlag = clockwise ? 0 : 1;
 
       // Create and add the arc sub-path.
@@ -307,7 +308,7 @@ define( require => {
 
       // Function that updates bounds to include a point at a specific angle on the arc, if the arc contains that angle
       const includeBoundsAtAngle = angle => {
-        if ( clockwise ? angle >= endAngle && angle <= startAngle : angle <= endAngle && angle >= startAngle ) {
+        if ( normalizeAngle( !clockwise ? endAngle - angle : startAngle - angle ) <= deltaAngle ) {
           this.bounds.includePoint( center.copy().add( angleVector.setAngle( angle ) ) );
         }
       };
