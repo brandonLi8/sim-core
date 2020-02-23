@@ -10,20 +10,39 @@ define( require => {
   'use strict';
 
   // modules
-  const Vector = require( 'SIM_CORE/util/Vector' );
+  const Bounds = require( 'SIM_CORE/util/Bounds' );
+  const ModelViewTransform = require( 'SIM_CORE/util/ModelViewTransform' );
   const Shape = require( 'SIM_CORE/util/Shape' );
   const truenit = require( 'truenit' );
-  const Bounds = require( 'SIM_CORE/util/Bounds' );
+  const Vector = require( 'SIM_CORE/util/Vector' );
 
   return () => {
 
-    // test A
+    // Create a MVT for testing.
+    const mvt = new ModelViewTransform( new Bounds( -20, -20, 30, 30 ), new Bounds( 0, 0, 200, 150 ) );
+
+    // A visual representation of the model-view frame, in a conventional mathematical coordinate system for the model
+    // and a flipped coordinate system for the view. Copied from ModelViewTransformTests.js
+    //                       ∧
+    //       view:(0, 0) •┄┄┄│┄┄┄┄┄┄┄┄• model:(30, 30)
+    //                   ┊   │        ┊
+    //                   ┊   │ model:(0,0)
+    //                  <────┼─────────>
+    //                   ┊   │        ┊
+    //  model:(-20, -20) •┄┄┄│┄┄┄┄┄┄┄┄• view:(200, 150)
+
+    // Test 1: Basic movements.
     const A = new Shape()
+      .moveTo( 15, 10 )
       .moveToPoint( Vector.ZERO )
+      .moveToRelative( 5, 5 )
       .moveToPoint( new Vector( 3, 4 ) )
-      .moveTo( 2, 2 );
-    truenit.equals( A.getSVGPath(), 'M 0 0 M 3 4 M 2 2' );
-    truenit.ok( A.bounds.equals( Bounds.ZERO ) );
+      .moveToPointRelative( new Vector( 2, 2 ) )
+      .moveToRelative( 4, -3 )
+      .moveTo( 2, -2 );
+    truenit.equals( A.getSVGPath(), 'M 15 10 M 0 0 M 5 5 M 3 4 M 5 6 M 9 3 M 2 -2' );
+
+    truenit.ok( !A.bounds );
 
 
     const B = new Shape()

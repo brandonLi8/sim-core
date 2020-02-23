@@ -2,6 +2,7 @@
 
 /**
  * Unit test file for `SIM_CORE/util/ModelViewTransform`. Run `npm run coverage` to see test coverage results.
+ * Transformations with shapes will be tested in `tests/util/ShapeTests.js`.
  *
  * @author Brandon Li <brandon.li820@gmail.com>
  */

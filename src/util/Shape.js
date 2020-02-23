@@ -83,9 +83,8 @@ define( require => {
       this._subpaths.push( { cmd: 'M', args: [ x, y ] } );
 
       if ( this.isDegenerate ) {
-        // Update the unknown references that are now known, centered around the passed-in coordinate.
+        // Update the _currentPoint which is now known, centered around the passed-in coordinate.
         this._currentPoint = new Vector( x, y );
-        this.bounds = new Bounds( x, y, x, y );
 
         // This Shape is no longer degenerate as it has at least one sub-path and a finite Bounds.
         this.isDegenerate = false;
@@ -142,10 +141,11 @@ define( require => {
       // If the shape is degenerate (implies no first point defined yet), move to the origin first.
       this.isDegenerate && this.moveTo( 0, 0 );
 
+      if ( !this._firstPoint ) this._firstPoint = this._currentPoint.copy();
+      if ( !this.bounds ) this.bounds = Bounds.withPoints( this._currentPoint, this._currentPoint );
+
       // Update bounds to include the _currentPoint, which is the starting point of the line here.
       this.bounds.includePoint( this._currentPoint );
-
-      if ( !this._firstPoint ) this._firstPoint = this._currentPoint.copy();
 
       // Create a sub-path that creates a line to the end point based off the path spec.
       this._subpaths.push( { cmd: 'L', args: [ x, y ] } );
@@ -264,7 +264,9 @@ define( require => {
 
       // If the shape is degenerate (implies no first point defined yet), move to the origin first.
       this.isDegenerate && this.moveTo( 0, 0 );
+
       if ( !this._firstPoint ) this._firstPoint = this._currentPoint.copy();
+      if ( !this.bounds ) this.bounds = Bounds.withPoints( this._currentPoint, this._currentPoint );
 
       const center = this._currentPoint.copy(); // Reference the _currentPoint as the center before moving.
 
