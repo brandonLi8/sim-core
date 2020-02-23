@@ -48,7 +48,7 @@ define( require => {
       // @private {Vector|null} - the first known position of the path. Null means unknown, and will be set in moveTo().
       this._firstPoint;
 
-      // @private {Bounds|null} - defined as the smallest Bounds that contains the entire Shape. Null means unknown.
+      // @private {Bounds|null} - the smallest Bounds that contains the entire drawn Shape. Null means unknown.
       this._bounds;
 
       // @public (read-only) - indicates if the Shape is empty or not, meaning if has at least one sub-path and a known
@@ -81,10 +81,9 @@ define( require => {
         this.isDegenerate = false;
       }
       else {
-        // The Shape wasn't degenerate before, and already contains a _firstPoint reference.
-        // Update the _currentPoint and _bounds to match the passed-in coordinate.
+        // The Shape wasn't degenerate before, and already contains a _firstPoint reference. Update the _currentPoint.
+        // Moving to a position doesn't update the _bounds unless something is drawn, so the _bounds isn't touched.
         this._currentPoint.setX( x ).setY( y );
-        this._bounds.includePoint( this._currentPoint );
       }
       return this;
     }
@@ -118,8 +117,8 @@ define( require => {
     moveToPointRelative( displacement ) { return this.moveToRelative( displacement.x, displacement.y ); }
 
     /**
-     * 'Draws' a straight line from the current position to the given coordinate (x, y).
-     * If the Shape doesn't have a first point defined, it will draw a line from (0, 0) to the specified coordinate.
+     * Draws a straight line from the current position to the given coordinate (x, y).
+     * If the Shape doesn't have a current position defined, it will draw a line from (0, 0) to the specified coordinate.
      * @public
      *
      * @param {number} x
@@ -133,6 +132,9 @@ define( require => {
       // If the shape is degenerate (implies no first point defined yet), move to the origin first.
       this.isDegenerate && this.moveTo( 0, 0 );
 
+      // Update _bounds to include the _currentPoint, which is the starting point of the line here.
+      this._bounds.includePoint( this._currentPoint );
+
       // Create a sub-path that creates a line to the end point based off the path spec.
       this._subpaths.push( { cmd: 'L', args: [ x, y ] } );
 
@@ -143,7 +145,8 @@ define( require => {
     }
 
     /**
-     * Makes a straight line to the given point.
+     * Draws a straight line from the current position to the given point (x, y).
+     * If the Shape doesn't have a current position defined, it will draw a line from (0, 0) to the specified point.
      * @public
      *
      * @param {Vector} point
@@ -152,26 +155,28 @@ define( require => {
     lineToPoint( point ) { return this.lineTo( point.x, point.y ); }
 
     /**
-     * Makes a straight line a relative displacement (x, y)
+     * Draws a straight line from the current position to another position determined by displacement (dx, dy).
+     * If the Shape doesn't have a current position defined, it will draw a line from (0, 0) to the displacement.
      * @public
      *
-     * @param {number} x - horizontal displacement
-     * @param {number} y - vertical displacement
+     * @param {number} dx - horizontal displacement
+     * @param {number} dy - vertical displacement
      * @returns {Shape} - 'this' reference, for chaining
      */
-    lineToRelative( x, y ) { return this.lineTo( this._currentPoint.x + x, this._currentPoint.y + y ); }
+    lineToRelative( dx, dy ) { return this.lineTo( this._currentPoint.x + dx, this._currentPoint.y + dy ); }
 
     /**
-     * Makes a straight line a relative displacement by the passed-in point.
+     * Draws a straight line from the current position to another position determined by displacement (dx, dy).
+     * If the Shape doesn't have a current position defined, it will draw a line from (0, 0) to the displacement.
      * @public
      *
-     * @param {Vector} point - displacement
+     * @param {Vector} displacement
      * @returns {Shape} - 'this' reference, for chaining
      */
-    lineToPointRelative( point ) { return this.lineToRelative( point.x, point.y ); }
+    lineToPointRelative( displacement ) { return this.lineToRelative( displacement.x, displacement.y ); }
 
     /**
-     * Makes a horizontal line to the given x coordinate
+     * Draws a horizontal line from the current position to the passed-in x of the end point.
      * @public
      *
      * @param {number} x
@@ -180,16 +185,16 @@ define( require => {
     horizontalLineTo( x ) { return this.lineTo( x, this._currentPoint.y ); }
 
     /**
-     * Adds a horizontal line with the given x-displacement
+     * Draws a horizontal line from the current position to the passed-in dx displacement of the end point.
      * @public
      *
-     * @param {number} x
+     * @param {number} dx
      * @returns {Shape} - 'this' reference, for chaining
      */
-    horizontalLineToRelative( x ) { return this.horizontalLineTo( this._currentPoint.x + x ); }
+    horizontalLineToRelative( dx ) { return this.horizontalLineTo( this._currentPoint.x + dx ); }
 
     /**
-     * Adds a vertical line (y represents the y-coordinate of the end point)
+     * Draws a vertical line from the current position to the passed-in y of the end point.
      * @public
      *
      * @param {number} y
@@ -198,50 +203,91 @@ define( require => {
     verticalLineTo( y ) { return this.lineTo( this._currentPoint.x, y ); }
 
     /**
-     * Adds a vertical line with the given y-displacement
+     * Draws a vertical line from the current position to the passed-in dy displacement of the end point.
      * @public
      *
-     * @param {number} y
+     * @param {number} dy
      * @returns {Shape} - 'this' reference, for chaining
      */
-    verticalLineToRelative( y ) { return this.verticalLineTo( this._currentPoint.y + y ); }
+    verticalLineToRelative( dy ) { return this.verticalLineTo( this._currentPoint.y + dy ); }
 
     /**
-     * Adds a straight line from the current position back to the first point of the shape.
+     * Closes the shape by drawing a straight line from the current position back to the first point of the shape.
      * @public
      *
      * @returns {Shape} - 'this' reference, for chaining
      */
     close() {
+
+      // Create the sub-path argument.
       this._subpaths.push( { cmd: 'Z' } );
+
+      // Update the _currentPoint and _bounds to match the end point.
       this._currentPoint.setX( this._firstPoint.x ).setY( this._firstPoint.y );
+      this._bounds.includePoint( this._currentPoint );
       return this;
     }
 
     /**
-     * Makes an arc, revolved around the current position.
+     * Draws an arc, revolved around the current position. If the current position isn't defined, will draw the arc
+     * around (0, 0).
      * @public
      *
-     * @param {number} radius - How far from the center the arc will be
-     * @param {number} startAngle - Angle (radians) of the start of the arc, relative to the horizontal
-     * @param {number} endAngle - Angle (radians) of the end of the arc, relative to the horizontal
-     * @param {boolean} [clockwise=true] - Decides which direction the arc takes around the center
+     * @param {number} radius - how far from the center the arc will be
+     * @param {number} startAngle - angle (in radians) of the start of the arc, relative to the horizontal
+     * @param {number} endAngle - angle (in radians) of the end of the arc, relative to the horizontal
+     * @param {boolean} [clockwise=true] - indicates if the arc should be drawn from the startAngle clockwise to the
+     *                                     endAngle or counter-clockwise
      * @returns {Shape} - 'this' reference, for chaining
      */
     arc( radius, startAngle, endAngle, clockwise = true ) {
+      assert( typeof radius === 'number' && isFinite( radius ), `invalid radius: ${ radius }` );
+      assert( typeof startAngle === 'number' && isFinite( startAngle ), `invalid startAngle: ${ startAngle }` );
+      assert( typeof endAngle === 'number' && isFinite( endAngle ), `invalid endAngle: ${ endAngle }` );
+      assert( typeof clockwise === 'boolean', `invalid clockwise: ${ clockwise }` );
 
-      // Get the starting and end Vectors as points.
-      const endVector = this._currentPoint.copy().add( new Vector( 0, radius ).setAngle( endAngle ) );
-      const startVector = this._currentPoint.copy().add( new Vector( 0, radius ).setAngle( startAngle ) );
-      const deltaAngle = endAngle - startAngle;
+      const center = this._currentPoint.copy(); // Reference the _currentPoint as the center before moving.
 
+      // If the shape is degenerate (implies no first point defined yet), move to the origin first.
+      this.isDegenerate && this.moveTo( 0, 0 );
+
+      // Create a Vector that will be rotated to compute coordinates at specific angles, relative to the origin.
+      const angleVector = new Vector( 0, radius );
+
+      // Compute the starting and end points.
+      const endPoint = center.copy().add( angleVector.setAngle( endAngle ) );
+      const startPoint = center.copy().add( angleVector.setAngle( startAngle ) );
+      const deltaAngle = clockwise ? endAngle - startAngle : startAngle - endAngle;
+
+      // Move the shape to the starting point, from where the arc will start.
+      this.moveToPoint( startPoint );
+
+      // Compute the largeArcFlag and sweepFlag. See https://www.w3.org/TR/SVG/paths.html#PathDataEllipticalArcCommands.
       const largeArcFlag = Math.abs( deltaAngle ) > Math.PI ? 1 : 0;
       const sweepFlag = clockwise ? 1 : 0;
-      this.moveToPoint( startVector );
-      this._subpaths.push( { cmd: 'A', args: [ radius, radius, 0, largeArcFlag, sweepFlag, endVector.x, endVector.y ] } );
 
-      this._currentPoint = endVector;
-      this._bounds.includePoint( this._currentPoint );
+      // Create and add the arc sub-path.
+      this._subpaths.push( { cmd: 'A', args: [ radius, radius, 0, largeArcFlag, sweepFlag, endPoint.x, endPoint.y ] } );
+
+      // Update the _currentPoint to the endPoint now that the arc has been added.
+      this._currentPoint = endPoint;
+
+      // Update the _bounds so that it includes both the startPoint and endPoint.
+      this._bounds.includePoint( startPoint );
+      this._bounds.includePoint( endPoint );
+
+      // Function that updates _bounds to include a point at a specific angle on the arc, if the arc contains that angle
+      const includeBoundsAtAngle = angle => {
+        if ( clockwise ? angle <= endAngle && angle >= startAngle : angle >= endAngle && angle <= startAngle ) {
+          this._bounds.includePoint( center.copy().add( angleVector.setAngle( angle ) ) );
+        }
+      };
+
+      // Update _bounds to include all extreme points to ensure that the _bounds contains the max/min points on the arc.
+      includeBoundsAtAngle( 0 );
+      includeBoundsAtAngle( Math.PI / 2 );
+      includeBoundsAtAngle( Math.PI );
+      includeBoundsAtAngle( 3 * Math.PI / 2 );
       return this;
     }
 

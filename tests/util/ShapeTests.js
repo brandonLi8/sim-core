@@ -24,7 +24,7 @@ define( require => {
       .moveTo( 2, 2 )
       .close();
     truenit.equals( A.getSVGPath(), 'M 0 0 M 3 4 M 2 2 Z' );
-    truenit.ok( A._bounds.equals( new Bounds( 0, 0, 3, 4 ) ) );
+    truenit.ok( A._bounds.equals( Bounds.ZERO ) );
 
 
     const B = new Shape()
