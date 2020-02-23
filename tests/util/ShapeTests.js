@@ -21,9 +21,8 @@ define( require => {
     const A = new Shape()
       .moveToPoint( Vector.ZERO )
       .moveToPoint( new Vector( 3, 4 ) )
-      .moveTo( 2, 2 )
-      .close();
-    truenit.equals( A.getSVGPath(), 'M 0 0 M 3 4 M 2 2 Z' );
+      .moveTo( 2, 2 );
+    truenit.equals( A.getSVGPath(), 'M 0 0 M 3 4 M 2 2' );
     truenit.ok( A._bounds.equals( Bounds.ZERO ) );
 
 

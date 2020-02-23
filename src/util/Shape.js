@@ -73,7 +73,6 @@ define( require => {
 
       if ( this.isDegenerate ) {
         // Update the unknown references that are now known, centered around the passed-in coordinate.
-        this._firstPoint = new Vector( x, y );
         this._currentPoint = new Vector( x, y );
         this._bounds = new Bounds( x, y, x, y );
 
@@ -134,6 +133,8 @@ define( require => {
 
       // Update _bounds to include the _currentPoint, which is the starting point of the line here.
       this._bounds.includePoint( this._currentPoint );
+
+      if ( !this._firstPoint ) this._firstPoint = this._currentPoint.copy();
 
       // Create a sub-path that creates a line to the end point based off the path spec.
       this._subpaths.push( { cmd: 'L', args: [ x, y ] } );
@@ -218,6 +219,8 @@ define( require => {
      * @returns {Shape} - 'this' reference, for chaining
      */
     close() {
+      assert( !this.isDegenerate, 'cannot close degenerate shape' );
+      assert( this._firstPoint, 'cannot close a shape that has no drawing points' );
 
       // Create the sub-path argument.
       this._subpaths.push( { cmd: 'Z' } );
@@ -250,6 +253,7 @@ define( require => {
 
       // If the shape is degenerate (implies no first point defined yet), move to the origin first.
       this.isDegenerate && this.moveTo( 0, 0 );
+      if ( !this._firstPoint ) this._firstPoint = this._currentPoint.copy();
 
       const center = this._currentPoint.copy(); // Reference the _currentPoint as the center before moving.
 
