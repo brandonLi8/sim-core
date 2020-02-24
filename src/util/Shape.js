@@ -105,7 +105,7 @@ define( require => {
      * @returns {Shape} - 'this' reference, for chaining
      */
     moveToRelative( dx, dy ) {
-      assert( this.currentPoint, 'Unkown current position. Make sure to call Shape.moveTo() to set the first point' );
+      assert( this.currentPoint, 'Unknown current position. Make sure to call Shape.moveTo() to set the first point' );
       return this.moveTo( this.currentPoint.x + dx, this.currentPoint.y + dy );
     }
 
@@ -130,7 +130,7 @@ define( require => {
       assert( typeof x === 'number' && isFinite( x ), `invalid x: ${ x }` );
       assert( typeof y === 'number' && isFinite( y ), `invalid y: ${ y }` );
       assert( !this.isClosed, 'cannot add lines to a closed shape' );
-      assert( this.currentPoint, 'Unkown current position. Make sure to call Shape.moveTo() to set the first point' );
+      assert( this.currentPoint, 'Unknown current position. Make sure to call Shape.moveTo() to set the first point' );
 
       // Update the _firstPoint and bounds references on the first time something is drawn.
       if ( !this._firstPoint ) this._firstPoint = this.currentPoint.copy();
@@ -166,7 +166,7 @@ define( require => {
      * @returns {Shape} - 'this' reference, for chaining
      */
     lineToRelative( dx, dy ) {
-      assert( this.currentPoint, 'Unkown current position. Make sure to call Shape.moveTo() to set the first point' );
+      assert( this.currentPoint, 'Unknown current position. Make sure to call Shape.moveTo() to set the first point' );
       return this.lineTo( this.currentPoint.x + dx, this.currentPoint.y + dy );
     }
 
@@ -187,7 +187,7 @@ define( require => {
      * @returns {Shape} - 'this' reference, for chaining
      */
     horizontalLineTo( x ) {
-      assert( this.currentPoint, 'Unkown current position. Make sure to call Shape.moveTo() to set the first point' );
+      assert( this.currentPoint, 'Unknown current position. Make sure to call Shape.moveTo() to set the first point' );
       return this.lineTo( x, this.currentPoint.y );
     }
 
@@ -199,7 +199,7 @@ define( require => {
      * @returns {Shape} - 'this' reference, for chaining
      */
     horizontalLineToRelative( dx ) {
-      assert( this.currentPoint, 'Unkown current position. Make sure to call Shape.moveTo() to set the first point' );
+      assert( this.currentPoint, 'Unknown current position. Make sure to call Shape.moveTo() to set the first point' );
       return this.horizontalLineTo( this.currentPoint.x + dx );
     }
 
@@ -211,7 +211,7 @@ define( require => {
      * @returns {Shape} - 'this' reference, for chaining
      */
     verticalLineTo( y ) {
-      assert( this.currentPoint, 'Unkown current position. Make sure to call Shape.moveTo() to set the first point' );
+      assert( this.currentPoint, 'Unknown current position. Make sure to call Shape.moveTo() to set the first point' );
       return this.lineTo( this.currentPoint.x, y );
     }
 
@@ -223,7 +223,7 @@ define( require => {
      * @returns {Shape} - 'this' reference, for chaining
      */
     verticalLineToRelative( dy ) {
-      assert( this.currentPoint, 'Unkown current position. Make sure to call Shape.moveTo() to set the first point' );
+      assert( this.currentPoint, 'Unknown current position. Make sure to call Shape.moveTo() to set the first point' );
       return this.verticalLineTo( this.currentPoint.y + dy );
     }
 
@@ -266,7 +266,7 @@ define( require => {
       assert( typeof endAngle === 'number' && isFinite( endAngle ), `invalid endAngle: ${ endAngle }` );
       assert( typeof clockwise === 'boolean', `invalid clockwise: ${ clockwise }` );
       assert( !this.isClosed, 'Cannot draw arc on a closed shape' );
-      assert( this.currentPoint, 'Unkown current position. Make sure to call Shape.moveTo() to set the first point' );
+      assert( this.currentPoint, 'Unknown current position. Make sure to call Shape.moveTo() to set the first point' );
 
       // Normalize angles (see normalizeAngle()) and adjust the endAngle (see adjustArcEndAngle())
       startAngle = normalizeAngle( startAngle );
