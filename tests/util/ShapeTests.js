@@ -18,7 +18,6 @@ define( require => {
 
   return () => {
 
-    //----------------------------------------------------------------------------------------
     // Test 1: Basic movements.
     const A = new Shape()
       .moveTo( 15, 10 )
@@ -31,7 +30,7 @@ define( require => {
     truenit.equals( A.getSVGPath(), 'M 15 10 M 0 0 M 5 5 M 3 4 M 5 6 M 9 3 M 2 -2' );
     truenit.ok( !A.bounds );
 
-    //----------------------------------------------------------------------------------------
+
     // Test 2: Absolute Lines
     const B = new Shape()
       .lineToPoint( new Vector( 3, 4 ) )
@@ -45,7 +44,7 @@ define( require => {
     truenit.ok( B.bounds.equals( new Bounds( -5, -4, 3, 4 ) ) );
     truenit.ok( B.currentPoint.equals( Vector.ZERO ) );
 
-    //----------------------------------------------------------------------------------------
+
     // Test 3: Relative Lines
     const C = new Shape()
       .moveTo( 2, 3 )
@@ -60,7 +59,7 @@ define( require => {
     truenit.ok( C.bounds.equals( new Bounds( -5, -4, 5, 7 ) ) );
     truenit.ok( C.currentPoint.equals( new Vector( 2, 3 ) ) );
 
-    //----------------------------------------------------------------------------------------
+
     // Test 4: Horizontal / Vertical Lines
     const D = new Shape()
       .moveTo( 5, 5 )
@@ -74,7 +73,7 @@ define( require => {
     truenit.ok( D.bounds.equals( new Bounds( -15, -10, 10, 10 ) ) );
     truenit.ok( D.currentPoint.equals( new Vector( 5, 5 ) ) );
 
-    //----------------------------------------------------------------------------------------
+
     // Test 5: Polygon
     const E = new Shape()
       .moveTo( 2, 2 )
@@ -88,7 +87,7 @@ define( require => {
     truenit.ok( E.bounds.equals( new Bounds( 1, 1, 9, 12 ) ) );
     truenit.ok( E.currentPoint.equals( new Vector( 5, 5 ) ) );
 
-    //----------------------------------------------------------------------------------------
+
     // Test 6: Copy
     const F = new Shape()
       .moveTo( 3, 3 )
@@ -103,7 +102,7 @@ define( require => {
     truenit.ok( copy.bounds.equals( new Bounds( 2, 2, 8, 9 ) ) );
     truenit.ok( copy.currentPoint.equals( new Vector( 8, 9 ) ) );
 
-    //----------------------------------------------------------------------------------------
+
     // Test 7: Counter-Clockwise Normal Angles Arc
     const G = new Shape()
       .moveTo( 5, 5 )
@@ -114,7 +113,7 @@ define( require => {
     truenit.ok( G.bounds.equalsEpsilon( new Bounds( -5, -2.0710678119, 12.0710678119, 15 ) ) );
     truenit.ok( G.currentPoint.equalsEpsilon( new Vector( 12.0710678119, 12.0710678119 ) ) );
 
-    //----------------------------------------------------------------------------------------
+
     // Test 8: Counter-Clockwise non-normal angles Arc
     const H = new Shape()
       .moveTo( 5, 5 )
@@ -124,7 +123,7 @@ define( require => {
     truenit.ok( H.bounds.equalsEpsilon( new Bounds( -5, -5, 15, 12.0710678119 ) ) );
     truenit.ok( H.currentPoint.equalsEpsilon( new Vector( 15, 5 ) ) );
 
-    //----------------------------------------------------------------------------------------
+
     // Test 9: Clockwise normal angles Arc
     const I = new Shape()
       .moveTo( 5, 5 )
@@ -134,7 +133,7 @@ define( require => {
     truenit.ok( I.bounds.equalsEpsilon( new Bounds( 5, -5, 15, 12.0710678119, ) ) );
     truenit.ok( I.currentPoint.equalsEpsilon( new Vector( 12.0710678119, 12.0710678119 ) ) );
 
-    //----------------------------------------------------------------------------------------
+
     // Test 10: Clockwise non-normal angles Arc
     const J = new Shape()
       .moveTo( 5, 5 )
@@ -144,11 +143,6 @@ define( require => {
     truenit.ok( J.bounds.equalsEpsilon( new Bounds( -5, -5, 15, 15 ) ) );
     truenit.ok( J.currentPoint.equalsEpsilon( new Vector( -5, 5 ) ) );
 
-
-    // const a = new Shape()
-    //   .arc( 10, 0, 5 * Math.PI / 4, true )
-    // truenit.equals( a.getSVGPath(), 'M 0 0 M 10 0 A 10n 10 0 0 0 -7.0710678119 -7.0710678119' );
-    // truenit.ok( a.bounnds.equalsEpsilon( new Bounds( -7.0710678119, -7.0710678119, 10, 0 ) ) );
 
 
     //     // Create a MVT for testing.

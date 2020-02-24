@@ -30,7 +30,6 @@ define( require => {
   const assert = require( 'SIM_CORE/util/assert' );
   const Bounds = require( 'SIM_CORE/util/Bounds' );
   const ModelViewTransform = require( 'SIM_CORE/util/ModelViewTransform' );
-  const Util = require( 'SIM_CORE/util/Util' );
   const Vector = require( 'SIM_CORE/util/Vector' );
 
   class Shape {
@@ -57,7 +56,7 @@ define( require => {
       // @private {Vector} - the first known position of the path. Null means unknown, and will be set in moveTo().
       this._firstPoint = firstPoint || null;
 
-      // @public (read-only) {Vector} - the current position of the path. Null means unknown, and must be set in moveTo().
+      // @public (read-only) {Vector} - the current position of the path. Null means unknown, (to be set in moveTo()).
       this.currentPoint = currentPoint || null;
 
       // @public (read-only) {Bounds} - the smallest Bounds that contains the entire drawn Shape. Null means unknown.
@@ -131,8 +130,8 @@ define( require => {
     moveToPointRelative( displacement ) { return this.moveToRelative( displacement.x, displacement.y ); }
 
     /**
-     * Draws a straight line from the current position to the given coordinate (x, y).
-     * If the Shape doesn't have a current position defined, it will draw a line from (0, 0) to the specified coordinate.
+     * Draws a straight line from the current position to the given coordinate (x, y). If the Shape doesn't have a
+     * current position defined, it will draw a line from (0, 0) to the specified coordinate.
      * @public
      *
      * @param {number} x
@@ -389,6 +388,8 @@ define( require => {
      * @returns {Shape} 'this' reference, for chaining.
      */
     transformToModel( modelViewTransform ) {
+      assert( modelViewTransform instanceof ModelViewTransform, `invalid modelViewTransform: ${ modelViewTransform }` );
+      assert( this.)
 
       // Transform subpaths first.
       this._subpaths.forEach( subpath => {
@@ -420,6 +421,7 @@ define( require => {
      * @returns {Shape} 'this' reference, for chaining.
      */
     transformToView( modelViewTransform ) {
+      assert( modelViewTransform instanceof ModelViewTransform, `invalid modelViewTransform: ${ modelViewTransform }` );
 
       // Transform subpaths first.
       this._subpaths.forEach( subpath => {
@@ -455,7 +457,7 @@ define( require => {
    */
   function normalizeAngle( angle ) {
     while ( angle < 0 ) angle += 2 * Math.PI;
-    while ( angle > 2 * Math.PI) angle -= 2 * Math.PI;
+    while ( angle > 2 * Math.PI ) angle -= 2 * Math.PI;
     return angle;
   }
 
@@ -473,7 +475,7 @@ define( require => {
   function computeActualEndAngle( startAngle, endAngle, clockwise ) {
     if ( !clockwise ) return endAngle >= startAngle ? endAngle : endAngle + 2 * Math.PI;
     else return startAngle >= endAngle ? endAngle : endAngle - 2 * Math.PI;
-  };
+  }
 
   return Shape;
 } );
