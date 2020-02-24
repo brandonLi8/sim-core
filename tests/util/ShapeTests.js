@@ -33,6 +33,7 @@ define( require => {
 
     // Test 2: Absolute Lines
     const B = new Shape()
+      .moveTo( 0, 0 )
       .lineToPoint( new Vector( 3, 4 ) )
       .lineTo( 2, 2 )
       .moveTo( 5, 6 )     // Shouldn't affect bounds
