@@ -144,10 +144,9 @@ define( require => {
     truenit.ok( J.bounds.equalsEpsilon( new Bounds( -5, -5, 15, 15 ) ) );
     truenit.ok( J.currentPoint.equalsEpsilon( new Vector( -5, 5 ) ) );
 
-
-
-    //     // Create a MVT for testing.
-    // const mvt = new ModelViewTransform( new Bounds( -20, -20, 30, 30 ), new Bounds( 0, 0, 200, 150 ) );
+    //----------------------------------------------------------------------------------------
+    // Create a MVT for testing.
+    const mvt = new ModelViewTransform( new Bounds( -20, -20, 30, 30 ), new Bounds( 0, 0, 200, 150 ) );
 
     // A visual representation of the model-view frame, in a conventional mathematical coordinate system for the model
     // and a flipped coordinate system for the view. Copied from ModelViewTransformTests.js
@@ -160,6 +159,42 @@ define( require => {
     //  model:(-20, -20) •┄┄┄│┄┄┄┄┄┄┄┄• view:(200, 150)
     //                       ∨
 
+    // Test 11: basic transformations
+    const K = new Shape()
+      .moveTo( 10, 10 )
+      .moveToRelative( 20, 20 )
+      .moveTo( 2, -2 );
 
+    truenit.equals( mvt.modelToViewShape( K ).getSVGPath(), 'M 120 60 M 200 0 M 88 96' );
+    truenit.equals( mvt.viewToModelShape( K ).getSVGPath(), 'M -17.5 26.6666666667 M -12.5 20 M -19.5 30.6666666667' );
+    truenit.ok( !mvt.modelToViewShape( K ).bounds );
+    truenit.ok( !mvt.viewToModelShape( K ).bounds );
+
+    // Test 12: lines transformations
+    const L = new Shape()
+      .moveTo( 10, 10 )
+      .lineToPointRelative( new Vector( 20, 20 ) )
+      .lineTo( 2, -2 )
+      .close();
+    truenit.equals( mvt.modelToViewShape( L ).getSVGPath(), 'M 120 60 L 200 0 L 88 96 Z' );
+    truenit.ok( mvt.viewToModelShape( L ).getSVGPath() === 'M -17.5 26.6666666667 L -12.5 20 L -19.5 30.6666666667 Z' );
+    truenit.ok( mvt.modelToViewShape( L ).bounds.equals( new Bounds( 88, 0, 200, 96 ) ) );
+    truenit.ok( mvt.viewToModelShape( L ).bounds.equalsEpsilon( new Bounds( -19.5, 20, -12.5, 30.6666666667 ) ) );
+    truenit.ok( mvt.modelToViewShape( L ).currentPoint.equals( new Vector( 120, 60 ) ) );
+    truenit.ok( mvt.viewToModelShape( L ).currentPoint.equalsEpsilon( new Vector( -17.5, 26.6666666667 ) ) );
+
+    // Test 13: lines transformations
+    const M = new Shape()
+      .moveTo( 0, 0 )
+      .arc( 1, Math.PI / 6, Math.PI / 2 )
+      .close();
+
+    truenit.equals( mvt.modelToViewShape( M ).getSVGPath(), 'M 80 90 M 83.4641016151 88.5 A 4 3 0 0 1 80 87 Z' );
+    truenit.equals( mvt.viewToModelShape( M ).getSVGPath(),
+      'M -20 30 M -19.7834936491 29.8333333333 A 0.25 0.3333333333 0 0 1 -20 29.6666666667 Z' );
+    truenit.ok( mvt.modelToViewShape( M ).bounds.equalsEpsilon( new Bounds( 80, 87, 83.4641016151, 88.5 ) ) );
+    truenit.ok( mvt.viewToModelShape( M ).bounds.equalsEpsilon( new Bounds( -20, 29.66666, -19.783493, 29.833333 ) ) );
+    truenit.ok( mvt.modelToViewShape( M ).currentPoint.equalsEpsilon( new Vector( 83.4641016151, 88.5 ) ) );
+    truenit.ok( mvt.viewToModelShape( M ).currentPoint.equalsEpsilon( new Vector( -19.783493, 29.833333 ) ) );
   };
 } );

@@ -261,7 +261,7 @@ define( require => {
      * @returns {Shape} - 'this' reference, for chaining
      */
     arc( radius, startAngle, endAngle, clockwise = false ) {
-      assert( typeof radius === 'number' && isFinite( radius ), `invalid radius: ${ radius }` );
+      assert( typeof radius === 'number' && isFinite( radius ) && radius >= 0, `invalid radius: ${ radius }` );
       assert( typeof startAngle === 'number' && isFinite( startAngle ), `invalid startAngle: ${ startAngle }` );
       assert( typeof endAngle === 'number' && isFinite( endAngle ), `invalid endAngle: ${ endAngle }` );
       assert( typeof clockwise === 'boolean', `invalid clockwise: ${ clockwise }` );
@@ -362,7 +362,7 @@ define( require => {
      */
     copy() {
       return new Shape(
-        this._subpaths.map( subpath => { return { cmd: subpath.cmd, args: subpath.args.slice() }; } ),
+        this._subpaths.map( subpath => ( { cmd: subpath.cmd, args: subpath.args ? subpath.args.slice() : null } ) ),
         this.currentPoint ? this.currentPoint.copy() : null,
         this._firstPoint ? this._firstPoint.copy() : null,
         this.bounds ? this.bounds.copy() : null,
@@ -391,8 +391,8 @@ define( require => {
           subpath.args[ 1 ] = modelViewTransform[ prefix + 'Y' ]( subpath.args[ 1 ] );
         }
         else if ( subpath.cmd === 'A' ) {
-          subpath.args[ 0 ] = modelViewTransform[ prefix + 'DeltaX' ]( subpath.args[ 0 ] );
-          subpath.args[ 1 ] = modelViewTransform[ prefix + 'DeltaY' ]( subpath.args[ 1 ] );
+          subpath.args[ 0 ] = Math.abs( modelViewTransform[ prefix + 'DeltaX' ]( subpath.args[ 0 ] ) );
+          subpath.args[ 1 ] = Math.abs( modelViewTransform[ prefix + 'DeltaY' ]( subpath.args[ 1 ] ) );
           subpath.args[ 5 ] = modelViewTransform[ prefix + 'X' ]( subpath.args[ 5 ] );
           subpath.args[ 6 ] = modelViewTransform[ prefix + 'Y' ]( subpath.args[ 6 ] );
         }
