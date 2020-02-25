@@ -14,7 +14,8 @@ define( require => {
   const truenit = require( 'truenit' );
 
   //----------------------------------------------------------------------------------------
-  // Start up the browser window and document objects.
+
+  // Start up the browser window and document objects
   global.window = require( 'window' );
   global.document = window.document;
   window.innerWidth = 1000;   // Arbitrary width.
@@ -23,8 +24,7 @@ define( require => {
   // Enable assertions
   assert.enableAssertions();
 
-  //----------------------------------------------------------------------------------------
-  // Run tests.
+  // Register all test files.
   truenit.registerTest( 'Util', require( 'TESTS/util/UtilTests' ) );
   truenit.registerTest( 'Vector', require( 'TESTS/util/VectorTests' ) );
   truenit.registerTest( 'Bounds', require( 'TESTS/util/BoundsTests' ) );
@@ -35,6 +35,8 @@ define( require => {
   truenit.registerTest( 'DerivedProperty', require( 'TESTS/util/DerivedPropertyTests' ) );
   truenit.registerTest( 'Enum', require( 'TESTS/util/EnumTests' ) );
   truenit.registerTest( 'Shape', require( 'TESTS/util/ShapeTests' ) );
+  truenit.registerTest( 'Node', require( 'TESTS/scenery/NodeTests' ) );
 
+  // Run tests
   truenit.start();
 } );
