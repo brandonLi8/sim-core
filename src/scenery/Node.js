@@ -476,6 +476,24 @@ define( require => {
       return traverser( this );
     }
 
+    get parentBounds() {
+      assert( this.parent, 'cannot get parent bounds when node doesn\'t have a parent' );
+
+      const globalBounds = this._computeGlobalBounds();
+
+      if ( this.parent instanceof require( 'SIM_CORE/scenery/ScreenView' ) ) {
+        return globalBounds;
+      }
+
+      const parentGlobalBounds = this.parent._computeGlobalBounds();
+      return Bounds.rect(
+        globalBounds.minX - parentGlobalBounds.minX,
+        globalBounds.minY - parentGlobalBounds.minY,
+        this.width,
+        this.height
+      );
+    }
+
     /**
      * Called when the Node layout needs to be updated, typically when the browser window is resized.
      * @private (scenery-internal)

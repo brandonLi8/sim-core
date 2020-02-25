@@ -10,6 +10,7 @@ define( require => {
   'use strict';
 
   // modules
+  const Bounds = require( 'SIM_CORE/util/Bounds' );
   const Display = require( 'SIM_CORE/core-internal/Display' );
   const DOMObject = require( 'SIM_CORE/core-internal/DOMObject' );
   const Node = require( 'SIM_CORE/scenery/Node' );
@@ -18,7 +19,7 @@ define( require => {
 
   return () => {
 
-    // Initialize the browser setup.
+    // Initialize a sample simulation setup.
     const display = new Display().initiate();
     const screen = new DOMObject( {
       height: '100%',
@@ -31,10 +32,15 @@ define( require => {
     const screenView = new ScreenView();
     display.addChild( screen.addChild( screenView ) );
 
+    //----------------------------------------------------------------------------------------
 
+    // Test 1: Root Node
+    const A = new Node();
+    screenView.addChild( A );
 
+    truenit.ok( A.localBounds.equals( Bounds.ZERO ) );
+    truenit.ok( A.parentBounds.equals( Bounds.ZERO ) );
 
-          // display.addChild( config.screens[ 0 ] );
 
   };
 } );
