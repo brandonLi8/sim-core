@@ -35,12 +35,12 @@ define( require => {
     //----------------------------------------------------------------------------------------
 
     // Test 1: Root Node
-    const A = new Node();
+    const A = new Node( { top: 10, left: 15 } );
     screenView.addChild( A );
 
     truenit.ok( A.localBounds.equals( Bounds.ZERO ) );
-    truenit.ok( A.parentBounds.equals( Bounds.ZERO ) );
-    truenit.ok( A.globalBounds.equals( Bounds.ZERO ) );
+    truenit.ok( A.parentBounds.equals( new Bounds( 15, 10, 15, 10 ) ) );
+    truenit.ok( A.globalBounds.equals( new Bounds( 15, 10, 15, 10 ) ) );
 
 
   };
