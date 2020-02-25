@@ -494,6 +494,8 @@ define( require => {
       );
     }
 
+    get globalBounds() { return this._computeGlobalBounds(); }
+
     /**
      * Called when the Node layout needs to be updated, typically when the browser window is resized.
      * @private (scenery-internal)

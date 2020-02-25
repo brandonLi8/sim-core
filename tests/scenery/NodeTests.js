@@ -40,6 +40,7 @@ define( require => {
 
     truenit.ok( A.localBounds.equals( Bounds.ZERO ) );
     truenit.ok( A.parentBounds.equals( Bounds.ZERO ) );
+    truenit.ok( A.globalBounds.equals( Bounds.ZERO ) );
 
 
   };
