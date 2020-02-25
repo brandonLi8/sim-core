@@ -15,11 +15,8 @@ define( require => {
 
   //----------------------------------------------------------------------------------------
 
-  // Start up the browser window and document objects
-  global.window = require( 'window' );
-  global.document = window.document;
-  window.innerWidth = 1000;   // Arbitrary width.
-  window.innerHeight = 1000;  // Arbitrary height.
+  // Start up the browser environment
+  require( 'browser-env' )();
 
   // Enable assertions
   assert.enableAssertions();

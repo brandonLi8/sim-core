@@ -373,7 +373,7 @@ define( require => {
      * @param {Object} style - object literal that describes the styles to override for the element.
      */
     static addElementStyles( element, style ) {
-      assert( element instanceof Element || element instanceof HTMLDocument, `invalid element: ${ element }` );
+      assert( element instanceof Element || element instanceof HTMLElement, `invalid element: ${ element }` );
       assert( Object.getPrototypeOf( style ) === Object.prototype, `invalid style object: ${ style }` );
 
       // convenience functions

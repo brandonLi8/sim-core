@@ -18,9 +18,9 @@
   },
   "devDependencies": {
     "@brandonli8/grunt-config": "0.0.0-dev.14",
+    "browser-env": "^3.3.0",
     "c8": "^7.0.1",
-    "truenit": "^0.9.14",
-    "window": "^4.2.6"
+    "truenit": "^0.9.14"
   },
   "dependencies": {
     "requirejs": "^2.3.6"
