@@ -3,7 +3,6 @@
 /**
  * Unit test file for `SIM_CORE/util/Bounds`. Run `npm run coverage` to see test coverage results.
  *
- *
  * @author Brandon Li <brandon.li820@gmail.com>
  */
 
@@ -171,6 +170,5 @@ define( require => {
     truenit.ok( A.copy().includeCoordinate( 6, 6 ).equals( new Bounds( 1, 2, 6, 6 ) ), 'includeCoordinate' );
     truenit.ok( A.copy().includeCoordinate( 0, 0 ).equals( new Bounds( 0, 0, 3, 4 ) ), 'includeCoordinate' );
     truenit.ok( Bounds.ZERO.copy().includeCoordinate( 2, 3 ).equals( B ), 'includeCoordinate' );
-
   };
 } );

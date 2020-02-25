@@ -14,10 +14,15 @@ define( require => {
   const truenit = require( 'truenit' );
 
   //----------------------------------------------------------------------------------------
+  // Start up the browser window and document objects.
+  global.window = require( 'window' );
+  global.document = window.document;
 
-  // enable assert
+  // Enable assertions
   assert.enableAssertions();
 
+  //----------------------------------------------------------------------------------------
+  // Run tests.
   truenit.registerTest( 'Util', require( 'TESTS/util/UtilTests' ) );
   truenit.registerTest( 'Vector', require( 'TESTS/util/VectorTests' ) );
   truenit.registerTest( 'Bounds', require( 'TESTS/util/BoundsTests' ) );
