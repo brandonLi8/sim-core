@@ -547,8 +547,43 @@ define( require => {
       super.addChild( child );
       const childBounds = child.bounds.copy().shift( this.left, this.top );
       this._bounds = this._bounds.union( childBounds );
+      this._recomupteAllLocalBounds();
       return this;
     }
+
+    _recomupteAllLocalBounds() {
+
+      const getSuperParent = ( currentNode ) => {
+        if ( currentNode instanceof require( 'SIM_CORE/scenery/ScreenView' ) ) {
+          return currentNode;
+        }
+        else if ( !currentNode.parent || !( currentNode.parent instanceof DOMObject ) ) {
+          return currentNode;
+        }
+        else {
+          return getSuperParent( currentNode.parent );
+        }
+      }
+
+      const updateParentBounds = ( parent => {
+        console.log( parent.constructor.name )
+        let parentBounds = parent instanceof require( 'SIM_CORE/scenery/ScreenView' ) ? parent.viewBounds : parent.localBounds;
+        let left = parent instanceof require( 'SIM_CORE/scenery/ScreenView' ) ? 0 : parent.left;
+        let top = parent instanceof require( 'SIM_CORE/scenery/ScreenView' ) ? 0 : parent.top;
+
+        console.log( parentBounds,left, top)
+        parent.children.forEach( child => {
+          console.log( 'child', child.bounds.copy().shift( left, top ) )
+          parentBounds = parentBounds.union( child.bounds );
+        } );
+        parent._bounds = parentBounds;
+        console.log( 'after', parent._bounds );
+
+        parent.children.forEach( updateParentBounds.bind( this ) );
+      } );
+      updateParentBounds( getSuperParent( this ) );
+    }
+
   }
 
   Node.X_LOCATION_KEYS = [ 'translation', 'left', 'right',
