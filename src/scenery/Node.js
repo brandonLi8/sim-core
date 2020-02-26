@@ -13,8 +13,8 @@
  * See the early portion of the constructor for details. Nodes also support pointer Events. See ./events/ for details.
  *
  * ## Coordinates
- * It is important to Node coordinates ARE NOT in pixels. The browser width and height (which are in pixels) change
- * from device to device and the window size may shrink or grow.
+ * It is important to note that Node coordinates ARE NOT in pixels. The browser width and height (which are in pixels)
+ * change from device to device and the window size may shrink or grow.
  *
  * Instead, Node uses ScreenView coordinates. ScreenView Coordinates are constant and don't depend on the window width.
  * It is a changing scalar off the actual window size. All Node coordinates are in terms of these coordinates.
@@ -511,7 +511,6 @@ define( require => {
 
         if ( globalBounds ) {
 
-          console.log( globalBounds.toString(), this.constructor.name )
           const r = this.rotation;
           const sx = this.scalar.x;
           const sy = this.scalar.y;

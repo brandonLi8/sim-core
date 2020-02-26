@@ -30,6 +30,8 @@ define( require => {
       zIndex: 999999
     } );
     const screenView = new ScreenView();
+    screenView.layout( window.innerWidth, window.innerHeight );
+
     display.addChild( screen.addChild( screenView ) );
 
     //----------------------------------------------------------------------------------------
@@ -37,6 +39,9 @@ define( require => {
     // Test 1: Root Node
     const A = new Node( { top: 10, left: 15 } );
     screenView.addChild( A );
+        screenView.layout( window.innerWidth, window.innerHeight );
+
+    console.log( A.style.transform )
 
     truenit.ok( A.localBounds.equals( Bounds.ZERO ) );
     truenit.ok( A.parentBounds.equals( new Bounds( 15, 10, 15, 10 ) ) );
