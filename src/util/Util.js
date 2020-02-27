@@ -391,14 +391,14 @@ define( require => {
      * @public
      *
      * @param {Object} object
+     * @returns {Object} - the frozen object
      */
     deepFreeze( object ) {
-
       // Ensure the standard sim query parameters have been loaded and parsed before checking if assertions are enabled.
       assert( StandardSimQueryParameters, 'StandardSimQueryParameters must be loaded before freezing' );
 
       // Only freezes if assertions are enabled. See Util/assert for more documentation.
-      if ( assert.enabled === false ) return;
+      if ( assert.enabled === false ) return object;
 
       Object.freeze( object );
 
@@ -411,6 +411,7 @@ define( require => {
           Util.deepFreeze( object[ property ] );
         }
       } );
+      return object;
     }
   };
 

@@ -329,14 +329,10 @@ define( require => {
   //========================================================================================
 
   // @public {Range} ZERO - a static Range that represents an empty Range with 0 length.
-  Range.ZERO = new Range( 0, 0 );
+  Range.ZERO = Util.deepFreeze( new Range( 0, 0 ) );
 
   // @public {Range} EVERYTHING - a static Range that contains all real numbers.
-  Range.EVERYTHING = new Range( Number.NEGATIVE_INFINITY, Number.POSITIVE_INFINITY );
-
-  // Conditionally freeze Range.ZERO and Range.EVERYTHING to ensure that they are constant.
-  Util.deepFreeze( Range.ZERO );
-  Util.deepFreeze( Range.EVERYTHING );
+  Range.EVERYTHING = Util.deepFreeze( new Range( Number.NEGATIVE_INFINITY, Number.POSITIVE_INFINITY ) );
 
   return Range;
 } );
