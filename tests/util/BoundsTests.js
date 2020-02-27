@@ -166,9 +166,8 @@ define( require => {
     truenit.ok( A.copy().includePoint( new Vector( 2, 3 ) ).equals( A ), 'includePoint' );
     truenit.ok( Bounds.ZERO.copy().includePoint( new Vector( 2, 3 ) ).equals( B ), 'includePoint' );
 
-    // includeCoordinate
-    truenit.ok( A.copy().includeCoordinate( 6, 6 ).equals( new Bounds( 1, 2, 6, 6 ) ), 'includeCoordinate' );
-    truenit.ok( A.copy().includeCoordinate( 0, 0 ).equals( new Bounds( 0, 0, 3, 4 ) ), 'includeCoordinate' );
-    truenit.ok( Bounds.ZERO.copy().includeCoordinate( 2, 3 ).equals( B ), 'includeCoordinate' );
+    // includeBounds/intersectBounds
+    truenit.ok( A.copy().includeBounds( B ).equals( new Bounds( 0, 0, 3, 4 ) ), 'includeBounds' );
+    truenit.ok( A.copy().intersectBounds( B ).equals( new Bounds( 1, 2, 2, 3 ) ), 'intersectBounds' );
   };
 } );

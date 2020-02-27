@@ -429,31 +429,50 @@ define( require => {
     }
 
     /**
-     * Modifies this bounds such that it is smallest bounds that contains this bounds and the coordinate (x, y).
-     * @public
-     *
-     * @param {number} x
-     * @param {number} y
-     * @returns {Bounds} - for chaining
-     */
-    includeCoordinate( x, y ) {
-      assert( typeof x === 'number', `invalid x: ${ x }` );
-      assert( typeof y === 'number', `invalid y: ${ y }` );
-      return this.setAll(
-        Math.min( this.minX, x ),
-        Math.min( this.minY, y ),
-        Math.max( this.maxX, x ),
-        Math.max( this.maxY, y ) );
-    }
-
-    /**
-     * Modifies this bounds such that it is smallest bounds that contains this bounds and the point (x,y).
+     * Modifies this bounds such that it is smallest bounds that contains this bounds and the the point (x, y).
      * @public
      *
      * @param {Vector} point - the point to include in the bounds
      * @returns {Bounds} - for chaining
      */
-    includePoint( point ) { return this.includeCoordinate( point.x, point.y ); }
+    includePoint( point ) {
+      assert( point instanceof Vector && point.isFinite(), `invalid point: ${ point }` );
+      return this.setAll(
+        Math.min( this.minX, point.x ),
+        Math.min( this.minY, point.y ),
+        Math.max( this.maxX, point.x ),
+        Math.max( this.maxY, point.y ) );
+    }
+
+    /**
+     * Modifies this bounds so that it contains both its original bounds and the input bounds.
+     * This is the mutable form of the `union()` method.
+     * @public
+     *
+     * @param {Bounds} bounds
+     * @returns {Bounds}
+     */
+    includeBounds( bounds ) {
+      assert( bounds instanceof Bounds, `invalid bounds: ${ bounds }` );
+      this.xRange.includeRange( bounds.xRange );
+      this.yRange.includeRange( bounds.yRange );
+      return this;
+    }
+
+    /**
+     * Modifies this bounds so that it is smallest bounds that is contained by both the original bounds and the input
+     * bounds. This is the mutable form of the `intersection()` method.
+     * @public
+     *
+     * @param {Bounds} bounds
+     * @returns {Bounds}
+     */
+    intersectBounds( bounds ) {
+      assert( bounds instanceof Bounds, `invalid bounds: ${ bounds }` );
+      this.xRange.intersectRange( bounds.xRange );
+      this.yRange.intersectRange( bounds.yRange );
+      return this;
+    }
   }
 
   //========================================================================================
@@ -470,10 +489,7 @@ define( require => {
    * @param {number} height - the height (maxY - minY) of the bounds.
    * @returns {Bounds}
    */
-  Bounds.rect = ( x, y, width, height ) => {
-    return new Bounds( x, y, x + width, y + height );
-  };
-
+  Bounds.rect = ( x, y, width, height ) => new Bounds( x, y, x + width, y + height );
   /**
    * Returns a new Bounds object, constructed with points <minPoint, maxPoint>.
    * @public
@@ -482,9 +498,7 @@ define( require => {
    * @param {Vector} maxPoint - the minimum point for the bounds.
    * @returns {Bounds}
    */
-  Bounds.withPoints = ( minPoint, maxPoint ) => {
-    return new Bounds( minPoint.x, minPoint.y, maxPoint.x, maxPoint.y );
-  };
+  Bounds.withPoints = ( minPoint, maxPoint ) => new Bounds( minPoint.x, minPoint.y, maxPoint.x, maxPoint.y );
 
   /**
    * Returns a new Bounds object, constructed with ranges in the form <xRange, yRange>.
@@ -501,19 +515,15 @@ define( require => {
   };
 
   // @public {Bounds} ZERO - a static Bounds that represents an empty Bounds with 0 width and height
-  Bounds.ZERO = new Bounds( 0, 0, 0, 0 );
+  Bounds.ZERO = Util.deepFreeze( new Bounds( 0, 0, 0, 0 ) );
 
   // @public {Bounds} EVERYTHING - a static Bounds that contains infinite width and height and contains all real numbers
-  Bounds.EVERYTHING = new Bounds(
+  Bounds.EVERYTHING = Util.deepFreeze( new Bounds(
     Number.NEGATIVE_INFINITY,
     Number.NEGATIVE_INFINITY,
     Number.POSITIVE_INFINITY,
     Number.POSITIVE_INFINITY
-  );
-
-  // Conditionally freeze Bounds.ZERO and Bounds.EVERYTHING to ensure that they are constant.
-  Util.deepFreeze( Bounds.ZERO );
-  Util.deepFreeze( Bounds.EVERYTHING );
+  ) );
 
   return Bounds;
 } );
