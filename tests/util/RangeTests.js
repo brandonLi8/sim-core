@@ -82,6 +82,11 @@ define( require => {
     truenit.ok( A.union( A ).equals( A ), 'union' );
     truenit.ok( A.union( new Range( 1, 1.5 ) ).equals( A ), 'union' );
 
+    // intersection
+    truenit.ok( A.intersection( new Range( 0, 1.5 ) ).equals( new Range( 1, 1.5 ) ), 'intersection' );
+    truenit.ok( A.intersection( A ).equals( A ), 'intersection' );
+    truenit.ok( A.intersection( new Range( 1.5, 2.5 ) ).equals( new Range( 1.5, 2 ) ), 'intersection' );
+
     //----------------------------------------------------------------------------------------
     // Mutators
     //----------------------------------------------------------------------------------------
@@ -104,5 +109,15 @@ define( require => {
     // shift
     truenit.ok( A.copy().shift( 0 ).equals( A.copy() ), 'shift' );
     truenit.ok( A.copy().shift( 5 ).equals( new Range( 6, 7 ) ), 'shift' );
+
+    // includeRange
+    truenit.ok( A.copy().includeRange( new Range( 0, 1.5 ) ).equals( new Range( 0, 2 ) ), 'includeRange' );
+    truenit.ok( A.copy().includeRange( A ).equals( A ), 'includeRange' );
+    truenit.ok( A.copy().includeRange( new Range( 1, 1.5 ) ).equals( A ), 'includeRange' );
+
+    // intersectRange
+    truenit.ok( A.copy().intersectRange( new Range( 0, 1.5 ) ).equals( new Range( 1, 1.5 ) ), 'intersectRange' );
+    truenit.ok( A.copy().intersectRange( A ).equals( A ), 'intersectRange' );
+    truenit.ok( A.copy().intersectRange( new Range( 1.5, 2.5 ) ).equals( new Range( 1.5, 2 ) ), 'intersectRange' );
   };
 } );

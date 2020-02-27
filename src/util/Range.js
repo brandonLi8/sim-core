@@ -296,6 +296,32 @@ define( require => {
       assert( typeof amount === 'number', `invalid amount: ${ amount }` );
       return this.expand( -amount, amount );
     }
+
+    /**
+     * Modifies this range so that it contains both its original range and the input range.
+     * This is the mutable form of the `union()` method.
+     * @public
+     *
+     * @param {Range} range
+     * @returns {Range}
+     */
+    includeRange( range ) {
+      assert( range instanceof Range, `invalid range: ${ range }` );
+      return this.setMinMax( Math.min( this.min, range.min ), Math.max( this.max, range.max ) );
+    }
+
+    /**
+     * Modifies this range so that it is smallest range that is contained by both the original range and the input range
+     * This is the mutable form of the `intersection()` method.
+     * @public
+     *
+     * @param {Range} range
+     * @returns {Range}
+     */
+    intersectRange( range ) {
+      assert( range instanceof Range, `invalid range: ${ range }` );
+      return this.setMinMax( Math.max( this.min, range.min ), Math.min( this.max, range.max ) );
+    }
   }
 
   //========================================================================================
