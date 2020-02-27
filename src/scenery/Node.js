@@ -395,7 +395,7 @@ define( require => {
     translate( translation ) {
       assert( translation instanceof Vector && translation.isFinite(), `invalid translation: ${ translation }` );
       this._bounds.shift( translation.x, translation.y );
-      this.layout( this._screenViewScale );
+      // this.layout( this._screenViewScale );
     }
 
     /**
@@ -469,8 +469,8 @@ define( require => {
           return result.setAll(
             parentBounds.minX + currentBounds.minX,
             parentBounds.minY + currentBounds.minY,
-            currentBounds.width,
-            currentBounds.height
+            parentBounds.minX + currentBounds.minX + currentBounds.width,
+            parentBounds.minY + currentBounds.minY + currentBounds.height
           );
         }
       }

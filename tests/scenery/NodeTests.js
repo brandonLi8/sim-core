@@ -42,11 +42,11 @@ define( require => {
 
 
 
-    // screenView.addChild( A );
+    screenView.addChild( A );
 
-    // truenit.ok( A.localBounds.equals( Bounds.ZERO ) );
-    // truenit.ok( A.parentBounds.equals( new Bounds( 15, 10, 15, 10 ) ) );
-    // truenit.ok( A.globalBounds.equals( new Bounds( 15, 10, 15, 10 ) ) );
+    truenit.ok( A.localBounds.equals( Bounds.ZERO ) );
+    truenit.ok( A.bounds.equals( new Bounds( 15, 10, 15, 10 ) ) );
+    truenit.ok( A.globalBounds.equals( new Bounds( 15, 10, 15, 10 ) ) );
 
 
     // // Test 2: Child of Root Node
