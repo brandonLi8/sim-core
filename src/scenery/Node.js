@@ -41,7 +41,7 @@ define( require => {
   const Bounds = require( 'SIM_CORE/util/Bounds' );
   const DOMObject = require( 'SIM_CORE/core-internal/DOMObject' );
   const Vector = require( 'SIM_CORE/util/Vector' );
-
+  const ScreenView = require( 'SIM_CORE/scenery/ScreenView' );
   class Node extends DOMObject {
 
     /**
@@ -70,13 +70,13 @@ define( require => {
         cursor: null,       // {string} - Alias of the CSS cursor of the Node. See set cursor() for doc.
         visible: true,      // {boolean} - Indicates if the Node is visible. See set visible() for more doc.
         opacity: 1,         // {number} - Alias of the CSS opacity of the Node. See set opacity() for more doc.
-        maxWidth: null,     // {number} - If provided, constrains width of this Node. See set maxWidth() for more doc.
-        maxHeight: null,    // {number} - If provided, constrains height of this Node. See set maxHeight() for more doc.
+        // maxWidth: null,     // {number} - If provided, constrains width of this Node. See set maxWidth() for more doc.
+        // maxHeight: null,    // {number} - If provided, constrains height of this Node. See set maxHeight() for more doc.
 
         // transformations
-        translation: null,  // {Vector} - If provided, (x, y) translation of the Node. See set translation() for more doc.
-        rotation: 0,        // {number} - rotation (in radians) of the Node. See set rotation() for more doc.
-        scale: 1,           // {Vector|number} - scale of the Node. See scale() for more doc.
+        // translation: null,  // {Vector} - If provided, (x, y) translation of the Node. See set translation() for more doc.
+        // rotation: 0,        // {number} - rotation (in radians) of the Node. See set rotation() for more doc.
+        // scale: 1,           // {Vector|number} - scale of the Node. See scale() for more doc.
 
         // Overrides the location of the Node, if provided.
         topLeft: null,      // {Vector} - The upper-left corner of this Node's bounds. See setLocation() for more doc.
@@ -95,8 +95,8 @@ define( require => {
         centerX: null,      // {number} - The x-center of this Node's bounds. See setLocation() for more doc.
         centerY: null,      // {number} - The y-center of this Node's bounds. See setLocation() for more doc.
 
-        width: null,        // {number} - The width of the Node's bounds.
-        height: null        // {number} - The height of the Node's bounds. See setHeight() for more doc.
+        width: null,        // {number} - The width of the Node's bounds. See set width() for more doc.
+        height: null        // {number} - The height of the Node's bounds. See set height() for more doc.
       };
 
       // Rewrite options so that it overrides the defaults.
@@ -111,20 +111,20 @@ define( require => {
       this._visible = options.visible;
       this._opacity = options.opacity;
       this._cursor = options.cursor;
-      this._maxWidth = options.maxWidth;
-      this._maxHeight = options.maxHeight;
-      this._rotation = options.rotation;
-      this._scalar = typeof options.scale === 'number' ? new Vector( options.scale, options.scale ) : options.scale;
+      // this._maxWidth = options.maxWidth;
+      // this._maxHeight = options.maxHeight;
+      // this._rotation = options.rotation;
+      // this._scalar = typeof options.scale === 'number' ? new Vector( options.scale, options.scale ) : options.scale;
 
-      // @private {number} - Scale applied due to the maximum width and height constraints.
-      this._appliedScaleFactor = 1;
+      // // @private {number} - Scale applied due to the maximum width and height constraints.
+      // this._appliedScaleFactor = 1;
 
       // @protected {number} - screenViewScale in terms of global units per local unit for converting Scenery
       //                       coordinates to pixels. Referenced as soon as the scale is known in `layout()`
       this._screenViewScale = null;
 
       // @private {Bounds} - // Bounds for the Node and its children in the "parent" coordinate frame.
-      this._bounds = Bounds.ZERO.copy(); // Bounds for the Node and its children in the "parent" coordinate frame.
+      this._bounds = Bounds.ZERO.copy();
 
       // Check that there are no conflicting location setters.
       assert( Node.X_LOCATION_KEYS.filter( key => !!options[ key ] ).length <= 1, 'more than 1 x-mutator' );
@@ -155,6 +155,8 @@ define( require => {
      * @returns {*} See the property declaration for documentation of the type.
      */
     get bounds() { return this._bounds; }
+    get parentBounds() { return this._bounds; }
+    get globalBounds() { return this._computeGlobalBounds(); }
     get localBounds() { return this._bounds.copy().shift( -this._bounds.minX, -this._bounds.minY ); }
     get topLeft() { return this._bounds.bottomLeft; }
     get topCenter() { return this._bounds.bottomCenter; }
@@ -176,11 +178,11 @@ define( require => {
     get visible() { return this._visible; }
     get opacity() { return this._opacity; }
     get cursor() { return this._cursor; }
-    get maxWidth() { return this._maxWidth; }
-    get maxHeight() { return this._maxHeight; }
-    get scalar() { return this._scalar; }
-    get translation() { return this.topLeft; }
-    get rotation() { return this._rotation; }
+    // get maxWidth() { return this._maxWidth; }
+    // get maxHeight() { return this._maxHeight; }
+    // get scalar() { return this._scalar; }
+    // get translation() { return this.topLeft; }
+    // get rotation() { return this._rotation; }
 
     //----------------------------------------------------------------------------------------
     // Mutators
@@ -221,7 +223,7 @@ define( require => {
       assert( this[ name ] instanceof Vector, `invalid name: ${ name }` );
       assert( location instanceof Vector && location.isFinite(), `${ name } should be a finite Vector` );
       this.translate( location.copy().subtract( this[ name ] ) );
-      this.layout( this._screenViewScale );
+      // this.layout( this._screenViewScale );
     }
 
     /**
@@ -292,7 +294,7 @@ define( require => {
     set width( width ) {
       assert( !width || ( typeof width === 'number' && width > 0 ), `invalid width: ${ width }` );
       this._bounds.maxX = this._bounds.minX + width;
-      this._updateMaxDimension();
+      // this._updateMaxDimension();
     }
 
     /**
@@ -303,85 +305,85 @@ define( require => {
     set height( height ) {
       assert( !height || ( typeof height === 'number' && height > 0 ), `invalid height: ${ height }` );
       this._bounds.maxY = this._bounds.minY + height;
-      this._updateMaxDimension();
+      // this._updateMaxDimension();
     }
 
 
-    /**
-     * Sets the maximum width of the Node. Will Scale the Node down if the current width is greater than the maxWidth.
-     * @public
-     *
-     * @param {number|null} maxWidth - if null, there is not maxWidth
-     */
-    set maxWidth( maxWidth ) {
-      assert( !maxWidth || ( typeof maxWidth === 'number' && maxWidth > 0 ), `invalid maxWidth: ${ maxWidth }` );
-      if ( this._maxWidth !== maxWidth ) {
-        this._maxWidth = maxWidth;
-        this._updateMaxDimension();
-      }
-    }
+    // /**
+    //  * Sets the maximum width of the Node. Will Scale the Node down if the current width is greater than the maxWidth.
+    //  * @public
+    //  *
+    //  * @param {number|null} maxWidth - if null, there is not maxWidth
+    //  */
+    // set maxWidth( maxWidth ) {
+    //   assert( !maxWidth || ( typeof maxWidth === 'number' && maxWidth > 0 ), `invalid maxWidth: ${ maxWidth }` );
+    //   if ( this._maxWidth !== maxWidth ) {
+    //     this._maxWidth = maxWidth;
+    //     this._updateMaxDimension();
+    //   }
+    // }
 
-    /**
-     * Sets the maximum height of the Node. Will Scale the Node down if the current height is greater than the maxHeight
-     * @public
-     *
-     * @param {number|null} maxHeight - if null, there is not maxHeight
-     */
-    set maxHeight( maxHeight ) {
-      assert( !maxHeight || ( typeof maxHeight === 'number' && maxHeight > 0 ), `invalid maxHeight: ${ maxHeight }` );
-      if ( this._maxHeight !== maxHeight ) {
-        this._maxHeight = maxHeight;
-        this._updateMaxDimension();
-      }
-    }
+    // /**
+    //  * Sets the maximum height of the Node. Will Scale the Node down if the current height is greater than the maxHeight
+    //  * @public
+    //  *
+    //  * @param {number|null} maxHeight - if null, there is not maxHeight
+    //  */
+    // set maxHeight( maxHeight ) {
+    //   assert( !maxHeight || ( typeof maxHeight === 'number' && maxHeight > 0 ), `invalid maxHeight: ${ maxHeight }` );
+    //   if ( this._maxHeight !== maxHeight ) {
+    //     this._maxHeight = maxHeight;
+    //     this._updateMaxDimension();
+    //   }
+    // }
 
-    /**
-     * Scales the Node's Transformation. NOTE: May scale larger than the maxWidth or maxHeight. Scale is relative to
-     * the CURRENT width and height. To scale to original width and height, see set scaleMagnitude();
-     * @public
-     *
-     * This method is overloaded and has 2 method signatures:
-     * @param {number} s - Scales in both the X and Y directions. Example usage: scale( 5 );
-     *
-     * OR:
-     * @param {number} vector - Scales in each direction, as <xScale, yScale>
-     */
-    scale( a ) {
-      if ( a instanceof Vector ) {
-        assert( a.isFinite(), `invalid scale: ${ a }` );
-        this.scalar = this.scalar.copy().componentMultiply( a );
-      }
-      else {
-        assert( isFinite( a ), `invalid scale: ${ a }` );
-        this.scale( new Vector( a, a ) );
-      }
-    }
+    // *
+    //  * Scales the Node's Transformation. NOTE: May scale larger than the maxWidth or maxHeight. Scale is relative to
+    //  * the CURRENT width and height. To scale to original width and height, see set scaleMagnitude();
+    //  * @public
+    //  *
+    //  * This method is overloaded and has 2 method signatures:
+    //  * @param {number} s - Scales in both the X and Y directions. Example usage: scale( 5 );
+    //  *
+    //  * OR:
+    //  * @param {number} vector - Scales in each direction, as <xScale, yScale>
 
-    /**
-     * Scales the Node's Transformation. NOTE: May scale larger than the maxWidth or maxHeight. Scale is relative to
-     * ORIGNAL width and height, see set scalar();
-     * @public
-     *
-     * This method is overloaded and has 2 method signatures:
-     * @param {number} s - Scales in both the X and Y directions. Example usage: scale( 5 );
-     *
-     * OR:
-     * @param {number} vector - Scales in each direction, as <xScale, yScale>
-     */
-    set scalar( a ) {
-      if ( a instanceof Vector ) {
-        assert( a.isFinite(), `invalid scale: ${ a }` );
-        this._scalar = a;
-        const xExpansion = this.width * a.x - this.width;
-        const yExpansion = this.height * a.y - this.height;
-        this._bounds.expand( xExpansion / 2, yExpansion / 2, xExpansion / 2, yExpansion / 2 );
-        this.layout( this._screenViewScale );
-      }
-      else {
-        assert( isFinite( a ), `invalid scale: ${ a }` );
-        this.scalar = new Vector( a, a );
-      }
-    }
+    // scale( a ) {
+    //   if ( a instanceof Vector ) {
+    //     assert( a.isFinite(), `invalid scale: ${ a }` );
+    //     this.scalar = this.scalar.copy().componentMultiply( a );
+    //   }
+    //   else {
+    //     assert( isFinite( a ), `invalid scale: ${ a }` );
+    //     this.scale( new Vector( a, a ) );
+    //   }
+    // }
+
+    // /**
+    //  * Scales the Node's Transformation. NOTE: May scale larger than the maxWidth or maxHeight. Scale is relative to
+    //  * ORIGNAL width and height, see set scalar();
+    //  * @public
+    //  *
+    //  * This method is overloaded and has 2 method signatures:
+    //  * @param {number} s - Scales in both the X and Y directions. Example usage: scale( 5 );
+    //  *
+    //  * OR:
+    //  * @param {number} vector - Scales in each direction, as <xScale, yScale>
+    //  */
+    // set scalar( a ) {
+    //   if ( a instanceof Vector ) {
+    //     assert( a.isFinite(), `invalid scale: ${ a }` );
+    //     this._scalar = a;
+    //     const xExpansion = this.width * a.x - this.width;
+    //     const yExpansion = this.height * a.y - this.height;
+    //     this._bounds.expand( xExpansion / 2, yExpansion / 2, xExpansion / 2, yExpansion / 2 );
+    //     this.layout( this._screenViewScale );
+    //   }
+    //   else {
+    //     assert( isFinite( a ), `invalid scale: ${ a }` );
+    //     this.scalar = new Vector( a, a );
+    //   }
+    // }
 
     /**
      * Translates the Node, in the typical view coordinate frame (where positive y is down), relative to the CURRENT
@@ -407,45 +409,45 @@ define( require => {
       this.translate( this.translation.copy().negate().add( translation ) );
     }
 
-    /**
-     * Rotates this Node's relative to its CURRENT rotation, in radians.
-     * IMPORTANT: rotations will mess up localBounds and might lead to inaccurate positioning of the Node's subtree.
-     * @public
-     *
-     * @param {number} rotation - In radians
-     */
-    rotate( rotation ) { this.rotation = this.rotation + rotation; }
+    // /**
+    //  * Rotates this Node's relative to its CURRENT rotation, in radians.
+    //  * IMPORTANT: rotations will mess up localBounds and might lead to inaccurate positioning of the Node's subtree.
+    //  * @public
+    //  *
+    //  * @param {number} rotation - In radians
+    //  */
+    // rotate( rotation ) { this.rotation = this.rotation + rotation; }
 
-    /**
-     * Rotates this Node's relative to its CURRENT rotation, in radians.
-     * IMPORTANT: rotations will mess up localBounds and might lead to inaccurate positioning of the Node's subtree.
-     * @public
-     *
-     * @param {number} rotation - In radians
-     */
-    set rotation( rotation ) {
-      assert( typeof rotation === 'number' && isFinite( rotation ), `invalid rotation: ${ rotation }` );
-      this._rotation = rotation;
-      this.layout( this._screenViewScale );
-    }
+    // /**
+    //  * Rotates this Node's relative to its CURRENT rotation, in radians.
+    //  * IMPORTANT: rotations will mess up localBounds and might lead to inaccurate positioning of the Node's subtree.
+    //  * @public
+    //  *
+    //  * @param {number} rotation - In radians
+    //  */
+    // set rotation( rotation ) {
+    //   assert( typeof rotation === 'number' && isFinite( rotation ), `invalid rotation: ${ rotation }` );
+    //   this._rotation = rotation;
+    //   this.layout( this._screenViewScale );
+    // }
 
-    /**
-     * Updates the Node's scale and applied scale factor if we need to change our scale to fit within the maximum
-     * dimensions (maxWidth and maxHeight).
-     * @private
-     */
-    _updateMaxDimension() {
+    // /**
+    //  * Updates the Node's scale and applied scale factor if we need to change our scale to fit within the maximum
+    //  * dimensions (maxWidth and maxHeight).
+    //  * @private
+    //  */
+    // _updateMaxDimension() {
 
-      // Compute the new Scale given the maxWidth and maxHeight. Use min to ensure that dimensions are smaller.
-      const scale = Math.min(
-        this._maxWidth ? this._maxWidth / this.width : 1,
-        this._maxHeight ? this._maxHeight / this.height : 1
-      );
+    //   // Compute the new Scale given the maxWidth and maxHeight. Use min to ensure that dimensions are smaller.
+    //   const scale = Math.min(
+    //     this._maxWidth ? this._maxWidth / this.width : 1,
+    //     this._maxHeight ? this._maxHeight / this.height : 1
+    //   );
 
-      // Scale the Node to match the maxWidth or maxHeight and update the _appliedScaleFactor flag.
-      this.scale( scale / this._appliedScaleFactor );
-      this._appliedScaleFactor = scale;
-    }
+    //   // Scale the Node to match the maxWidth or maxHeight and update the _appliedScaleFactor flag.
+    //   this.scale( scale / this._appliedScaleFactor );
+    //   this._appliedScaleFactor = scale;
+    // }
 
     /**
      * Returns a bounding box for this Node (and its sub-tree) in the global coordinate frame. Must have ScreenView
@@ -455,17 +457,16 @@ define( require => {
      */
     _computeGlobalBounds() {
 
+      const result = Bounds.ZERO.copy();
       const traverser = ( currentNode ) => {
-        if ( currentNode instanceof require( 'SIM_CORE/scenery/ScreenView' ) ) {
-          return currentNode.viewBounds;
-        }
-        else if ( !currentNode.parent || !( currentNode.parent instanceof DOMObject ) ) {
-          return null;
-        }
+        assert( currentNode.parent instanceof DOMObject, 'must have a valid sub-tree to get global bounds' );
+
+        // Base Case
+        if ( currentNode instanceof ScreenView ) { return currentNode.viewBounds; }
         else {
           const parentBounds = traverser( currentNode.parent );
           const currentBounds = currentNode.bounds;
-          return Bounds.rect(
+          return result.setAll(
             parentBounds.minX + currentBounds.minX,
             parentBounds.minY + currentBounds.minY,
             currentBounds.width,
@@ -476,25 +477,6 @@ define( require => {
       return traverser( this );
     }
 
-    get parentBounds() {
-      assert( this.parent, 'cannot get parent bounds when node doesn\'t have a parent' );
-
-      const globalBounds = this._computeGlobalBounds();
-
-      if ( this.parent instanceof require( 'SIM_CORE/scenery/ScreenView' ) ) {
-        return globalBounds;
-      }
-
-      const parentGlobalBounds = this.parent._computeGlobalBounds();
-      return Bounds.rect(
-        globalBounds.minX - parentGlobalBounds.minX,
-        globalBounds.minY - parentGlobalBounds.minY,
-        this.width,
-        this.height
-      );
-    }
-
-    get globalBounds() { return this._computeGlobalBounds(); }
 
     /**
      * Called when the Node layout needs to be updated, typically when the browser window is resized.
@@ -502,37 +484,37 @@ define( require => {
      *
      * @param {number} scale - scale in terms of global units per local unit
      */
-    layout( scale ) {
-      if ( !scale ) return
+    // layout( scale ) {
+    //   if ( !scale ) return
 
-      if ( this.bounds.isFinite() ) {
-        const globalBounds = this._computeGlobalBounds();
+    //   if ( this.bounds.isFinite() ) {
+    //     const globalBounds = this._computeGlobalBounds();
 
 
-        if ( globalBounds ) {
+    //     if ( globalBounds ) {
 
-          const r = this.rotation;
-          const sx = this.scalar.x;
-          const sy = this.scalar.y;
-          const tx = globalBounds.bottomLeft.x;
-          const ty = globalBounds.bottomLeft.y;
-          const cx = this.center.x;
-          const cy = this.center.y;
+    //       const r = this.rotation;
+    //       const sx = this.scalar.x;
+    //       const sy = this.scalar.y;
+    //       const tx = globalBounds.bottomLeft.x;
+    //       const ty = globalBounds.bottomLeft.y;
+    //       const cx = this.center.x;
+    //       const cy = this.center.y;
 
-          // Compute the transformation matrix values. // NOTE: the toFixed calls are inlined for performance reasons.
-          const scaleX = ( Math.cos( r ) * sx ).toFixed( 10 );
-          const scaleY = ( Math.cos( r ) * sy ).toFixed( 10 );
-          const skewX = ( -1 * Math.sin( r ) * sx ).toFixed( 10 );
-          const skewY = ( Math.sin( r ) * sy ).toFixed( 10 );
-          const translateX = ( (-cx * Math.cos(r) + cy * Math.sin(r) + cx) * sx + tx ).toFixed( 10 ) * scale;
-          const translateY = ( (-cx * Math.sin(r) - cy * Math.cos(r) + cy) * sy + ty ).toFixed( 10 ) * scale;
-          this.style.transform = `matrix(${ scaleX },${ skewY },${ skewX },${ scaleY },${ translateX },${ translateY })`;
+    //       // Compute the transformation matrix values. // NOTE: the toFixed calls are inlined for performance reasons.
+    //       const scaleX = ( Math.cos( r ) * sx ).toFixed( 10 );
+    //       const scaleY = ( Math.cos( r ) * sy ).toFixed( 10 );
+    //       const skewX = ( -1 * Math.sin( r ) * sx ).toFixed( 10 );
+    //       const skewY = ( Math.sin( r ) * sy ).toFixed( 10 );
+    //       const translateX = ( (-cx * Math.cos(r) + cy * Math.sin(r) + cx) * sx + tx ).toFixed( 10 ) * scale;
+    //       const translateY = ( (-cx * Math.sin(r) - cy * Math.cos(r) + cy) * sy + ty ).toFixed( 10 ) * scale;
+    //       this.style.transform = `matrix(${ scaleX },${ skewY },${ skewX },${ scaleY },${ translateX },${ translateY })`;
 
-        }
-      }
+    //     }
+    //   }
 
-      this._screenViewScale = scale;
-    }
+    //   this._screenViewScale = scale;
+    // }
 
     /**
      * Ensures that all children are Node types, and updates the Node's bounds.
@@ -545,45 +527,26 @@ define( require => {
     addChild( child ) {
       assert( child instanceof Node, `invalid child: ${ child }` );
       super.addChild( child );
-      const childBounds = child.bounds.copy().shift( this.left, this.top );
-      this._bounds = this._bounds.union( childBounds );
+
+      // Include the child bounds within our parent coordinate frame.
       this._recomupteAllLocalBounds();
       return this;
     }
 
     _recomupteAllLocalBounds() {
 
-      const getSuperParent = ( currentNode ) => {
-        if ( currentNode instanceof require( 'SIM_CORE/scenery/ScreenView' ) ) {
-          return currentNode;
-        }
-        else if ( !currentNode.parent || !( currentNode.parent instanceof DOMObject ) ) {
-          return currentNode;
-        }
-        else {
-          return getSuperParent( currentNode.parent );
-        }
-      }
+      const updateNodeChildrenBounds = ( currentNode ) => {
 
-      const updateParentBounds = ( parent => {
-        console.log( parent.constructor.name )
-        let parentBounds = parent instanceof require( 'SIM_CORE/scenery/ScreenView' ) ? parent.viewBounds : parent.localBounds;
-        let left = parent instanceof require( 'SIM_CORE/scenery/ScreenView' ) ? 0 : parent.left;
-        let top = parent instanceof require( 'SIM_CORE/scenery/ScreenView' ) ? 0 : parent.top;
-
-        console.log( parentBounds,left, top)
-        parent.children.forEach( child => {
-          console.log( 'child', child.bounds.copy().shift( left, top ) )
-          parentBounds = parentBounds.union( child.bounds );
+        currentNode.children.forEach( child => {
+          currentNode._bounds.includeBounds( child.bounds.copy().shift( currentNode.left, currentNode.top ) );
         } );
-        parent._bounds = parentBounds;
-        console.log( 'after', parent._bounds );
 
-        parent.children.forEach( updateParentBounds.bind( this ) );
-      } );
-      updateParentBounds( getSuperParent( this ) );
+        if ( currentNode.parent ) {
+          if ( !( currentNode.parent instanceof ScreenView ) ) updateNodeChildrenBounds( currentNode.parent );
+        }
+      };
+      updateNodeChildrenBounds( this );
     }
-
   }
 
   Node.X_LOCATION_KEYS = [ 'translation', 'left', 'right',

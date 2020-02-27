@@ -59,7 +59,7 @@ define( require => {
      * @returns {ScreenView} - Returns 'this' reference, for chaining
      */
     addChild( child ) {
-      assert( child instanceof require( 'SIM_CORE/scenery/Node' ), `invalid child: ${ child }` );
+      // assert( child instanceof ( require( 'SIM_CORE/scenery/Node' ) ), `invalid child: ${ child }` );
       return super.addChild( child );
     }
 
