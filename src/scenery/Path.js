@@ -42,29 +42,30 @@ define( require => {
       super( options );
 
       // @private
-      this._shape = shape;
+      this._shape = shape ? Util.deepFreeze( shape ) : shape;
+      if ( this._shape ) this._bounds = this._shape.bounds.copy();
+
+      this.addAttributes( {
+        fill: options.fill,
+        stroke: options.stroke,
+        'stroke-width': options.strokeWidth
+      } );
     }
 
 
     setShape( shape ) {
-      this._shape = shape;
-
-      // Make the shape immutable
-      Util.deepFreeze( this._shape );
-      this._draw();
+      this._shape = shape ? Util.deepFreeze( shape ) : shape;
+      if ( this._shape ) this._bounds = this._shape.bounds.copy();
+      this.layout();
     }
 
     layout( scale ) {
-
-      super.layout( scale );
-      this.addAttributes( {
-        x: `${ scale * this.x }px`,
-        y: `${ scale * this.y }px`,
-        rx: `${ scale * this.cornerRadius }px`,
-        ry: `${ scale * this.cornerRadius }px`
+      this._shape && this.addAttributes( {
+        d: this._shape.getSVGPath( scale )
       } );
+      super.layout( scale );
     }
   }
 
-  return Rectangle;
+  return Path;
 } );

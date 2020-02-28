@@ -29,7 +29,9 @@ define( require => {
   // modules
   const assert = require( 'SIM_CORE/util/assert' );
   const DOMObject = require( 'SIM_CORE/core-internal/DOMObject' );
+  const Path = require( 'SIM_CORE/scenery/Path' );
   const ScreenView = require( 'SIM_CORE/scenery/ScreenView' );
+  const Shape = require( 'SIM_CORE/util/Shape' );
   const Text = require( 'SIM_CORE/scenery/Text' );
   const Vector = require( 'SIM_CORE/util/Vector' );
 
