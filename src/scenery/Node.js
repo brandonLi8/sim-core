@@ -132,8 +132,8 @@ define( require => {
       assert( Node.Y_LOCATION_KEYS.filter( key => !!options[ key ] ).length <= 1, 'more than 1 y-mutator' );
 
       // Call the mutators of this instance for the location options that were provided.
-      Object.keys( options ).forEach( key => {
-        if ( options[ key ] ) {
+      Node.BOUNDS_MUTATORS.forEach( ( key, index ) => {
+        if ( options[ key ] && Node.BOUNDS_MUTATORS.indexOf( key ) === index ) {
           const descriptor = Object.getOwnPropertyDescriptor( Node.prototype, key );
 
           // If the key refers to a setter, it will call the setter with the option value.
@@ -576,6 +576,8 @@ define( require => {
                            'centerY', 'topCenter', 'topRight',
                            'centerLeft', 'center', 'centerRight',
                            'bottomLeft', 'bottomCenter', 'bottomRight' ];
+
+  Node.BOUNDS_MUTATORS = [ 'width', 'height', ...Node.X_LOCATION_KEYS, ...Node.Y_LOCATION_KEYS ];
 
 
   return Node;

@@ -55,17 +55,6 @@ define( require => {
         stroke: options.stroke,
         'stroke-width': options.strokeWidth
       } );
-
-      // Call the mutators of this instance for the location options that were provided.
-      Object.keys( options ).forEach( key => {
-        if ( options[ key ] ) {
-          const descriptor = Object.getOwnPropertyDescriptor( Node.prototype, key );
-
-          // If the key refers to a setter, it will call the setter with the option value.
-          if ( descriptor && typeof descriptor.value === 'function' ) this[ key ]( options[ key ] );
-          if ( descriptor && typeof descriptor.set === 'function' ) this[ key ] = options[ key ];
-        }
-      } );
     }
 
 
