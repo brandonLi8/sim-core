@@ -338,15 +338,25 @@ define( require => {
      * Although Shape supports relative placements (moveToRelative, lineToRelative ...), the getSVGPath() d-attribute
      * string will only use the base absolute upper-case commands and not the lower-case relative commands.
      *
+     * @param {number} [scale=1] - option to scale the Shape (usually to scale scenery coordinates to pixels).
      * @returns {string}
      */
-    getSVGPath() {
+    getSVGPath( scale = 1 ) {
       let result = '';
       this._subpaths.forEach( subpath => {
-        if ( [ 'M', 'L', 'A' ].includes( subpath.cmd ) ) {
+        if ( subpath.cmd === 'M' || subpath.cmd === 'L' ) {
           // Round each number in the subpaths to a maximum of 10 numbers to prevent exponentials.
-          const argsString = subpath.args.map( num => parseFloat( num.toFixed( 10 ) ) ).join( ' ' );
+          const argsString = subpath.args.map( num => parseFloat( ( num * scale ).toFixed( 10 ) ) ).join( ' ' );
           result += `${ subpath.cmd } ${ argsString } `;
+        }
+        else if ( subpath.cmd === 'A' ) {
+          const args = subpath.args.slice();
+          args[ 0 ] = args[ 0 ] * scale;
+          args[ 1 ] = args[ 1 ] * scale;
+          args[ 5 ] = args[ 5 ] * scale;
+          args[ 6 ] = args[ 6 ] * scale;
+          // Round each number in the subpaths to a maximum of 10 numbers to prevent exponentials.
+          result += `${ subpath.cmd } ${ args.map( num => parseFloat( num.toFixed( 10 ) ) ).join( ' ' ) } `;
         }
         else if ( subpath.cmd === 'Z' ) { result += 'Z '; }
         else { assert( false, `unrecognized command: ${ subpath.cmd }` ); }
