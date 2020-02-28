@@ -13,6 +13,7 @@ define( require => {
   const assert = require( 'SIM_CORE/util/assert' );
   const Node = require( 'SIM_CORE/scenery/Node' );
   const Shape = require( 'SIM_CORE/util/Shape' );
+  const Util = require( 'SIM_CORE/util/Util' );
 
   class Path extends Node {
 
@@ -45,8 +46,9 @@ define( require => {
       this._shape = shape ? Util.deepFreeze( shape ) : shape;
       if ( this._shape ) this._bounds = this._shape.bounds.copy();
 
+      this._strokeWidth = options.strokeWidth;
       this.addAttributes( {
-        fill: options.fill,
+        fill: options.fill ? options.fill : 'none',
         stroke: options.stroke,
         'stroke-width': options.strokeWidth
       } );
@@ -63,7 +65,12 @@ define( require => {
       this._shape && this.addAttributes( {
         d: this._shape.getSVGPath( scale )
       } );
-      super.layout( scale );
+
+      if ( this._strokeWidth ) {
+        this.addAttributes( {
+          'stroke-width': Math.max( this._strokeWidth * scale, 1 )
+        } );
+      }
     }
   }
 
