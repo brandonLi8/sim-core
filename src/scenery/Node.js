@@ -40,8 +40,9 @@ define( require => {
   const assert = require( 'SIM_CORE/util/assert' );
   const Bounds = require( 'SIM_CORE/util/Bounds' );
   const DOMObject = require( 'SIM_CORE/core-internal/DOMObject' );
-  const Vector = require( 'SIM_CORE/util/Vector' );
   const ScreenView = require( 'SIM_CORE/scenery/ScreenView' );
+  const Vector = require( 'SIM_CORE/util/Vector' );
+
   class Node extends DOMObject {
 
     /**
@@ -74,26 +75,26 @@ define( require => {
         // maxHeight: null,    // {number} - If provided, constrains height of this Node. See set maxHeight() for more doc.
 
         // transformations
-        // translation: null,  // {Vector} - If provided, (x, y) translation of the Node. See set translation() for more doc.
+        translation: null,  // {Vector} - If provided, (x, y) translation of the Node. See set translation() for more doc.
         // rotation: 0,        // {number} - rotation (in radians) of the Node. See set rotation() for more doc.
         // scale: 1,           // {Vector|number} - scale of the Node. See scale() for more doc.
 
-        // Overrides the location of the Node, if provided.
-        topLeft: null,      // {Vector} - The upper-left corner of this Node's bounds. See setLocation() for more doc.
-        topCenter: null,    // {Vector} - The top-center of this Node's bounds. See setLocation() for more doc.
-        topRight: null,     // {Vector} - The upper-right corner of this Node's bounds. See setLocation() for more doc.
-        centerLeft: null,   // {Vector} - The left-center of this Node's bounds. See setLocation() for more doc.
-        center: null,       // {Vector} - The center of this Node's bounds. See setLocation() for more doc.
+        // Overrides the location of the Node, if provided. See setLocation() for more doc.
+        topLeft: null,      // {Vector} - The upper-left corner of this Node's bounds.
+        topCenter: null,    // {Vector} - The top-center of this Node's bounds.
+        topRight: null,     // {Vector} - The upper-right corner of this Node's bounds.
+        centerLeft: null,   // {Vector} - The left-center of this Node's bounds.
+        center: null,       // {Vector} - The center of this Node's bounds.
         centerRight: null,  // {Vector} - The center-right of this Node's bounds. See seLocation() for more doc.
-        bottomLeft: null,   // {Vector} - The bottom-left of this Node's bounds. See setLocation() for more doc.
-        bottomCenter: null, // {Vector} - The middle center of this Node's bounds. See setLocation() for more doc.
-        bottomRight: null,  // {Vector} - The bottom right of this Node's bounds. See setLocation() for more doc.
-        left: null,         // {number} - The left side of this Node's bounds. See setLocation() for more doc.
-        right: null,        // {number} - The right side of this Node's bounds. See setLocation() for more doc.
-        top: null,          // {number} - The top side of this Node's bounds. See setLocation() for more doc.
-        bottom: null,       // {number} - The bottom side of this Node's bounds. See setLocation() for more doc.
-        centerX: null,      // {number} - The x-center of this Node's bounds. See setLocation() for more doc.
-        centerY: null,      // {number} - The y-center of this Node's bounds. See setLocation() for more doc.
+        bottomLeft: null,   // {Vector} - The bottom-left of this Node's bounds.
+        bottomCenter: null, // {Vector} - The middle center of this Node's bounds.
+        bottomRight: null,  // {Vector} - The bottom right of this Node's bounds.
+        left: null,         // {number} - The left side of this Node's bounds.
+        right: null,        // {number} - The right side of this Node's bounds.
+        top: null,          // {number} - The top side of this Node's bounds.
+        bottom: null,       // {number} - The bottom side of this Node's bounds.
+        centerX: null,      // {number} - The x-center of this Node's bounds.
+        centerY: null,      // {number} - The y-center of this Node's bounds.
 
         width: null,        // {number} - The width of the Node's bounds. See set width() for more doc.
         height: null        // {number} - The height of the Node's bounds. See set height() for more doc.
