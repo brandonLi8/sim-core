@@ -529,11 +529,41 @@ define( require => {
       super.addChild( child );
 
       // Include the child bounds within our parent coordinate frame.
-      this._recomupteAllLocalBounds();
+      this._recomupteAllBounds();
       return this;
     }
 
-    _recomupteAllLocalBounds() {
+    /**
+     * Removes a child DOMObject from our list of children. Will fail an assertion if the Object is not currently one of
+     * our children.
+     * @public
+     *
+     * @param {DOMObject} child
+     * @returns {DOMObject} - Returns 'this' reference, for chaining
+     */
+    removeChild( child ) {
+      assert( child instanceof Node, `invalid child: ${ child }` );
+      super.removeChild( child );
+
+      // Include the child bounds within our parent coordinate frame.
+      this._invalidateAllBounds();
+      this._recomupteAllBounds();
+      return this;
+    }
+
+
+    _invalidateAllBounds() {
+      const invalidator = ( currentNode ) => {
+        currentNode._bounds.setAll( currentNode.left, currentNode.top, currentNode.left, currentNode.top );
+
+        if ( currentNode.parent ) {
+          if ( !( currentNode.parent instanceof ScreenView ) ) invalidator( currentNode.parent );
+        }
+      }
+      invalidator( this );
+    }
+
+    _recomupteAllBounds() {
 
       const updateNodeChildrenBounds = ( currentNode ) => {
 
