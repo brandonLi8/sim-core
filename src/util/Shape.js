@@ -338,23 +338,26 @@ define( require => {
      * Although Shape supports relative placements (moveToRelative, lineToRelative ...), the getSVGPath() d-attribute
      * string will only use the base absolute upper-case commands and not the lower-case relative commands.
      *
+     * @param {Vector} [origin=Vector.ZERO] - option to set the origin and translate the Shape path, for use in Path.
      * @param {number} [scale=1] - option to scale the Shape (usually to scale scenery coordinates to pixels).
      * @returns {string}
      */
-    getSVGPath( scale = 1 ) {
+    getSVGPath( origin = Vector.ZERO, scale = 1 ) {
       let result = '';
       this._subpaths.forEach( subpath => {
         if ( subpath.cmd === 'M' || subpath.cmd === 'L' ) {
+          const args = subpath.args.slice();
+          args[ 0 ] = ( args[ 0 ] + origin.x ) * scale;
+          args[ 1 ] = ( args[ 1 ] + origin.y ) * scale;
           // Round each number in the subpaths to a maximum of 10 numbers to prevent exponentials.
-          const argsString = subpath.args.map( num => parseFloat( ( num * scale ).toFixed( 10 ) ) ).join( ' ' );
-          result += `${ subpath.cmd } ${ argsString } `;
+          result += `${ subpath.cmd } ${ args.map( num => parseFloat( num.toFixed( 10 ) ) ).join( ' ' ) } `;
         }
         else if ( subpath.cmd === 'A' ) {
           const args = subpath.args.slice();
-          args[ 0 ] = args[ 0 ] * scale;
-          args[ 1 ] = args[ 1 ] * scale;
-          args[ 5 ] = args[ 5 ] * scale;
-          args[ 6 ] = args[ 6 ] * scale;
+          args[ 0 ] = ( args[ 0 ] * scale );
+          args[ 1 ] = ( args[ 1 ] * scale );
+          args[ 5 ] = ( args[ 5 ] + origin.x ) * scale;
+          args[ 6 ] = ( args[ 6 ] + origin.y ) * scale;
           // Round each number in the subpaths to a maximum of 10 numbers to prevent exponentials.
           result += `${ subpath.cmd } ${ args.map( num => parseFloat( num.toFixed( 10 ) ) ).join( ' ' ) } `;
         }

@@ -14,6 +14,7 @@ define( require => {
   const Node = require( 'SIM_CORE/scenery/Node' );
   const Shape = require( 'SIM_CORE/util/Shape' );
   const Util = require( 'SIM_CORE/util/Util' );
+  const Vector = require( 'SIM_CORE/util/Vector' );
 
   class Path extends Node {
 
@@ -37,6 +38,9 @@ define( require => {
         stroke: null,
         strokeWidth: null,
 
+        width: shape.bounds.width,
+        height: shape.bounds.height,
+
         // Rewrite options so that it overrides the defaults.
         ...options
       };
@@ -44,7 +48,6 @@ define( require => {
 
       // @private
       this._shape = shape ? Util.deepFreeze( shape ) : shape;
-      if ( this._shape ) this._bounds = this._shape.bounds.copy();
 
       this._strokeWidth = options.strokeWidth;
       this.addAttributes( {
@@ -52,18 +55,29 @@ define( require => {
         stroke: options.stroke,
         'stroke-width': options.strokeWidth
       } );
+
+      // Call the mutators of this instance for the location options that were provided.
+      Object.keys( options ).forEach( key => {
+        if ( options[ key ] ) {
+          const descriptor = Object.getOwnPropertyDescriptor( Node.prototype, key );
+
+          // If the key refers to a setter, it will call the setter with the option value.
+          if ( descriptor && typeof descriptor.value === 'function' ) this[ key ]( options[ key ] );
+          if ( descriptor && typeof descriptor.set === 'function' ) this[ key ] = options[ key ];
+        }
+      } );
     }
 
 
     setShape( shape ) {
       this._shape = shape ? Util.deepFreeze( shape ) : shape;
-      if ( this._shape ) this._bounds = this._shape.bounds.copy();
+      if ( this._shape ) this._bounds = this._shape.bounds.copy().shift( -this._shape.bounds.topLeft );
       this.layout();
     }
 
     layout( scale ) {
       this._shape && this.addAttributes( {
-        d: this._shape.getSVGPath( scale )
+        d: this._shape.getSVGPath( this._shape.bounds.bottomLeft.negate(), scale )
       } );
 
       if ( this._strokeWidth ) {
@@ -71,6 +85,7 @@ define( require => {
           'stroke-width': Math.max( this._strokeWidth * scale, 1 )
         } );
       }
+      super.layout( scale );
     }
   }
 

@@ -120,14 +120,16 @@ define( require => {
       this._screenView.addChild( this._titleLabel );
 
       const foregroundCircleShape = new Shape()
-        .moveToPoint( this._screenView.viewBounds.center.addXY( 0, 150 ) )
-        .arc( 100, -Math.PI / 2, 0, false )
+        .moveTo( 1000, 1000 )
+        .arc( 100, -Math.PI / 2, - 3 * Math.PI / 4, false )
 
       const foregroundCirclePath = new Path( foregroundCircleShape, {
         fill: 'blue',
         stroke: 'green',
-        strokeWidth: 14
+        strokeWidth: 1,
+        center: this._screenView.viewBounds.center
       } );
+      //
       this._screenView.addChild( foregroundCirclePath );
     }
 

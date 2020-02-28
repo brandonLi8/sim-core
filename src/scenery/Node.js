@@ -124,7 +124,7 @@ define( require => {
       //                       coordinates to pixels. Referenced as soon as the scale is known in `layout()`
       this._screenViewScale = null;
 
-      // @private {Bounds} - // Bounds for the Node and its children in the "parent" coordinate frame.
+      // @protected {Bounds} - Bounds for the Node and its children in the "parent" coordinate frame.
       this._bounds = Bounds.ZERO.copy();
 
       // Check that there are no conflicting location setters.
@@ -152,7 +152,7 @@ define( require => {
      * @returns {*} See the property declaration for documentation of the type.
      */
     get bounds() { return this._bounds; }
-    get parentBounds() { return this._bounds; }
+    get parentBounds() { return this._bounds; } // Alias
     get globalBounds() { return this._computeGlobalBounds(); }
     get localBounds() { return this._bounds.copy().shift( -this._bounds.minX, -this._bounds.minY ); }
     get topLeft() { return this._bounds.bottomLeft; }
@@ -178,7 +178,7 @@ define( require => {
     // get maxWidth() { return this._maxWidth; }
     // get maxHeight() { return this._maxHeight; }
     // get scalar() { return this._scalar; }
-    // get translation() { return this.topLeft; }
+    get translation() { return this.topLeft; }
     // get rotation() { return this._rotation; }
 
     //----------------------------------------------------------------------------------------
@@ -201,26 +201,32 @@ define( require => {
      */
     setLocation( name, location ) {
       assert( typeof name === 'string', `invalid name: ${ name }` );
-      assert( this._bounds.isFinite(),
-        `Cannot set ${ name } when the Node has invalid (empty/NaN/infinite) bounds.` );
+      assert( this._bounds.isFinite(), `Cannot set ${ name } when the Node has invalid (empty/NaN/infinite) bounds.` );
 
-      // horizontal shift
+      // Horizontal shift
       if ( [ 'left', 'right', 'centerX' ].includes( name ) ) {
-        assert( isFinite( location ), `${ name } should be a finite.` );
+        assert( isFinite( location ), `${ name } should be finite.` );
         return this.translate( new Vector( location - this[ name ], 0 ) );
       }
 
-      // vertical shift
+      // Vertical shift
       if ( [ 'top', 'bottom', 'centerY' ].includes( name ) ) {
-        assert( isFinite( location ), `${ name } should be a finite.` );
+        assert( isFinite( location ), `${ name } should be finite.` );
         return this.translate( new Vector( 0, location - this[ name ] ) );
       }
 
+      if ( this.constructor.name === 'Path' ) {
+        console.log( this.constructor.name, name, location, this._bounds.toString() )
+
+      }
       // At this point, the location must be a point location
-      assert( this[ name ] instanceof Vector, `invalid name: ${ name }` );
       assert( location instanceof Vector && location.isFinite(), `${ name } should be a finite Vector` );
       this.translate( location.copy().subtract( this[ name ] ) );
       this.layout( this._screenViewScale );
+      if ( this.constructor.name === 'Path' ) {
+        console.log( 'after', this._bounds.toString() )
+
+      }
     }
 
     /**
