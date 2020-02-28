@@ -136,13 +136,9 @@ define( require => {
         if ( options[ key ] ) {
           const descriptor = Object.getOwnPropertyDescriptor( Node.prototype, key );
 
-          // if the key refers to a function that is not ES5 writable, it will execute that function with the single argument
-          if ( descriptor && typeof descriptor.value === 'function' ) {
-            this[ key ]( options[ key ] );
-          }
-          if ( descriptor && typeof descriptor.set === 'function' ) {
-            this[ key ] = options[ key ];
-          }
+          // If the key refers to a setter, it will call the setter with the option value.
+          if ( descriptor && typeof descriptor.value === 'function' ) this[ key ]( options[ key ] );
+          if ( descriptor && typeof descriptor.set === 'function' ) this[ key ] = options[ key ];
         }
       } );
     }
