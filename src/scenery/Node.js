@@ -223,7 +223,7 @@ define( require => {
       assert( this[ name ] instanceof Vector, `invalid name: ${ name }` );
       assert( location instanceof Vector && location.isFinite(), `${ name } should be a finite Vector` );
       this.translate( location.copy().subtract( this[ name ] ) );
-      // this.layout( this._screenViewScale );
+      this.layout( this._screenViewScale );
     }
 
     /**
@@ -395,7 +395,7 @@ define( require => {
     translate( translation ) {
       assert( translation instanceof Vector && translation.isFinite(), `invalid translation: ${ translation }` );
       this._bounds.shift( translation.x, translation.y );
-      // this.layout( this._screenViewScale );
+      this.layout( this._screenViewScale );
     }
 
     /**
@@ -484,37 +484,20 @@ define( require => {
      *
      * @param {number} scale - scale in terms of global units per local unit
      */
-    // layout( scale ) {
-    //   if ( !scale ) return
+    layout( scale ) {
+      if ( !scale ) return
 
-    //   if ( this.bounds.isFinite() ) {
-    //     const globalBounds = this._computeGlobalBounds();
+      if ( this.bounds.isFinite() ) {
+        const globalBounds = this._computeGlobalBounds();
 
 
-    //     if ( globalBounds ) {
+        const translateX = ( this.left ).toFixed( 10 ) * scale;
+        const translateY = ( this.top ).toFixed( 10 ) * scale;
+        this.style.transform = `matrix(${ 1 },${ 0 },${ 0 },${ 1 },${ translateX },${ translateY })`;
+      }
 
-    //       const r = this.rotation;
-    //       const sx = this.scalar.x;
-    //       const sy = this.scalar.y;
-    //       const tx = globalBounds.bottomLeft.x;
-    //       const ty = globalBounds.bottomLeft.y;
-    //       const cx = this.center.x;
-    //       const cy = this.center.y;
-
-    //       // Compute the transformation matrix values. // NOTE: the toFixed calls are inlined for performance reasons.
-    //       const scaleX = ( Math.cos( r ) * sx ).toFixed( 10 );
-    //       const scaleY = ( Math.cos( r ) * sy ).toFixed( 10 );
-    //       const skewX = ( -1 * Math.sin( r ) * sx ).toFixed( 10 );
-    //       const skewY = ( Math.sin( r ) * sy ).toFixed( 10 );
-    //       const translateX = ( (-cx * Math.cos(r) + cy * Math.sin(r) + cx) * sx + tx ).toFixed( 10 ) * scale;
-    //       const translateY = ( (-cx * Math.sin(r) - cy * Math.cos(r) + cy) * sy + ty ).toFixed( 10 ) * scale;
-    //       this.style.transform = `matrix(${ scaleX },${ skewY },${ skewX },${ scaleY },${ translateX },${ translateY })`;
-
-    //     }
-    //   }
-
-    //   this._screenViewScale = scale;
-    // }
+      this._screenViewScale = scale;
+    }
 
     /**
      * Ensures that all children are Node types, and updates the Node's bounds.
@@ -530,6 +513,7 @@ define( require => {
 
       // Include the child bounds within our parent coordinate frame.
       this._recomupteAllBounds();
+      this.layout( this._screenViewScale );
       return this;
     }
 
@@ -548,6 +532,7 @@ define( require => {
       // Include the child bounds within our parent coordinate frame.
       this._invalidateAllBounds();
       this._recomupteAllBounds();
+      this.layout( this._screenViewScale );
       return this;
     }
 

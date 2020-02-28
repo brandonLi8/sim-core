@@ -147,7 +147,7 @@ define( require => {
         const currentTime = Date.now();
         const ellapsedTime = Math.min( Util.convertFrom( currentTime - lastStepTime, Util.MILLI ), config.maxDT );
         lastStepTime = currentTime;
-        fpsCounter.registerNewFrame( ellapsedTime );
+        fpsCounter && fpsCounter.registerNewFrame( ellapsedTime );
         // config.screens[ 0 ]._model.step && screen._model.step( ellapsedTime );
         // Sim._stepSimulationListeners.forEach( listener => { listener( ellapsedTime ); } );
 
