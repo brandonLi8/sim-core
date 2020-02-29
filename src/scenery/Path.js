@@ -77,6 +77,8 @@ define( require => {
       super.layout( scale );
     }
   }
+   Path.BOUNDS_MUTATORS = [ 'stroke-width', ...Node.BOUNDS_MUTATORS ];
+
 
   return Path;
 } );

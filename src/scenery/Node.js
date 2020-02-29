@@ -126,21 +126,7 @@ define( require => {
 
       // @protected {Bounds} - Bounds for the Node and its children in the "parent" coordinate frame.
       this._bounds = Bounds.ZERO.copy();
-
-      // Check that there are no conflicting location setters of the bounds of this Node.
-      assert( Node.X_BOUNDS_MUTATORS.filter( key => !!options[ key ] ).length <= 1, 'more than 1 x-mutator' );
-      assert( Node.Y_BOUNDS_MUTATORS.filter( key => !!options[ key ] ).length <= 1, 'more than 1 y-mutator' );
-
-      // Call the bounds mutators of this instance for the location options that were provided.
-      Node.BOUNDS_MUTATORS.forEach( ( key, index ) => {
-        if ( options[ key ] && Node.BOUNDS_MUTATORS.indexOf( key ) === index ) {
-          const descriptor = Object.getOwnPropertyDescriptor( Node.prototype, key );
-
-          // If the key refers to a setter, it will call the setter with the option value.
-          if ( descriptor && typeof descriptor.value === 'function' ) this[ key ]( options[ key ] );
-          if ( descriptor && typeof descriptor.set === 'function' ) this[ key ] = options[ key ];
-        }
-      } );
+      this.mutate( options );
     }
 
     /**
@@ -185,6 +171,35 @@ define( require => {
     //----------------------------------------------------------------------------------------
     // Mutators
     //----------------------------------------------------------------------------------------
+
+    /**
+     * Mutates multiple location setters in one function call. For instance, `Node.mutate( { top: 0, left: 5 } );`
+     * is equivalent to `Node.left = 5; Node.top = 0;`
+     * @public
+     *
+     * Mutators will be set in the order of the static field BOUNDS_MUTATORS, which subtypes can add to.
+     *
+     * @param {Object} [options]
+     */
+    mutate( options ) {
+      assert( !options || Object.getPrototypeOf( options ) === Object.prototype, `invalid options: ${ options }` );
+
+      // Check that there are no conflicting location setters of the bounds of this Node.
+      assert( this.constructor.X_BOUNDS_MUTATORS.filter( key => options[ key ] ).length <= 1, 'more than 1 x-mutator' );
+      assert( this.constructor.Y_BOUNDS_MUTATORS.filter( key => options[ key ] ).length <= 1, 'more than 1 y-mutator' );
+
+      // Call the bounds mutators of this instance for the location options that were provided.
+      this.constructor.BOUNDS_MUTATORS.forEach( ( key, index ) => {
+        if ( options[ key ] && Node.BOUNDS_MUTATORS.indexOf( key ) === index ) { // Ensure the option was provided
+          const descriptor = Object.getOwnPropertyDescriptor( Node.prototype, key );
+
+          // If the key refers to a setter, it will call the setter with the option value.
+          if ( descriptor && typeof descriptor.value === 'function' ) this[ key ]( options[ key ] );
+          else if ( descriptor && typeof descriptor.set === 'function' ) this[ key ] = options[ key ]; // ES5 setter.
+          else assert( false, `unrecognized mutator: ${ key }` );
+        }
+      } );
+    }
 
     /**
      * Convenience method that sets the one of the following locations of the Node's bounds to the specified point,
@@ -574,6 +589,25 @@ define( require => {
                            'centerLeft', 'center', 'centerRight',
                            'bottomLeft', 'bottomCenter', 'bottomRight' ];
 
+  /**
+   * @public (read-only)
+   * This is an array of property (setter) names for Node.mutate(), which are also used when creating nodes with
+   * parameter objects.
+   * @protected
+   *
+   * E.g. new scenery.Node( { x: 5, rotation: 20 } ) will create a Path, and apply setters in the order below
+   * (node.x = 5; node.rotation = 20)
+   *
+   * Some special cases exist (for function names). new scenery.Node( { scale: 2 } ) will actually call
+   * node.scale( 2 ).
+   *
+   * The order below is important! Don't change this without knowing the implications.
+   *
+   * NOTE: Translation-based mutators come before rotation/scale, since typically we think of their operations
+   *       occurring "after" the rotation / scaling
+   * NOTE: left/right/top/bottom/centerX/centerY are at the end, since they rely potentially on rotation / scaling
+   *       changes of bounds that may happen beforehand
+   */
   Node.BOUNDS_MUTATORS = [ 'width', 'height', ...Node.X_BOUNDS_MUTATORS, ...Node.Y_BOUNDS_MUTATORS ];
 
   return Node;
