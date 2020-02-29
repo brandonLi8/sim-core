@@ -360,6 +360,15 @@ define( require => {
     }
 
     /**
+     * Sets the values of this bounds to be equal to the input bounds.
+     * @public
+     *
+     * @param {Bounds} bounds
+     * @returns {Bounds} - for chaining
+     */
+    set( bounds ) { return this.setAll( bounds.minX, bounds.minY, bounds.maxX, bounds.maxY ); }
+
+    /**
      * Rounds each the edges of this bounds with Util.roundSymmetric.
      * @public
      *
