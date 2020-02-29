@@ -217,18 +217,10 @@ define( require => {
         return this.translate( new Vector( 0, location - this[ name ] ) );
       }
 
-      if ( this.constructor.name === 'Path' ) {
-        console.log( this.constructor.name, name, location, this._bounds.toString() )
-
-      }
       // At this point, the location must be a point location
       assert( location instanceof Vector && location.isFinite(), `${ name } should be a finite Vector` );
       this.translate( location.copy().subtract( this[ name ] ) );
       this.layout( this._screenViewScale );
-      if ( this.constructor.name === 'Path' ) {
-        console.log( 'after', this._bounds.toString() )
-
-      }
     }
 
     /**
@@ -393,8 +385,8 @@ define( require => {
     // }
 
     /**
-     * Translates the Node, in the typical view coordinate frame (where positive y is down), relative to the CURRENT
-     * position. See set translation() toe translate relative to the original position.
+     * Translates the Node, in the typical view coordinate frame (where the positive-y is downwards), relative to the
+     * current position.
      * @public
      *
      * @param {Vector} translation - the translation amount, given as <xTranslation, yTranslation>.
@@ -413,7 +405,8 @@ define( require => {
      */
     set translation( translation ) {
       assert( translation instanceof Vector, `invalid translation: ${ translation }` );
-      this.translate( this.translation.copy().negate().add( translation ) );
+      this.topLeft = translation;
+      this.layout( this._screenViewScale );
     }
 
     // /**
