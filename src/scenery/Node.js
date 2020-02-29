@@ -22,7 +22,7 @@
  * for more documentation.
  *
  * It is also important to note that coordinates for all view-related objects have the origin at the top-left of its
- * bounds and the positive-y downwards.
+ * local bounds and the positive-y downwards.
  *
  * ## Terminology:
  * - Window coordinates: Coordinate frame of a node relative to the browser, in pixels.
@@ -190,7 +190,7 @@ define( require => {
 
       // Call the bounds mutators of this instance for the location options that were provided.
       this.constructor.BOUNDS_MUTATORS.forEach( ( key, index ) => {
-        if ( options[ key ] && Node.BOUNDS_MUTATORS.indexOf( key ) === index ) { // Ensure the option was provided
+        if ( options[ key ] ) { // Only mutate if the option was provided
           const descriptor = Object.getOwnPropertyDescriptor( Node.prototype, key );
 
           // If the key refers to a setter, it will call the setter with the option value.
@@ -575,40 +575,28 @@ define( require => {
           if ( !( currentNode.parent instanceof ScreenView ) ) updateNodeChildrenBounds( currentNode.parent );
         }
       };
-      updateNodeChildrenBounds( this );
+    updateNodeChildrenBounds( this );
     }
   }
 
-  Node.X_BOUNDS_MUTATORS = [ 'translation', 'left', 'right',
-                           'centerX', 'topLeft', 'topCenter', 'topRight',
-                           'centerLeft', 'center', 'centerRight',
-                           'bottomLeft', 'bottomCenter', 'bottomRight' ];
 
-  Node.Y_BOUNDS_MUTATORS = [ 'translation', 'top', 'bottom',
-                           'centerY', 'topLeft', 'topCenter', 'topRight',
-                           'centerLeft', 'center', 'centerRight',
-                           'bottomLeft', 'bottomCenter', 'bottomRight' ];
+  /*----------------------------------------------------------------------------*
+   * Static Constants
+   *----------------------------------------------------------------------------*/
 
-  /**
-   * @public (read-only)
-   * This is an array of property (setter) names for Node.mutate(), which are also used when creating nodes with
-   * parameter objects.
-   * @protected
-   *
-   * E.g. new scenery.Node( { x: 5, rotation: 20 } ) will create a Path, and apply setters in the order below
-   * (node.x = 5; node.rotation = 20)
-   *
-   * Some special cases exist (for function names). new scenery.Node( { scale: 2 } ) will actually call
-   * node.scale( 2 ).
-   *
-   * The order below is important! Don't change this without knowing the implications.
-   *
-   * NOTE: Translation-based mutators come before rotation/scale, since typically we think of their operations
-   *       occurring "after" the rotation / scaling
-   * NOTE: left/right/top/bottom/centerX/centerY are at the end, since they rely potentially on rotation / scaling
-   *       changes of bounds that may happen beforehand
-   */
-  Node.BOUNDS_MUTATORS = [ 'width', 'height', ...Node.X_BOUNDS_MUTATORS, ...Node.Y_BOUNDS_MUTATORS ];
+  // @protected {string[]} - setter names that modify the x-location of this Node's Bounds, in no particular order.
+  Node.X_BOUNDS_MUTATORS = [ 'left', 'right', 'centerX', 'translation', 'topLeft', 'topCenter', 'topRight',
+                             'centerLeft', 'center', 'centerRight', 'bottomLeft', 'bottomCenter', 'bottomRight' ];
+
+  // @protected {string[]} - setter names that modify the y-location of this Node's Bounds, in no particular order.
+  Node.Y_BOUNDS_MUTATORS = [ 'top', 'bottom', 'centerY', 'translation', 'topLeft', 'topCenter', 'topRight',
+                             'centerLeft', 'center', 'centerRight', 'bottomLeft', 'bottomCenter', 'bottomRight' ];
+
+  // @protected {string[]} - setter names used in Node.mutate(), in the order that the setters are called.
+  //                         The order is important! Don't change this without knowing the implications.
+  Node.BOUNDS_MUTATORS = [ 'width', 'height', 'translation', 'topLeft', 'topCenter', 'topRight',
+                           'centerLeft', 'center', 'centerRight', 'bottomLeft', 'bottomCenter',
+                           'bottomRight', 'left', 'right', 'centerX', 'top', 'bottom', 'centerY' ];
 
   return Node;
 } );
