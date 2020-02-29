@@ -16,6 +16,7 @@ define( require => {
   const Node = require( 'SIM_CORE/scenery/Node' );
   const ScreenView = require( 'SIM_CORE/scenery/ScreenView' );
   const truenit = require( 'truenit' );
+  const Vector = require( 'SIM_CORE/util/Vector' );
 
   return () => {
 
@@ -31,9 +32,10 @@ define( require => {
     } );
     const screenView = new ScreenView();
     screenView.layout( window.innerWidth, window.innerHeight );
-
     display.addChild( screen.addChild( screenView ) );
 
+    //----------------------------------------------------------------------------------------
+    // Bounds Tests
     //----------------------------------------------------------------------------------------
 
     // Test 1: Root Node
@@ -85,7 +87,7 @@ define( require => {
     truenit.ok( A.localBounds.equals( new Bounds( 0, 0, 14, 13 ) ) );
     truenit.ok( A.parentBounds.equals( new Bounds( 15, 10, 29, 23 ) ) );
 
-    // Test 4: Remove Child (3 layers from screenView_
+    // Test 4: Remove Child (3 layers from screenView)
     B.removeChild( C );
 
     truenit.ok( B.localBounds.equals( Bounds.ZERO ) ); // shouldn't save width/height
@@ -96,12 +98,50 @@ define( require => {
     truenit.ok( C.localBounds.equals( new Bounds( 0, 0, 3, 3 ) ) );
     truenit.ok( C.parentBounds.equals( new Bounds( 6, 6, 9, 9 ) ) );
 
+    //----------------------------------------------------------------------------------------
+    // Location Tests
+    //----------------------------------------------------------------------------------------
+    const E = new Node( { left: 5, top: 4, width: 3, height: 4 } );
 
+    // Test 5: Location getters
+    truenit.ok( E.translation.equals( new Vector( 5, 4 ) ) );
+    truenit.ok( E.topLeft.equals( new Vector( 5, 4 ) ) );
+    truenit.ok( E.topCenter.equals( new Vector( 6.5, 4 ) ) );
+    truenit.ok( E.topRight.equals( new Vector( 8, 4 ) ) );
+    truenit.ok( E.centerLeft.equals( new Vector( 5, 6 ) ) );
+    truenit.ok( E.center.equals( new Vector( 6.5, 6 ) ) );
+    truenit.ok( E.centerRight.equals( new Vector( 8, 6 ) ) );
+    truenit.equals( E.centerX, 6.5 );
+    truenit.equals( E.centerY, 6 );
+    truenit.ok( E.bottomLeft.equals( new Vector( 5, 8 ) ) );
+    truenit.ok( E.bottomCenter.equals( new Vector( 6.5, 8 ) ) );
+    truenit.ok( E.bottomRight.equals( new Vector( 8, 8 ) ) );
+    truenit.equals( E.left, 5 );
+    truenit.equals( E.right, 8 );
+    truenit.equals( E.top, 4 );
+    truenit.equals( E.bottom, 8 );
 
+    // Test 6: Location setters
+    [ 'topLeft', 'topCenter', 'topRight',
+      'centerLeft', 'center', 'centerRight',
+      'bottomLeft', 'bottomCenter', 'bottomRight' ].forEach( location => {
 
-    // truenit.ok( C.globalBounds.equals( new Bounds( 20, 14, 23, 18 ) ) );
-    // truenit.ok( A.localBounds.equals( new Bounds( 0, 0, 8, 8 ) ) );
-    // truenit.ok( A.parentBounds.equals( new Bounds( 15, 10, 23, 18 ) ) );
+        E[ location ] = new Vector( 5, 5 );
+        truenit.ok( E.width === 3 && E.height === 4 );
+        truenit.ok( E[ location ].equals( new Vector( 5, 5 ) ) );
+      } );
+    [ 'left', 'right', 'top', 'bottom', 'centerX', 'centerY' ].forEach( location => {
+      E[ location ] = 5;
+      truenit.ok( E.width === 3 && E.height === 4 );
+      truenit.ok( E[ location ] ===  5 );
+    } );
+
+    E.translation = new Vector( 5, 5 );
+    truenit.ok( E.bounds.equals( new Bounds( 5, 5, 8, 9 ) ) );
+    E.width = 5;
+    truenit.ok( E.bounds.equals( new Bounds( 5, 5, 10, 9 ) ) );
+    E.height = 5;
+    truenit.ok( E.bounds.equals( new Bounds( 5, 5, 10, 10 ) ) );
 
 
 

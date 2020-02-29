@@ -565,17 +565,16 @@ define( require => {
   }
 
   Node.X_BOUNDS_MUTATORS = [ 'translation', 'left', 'right',
-                           'centerX', 'topCenter', 'topRight',
+                           'centerX', 'topLeft', 'topCenter', 'topRight',
                            'centerLeft', 'center', 'centerRight',
                            'bottomLeft', 'bottomCenter', 'bottomRight' ];
 
   Node.Y_BOUNDS_MUTATORS = [ 'translation', 'top', 'bottom',
-                           'centerY', 'topCenter', 'topRight',
+                           'centerY', 'topLeft', 'topCenter', 'topRight',
                            'centerLeft', 'center', 'centerRight',
                            'bottomLeft', 'bottomCenter', 'bottomRight' ];
 
   Node.BOUNDS_MUTATORS = [ 'width', 'height', ...Node.X_BOUNDS_MUTATORS, ...Node.Y_BOUNDS_MUTATORS ];
-
 
   return Node;
 } );
