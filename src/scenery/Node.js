@@ -28,7 +28,7 @@
  * - Window coordinates: Coordinate frame of a node relative to the browser, in pixels.
  * - Global coordinates: Coordinate frame of a node relative to the ScreenView (specifically in its local coordinates).
  * - Parent coordinates: Coordinate frame of a node relative to the parent of each Node's local bounds.
- * - Local coordinates: Coordinate frame of a node relative to itself, where (0, 0) would be at the Node's origin.
+ * - Local coordinates: Coordinate frame of a node relative to itself, where (0, 0) is at the top left of the Node.
  *
  * @author Brandon Li <brandon.li820@gmail.com>
  */
