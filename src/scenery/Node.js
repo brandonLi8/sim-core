@@ -472,7 +472,7 @@ define( require => {
     /**
      * Returns a bounding box for this Node (and its sub-tree) in the global coordinate frame. Must have ScreenView
      * as one of its ancestors, or nothing will be returned.
-     * @protected
+     * @private
      *
      * @returns {Bounds|null} - will return null if the Node isn't in the sub-tree of ScreenView.
      */
@@ -534,7 +534,7 @@ define( require => {
       super.addChild( child );
 
       // Include the child bounds within our parent coordinate frame.
-      this._recomupteAllBounds();
+      this._recomputeAncestorBounds();
       this.layout( this._screenViewScale );
       return this;
     }
@@ -552,37 +552,35 @@ define( require => {
       super.removeChild( child );
 
       // Include the child bounds within our parent coordinate frame.
-      this._invalidateAllBounds();
-      this._recomupteAllBounds();
+      this._recomputeAncestorBounds();
       this.layout( this._screenViewScale );
       return this;
     }
 
+    /**
+     * Recomputes this Node's bounds (in the parent coordinate frame) and will recursively call this method for each
+     * parent up to either the ScreenView or to the point where a Node doesn't have a parent. This is called after the
+     * addChild() and removeChild() methods to ensure that Bounds are correct after adding/removing children for
+     * all Nodes in its ancestor tree.
+     * @private
+     */
+    _recomputeAncestorBounds() {
 
-    _invalidateAllBounds() {
-      const invalidator = ( currentNode ) => {
-        currentNode._bounds.setAll( currentNode.left, currentNode.top, currentNode.left, currentNode.top );
+      // First step: Set this Node's parent bounds to include just its upper-left corner for now.
+      this._bounds.setAll( this.left, this.top, this.left, this.top );
 
-        if ( currentNode.parent ) {
-          if ( !( currentNode.parent instanceof ScreenView ) ) invalidator( currentNode.parent );
-        }
-      }
-      invalidator( this );
-    }
+      // Next include the Bounds of each of this Node's first generation children, in parent coordinate frame.
+      this.children.forEach( child => {
+        // Shift child's bounds (which is in the child's parent coordinate frame, or in other words in this Node's
+        // local coordinate frame) by this Node's top-left, which converts the child bounds to this Node's parent
+        // coordinate frame. Use scratchBounds to eliminate new Bounds instances on each recursive layer.
+        const childBounds = scratchBounds.set( child.bounds ).shift( this.left, this.top );
+        this._bounds.includeBounds( childBounds );
+      } );
 
-    _recomupteAllBounds() {
-
-      const updateNodeChildrenBounds = ( currentNode ) => {
-
-        currentNode.children.forEach( child => {
-          currentNode._bounds.includeBounds( child.bounds.copy().shift( currentNode.left, currentNode.top ) );
-        } );
-
-        if ( currentNode.parent ) {
-          if ( !( currentNode.parent instanceof ScreenView ) ) updateNodeChildrenBounds( currentNode.parent );
-        }
-      };
-    updateNodeChildrenBounds( this );
+      // Recursively call this method for each parent up to either the ScreenView or to the point where a Node doesn't
+      // have a parent, making all bounds correct.
+      if ( this.parent && !( this.parent instanceof ScreenView ) ) this.parent._recomputeAncestorBounds();
     }
   }
 
