@@ -43,6 +43,10 @@ define( require => {
   const ScreenView = require( 'SIM_CORE/scenery/ScreenView' );
   const Vector = require( 'SIM_CORE/util/Vector' );
 
+  // Mutable Bounds used temporarily in methods and may be returned in Bounds getters. Used to reduce the memory
+  // footprint by minimizing the number of new Bounds instances on every Bounds getter.
+  const scratchBounds = Bounds.ZERO.copy();
+
   class Node extends DOMObject {
 
     /**
@@ -136,12 +140,13 @@ define( require => {
      * coordinate frame.
      * @public
      *
-     * @returns {*} See the property declaration for documentation of the type.
+     * @returns {*} See the property declaration for documentation of the type. If the return type is a Bounds, DO NOT
+     *              mutate the returned value! If the return type is a Vector, the returned value can be mutated.
      */
-    get bounds() { return this._bounds; }
-    get parentBounds() { return this._bounds; } // Alias
-    get globalBounds() { return this._computeGlobalBounds(); }
-    get localBounds() { return this._bounds.copy().shift( -this._bounds.minX, -this._bounds.minY ); }
+    get bounds() { return this._bounds; } // Do NOT mutate!
+    get parentBounds() { return this._bounds; } // Alias to 'get bounds'. Do NOT mutate!
+    get globalBounds() { return this._computeGlobalBounds(); } // Do NOT mutate!
+    get localBounds() { return this._bounds.copy().shift( -this._bounds.minX, -this._bounds.minY ); } // Do NOT mutate!
     get topLeft() { return this._bounds.bottomLeft; }
     get topCenter() { return this._bounds.bottomCenter; }
     get topRight() { return this._bounds.bottomRight; }
@@ -466,30 +471,32 @@ define( require => {
 
     /**
      * Returns a bounding box for this Node (and its sub-tree) in the global coordinate frame. Must have ScreenView
-     * as one of its ancestors.
+     * as one of its ancestors, or nothing will be returned.
      * @protected
+     *
      * @returns {Bounds|null} - will return null if the Node isn't in the sub-tree of ScreenView.
      */
     _computeGlobalBounds() {
 
-      const result = Bounds.ZERO.copy();
-      const traverser = ( currentNode ) => {
-        assert( currentNode.parent instanceof DOMObject, 'must have a valid sub-tree to get global bounds' );
+      // Base-case: If this Node is a 1st generation child of ScreenView, its globalBounds is equivalent to its
+      //            parentBounds.
+      if ( this.parent instanceof ScreenView ) return this._bounds;
 
-        // Base Case
-        if ( currentNode instanceof ScreenView ) { return currentNode.viewBounds; }
-        else {
-          const parentBounds = traverser( currentNode.parent );
-          const currentBounds = currentNode.bounds;
-          return result.setAll(
-            parentBounds.minX + currentBounds.minX,
-            parentBounds.minY + currentBounds.minY,
-            parentBounds.minX + currentBounds.minX + currentBounds.width,
-            parentBounds.minY + currentBounds.minY + currentBounds.height
-          );
-        }
+      // Recursively get the parent's global Bounds.
+      const parentGlobalBounds = this.parent._computeGlobalBounds();
+
+      // Only return if Node the parent has valid bounds.
+      if ( parentGlobalBounds && parentGlobalBounds.isFinite() ) {
+
+        // Shift the parent's global top-left by this Node's top-left (which is in the parent's coordinate frame) to get
+        // this Node's globalBounds. Use scratchBounds to eliminate new Bounds instances on each recursive layer.
+        return scratchBounds.setAll(
+          parentGlobalBounds.minX + this.left,
+          parentGlobalBounds.minY + this.top,
+          parentGlobalBounds.minX + this.left + this.width,
+          parentGlobalBounds.minY + this.top + this.height
+        );
       }
-      return traverser( this );
     }
 
 
