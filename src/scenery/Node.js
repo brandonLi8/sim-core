@@ -469,36 +469,6 @@ define( require => {
     //   this._appliedScaleFactor = scale;
     // }
 
-    /**
-     * Returns a bounding box for this Node (and its sub-tree) in the global coordinate frame. Must have ScreenView
-     * as one of its ancestors, or nothing will be returned.
-     * @private
-     *
-     * @returns {Bounds|null} - will return null if the Node isn't in the sub-tree of ScreenView.
-     */
-    _computeGlobalBounds() {
-
-      // Base-case: If this Node is a 1st generation child of ScreenView, its globalBounds is equivalent to its
-      //            parentBounds.
-      if ( this.parent instanceof ScreenView ) return this._bounds;
-
-      // Recursively get the parent's global Bounds.
-      const parentGlobalBounds = this.parent._computeGlobalBounds();
-
-      // Only return if Node the parent has valid bounds.
-      if ( parentGlobalBounds && parentGlobalBounds.isFinite() ) {
-
-        // Shift the parent's global top-left by this Node's top-left (which is in the parent's coordinate frame) to get
-        // this Node's globalBounds. Use scratchBounds to eliminate new Bounds instances on each recursive layer.
-        return scratchBounds.setAll(
-          parentGlobalBounds.minX + this.left,
-          parentGlobalBounds.minY + this.top,
-          parentGlobalBounds.minX + this.left + this.width,
-          parentGlobalBounds.minY + this.top + this.height
-        );
-      }
-    }
-
 
     /**
      * Called when the Node layout needs to be updated, typically when the browser window is resized.
@@ -522,7 +492,8 @@ define( require => {
     }
 
     /**
-     * Ensures that all children are Node types, and updates the Node's bounds.
+     * @override
+     * Ensures that all children are Node types, and updates this Node's bounds after adding the child.
      * @override
      * @public
      *
@@ -533,26 +504,24 @@ define( require => {
       assert( child instanceof Node, `invalid child: ${ child }` );
       super.addChild( child );
 
-      // Include the child bounds within our parent coordinate frame.
-      this._recomputeAncestorBounds();
+      this._recomputeAncestorBounds(); // Update this Node's bounds after removing this child.
       this.layout( this._screenViewScale );
       return this;
     }
 
     /**
-     * Removes a child DOMObject from our list of children. Will fail an assertion if the Object is not currently one of
-     * our children.
+     * @override
+     * Removes a child Node, and update this Node's bounds after removing this child.
      * @public
      *
-     * @param {DOMObject} child
-     * @returns {DOMObject} - Returns 'this' reference, for chaining
+     * @param {Node} child
+     * @returns {Node} - Returns 'this' reference, for chaining
      */
     removeChild( child ) {
       assert( child instanceof Node, `invalid child: ${ child }` );
       super.removeChild( child );
 
-      // Include the child bounds within our parent coordinate frame.
-      this._recomputeAncestorBounds();
+      this._recomputeAncestorBounds(); // Update this Node's bounds after removing this child.
       this.layout( this._screenViewScale );
       return this;
     }
@@ -582,8 +551,37 @@ define( require => {
       // have a parent, making all bounds correct.
       if ( this.parent && !( this.parent instanceof ScreenView ) ) this.parent._recomputeAncestorBounds();
     }
-  }
 
+    /**
+     * Returns a bounding box for this Node (and its sub-tree) in the global coordinate frame. Must have ScreenView
+     * as one of its ancestors, or nothing will be returned.
+     * @private
+     *
+     * @returns {Bounds|null} - will return null if the Node isn't in the sub-tree of ScreenView.
+     */
+    _computeGlobalBounds() {
+
+      // Base-case: If this Node is a 1st generation child of ScreenView, its globalBounds is equivalent to its
+      //            parentBounds.
+      if ( this.parent instanceof ScreenView ) return this._bounds;
+
+      // Recursively get the parent's global Bounds.
+      const parentGlobalBounds = this.parent._computeGlobalBounds();
+
+      // Only return if Node the parent has valid bounds.
+      if ( parentGlobalBounds && parentGlobalBounds.isFinite() ) {
+
+        // Shift the parent's global top-left by this Node's top-left (which is in the parent's coordinate frame) to get
+        // this Node's globalBounds. Use scratchBounds to eliminate new Bounds instances on each recursive layer.
+        return scratchBounds.setAll(
+          parentGlobalBounds.minX + this.left,
+          parentGlobalBounds.minY + this.top,
+          parentGlobalBounds.minX + this.left + this.width,
+          parentGlobalBounds.minY + this.top + this.height
+        );
+      }
+    }
+  }
 
   /*----------------------------------------------------------------------------*
    * Static Constants
