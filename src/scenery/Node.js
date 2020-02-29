@@ -127,11 +127,11 @@ define( require => {
       // @protected {Bounds} - Bounds for the Node and its children in the "parent" coordinate frame.
       this._bounds = Bounds.ZERO.copy();
 
-      // Check that there are no conflicting location setters.
-      assert( Node.X_LOCATION_KEYS.filter( key => !!options[ key ] ).length <= 1, 'more than 1 x-mutator' );
-      assert( Node.Y_LOCATION_KEYS.filter( key => !!options[ key ] ).length <= 1, 'more than 1 y-mutator' );
+      // Check that there are no conflicting location setters of the bounds of this Node.
+      assert( Node.X_BOUNDS_MUTATORS.filter( key => !!options[ key ] ).length <= 1, 'more than 1 x-mutator' );
+      assert( Node.Y_BOUNDS_MUTATORS.filter( key => !!options[ key ] ).length <= 1, 'more than 1 y-mutator' );
 
-      // Call the mutators of this instance for the location options that were provided.
+      // Call the bounds mutators of this instance for the location options that were provided.
       Node.BOUNDS_MUTATORS.forEach( ( key, index ) => {
         if ( options[ key ] && Node.BOUNDS_MUTATORS.indexOf( key ) === index ) {
           const descriptor = Object.getOwnPropertyDescriptor( Node.prototype, key );
@@ -146,7 +146,8 @@ define( require => {
     /**
      * ES5 getters of properties of this Node. Traditional Accessors methods aren't included to reduce the memory
      * footprint. Upper locations are in terms of the visual layout, so the minY is the 'upper', and maxY is the 'lower'
-     * See setLocation() for more documentation of Node locations and their names.
+     * See setLocation() for more documentation of Node locations and their names. Locations are in the parent
+     * coordinate frame.
      * @public
      *
      * @returns {*} See the property declaration for documentation of the type.
@@ -186,7 +187,8 @@ define( require => {
     //----------------------------------------------------------------------------------------
 
     /**
-     * Convenience method that sets the one of the following locations of the Node's bounds to the specified point.
+     * Convenience method that sets the one of the following locations of the Node's bounds to the specified point,
+     * in the parent coordinate frame.
      *                        top
      *          ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
      *          ┃ topLeft     topCenter     topRight    ┃
@@ -230,8 +232,8 @@ define( require => {
     }
 
     /**
-     * ES5 Setters of locations of this Node. Traditional Mutator methods aren't included to reduce the memory
-     * footprint. See setLocation() for more documentation of Node locations and their names.
+     * ES5 Setters of locations of this Node (in the parent coordinate frame). Traditional Mutator methods aren't
+     * included to reduce the memory footprint. See setLocation() for details of Node locations and their names.
      * @public
      *
      * @param {*} * - See the property declaration for documentation of the type.
@@ -290,23 +292,25 @@ define( require => {
     }
 
     /**
+     * Sets the width of this Node's bounding box, keeping the minX the same but expanding/contracting the right border.
      * @public
      *
-     * @param {number|null} width
+     * @param {number} width
      */
     set width( width ) {
-      assert( !width || ( typeof width === 'number' && width > 0 ), `invalid width: ${ width }` );
+      assert( typeof width === 'number' && isFinite( width ) && width >= 0, `invalid width: ${ width }` );
       this._bounds.maxX = this._bounds.minX + width;
       // this._updateMaxDimension();
     }
 
     /**
+     * Sets the height of this Node's bounding box, keeping the minY the same but expanding/contracting the bottom maxY.
      * @public
      *
-     * @param {number|null} width
+     * @param {number} height
      */
     set height( height ) {
-      assert( !height || ( typeof height === 'number' && height > 0 ), `invalid height: ${ height }` );
+      assert( typeof height === 'number' && isFinite( height ) && height >= 0, `invalid height: ${ height }` );
       this._bounds.maxY = this._bounds.minY + height;
       // this._updateMaxDimension();
     }
@@ -567,17 +571,17 @@ define( require => {
     }
   }
 
-  Node.X_LOCATION_KEYS = [ 'translation', 'left', 'right',
+  Node.X_BOUNDS_MUTATORS = [ 'translation', 'left', 'right',
                            'centerX', 'topCenter', 'topRight',
                            'centerLeft', 'center', 'centerRight',
                            'bottomLeft', 'bottomCenter', 'bottomRight' ];
 
-  Node.Y_LOCATION_KEYS = [ 'translation', 'top', 'bottom',
+  Node.Y_BOUNDS_MUTATORS = [ 'translation', 'top', 'bottom',
                            'centerY', 'topCenter', 'topRight',
                            'centerLeft', 'center', 'centerRight',
                            'bottomLeft', 'bottomCenter', 'bottomRight' ];
 
-  Node.BOUNDS_MUTATORS = [ 'width', 'height', ...Node.X_LOCATION_KEYS, ...Node.Y_LOCATION_KEYS ];
+  Node.BOUNDS_MUTATORS = [ 'width', 'height', ...Node.X_BOUNDS_MUTATORS, ...Node.Y_BOUNDS_MUTATORS ];
 
 
   return Node;
