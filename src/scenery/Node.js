@@ -75,8 +75,8 @@ define( require => {
         cursor: null,       // {string} - Alias of the CSS cursor of the Node. See set cursor() for doc.
         visible: true,      // {boolean} - Indicates if the Node is visible. See set visible() for more doc.
         opacity: 1,         // {number} - Alias of the CSS opacity of the Node. See set opacity() for more doc.
-        // maxWidth: null,     // {number} - If provided, constrains width of this Node. See set maxWidth() for more doc.
-        // maxHeight: null,    // {number} - If provided, constrains height of this Node. See set maxHeight() for more doc.
+        maxWidth: null,     // {number} - If provided, constrains width of this Node. See set maxWidth() for more doc.
+        maxHeight: null,    // {number} - If provided, constrains height of this Node. See set maxHeight() for more doc.
 
         // transformations
         translation: null,  // {Vector} - If provided, (x, y) translation of the Node. See set translation() for more doc.
@@ -116,13 +116,13 @@ define( require => {
       this._visible = options.visible;
       this._opacity = options.opacity;
       this._cursor = options.cursor;
-      // this._maxWidth = options.maxWidth;
-      // this._maxHeight = options.maxHeight;
+      this._maxWidth = options.maxWidth;
+      this._maxHeight = options.maxHeight;
       // this._rotation = options.rotation;
       this._scalar = options.scale;
 
       // // @private {number} - Scale applied due to the maximum width and height constraints.
-      // this._appliedScaleFactor = 1;
+      this._appliedScaleFactor = 1;
 
       this._appliedOffsetTranslationDueToScale = Vector.ZERO.copy();
 
@@ -169,8 +169,8 @@ define( require => {
     get visible() { return this._visible; }
     get opacity() { return this._opacity; }
     get cursor() { return this._cursor; }
-    // get maxWidth() { return this._maxWidth; }
-    // get maxHeight() { return this._maxHeight; }
+    get maxWidth() { return this._maxWidth; }
+    get maxHeight() { return this._maxHeight; }
     get scalar() { return this._scalar; }
     get translation() { return this.topLeft; }
     // get rotation() { return this._rotation; }
@@ -314,7 +314,7 @@ define( require => {
     set width( width ) {
       assert( typeof width === 'number' && isFinite( width ) && width >= 0, `invalid width: ${ width }` );
       this._bounds.maxX = this._bounds.minX + width;
-      // this._updateMaxDimension();
+      if ( this.maxWidth && this.width > this.maxWidth ) this._updateMaxDimension();
     }
 
     /**
@@ -326,37 +326,36 @@ define( require => {
     set height( height ) {
       assert( typeof height === 'number' && isFinite( height ) && height >= 0, `invalid height: ${ height }` );
       this._bounds.maxY = this._bounds.minY + height;
-      // this._updateMaxDimension();
+      if ( this.maxHeight && this.height > this.maxHeight ) this._updateMaxDimension();
     }
 
+    /**
+     * Sets the maximum width of the Node. Will Scale the Node down if the current width is greater than the maxWidth.
+     * @public
+     *
+     * @param {number|null} maxWidth - if null, there is not maxWidth
+     */
+    set maxWidth( maxWidth ) {
+      assert( !maxWidth || ( typeof maxWidth === 'number' && maxWidth > 0 ), `invalid maxWidth: ${ maxWidth }` );
+      if ( this._maxWidth !== maxWidth ) {
+        this._maxWidth = maxWidth;
+        this._updateMaxDimension();
+      }
+    }
 
-    // /**
-    //  * Sets the maximum width of the Node. Will Scale the Node down if the current width is greater than the maxWidth.
-    //  * @public
-    //  *
-    //  * @param {number|null} maxWidth - if null, there is not maxWidth
-    //  */
-    // set maxWidth( maxWidth ) {
-    //   assert( !maxWidth || ( typeof maxWidth === 'number' && maxWidth > 0 ), `invalid maxWidth: ${ maxWidth }` );
-    //   if ( this._maxWidth !== maxWidth ) {
-    //     this._maxWidth = maxWidth;
-    //     this._updateMaxDimension();
-    //   }
-    // }
-
-    // /**
-    //  * Sets the maximum height of the Node. Will Scale the Node down if the current height is greater than the maxHeight
-    //  * @public
-    //  *
-    //  * @param {number|null} maxHeight - if null, there is not maxHeight
-    //  */
-    // set maxHeight( maxHeight ) {
-    //   assert( !maxHeight || ( typeof maxHeight === 'number' && maxHeight > 0 ), `invalid maxHeight: ${ maxHeight }` );
-    //   if ( this._maxHeight !== maxHeight ) {
-    //     this._maxHeight = maxHeight;
-    //     this._updateMaxDimension();
-    //   }
-    // }
+    /**
+     * Sets the maximum height of the Node. Will Scale the Node down if the current height is greater than the maxHeight
+     * @public
+     *
+     * @param {number|null} maxHeight - if null, there is not maxHeight
+     */
+    set maxHeight( maxHeight ) {
+      assert( !maxHeight || ( typeof maxHeight === 'number' && maxHeight > 0 ), `invalid maxHeight: ${ maxHeight }` );
+      if ( this._maxHeight !== maxHeight ) {
+        this._maxHeight = maxHeight;
+        this._updateMaxDimension();
+      }
+    }
 
     /**
      * Scales the Node. NOTE: Scale is relative to the CURRENT width and height. To scale to original width and height,
@@ -396,13 +395,18 @@ define( require => {
       if ( a instanceof Vector ) {
         assert( a.isFinite(), `invalid scale: ${ a }` );
         const previousScalar = this._scalar.copy();
+
         this._scalar = a;
         this._appliedOffsetTranslationDueToScale.set( this._scalar ).componentMultiply( new Vector( this.width, this.height ) );
         const center = this.center.copy();
 
         this.width = this.width / previousScalar.x * a.x;
         this.height = this.height / previousScalar.y * a.y;
+
         this.center = center;
+        if ( !( ( !this.maxWidth || this.width <= this.maxWidth ) && ( !this.maxHeight || this.height <= this.maxHeight ) ) ) {
+          this._updateMaxDimension();
+        }
         this.layout( this._screenViewScale );
       }
       else {
@@ -458,23 +462,24 @@ define( require => {
     //   this.layout( this._screenViewScale );
     // }
 
-    // /**
-    //  * Updates the Node's scale and applied scale factor if we need to change our scale to fit within the maximum
-    //  * dimensions (maxWidth and maxHeight).
-    //  * @private
-    //  */
-    // _updateMaxDimension() {
+    /**
+     * Updates the Node's scale and applied scale factor if we need to change our scale to fit within the maximum
+     * dimensions (maxWidth and maxHeight).
+     * @private
+     */
+    _updateMaxDimension() {
 
-    //   // Compute the new Scale given the maxWidth and maxHeight. Use min to ensure that dimensions are smaller.
-    //   const scale = Math.min(
-    //     this._maxWidth ? this._maxWidth / this.width : 1,
-    //     this._maxHeight ? this._maxHeight / this.height : 1
-    //   );
+      // Compute the new Scale given the maxWidth and maxHeight. Use min to ensure that dimensions are smaller.
+      const scale = Math.min(
+        this._maxWidth ? this._maxWidth / this.width : 1,
+        this._maxHeight ? this._maxHeight / this.height : 1
+      );
 
-    //   // Scale the Node to match the maxWidth or maxHeight and update the _appliedScaleFactor flag.
-    //   this.scale( scale / this._appliedScaleFactor );
-    //   this._appliedScaleFactor = scale;
-    // }
+      // console.log( scale / this._appliedScaleFactor  )
+      // Scale the Node to match the maxWidth or maxHeight and update the _appliedScaleFactor flag.
+      this.scale( scale  );
+      this._appliedScaleFactor = scale;
+    }
 
 
     /**
