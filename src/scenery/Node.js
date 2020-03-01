@@ -81,7 +81,7 @@ define( require => {
         // transformations
         translation: null,  // {Vector} - If provided, (x, y) translation of the Node. See set translation() for more doc.
         // rotation: 0,        // {number} - rotation (in radians) of the Node. See set rotation() for more doc.
-        // scale: 1,           // {Vector|number} - scale of the Node. See scale() for more doc.
+        scale: 1,           // {Vector|number} - scale of the Node. See scale() for more doc.
 
         // Overrides the location of the Node, if provided. See setLocation() for more doc.
         topLeft: null,      // {Vector} - The upper-left corner of this Node's bounds.
@@ -119,10 +119,12 @@ define( require => {
       // this._maxWidth = options.maxWidth;
       // this._maxHeight = options.maxHeight;
       // this._rotation = options.rotation;
-      // this._scalar = typeof options.scale === 'number' ? new Vector( options.scale, options.scale ) : options.scale;
+      this._scalar = options.scale;
 
       // // @private {number} - Scale applied due to the maximum width and height constraints.
       // this._appliedScaleFactor = 1;
+
+      this._appliedOffsetTranslationDueToScale = Vector.ZERO.copy();
 
       // @protected {number} - screenViewScale in terms of global units per local unit for converting Scenery
       //                       coordinates to pixels. Referenced as soon as the scale is known in `layout()`
@@ -169,7 +171,7 @@ define( require => {
     get cursor() { return this._cursor; }
     // get maxWidth() { return this._maxWidth; }
     // get maxHeight() { return this._maxHeight; }
-    // get scalar() { return this._scalar; }
+    get scalar() { return this._scalar; }
     get translation() { return this.topLeft; }
     // get rotation() { return this._rotation; }
 
@@ -356,53 +358,58 @@ define( require => {
     //   }
     // }
 
-    // *
-    //  * Scales the Node's Transformation. NOTE: May scale larger than the maxWidth or maxHeight. Scale is relative to
-    //  * the CURRENT width and height. To scale to original width and height, see set scaleMagnitude();
-    //  * @public
-    //  *
-    //  * This method is overloaded and has 2 method signatures:
-    //  * @param {number} s - Scales in both the X and Y directions. Example usage: scale( 5 );
-    //  *
-    //  * OR:
-    //  * @param {number} vector - Scales in each direction, as <xScale, yScale>
+    /**
+     * Scales the Node. NOTE: Scale is relative to the CURRENT width and height. To scale to original width and height,
+     * see 'set scalar()';
+     * @public
+     *
+     * This method is overloaded and has 2 method signatures:
+     * @param {number} s - Scales in both the X and Y directions. Example usage: scale( 5 );
+     *
+     * OR:
+     * @param {number} vector - Scales in each direction, as <xScale, yScale>
+     */
+    scale( a ) {
+      if ( a instanceof Vector ) {
+        assert( a.isFinite(), `invalid scale: ${ a }` );
+        this._scalar = this._scalar instanceof Vector ? this._scalar : new Vector( this._scalar, this._scalar );
+        this.scalar = this._scalar.copy().componentMultiply( a );
+      }
+      else {
+        assert( isFinite( a ), `invalid scale: ${ a }` );
+        this.scale( new Vector( a, a ) );
+      }
+    }
 
-    // scale( a ) {
-    //   if ( a instanceof Vector ) {
-    //     assert( a.isFinite(), `invalid scale: ${ a }` );
-    //     this.scalar = this.scalar.copy().componentMultiply( a );
-    //   }
-    //   else {
-    //     assert( isFinite( a ), `invalid scale: ${ a }` );
-    //     this.scale( new Vector( a, a ) );
-    //   }
-    // }
+    /**
+     * Scales the Node. NOTE: Scale is relative to ORIGNAL width and height. To scale to the current width and height,
+     * see `scale()`;
+     * @public
+     *
+     * This method is overloaded and has 2 method signatures:
+     * @param {number} s - Scales in both the X and Y directions. Example usage: `Node.scalar = 5`;
+     *
+     * OR:
+     * @param {number} vector - Scales in each direction, as <xScale, yScale>
+     */
+    set scalar( a ) {
+      if ( a instanceof Vector ) {
+        assert( a.isFinite(), `invalid scale: ${ a }` );
+        const previousScalar = this._scalar.copy();
+        this._scalar = a;
+        this._appliedOffsetTranslationDueToScale.set( this._scalar ).componentMultiply( new Vector( this.width, this.height ) );
+        const center = this.center.copy();
 
-    // /**
-    //  * Scales the Node's Transformation. NOTE: May scale larger than the maxWidth or maxHeight. Scale is relative to
-    //  * ORIGNAL width and height, see set scalar();
-    //  * @public
-    //  *
-    //  * This method is overloaded and has 2 method signatures:
-    //  * @param {number} s - Scales in both the X and Y directions. Example usage: scale( 5 );
-    //  *
-    //  * OR:
-    //  * @param {number} vector - Scales in each direction, as <xScale, yScale>
-    //  */
-    // set scalar( a ) {
-    //   if ( a instanceof Vector ) {
-    //     assert( a.isFinite(), `invalid scale: ${ a }` );
-    //     this._scalar = a;
-    //     const xExpansion = this.width * a.x - this.width;
-    //     const yExpansion = this.height * a.y - this.height;
-    //     this._bounds.expand( xExpansion / 2, yExpansion / 2, xExpansion / 2, yExpansion / 2 );
-    //     this.layout( this._screenViewScale );
-    //   }
-    //   else {
-    //     assert( isFinite( a ), `invalid scale: ${ a }` );
-    //     this.scalar = new Vector( a, a );
-    //   }
-    // }
+        this.width = this.width / previousScalar.x * a.x;
+        this.height = this.height / previousScalar.y * a.y;
+        this.center = center;
+        this.layout( this._screenViewScale );
+      }
+      else {
+        assert( isFinite( a ), `invalid scale: ${ a }` );
+        this.scalar = new Vector( a, a );
+      }
+    }
 
     /**
      * Translates the Node, in the typical view coordinate frame (where the positive-y is downwards), relative to the
@@ -481,11 +488,12 @@ define( require => {
 
       if ( this.bounds.isFinite() ) {
         const globalBounds = this._computeGlobalBounds( scratchBounds );
-
+        const scaleX = ( this._scalar instanceof Vector ? this._scalar.x : this._scalar ).toFixed( 10 );
+        const scaleY = ( this._scalar instanceof Vector ? this._scalar.y : this._scalar ).toFixed( 10 );
 
         const translateX = ( this.left ).toFixed( 10 ) * scale;
         const translateY = ( this.top ).toFixed( 10 ) * scale;
-        this.style.transform = `matrix(${ 1 },${ 0 },${ 0 },${ 1 },${ translateX },${ translateY })`;
+        this.style.transform = `matrix(${ scaleX },${ 0 },${ 0 },${ scaleY },${ translateX },${ translateY })`;
       }
 
       this._screenViewScale = scale;
@@ -599,9 +607,9 @@ define( require => {
 
   // @protected {string[]} - setter names used in Node.mutate(), in the order that the setters are called.
   //                         The order is important! Don't change this without knowing the implications.
-  Node.BOUNDS_MUTATORS = [ 'width', 'height', 'translation', 'topLeft', 'topCenter', 'topRight',
-                           'centerLeft', 'center', 'centerRight', 'bottomLeft', 'bottomCenter',
-                           'bottomRight', 'left', 'right', 'centerX', 'top', 'bottom', 'centerY' ];
+  Node.BOUNDS_MUTATORS = [ 'scale', 'width', 'height', 'maxWidth', 'maxHeight', 'translation', 'topLeft',
+                           'topCenter', 'topRight', 'centerLeft', 'center', 'centerRight', 'bottomLeft',
+                           'bottomCenter', 'bottomRight', 'left', 'right', 'centerX', 'top', 'bottom', 'centerY' ];
 
   return Node;
 } );

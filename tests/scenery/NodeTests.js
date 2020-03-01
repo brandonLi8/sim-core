@@ -143,8 +143,13 @@ define( require => {
     E.height = 5;
     truenit.ok( E.bounds.equals( new Bounds( 5, 5, 10, 10 ) ) );
 
+    //----------------------------------------------------------------------------------------
+    // Node Features
+    //----------------------------------------------------------------------------------------
 
-
+    // Test 7: Max width
+    const F = new Node( { left: 5, top: 4, width: 4, height: 8, maxWidth: 1 } );
+    truenit.ok( F.parentBounds.equals( new Bounds( 5, 4, 1, 2 ) ) );
 
   };
 } );

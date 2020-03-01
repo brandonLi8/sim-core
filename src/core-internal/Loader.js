@@ -131,6 +131,11 @@ define( require => {
       } );
       //
       this._screenView.addChild( foregroundCirclePath );
+
+      window.addEventListener( 'mousedown', () => {
+        foregroundCirclePath.scale( 2 )
+
+      })
     }
 
     layout( width, height ) {
