@@ -145,8 +145,8 @@ define( require => {
      */
     get bounds() { return this._bounds; } // Do NOT mutate!
     get parentBounds() { return this._bounds; } // Alias to 'get bounds'. Do NOT mutate!
-    get globalBounds() { return this._computeGlobalBounds(); } // Do NOT mutate!
-    get localBounds() { return this._bounds.copy().shift( -this._bounds.minX, -this._bounds.minY ); } // Do NOT mutate!
+    get globalBounds() { return this._computeGlobalBounds( Bounds.ZERO.copy() ); } // Can mutate
+    get localBounds() { return this._bounds.copy().shift( -this._bounds.minX, -this._bounds.minY ); } // Can mutate
     get topLeft() { return this._bounds.bottomLeft; }
     get topCenter() { return this._bounds.bottomCenter; }
     get topRight() { return this._bounds.bottomRight; }
@@ -480,7 +480,7 @@ define( require => {
       if ( !scale ) return
 
       if ( this.bounds.isFinite() ) {
-        const globalBounds = this._computeGlobalBounds();
+        const globalBounds = this._computeGlobalBounds( scratchBounds );
 
 
         const translateX = ( this.left ).toFixed( 10 ) * scale;
@@ -557,23 +557,25 @@ define( require => {
      * as one of its ancestors, or nothing will be returned.
      * @private
      *
+     * @param {Bounds} resultBounds - the bounds to set the result globalBounds to. Passing the same Bounds eliminates
+     *                                new Bounds instances on each recursive call, improving the memory footprint.
      * @returns {Bounds|null} - will return null if the Node isn't in the sub-tree of ScreenView.
      */
-    _computeGlobalBounds() {
+    _computeGlobalBounds( resultBounds ) {
 
       // Base-case: If this Node is a 1st generation child of ScreenView, its globalBounds is equivalent to its
       //            parentBounds.
       if ( this.parent instanceof ScreenView ) return this._bounds;
 
       // Recursively get the parent's global Bounds.
-      const parentGlobalBounds = this.parent._computeGlobalBounds();
+      const parentGlobalBounds = this.parent._computeGlobalBounds( resultBounds );
 
       // Only return if Node the parent has valid bounds.
       if ( parentGlobalBounds && parentGlobalBounds.isFinite() ) {
 
         // Shift the parent's global top-left by this Node's top-left (which is in the parent's coordinate frame) to get
-        // this Node's globalBounds. Use scratchBounds to eliminate new Bounds instances on each recursive layer.
-        return scratchBounds.setAll(
+        // this Node's globalBounds.
+        return resultBounds.setAll(
           parentGlobalBounds.minX + this.left,
           parentGlobalBounds.minY + this.top,
           parentGlobalBounds.minX + this.left + this.width,
