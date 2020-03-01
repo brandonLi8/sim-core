@@ -9,6 +9,7 @@
 
 define( require => {
   'use strict';
+  const StandardSimQueryParameters = require( 'SIM_CORE/StandardSimQueryParameters' );
 
   // modules
   const assert = require( 'SIM_CORE/util/assert' );
@@ -18,7 +19,6 @@ define( require => {
   const NavigationBar = require( 'SIM_CORE/core-internal/NavigationBar' );
   const Screen = require( 'SIM_CORE/Screen' );
   const ScreenView = require( 'SIM_CORE/scenery/ScreenView' );
-  const StandardSimQueryParameters = require( 'SIM_CORE/StandardSimQueryParameters' );
   const Util = require( 'SIM_CORE/util/Util' );
 
   const Sim = {
