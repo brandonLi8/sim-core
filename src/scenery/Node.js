@@ -43,9 +43,10 @@ define( require => {
   const ScreenView = require( 'SIM_CORE/scenery/ScreenView' );
   const Vector = require( 'SIM_CORE/util/Vector' );
 
-  // Mutable Bounds used temporarily in methods and may be returned in Bounds getters. Used to reduce the memory
-  // footprint by minimizing the number of new Bounds instances on every Bounds getter.
+  // Mutable Bounds & Vector used temporarily in methods to reduce the memory footprint by minimizing the number of
+  // new Bounds and Vector instances when recursing, layouting, etc.
   const scratchBounds = Bounds.ZERO.copy();
+  const scratchVector = Vector.ZERO.copy();
 
   class Node extends DOMObject {
 
@@ -129,7 +130,7 @@ define( require => {
 
       // @protected {Bounds} - Bounds for the Node and its children in the "parent" coordinate frame.
       this._bounds = Bounds.ZERO.copy();
-      this.mutate( options );
+      options && this.mutate( options );
     }
 
     /**
@@ -166,22 +167,22 @@ define( require => {
     get visible() { return this._visible; }
     get opacity() { return this._opacity; }
     get cursor() { return this._cursor; }
-    get maxWidth() { return this._maxWidth; }
-    get maxHeight() { return this._maxHeight; }
+    // get maxWidth() { return this._maxWidth; }
+    // get maxHeight() { return this._maxHeight; }
     get scalar() { return this._scalar; }
     get translation() { return this.topLeft; }
-    get rotation() { return this._rotation; }
+    // get rotation() { return this._rotation; }
 
     //----------------------------------------------------------------------------------------
     // Mutators
     //----------------------------------------------------------------------------------------
 
     /**
-     * Mutates multiple location setters in one function call. For instance, `Node.mutate( { top: 0, left: 5 } );`
+     * Mutates multiple Node setters in one function call. For instance, `Node.mutate( { top: 0, left: 5 } );`
      * is equivalent to `Node.left = 5; Node.top = 0;`
      * @public
      *
-     * Mutators will be set in the order of the static field MUTATOR_KEYS, which subtypes can add to.
+     * Mutators will be set in the order of the static field MUTATOR_KEYS, which subtypes can add to or modify.
      *
      * @param {Object} [options]
      */
@@ -192,10 +193,9 @@ define( require => {
       assert( this.constructor.X_BOUNDS_MUTATORS.filter( key => options[ key ] ).length <= 1, 'more than 1 x-mutator' );
       assert( this.constructor.Y_BOUNDS_MUTATORS.filter( key => options[ key ] ).length <= 1, 'more than 1 y-mutator' );
 
-      // Call the bounds mutators of this instance for the location options that were provided.
-      this.constructor.MUTATOR_KEYS.forEach( ( key, index ) => {
+      // Call the mutators of this instance for the setter options that were provided.
+      this.constructor.MUTATOR_KEYS.forEach( key => {
         if ( options[ key ] ) { // Only mutate if the option was provided
-          console.log( key, options[ key ])
           const descriptor = Object.getOwnPropertyDescriptor( Node.prototype, key );
 
           // If the key refers to a setter, it will call the setter with the option value.
@@ -228,19 +228,18 @@ define( require => {
       // Horizontal shift
       if ( [ 'left', 'right', 'centerX' ].includes( name ) ) {
         assert( isFinite( location ), `${ name } should be finite.` );
-        return this.translate( new Vector( location - this[ name ], 0 ) );
+        return this.translate( scratchVector.set( location - this[ name ], 0 ) ); // translate and exit
       }
 
       // Vertical shift
       if ( [ 'top', 'bottom', 'centerY' ].includes( name ) ) {
         assert( isFinite( location ), `${ name } should be finite.` );
-        return this.translate( new Vector( 0, location - this[ name ] ) );
+        return this.translate( scratchVector.set( 0, location - this[ name ] ) ); // translate and exit
       }
 
       // At this point, the location must be a point location
       assert( location instanceof Vector && location.isFinite(), `${ name } should be a finite Vector` );
-      this.translate( location.copy().subtract( this[ name ] ) );
-      this.layout( this._screenViewScale );
+      this.translate( scratchVector.set( location ).subtract( this[ name ] ) );
     }
 
     /**
