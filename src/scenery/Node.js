@@ -139,12 +139,13 @@ define( require => {
      * coordinate frame.
      * @public
      *
-     * @returns {*} See the property declaration for documentation of the type.
+     * @returns {*} See the property declaration for documentation of the type. All number, string, and Vector return
+     *              types can be mutated once accessed. Bounds return types mutability vary, but are documented below.
      */
-    get bounds() { return this._bounds; } // Do NOT mutate returned value!
-    get parentBounds() { return this._bounds; } // Alias to 'get bounds'. Do NOT mutate returned value!
-    get globalBounds() { return this._computeGlobalBounds( Bounds.ZERO.copy() ); }                    // Can mutate.
-    get localBounds() { return this._bounds.copy().shift( -this._bounds.minX, -this._bounds.minY ); } // Can mutate.
+    get bounds() { return this._bounds; }                                             // Do NOT mutate returned value!
+    get parentBounds() { return this._bounds; }  // Alias to 'get bounds'.            // Do NOT mutate returned value!
+    get globalBounds() { return this._computeGlobalBounds( Bounds.ZERO.copy() ); }    // Can mutate returned value.
+    get localBounds() { return this._bounds.copy().shift( -this.left, -this.left ); } // Can mutate returned value.
     get topLeft() { return this._bounds.bottomLeft; }
     get topCenter() { return this._bounds.bottomCenter; }
     get topRight() { return this._bounds.bottomRight; }
