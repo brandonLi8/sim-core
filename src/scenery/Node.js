@@ -60,6 +60,7 @@ define( require => {
 
       // Some options are set by Node. Assert that they weren't provided.
       assert( !options || !options.style || !options.style.position, 'Node sets position' );
+      assert( !options || !options.style || !options.style.transformOrigin, 'Node sets transformOrigin' );
       assert( !options || !options.type || DOMObject.SVG_TYPES.includes( options.type ), 'Must be an SVG sub-type.' );
 
       // Defaults for options.
@@ -68,15 +69,16 @@ define( require => {
         // Super-class options
         type: 'g',
         style: {
-          position: 'absolute' // Ensure that every Node is relative to the ScreenView
+          transformOrigin: 'center', // Ensure all Nodes scale/rotate about its center
+          position: 'absolute'       // Ensure that every Node is relative to the ScreenView
         },
 
         // Options specific to Node
         cursor: null,       // {string} - Alias of the CSS cursor of the Node. See set cursor() for doc.
         visible: true,      // {boolean} - Indicates if the Node is visible. See set visible() for more doc.
         opacity: 1,         // {number} - Alias of the CSS opacity of the Node. See set opacity() for more doc.
-        maxWidth: null,     // {number} - If provided, constrains width of this Node. See set maxWidth() for more doc.
-        maxHeight: null,    // {number} - If provided, constrains height of this Node. See set maxHeight() for more doc.
+        // maxWidth: null,     // {number} - If provided, constrains width of this Node. See set maxWidth() for more doc.
+        // maxHeight: null,    // {number} - If provided, constrains height of this Node. See set maxHeight() for more doc.
 
         // transformations
         translation: null,  // {Vector} - If provided, (x, y) translation of the Node. See set translation() for more doc.
@@ -116,9 +118,9 @@ define( require => {
       this._visible = options.visible;
       this._opacity = options.opacity;
       this._cursor = options.cursor;
-      this._maxWidth = options.maxWidth;
-      this._maxHeight = options.maxHeight;
-      // this._rotation = options.rotation;
+      // this._maxWidth = null; //
+      // this._maxHeight = null; //
+      this._rotation = options.rotation;
       this._scalar = options.scale;
 
       // // @private {number} - Scale applied due to the maximum width and height constraints.
@@ -173,7 +175,7 @@ define( require => {
     get maxHeight() { return this._maxHeight; }
     get scalar() { return this._scalar; }
     get translation() { return this.topLeft; }
-    // get rotation() { return this._rotation; }
+    get rotation() { return this._rotation; }
 
     //----------------------------------------------------------------------------------------
     // Mutators
@@ -184,7 +186,7 @@ define( require => {
      * is equivalent to `Node.left = 5; Node.top = 0;`
      * @public
      *
-     * Mutators will be set in the order of the static field BOUNDS_MUTATORS, which subtypes can add to.
+     * Mutators will be set in the order of the static field MUTATOR_KEYS, which subtypes can add to.
      *
      * @param {Object} [options]
      */
@@ -196,8 +198,9 @@ define( require => {
       assert( this.constructor.Y_BOUNDS_MUTATORS.filter( key => options[ key ] ).length <= 1, 'more than 1 y-mutator' );
 
       // Call the bounds mutators of this instance for the location options that were provided.
-      this.constructor.BOUNDS_MUTATORS.forEach( ( key, index ) => {
+      this.constructor.MUTATOR_KEYS.forEach( ( key, index ) => {
         if ( options[ key ] ) { // Only mutate if the option was provided
+          console.log( key, options[ key ])
           const descriptor = Object.getOwnPropertyDescriptor( Node.prototype, key );
 
           // If the key refers to a setter, it will call the setter with the option value.
@@ -314,7 +317,7 @@ define( require => {
     set width( width ) {
       assert( typeof width === 'number' && isFinite( width ) && width >= 0, `invalid width: ${ width }` );
       this._bounds.maxX = this._bounds.minX + width;
-      if ( this.maxWidth && this.width > this.maxWidth ) this._updateMaxDimension();
+      if ( ( this.maxHeight && this.height > this.maxHeight ) || ( this.maxWidth && this.width > this.maxWidth ) ) this._updateMaxDimension();
     }
 
     /**
@@ -326,7 +329,7 @@ define( require => {
     set height( height ) {
       assert( typeof height === 'number' && isFinite( height ) && height >= 0, `invalid height: ${ height }` );
       this._bounds.maxY = this._bounds.minY + height;
-      if ( this.maxHeight && this.height > this.maxHeight ) this._updateMaxDimension();
+      if ( ( this.maxHeight && this.height > this.maxHeight ) || ( this.maxWidth && this.width > this.maxWidth ) ) this._updateMaxDimension();
     }
 
     /**
@@ -397,12 +400,12 @@ define( require => {
         const previousScalar = this._scalar.copy();
 
         this._scalar = a;
-        this._appliedOffsetTranslationDueToScale.set( this._scalar ).componentMultiply( new Vector( this.width, this.height ) );
         const center = this.center.copy();
+        this._appliedOffsetTranslationDueToScale = new Vector( this.width + this.width / this._scalar.x, this.height - this.height / this._scalar.y );
+        console.log( this.width, this.height, previousScalar, a, this.height, this.bounds.toString() )
 
         this.width = this.width / previousScalar.x * a.x;
         this.height = this.height / previousScalar.y * a.y;
-
         this.center = center;
         if ( !( ( !this.maxWidth || this.width <= this.maxWidth ) && ( !this.maxHeight || this.height <= this.maxHeight ) ) ) {
           this._updateMaxDimension();
@@ -440,27 +443,27 @@ define( require => {
       this.layout( this._screenViewScale );
     }
 
-    // /**
-    //  * Rotates this Node's relative to its CURRENT rotation, in radians.
-    //  * IMPORTANT: rotations will mess up localBounds and might lead to inaccurate positioning of the Node's subtree.
-    //  * @public
-    //  *
-    //  * @param {number} rotation - In radians
-    //  */
-    // rotate( rotation ) { this.rotation = this.rotation + rotation; }
+    /**
+     * Rotates this Node's relative to its CURRENT rotation, in radians.
+     * IMPORTANT: rotations will mess up localBounds and might lead to inaccurate positioning of the Node's subtree.
+     * @public
+     *
+     * @param {number} rotation - In radians
+     */
+    rotate( rotation ) { this.rotation = this.rotation + rotation; }
 
-    // /**
-    //  * Rotates this Node's relative to its CURRENT rotation, in radians.
-    //  * IMPORTANT: rotations will mess up localBounds and might lead to inaccurate positioning of the Node's subtree.
-    //  * @public
-    //  *
-    //  * @param {number} rotation - In radians
-    //  */
-    // set rotation( rotation ) {
-    //   assert( typeof rotation === 'number' && isFinite( rotation ), `invalid rotation: ${ rotation }` );
-    //   this._rotation = rotation;
-    //   this.layout( this._screenViewScale );
-    // }
+    /**
+     * Rotates this Node's relative to its CURRENT rotation, in radians.
+     * IMPORTANT: rotations will mess up localBounds and might lead to inaccurate positioning of the Node's subtree.
+     * @public
+     *
+     * @param {number} rotation - In radians
+     */
+    set rotation( rotation ) {
+      assert( typeof rotation === 'number' && isFinite( rotation ), `invalid rotation: ${ rotation }` );
+      this._rotation = rotation;
+      this.layout( this._screenViewScale );
+    }
 
     /**
      * Updates the Node's scale and applied scale factor if we need to change our scale to fit within the maximum
@@ -493,12 +496,17 @@ define( require => {
 
       if ( this.bounds.isFinite() ) {
         const globalBounds = this._computeGlobalBounds( scratchBounds );
-        const scaleX = ( this._scalar instanceof Vector ? this._scalar.x : this._scalar ).toFixed( 10 );
-        const scaleY = ( this._scalar instanceof Vector ? this._scalar.y : this._scalar ).toFixed( 10 );
-
-        const translateX = ( this.left ).toFixed( 10 ) * scale;
-        const translateY = ( this.top ).toFixed( 10 ) * scale;
-        this.style.transform = `matrix(${ scaleX },${ 0 },${ 0 },${ scaleY },${ translateX },${ translateY })`;
+        const sx = ( this._scalar instanceof Vector ? this._scalar.x : this._scalar );
+        const sy = ( this._scalar instanceof Vector ? this._scalar.y : this._scalar );
+        const r = this.rotation;
+      const scaleX = ( Math.cos( r ) * sx ).toFixed( 10 );
+      const scaleY = ( Math.cos( r ) * sy ).toFixed( 10 );
+      const skewX = ( -1 * Math.sin( r ) * sx ).toFixed( 10 );
+      const skewY = ( Math.sin( r ) * sy ).toFixed( 10 );
+      console.log( this._appliedOffsetTranslationDueToScale)
+        const translateX = ( this.left ).toFixed( 10 ) * scale + this._appliedOffsetTranslationDueToScale.x;
+        const translateY = ( this.top ).toFixed( 10 ) * scale + this._appliedOffsetTranslationDueToScale.x;
+        this.style.transform = `matrix(${ scaleX },${ skewY },${ skewX },${ scaleY },${ translateX },${ translateY })`;
       }
 
       this._screenViewScale = scale;
@@ -612,9 +620,10 @@ define( require => {
 
   // @protected {string[]} - setter names used in Node.mutate(), in the order that the setters are called.
   //                         The order is important! Don't change this without knowing the implications.
-  Node.BOUNDS_MUTATORS = [ 'scale', 'width', 'height', 'maxWidth', 'maxHeight', 'translation', 'topLeft',
-                           'topCenter', 'topRight', 'centerLeft', 'center', 'centerRight', 'bottomLeft',
-                           'bottomCenter', 'bottomRight', 'left', 'right', 'centerX', 'top', 'bottom', 'centerY' ];
+  Node.MUTATOR_KEYS = [ 'opacity', 'cursor', 'visible', 'scale', 'rotation', 'width', 'height',
+                        'maxWidth', 'maxHeight', 'translation', 'topLeft', 'topCenter', 'topRight',
+                        'centerLeft', 'center', 'centerRight', 'bottomLeft', 'bottomCenter',
+                        'bottomRight', 'left', 'right', 'centerX', 'top', 'bottom', 'centerY' ];
 
   return Node;
 } );

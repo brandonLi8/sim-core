@@ -128,15 +128,14 @@ define( require => {
         stroke: 'green',
         strokeWidth: 1,
         center: this._screenView.viewBounds.center,
-        maxHeight: 90
       } );
       //
       this._screenView.addChild( foregroundCirclePath );
 
-      window.addEventListener( 'mousedown', () => {
-        foregroundCirclePath.scale( 2 )
-        console.log( foregroundCirclePath.bounds.toString() )
-      })
+      // window.addEventListener( 'mousedown', () => {
+      //   foregroundCirclePath.scale( new Vector( 2, 2 ) )
+      //   console.log( foregroundCirclePath.bounds.toString() )
+      // })
     }
 
     layout( width, height ) {
