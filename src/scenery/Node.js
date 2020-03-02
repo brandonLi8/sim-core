@@ -120,13 +120,8 @@ define( require => {
       this._cursor = options.cursor;
       // this._maxWidth = null; //
       // this._maxHeight = null; //
-      this._rotation = options.rotation;
+      // this._rotation = options.rotation;
       this._scalar = options.scale;
-
-      // // @private {number} - Scale applied due to the maximum width and height constraints.
-      this._appliedScaleFactor = 1;
-
-      this._appliedOffsetTranslationDueToScale = Vector.ZERO.copy();
 
       // @protected {number} - screenViewScale in terms of global units per local unit for converting Scenery
       //                       coordinates to pixels. Referenced as soon as the scale is known in `layout()`
@@ -144,13 +139,12 @@ define( require => {
      * coordinate frame.
      * @public
      *
-     * @returns {*} See the property declaration for documentation of the type. If the return type is a Bounds, DO NOT
-     *              mutate the returned value! If the return type is a Vector, the returned value can be mutated.
+     * @returns {*} See the property declaration for documentation of the type.
      */
-    get bounds() { return this._bounds; } // Do NOT mutate!
-    get parentBounds() { return this._bounds; } // Alias to 'get bounds'. Do NOT mutate!
-    get globalBounds() { return this._computeGlobalBounds( Bounds.ZERO.copy() ); } // Can mutate
-    get localBounds() { return this._bounds.copy().shift( -this._bounds.minX, -this._bounds.minY ); } // Can mutate
+    get bounds() { return this._bounds; } // Do NOT mutate returned value!
+    get parentBounds() { return this._bounds; } // Alias to 'get bounds'. Do NOT mutate returned value!
+    get globalBounds() { return this._computeGlobalBounds( Bounds.ZERO.copy() ); }                    // Can mutate.
+    get localBounds() { return this._bounds.copy().shift( -this._bounds.minX, -this._bounds.minY ); } // Can mutate.
     get topLeft() { return this._bounds.bottomLeft; }
     get topCenter() { return this._bounds.bottomCenter; }
     get topRight() { return this._bounds.bottomRight; }
