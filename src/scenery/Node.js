@@ -70,8 +70,7 @@ define( require => {
         // Super-class options
         type: 'g',
         style: {
-          // transformOrigin: 'center', // Ensure all Nodes scale/rotate about its center
-          position: 'absolute'       // Ensure that every Node is relative to the ScreenView
+          position: 'absolute' // Ensure that every Node is relative to the ScreenView
         },
 
         // Options specific to Node
@@ -117,6 +116,8 @@ define( require => {
 
       // @protected {Bounds} - Bounds for the Node and its children in the "parent" coordinate frame.
       this._bounds = Bounds.ZERO.copy();
+
+      this._test = Vector.ZERO.copy();
 
       // @private {*} - see options declaration for documentation. Contains getters and setters. Set to null for now and
       //                to be set in the mutate() call in the constructor.
@@ -508,9 +509,15 @@ define( require => {
         // const skewX = ( -1 * Math.sin( r ) * sx ).toFixed( 10 );
         // const skewY = ( Math.sin( r ) * sy ).toFixed( 10 );
         // console.log( this._appliedOffsetTranslationDueToScale)
-        const translateX = ( this.left ).toFixed( 10 ) * scale;
-        const translateY = ( this.top ).toFixed( 10 ) * scale;
-        this.style.transform = `matrix(${ scaleX },${ 0 },${ 0 },${ scaleY },${ translateX },${ translateY })`;
+        const translateX = ( this.left ).toFixed( 10 ) * scale ;//0.6213592233009708
+        //matrix(2, 0, 0, 2, 193.864, 67.7282)
+        //should be matrix(2, 0, 0, 2, 509.864, 257.7282);
+        // translate( 509.864, 257.7282 ) scale( 2, 2 )
+        //Bounds[ min:( 312, 109 ), max:( 712, 509) ] SCale 2
+        // console.log( window.innerHeight)
+        const translateY = ( this.top ).toFixed( 10 ) * scale ;
+        this.setAttribute( 'transform', `translate(${ translateX } ${ translateY }) scale(${ scaleX } ${ scaleY })` );
+        // this.style.transform = `matrix(${ scaleX },${ 0 },${ 0 },${ scaleY },${ translateX },${ translateY })`;
       }
 
       this._screenViewScale = scale;
