@@ -129,7 +129,8 @@ define( require => {
         strokeWidth: 1,
         center: this._screenView.viewBounds.center,
         visible: true,
-        cursor: 'pointer'
+        cursor: 'pointer',
+        maxWidth: 100
       } );
       this._screenView.addChild( foregroundCirclePath );
         console.log( foregroundCirclePath.bounds.toString() )
