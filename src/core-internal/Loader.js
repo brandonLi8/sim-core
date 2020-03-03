@@ -135,6 +135,7 @@ define( require => {
         console.log( foregroundCirclePath.bounds.toString() )
 
       window.addEventListener( 'mousedown', () => {
+        foregroundCirclePath.rotate( Math.PI / 6 )
         foregroundCirclePath.scalar = foregroundCirclePath.scalar + 1;
         console.log( foregroundCirclePath.bounds.toString() )
 

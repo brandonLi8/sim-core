@@ -41,6 +41,7 @@ define( require => {
   const Bounds = require( 'SIM_CORE/util/Bounds' );
   const DOMObject = require( 'SIM_CORE/core-internal/DOMObject' );
   const ScreenView = require( 'SIM_CORE/scenery/ScreenView' );
+  const Util = require( 'SIM_CORE/util/Util' );
   const Vector = require( 'SIM_CORE/util/Vector' );
 
   // Mutable Bounds & Vector used temporarily in methods to reduce the memory footprint by minimizing the number of
@@ -70,6 +71,7 @@ define( require => {
         // Super-class options
         type: 'g',
         style: {
+          transformOrigin: 'topLeft',
           position: 'absolute' // Ensure that every Node is relative to the ScreenView
         },
 
@@ -82,7 +84,7 @@ define( require => {
 
         // transformations
         translation: null,  // {Vector} - If provided, (x, y) translation of the Node. See set translation() for more doc.
-        // rotation: 0,        // {number} - rotation (in radians) of the Node. See set rotation() for more doc.
+        rotation: 0,        // {number} - rotation (in radians) of the Node. See set rotation() for more doc.
         scale: 1,           // {Vector|number} - scale of the Node. See scale() for more doc.
 
         // Overrides the location of the Node, if provided. See setLocation() for more doc.
@@ -126,7 +128,7 @@ define( require => {
       this._cursor;
       // this._maxWidth = null; //
       // this._maxHeight = null; //
-      // this._rotation = options.rotation;
+      this._rotation = options.rotation;
       this._scalar;
 
       // @protected {number} - screenViewScale in terms of global units per local unit for converting Scenery
@@ -174,7 +176,7 @@ define( require => {
     // get maxHeight() { return this._maxHeight; }
     get scalar() { return this._scalar; }
     get translation() { return this.topLeft; }
-    // get rotation() { return this._rotation; }
+    get rotation() { return this._rotation; }
 
     //----------------------------------------------------------------------------------------
     // Mutators
@@ -448,27 +450,27 @@ define( require => {
       this.layout( this._screenViewScale );
     }
 
-    // /**
-    //  * Rotates this Node's relative to its CURRENT rotation, in radians.
-    //  * IMPORTANT: rotations will mess up localBounds and might lead to inaccurate positioning of the Node's subtree.
-    //  * @public
-    //  *
-    //  * @param {number} rotation - In radians
-    //  */
-    // rotate( rotation ) { this.rotation = this.rotation + rotation; }
+    /**
+     * Rotates this Node's relative to its CURRENT rotation, in radians.
+     * IMPORTANT: rotations will mess up localBounds and might lead to inaccurate positioning of the Node's subtree.
+     * @public
+     *
+     * @param {number} rotation - In radians
+     */
+    rotate( rotation ) { this.rotation = this.rotation + rotation; }
 
-    // *
-    //  * Rotates this Node's relative to its CURRENT rotation, in radians.
-    //  * IMPORTANT: rotations will mess up localBounds and might lead to inaccurate positioning of the Node's subtree.
-    //  * @public
-    //  *
-    //  * @param {number} rotation - In radians
-
-    // set rotation( rotation ) {
-    //   assert( typeof rotation === 'number' && isFinite( rotation ), `invalid rotation: ${ rotation }` );
-    //   this._rotation = rotation;
-    //   this.layout( this._screenViewScale );
-    // }
+    /**
+     * Rotates this Node's relative to its CURRENT rotation, in radians.
+     * IMPORTANT: rotations will mess up localBounds and might lead to inaccurate positioning of the Node's subtree.
+     * @public
+     *
+     * @param {number} rotation - In radians
+     */
+    set rotation( rotation ) {
+      assert( typeof rotation === 'number' && isFinite( rotation ), `invalid rotation: ${ rotation }` );
+      this._rotation = rotation;
+      this.layout( this._screenViewScale );
+    }
 
     // // /**
     //  * Updates the Node's scale and applied scale factor if we need to change our scale to fit within the maximum
@@ -516,7 +518,13 @@ define( require => {
         //Bounds[ min:( 312, 109 ), max:( 712, 509) ] SCale 2
         // console.log( window.innerHeight)
         const translateY = ( this.top ).toFixed( 10 ) * scale ;
-        this.setAttribute( 'transform', `translate(${ translateX } ${ translateY }) scale(${ scaleX } ${ scaleY })` );
+        const width = this.width * scale;
+        const height = this.height * scale;
+        const rotation = `rotate( ${ Util.toDegrees( this.rotation ) } ${ width / 2 } ${ height / 2 } )`;
+        const scaleString = `scale( ${ sx } ${ sy } )`;
+        const translate = `translate( ${ translateX } ${ translateY } )`;
+
+        this.setAttribute( 'transform', translate + rotation + scaleString );
         // this.style.transform = `matrix(${ scaleX },${ 0 },${ 0 },${ scaleY },${ translateX },${ translateY })`;
       }
 
