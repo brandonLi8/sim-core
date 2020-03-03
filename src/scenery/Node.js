@@ -148,7 +148,7 @@ define( require => {
     get bounds() { return this._bounds; }                                             // Do NOT mutate returned value!
     get parentBounds() { return this._bounds; }  // Alias to 'get bounds'.            // Do NOT mutate returned value!
     get globalBounds() { return this._computeGlobalBounds( Bounds.ZERO.copy() ); }    // Can mutate returned value.
-    get localBounds() { return this._bounds.copy().shift( -this.left, -this.left ); } // Can mutate returned value.
+    get localBounds() { return this._bounds.copy().shift( -this.left, -this.top ); } // Can mutate returned value.
     get topLeft() { return this._bounds.bottomLeft; }
     get topCenter() { return this._bounds.bottomCenter; }
     get topRight() { return this._bounds.bottomRight; }
@@ -230,13 +230,13 @@ define( require => {
       // Horizontal shift
       if ( [ 'left', 'right', 'centerX' ].includes( name ) ) {
         assert( isFinite( location ), `${ name } should be finite.` );
-        return this.translate( scratchVector.set( location - this[ name ], 0 ) ); // translate and exit
+        return this.translate( scratchVector.setX( location - this[ name ] ).setY( 0 ) ); // translate and exit
       }
 
       // Vertical shift
       if ( [ 'top', 'bottom', 'centerY' ].includes( name ) ) {
         assert( isFinite( location ), `${ name } should be finite.` );
-        return this.translate( scratchVector.set( 0, location - this[ name ] ) ); // translate and exit
+        return this.translate( scratchVector.setX( 0 ).setY( location - this[ name ] ) ); // translate and exit
       }
 
       // At this point, the location must be a point location
@@ -385,7 +385,6 @@ define( require => {
         // Calculate how much to expand our bounds
         const xExpand = this.width / 2 * ( a.x - 1 );
         const yExpand = this.height / 2 * ( a.y - 1 );
-        console.log( xExpand, yExpand)
         if ( xExpand && yExpand ) this._bounds.expand( xExpand, yExpand, xExpand, yExpand );
 
         // this._appliedOffsetTranslationDueToScale = new Vector( this.width + this.width / this._scalar.x, this.height - this.height / this._scalar.y );
@@ -625,7 +624,7 @@ define( require => {
 
   // @protected {string[]} - setter names used in Node.mutate(), in the order that the setters are called.
   //                         The order is important! Don't change this without knowing the implications.
-  Node.MUTATOR_KEYS = [ 'opacity', 'cursor', 'visible', 'scale', 'rotation', 'width', 'height',
+  Node.MUTATOR_KEYS = [ 'opacity', 'cursor', 'visible', 'rotation', 'width', 'height', 'scale',
                         'maxWidth', 'maxHeight', 'translation', 'topLeft', 'topCenter', 'topRight',
                         'centerLeft', 'center', 'centerRight', 'bottomLeft', 'bottomCenter',
                         'bottomRight', 'left', 'right', 'centerX', 'top', 'bottom', 'centerY' ];
