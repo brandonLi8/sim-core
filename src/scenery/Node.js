@@ -197,12 +197,10 @@ define( require => {
       // Call the mutators of this instance for the setter options that were provided.
       this.constructor.MUTATOR_KEYS.forEach( key => {
         if ( options[ key ] !== null && options[ key ] !== undefined ) { // Only mutate if the option was provided
-          const descriptor = Object.getOwnPropertyDescriptor( Node.prototype, key );
 
           // If the key refers to a setter, it will call the setter with the option value.
-          if ( descriptor && typeof descriptor.value === 'function' ) this[ key ]( options[ key ] );
-          else if ( descriptor && typeof descriptor.set === 'function' ) this[ key ] = options[ key ]; // ES5 setter.
-          else assert( false, `unrecognized mutator: ${ key }` );
+          if ( typeof this[ key ] === 'function' ) this[ key ]( options[ key ] );
+          else this[ key ] = options[ key ]; // ES5 setter.
         }
       } );
     }
