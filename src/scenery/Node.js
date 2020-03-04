@@ -71,7 +71,6 @@ define( require => {
         // Super-class options
         type: 'g',
         style: {
-          transformOrigin: 'topLeft',
           position: 'absolute' // Ensure that every Node is relative to the ScreenView
         },
 
@@ -79,11 +78,11 @@ define( require => {
         cursor: null,       // {string} - Alias of the CSS cursor of the Node. See set cursor() for doc.
         visible: true,      // {boolean} - Indicates if the Node is visible. See set visible() for more doc.
         opacity: 1,         // {number} - Alias of the CSS opacity of the Node. See set opacity() for more doc.
-        // maxWidth: null,     // {number} - If provided, constrains width of this Node. See set maxWidth() for more doc.
-        // maxHeight: null,    // {number} - If provided, constrains height of this Node. See set maxHeight() for more doc.
+        maxWidth: null,     // {number} - If provided, constrains width of this Node. See set maxWidth() for more doc.
+        maxHeight: null,    // {number} - If provided, constrains height of this Node. See set maxHeight() for more doc.
 
         // transformations
-        translation: null,  // {Vector} - If provided, (x, y) translation of the Node. See set translation() for more doc.
+        translation: null,  // {Vector} - If provided, (x, y) translation of the Node. See set translation().
         rotation: 0,        // {number} - rotation (in radians) of the Node. See set rotation() for more doc.
         scale: 1,           // {Vector|number} - scale of the Node. See scale() for more doc.
 
@@ -110,16 +109,11 @@ define( require => {
 
       // Rewrite options so that it overrides the defaults.
       options = { ...defaults, ...options };
-      options.style = { ...defaults.style, ...options.style };
+      options.style = { ...defaults.style, ...options.style }; // Preserve default styles.
 
       super( options );
 
       //----------------------------------------------------------------------------------------
-
-      // @protected {Bounds} - Bounds for the Node and its children in the "parent" coordinate frame.
-      this._bounds = Bounds.ZERO.copy();
-
-      this._test = Vector.ZERO.copy();
 
       // @private {*} - see options declaration for documentation. Contains getters and setters. Set to null for now and
       //                to be set in the mutate() call in the constructor.
@@ -131,10 +125,12 @@ define( require => {
       this._rotation;
       this._scalar;
 
+      // @protected {Bounds} - Bounds for the Node and its children in the "parent" coordinate frame.
+      this._bounds = Bounds.ZERO.copy();
+
       // @protected {number} - screenViewScale in terms of global units per local unit for converting Scenery
       //                       coordinates to pixels. Referenced as soon as the scale is known in `layout()`
       this._screenViewScale;
-
       options && this.mutate( options );
     }
 
@@ -151,7 +147,7 @@ define( require => {
     get bounds() { return this._bounds; }                                             // Do NOT mutate returned value!
     get parentBounds() { return this._bounds; }  // Alias to 'get bounds'.            // Do NOT mutate returned value!
     get globalBounds() { return this._computeGlobalBounds( Bounds.ZERO.copy() ); }    // Can mutate returned value.
-    get localBounds() { return this._bounds.copy().shift( -this.left, -this.top ); } // Can mutate returned value.
+    get localBounds() { return this._bounds.copy().shift( -this.left, -this.top ); }  // Can mutate returned value.
     get topLeft() { return this._bounds.bottomLeft; }
     get topCenter() { return this._bounds.bottomCenter; }
     get topRight() { return this._bounds.bottomRight; }
@@ -241,7 +237,6 @@ define( require => {
         assert( isFinite( location ), `${ name } should be finite.` );
         return this.translate( scratchVector.setX( 0 ).setY( location - this[ name ] ) ); // translate and exit
       }
-
       // At this point, the location must be a point location
       assert( location instanceof Vector && location.isFinite(), `${ name } should be a finite Vector` );
       this.translate( scratchVector.set( location ).subtract( this[ name ] ) );
@@ -341,7 +336,7 @@ define( require => {
      * Sets the maximum width of the Node. Will Scale the Node down if the current width is greater than the maxWidth.
      * @public
      *
-     * @param {number|null} maxWidth - if null, there is not maxWidth
+     * @param {number|null} maxWidth - if null, there is no maxWidth
      */
     set maxWidth( maxWidth ) {
       assert( !maxWidth || ( typeof maxWidth === 'number' && maxWidth > 0 ), `invalid maxWidth: ${ maxWidth }` );
@@ -355,7 +350,7 @@ define( require => {
      * Sets the maximum height of the Node. Will Scale the Node down if the current height is greater than the maxHeight
      * @public
      *
-     * @param {number|null} maxHeight - if null, there is not maxHeight
+     * @param {number|null} maxHeight - if null, there is no maxHeight
      */
     set maxHeight( maxHeight ) {
       assert( !maxHeight || ( typeof maxHeight === 'number' && maxHeight > 0 ), `invalid maxHeight: ${ maxHeight }` );
@@ -380,21 +375,18 @@ define( require => {
       if ( a instanceof Vector ) {
         assert( a.isFinite(), `invalid scale: ${ a }` );
 
-        // Set the scalar reference.
+        // Set out scalar reference.
         if ( !this._scalar ) this._scalar = a.x === a.y ? a.x : a.copy();
         else if ( this._scalar instanceof Vector ) this._scalar.componentMultiply( a );
-        else this._scalar = a.x === a.y ? this._scalar * a.x : a.copy().multiply( a );
+        else this._scalar = a.x === a.y ? this._scalar * a.x : a.copy().multiply( this._scalar );
 
         // Calculate how much to expand our bounds
         const xExpand = this.width / 2 * ( a.x - 1 );
         const yExpand = this.height / 2 * ( a.y - 1 );
         if ( xExpand && yExpand ) this._bounds.expand( xExpand, yExpand, xExpand, yExpand );
 
-        // this._appliedOffsetTranslationDueToScale = new Vector( this.width + this.width / this._scalar.x, this.height - this.height / this._scalar.y );
-        // console.log( this.width, this.height, currentScalar, a, this.height, this.bounds.toString() )
-        // if ( !( ( !this.maxWidth || this.width <= this.maxWidth ) && ( !this.maxHeight || this.height <= this.maxHeight ) ) ) {
+        // Ensure the maxWidth and maxHeight flags are satisfied.
         this._updateMaxDimension();
-        // }
         this.layout( this._screenViewScale );
       }
       else this.scale( scratchVector.setX( a ).setY( a ) ); // Forward as `scale( <a, a> )`
@@ -416,7 +408,7 @@ define( require => {
         if ( this._scalar instanceof Vector && this._scalar.equals( a ) ) return; // Exit if setting to the same scale.
         if ( a.x === this._scalar && a.y === this._scalar ) return; // Exit if setting to the same scale.
 
-        // Reference the current scalar, after setting our scalar property.
+        // Get our current scale.
         const currentScalarX = this._scalar instanceof Vector ? this._scalar.x : this._scalar;
         const currentScalarY = this._scalar instanceof Vector ? this._scalar.y : this._scalar;
 
@@ -434,6 +426,7 @@ define( require => {
      */
     translate( translation ) {
       assert( translation instanceof Vector && translation.isFinite(), `invalid translation: ${ translation }` );
+      if ( translation.x === 0 && translation.y === 0 ) return; // Exit if setting to the same translation.
       this._bounds.shift( translation.x, translation.y );
       this.layout( this._screenViewScale );
     }
@@ -446,39 +439,46 @@ define( require => {
      */
     set translation( translation ) {
       assert( translation instanceof Vector, `invalid translation: ${ translation }` );
+      if ( this.translation.equals( translation ) ) return; // Exit if setting to the same translation.
       this.topLeft = translation;
       this.layout( this._screenViewScale );
     }
 
     /**
      * Rotates this Node's relative to its CURRENT rotation, in radians.
-     * IMPORTANT: rotations will mess up localBounds and might lead to inaccurate positioning of the Node's subtree.
+     * IMPORTANT: rotations will not recalculate localBounds and might lead to inaccurate positioning of the Node's
+     *            subtree. Thus, it is recommended to only rotate leafs that are symmetrical (like circles).
      * @public
      *
      * @param {number} rotation - In radians
      */
-    rotate( rotation ) { this.rotation = this.rotation + rotation; }
+    rotate( rotation ) {
+      if ( rotation === 0 ) return; // Exit if setting to the same rotation.
+      this.rotation = this.rotation + rotation;
+    }
 
     /**
      * Rotates this Node's relative to its CURRENT rotation, in radians.
-     * IMPORTANT: rotations will mess up localBounds and might lead to inaccurate positioning of the Node's subtree.
+     * IMPORTANT: rotations will not recalculate localBounds and might lead to inaccurate positioning of the Node's
+     *            subtree. Thus, it is recommended to only rotate leafs that are symmetrical (like circles).
      * @public
      *
      * @param {number} rotation - In radians
      */
     set rotation( rotation ) {
       assert( typeof rotation === 'number' && isFinite( rotation ), `invalid rotation: ${ rotation }` );
+      if ( this._rotation === rotation ) return; // Exit if setting to the same rotation.
       this._rotation = rotation;
       this.layout( this._screenViewScale );
     }
 
     /**
-     * Updates the Node's scale and applied scale factor if we need to change our scale to fit within the maximum
-     * dimensions (maxWidth and maxHeight).
+     * Ensures that the maxWidth and/or the maxWidth of this Node are satisfied. Will scale the Node down if these
+     * invariants are not satisfied, so that our dimensions fit within the maximum dimensions (maxWidth and maxHeight).
      * @private
      */
     _updateMaxDimension() {
-
+      // Only update if the maxWidth and/or the maxWidth of this Node is not satisfied.
       if ( ( this.maxHeight && this.height > this.maxHeight ) || ( this.maxWidth && this.width > this.maxWidth ) ) {
 
         // Compute the new Scale given the maxWidth and maxHeight. Use min to ensure that dimensions are smaller.
@@ -487,48 +487,66 @@ define( require => {
           this._maxHeight ? this._maxHeight / this.height : 1
         );
 
-        // Scale the Node to match the maxWidth or maxHeight and update the _appliedScaleFactor flag.
-        this.scale( scale  );
+        // Scale the Node to match the maxWidth or maxHeight.
+        this.scale( scale );
       }
     }
 
-
     /**
-     * Called when the Node layout needs to be updated, typically when the browser window is resized.
-     * @private (scenery-internal)
+     * Layouts the Node, ensuring correct pixel positioning in the window based off this Node's global bounds.
+     * Also applies other transformations, including rotation and scale. Requires a scale, in terms of window pixels
+     * per ScreenView coordinate, for determining exact pixel coordinates.
      *
-     * @param {number} scale - scale in terms of global units per local unit
+     * This method may be overridden in sub-types, but it is required to call the super class's layout method. Node's
+     * layout method will position the Node's top-left, meaning sub-types must have their origin at the top-left corner
+     * of its Node, where 0 transformation positions the sub-type at the upper-left corner of the ScreenView.
+     *
+     * This method is generally called in 3 scenarios:
+     *   (1) The browser window is resized, meaning that the Node's pixel coordinates will change, but its bounds
+     *       don't change. The scale should be different.
+     *   (2) The Node's parent/local/global Bounds changes, meaning its ScreenView coordinates have changed, which
+     *       incurs a different pixel coordinate.
+     *   (3) The Node is scaled/rotated. Scaling technically falls under scenario 2, while rotations don't change
+     *       bounds. However, the layout method will apply the CSS scale and rotation transformation, changing the
+     *       visual output of the Node in the browser.
+     *
+     * Internally, this method prioritizes performance to minimize frame rate drops when resizing the browser.
+     * @public (sim-core-internal)
+     *
+     * @param {number|null} scale - scenery scale, in terms of window pixels per ScreenView coordinate.
      */
     layout( scale ) {
-      if ( !scale ) return
+      if ( !scale ) return; // Exit if no scale was provided.
 
-      if ( this.bounds.isFinite() ) {
-        const globalBounds = this._computeGlobalBounds( scratchBounds );
-        const sx = ( this._scalar instanceof Vector ? this._scalar.x : this._scalar );
-        const sy = ( this._scalar instanceof Vector ? this._scalar.y : this._scalar );
-        // const r = this.rotation;
-        const scaleX = ( Math.cos( 0 ) * sx ).toFixed( 10 );
-        const scaleY = ( Math.cos( 0 ) * sy ).toFixed( 10 );
-        // const skewX = ( -1 * Math.sin( r ) * sx ).toFixed( 10 );
-        // const skewY = ( Math.sin( r ) * sy ).toFixed( 10 );
-        // console.log( this._appliedOffsetTranslationDueToScale)
-        const translateX = ( this.left ).toFixed( 10 ) * scale ;//0.6213592233009708
-        //matrix(2, 0, 0, 2, 193.864, 67.7282)
-        //should be matrix(2, 0, 0, 2, 509.864, 257.7282);
-        // translate( 509.864, 257.7282 ) scale( 2, 2 )
-        //Bounds[ min:( 312, 109 ), max:( 712, 509) ] SCale 2
-        // console.log( window.innerHeight)
-        const translateY = ( this.top ).toFixed( 10 ) * scale ;
-        const width = this.width * scale;
-        const height = this.height * scale;
-        const rotation = `rotate( ${ Util.toDegrees( this.rotation ) } ${ width / 2 } ${ height / 2 } )`;
-        const scaleString = `scale( ${ sx } ${ sy } )`;
-        const translate = `translate( ${ translateX } ${ translateY } )`;
-
-        this.setAttribute( 'transform', translate + rotation + scaleString );
-        // this.style.transform = `matrix(${ scaleX },${ 0 },${ 0 },${ scaleY },${ translateX },${ translateY })`;
+      if ( assert.enabled ) { // Only assert sanity checks if assertions are enabled for performance reasons.
+        // Sanity checks
+        assert( this.bounds.isFinite(), 'bounds are not finite.'  );
+        assert( this._computeGlobalBounds( scratchBounds ).isFinite(), 'globalBounds are not finite.'  );
       }
+      /**
+       * Access and reference all necessary information to generate the svg transform attribute string.
+       * See https://css-tricks.com/transforms-on-svg-elements/ for more information of this attribute.
+       *
+       * All Numbers are rounded to 10 decimal places. 10 is the largest guaranteed number of digits of the transform
+       * attribute. See https://developer.mozilla.org/en-US/docs/JavaScript/Reference/Global_Objects/Number/toFixed
+       * NOTE: the toFixed calls are inlined for performance reasons, and slight inaccuracies won't be visible.
+       */
+      const globalBounds = this._computeGlobalBounds( scratchBounds );
+      const scaleX = ( this._scalar instanceof Vector ? this._scalar.x : this._scalar ).toFixed( 10 );
+      const scaleY = ( this._scalar instanceof Vector ? this._scalar.y : this._scalar ).toFixed( 10 );
+      const rotation = ( Util.toDegrees( this.rotation ) ).toFixed( 10 );
+      const translateX = ( this.globalBounds.minX * scale ).toFixed( 10 ); // Scale to convert to pixels.
+      const translateY = ( this.globalBounds.minY * scale ).toFixed( 10 );  // Scale to convert to pixels.
+      const width = ( this.width * scale ).toFixed( 10 );             // Scale to convert to pixels.
+      const height = ( this.height * scale ).toFixed( 10 );           // Scale to convert to pixels.
 
+      // Create a flag for the final transform attribute string.
+      let transformString = `translate( ${ translateX } ${ translateY } )`;
+      if ( rotation !== 0 ) transformString += `rotate( ${ rotation } ${ width / 2 } ${ height / 2 } )`;
+      if ( scaleX !== 1 || scaleY !== 1 ) transformString += `scale( ${ scaleX } ${ scaleY } )`;
+
+      // Set the svg transform attribute and reference the new screenViewScale.
+      this.setAttribute( 'transform', transformString );
       this._screenViewScale = scale;
     }
 

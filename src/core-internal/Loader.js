@@ -127,19 +127,14 @@ define( require => {
         fill: 'blue',
         stroke: 'green',
         strokeWidth: 1,
-        center: this._screenView.viewBounds.center,
-        visible: true,
-        cursor: 'pointer',
-        maxWidth: 100
+        center: this._screenView.viewBounds.center
       } );
+      //
       this._screenView.addChild( foregroundCirclePath );
-        console.log( foregroundCirclePath.bounds.toString() )
 
       window.addEventListener( 'mousedown', () => {
-        foregroundCirclePath.rotate( Math.PI / 6 )
-        foregroundCirclePath.scalar = foregroundCirclePath.scalar + 1;
+        foregroundCirclePath.scale( new Vector( 2, 2 ) )
         console.log( foregroundCirclePath.bounds.toString() )
-
       })
     }
 
