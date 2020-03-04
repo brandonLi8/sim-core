@@ -485,7 +485,7 @@ define( require => {
         const scale = Math.min(
           this._maxWidth ? this._maxWidth / this.width : 1,
           this._maxHeight ? this._maxHeight / this.height : 1
-        );
+       );
 
         // Scale the Node to match the maxWidth or maxHeight.
         this.scale( scale );
@@ -520,8 +520,8 @@ define( require => {
 
       if ( assert.enabled ) { // Only assert sanity checks if assertions are enabled for performance reasons.
         // Sanity checks
-        assert( this.bounds.isFinite(), 'bounds are not finite.'  );
-        assert( this._computeGlobalBounds( scratchBounds ).isFinite(), 'globalBounds are not finite.'  );
+        assert( this.bounds.isFinite(), 'bounds are not finite.' );
+        assert( this._computeGlobalBounds( scratchBounds ).isFinite(), 'globalBounds are not finite.' );
       }
       /**
        * Access and reference all necessary information to generate the svg transform attribute string.
@@ -535,8 +535,8 @@ define( require => {
       const scaleX = ( this._scalar instanceof Vector ? this._scalar.x : this._scalar ).toFixed( 10 );
       const scaleY = ( this._scalar instanceof Vector ? this._scalar.y : this._scalar ).toFixed( 10 );
       const rotation = ( Util.toDegrees( this.rotation ) ).toFixed( 10 );
-      const translateX = ( this.globalBounds.minX * scale ).toFixed( 10 ); // Scale to convert to pixels.
-      const translateY = ( this.globalBounds.minY * scale ).toFixed( 10 );  // Scale to convert to pixels.
+      const translateX = ( globalBounds.minX * scale ).toFixed( 10 ); // Scale to convert to pixels.
+      const translateY = ( globalBounds.minY * scale ).toFixed( 10 );  // Scale to convert to pixels.
       const width = ( this.width * scale ).toFixed( 10 );             // Scale to convert to pixels.
       const height = ( this.height * scale ).toFixed( 10 );           // Scale to convert to pixels.
 
