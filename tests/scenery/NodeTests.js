@@ -1,4 +1,4 @@
-// Copyright © 2019-2020 Brandon Li. All rights reserved.
+// Copyright © 2020 Brandon Li. All rights reserved.
 
 /**
  * Unit test file for `SIM_CORE/scenery/Node`.
@@ -133,7 +133,7 @@ define( require => {
     [ 'left', 'right', 'top', 'bottom', 'centerX', 'centerY' ].forEach( location => {
       E[ location ] = 5;
       truenit.ok( E.width === 3 && E.height === 4 );
-      truenit.ok( E[ location ] ===  5 );
+      truenit.ok( E[ location ] === 5 );
     } );
 
     E.translation = new Vector( 5, 5 );
