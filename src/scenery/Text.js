@@ -85,6 +85,7 @@ define( require => {
     get stroke() { return this._stroke; }
     get strokeWidth() { return this._strokeWidth; }
     get textRendering() { return this._textRendering; }
+    get text() { return this._text; }
 
     //----------------------------------------------------------------------------------------
 
@@ -99,12 +100,7 @@ define( require => {
      */
     setText( text ) {
       super.setText( text );
-      console.log( this._generateCSS3FontString()  );
-      // Update bounds.
-      const textBoundingRect = Text._computeTextBoundingBox( text, this._generateCSS3FontString() );
-      this.width = textBoundingRect.width;
-      this.height = textBoundingRect.height;
-      console.log( this.width, this.height )
+      this._updateTextBounds();
     }
     set text( text ) { this.setText( text ); }
 
@@ -118,7 +114,8 @@ define( require => {
       if ( fontStyle === this._fontStyle ) return; // Exit if setting to the same 'fontStyle'
       assert( [ 'normal', 'italic', 'oblique' ].includes( fontStyle ), `invalid fontStyle: ${ fontStyle }` );
       this._fontStyle = fontStyle;
-      this.style.font = this._generateCSS3FontString();
+      this._updateTextBounds();
+      this.layout( this._screenViewScale );
     }
 
     /**
@@ -132,7 +129,8 @@ define( require => {
       assert( typeof fontWeight === 'number' ? ( fontWeight <= 900 && fontWeight >= 100 && fontWeight % 100 === 0 ) :
               [ 'normal', 'bold', 'bolder', 'lighter' ].includes( fontWeight ), `invalid fontWeight: ${ fontWeight }` );
       this._fontWeight = fontWeight;
-      this.style.font = this._generateCSS3FontString();
+      this._updateTextBounds();
+      this.layout( this._screenViewScale );
     }
 
     /**
@@ -147,6 +145,7 @@ define( require => {
       assert( [ 'normal', 'ultra-condensed', 'extra-condensed', 'condensed', 'semi-condensed', 'semi-expanded',
         'expanded', 'extra-expanded', 'ultra-expanded' ].includes( fontStretch ), `invalid stretch: ${ fontStretch }` );
       this._fontStretch = fontStretch;
+      this._updateTextBounds();
       this.layout( this._screenViewScale );
     }
 
@@ -160,6 +159,7 @@ define( require => {
       if ( fontSize === this._fontSize ) return; // Exit if setting to the same 'fontSize'
       assert( typeof fontSize === 'number', `invalid fontSize: ${ fontSize }` );
       this._fontSize = fontSize;
+      this._updateTextBounds();
       this.layout( this._screenViewScale );
     }
 
@@ -173,6 +173,7 @@ define( require => {
       if ( fontFamily === this._fontFamily ) return; // Exit if setting to the same 'fontFamily'
       assert( typeof fontFamily === 'string', `invalid fontFamily: ${ fontFamily }` );
       this._fontFamily = fontFamily;
+      this._updateTextBounds();
       this.layout( this._screenViewScale );
     }
 
@@ -250,6 +251,12 @@ define( require => {
       return result;
     }
 
+    _updateTextBounds() {
+      // Update bounds.
+      const textBoundingRect = Text._computeTextBoundingBox( this.text, this._generateCSS3FontString() );
+      this.width = textBoundingRect.width;
+      this.height = textBoundingRect.height;
+    }
 
 
     layout( scale ) {

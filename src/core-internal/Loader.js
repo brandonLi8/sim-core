@@ -112,11 +112,9 @@ define( require => {
 
       // @private
       this._titleLabel = new Text( 'asdf', {
-        // center: this._screenView.viewBounds.center.subtractXY( 0, 150 ),
+        center: this._screenView.viewBounds.center.subtractXY( 0, 150 ),
         fill: 'white',
-        fontSize: 39,
-        right: this._screenView.viewBounds.maxX,
-        top: 0
+        fontSize: 39
       } );
       this._screenView.addChild( this._titleLabel );
 
@@ -132,10 +130,13 @@ define( require => {
       } );
       //
       this._screenView.addChild( foregroundCirclePath );
+      let i = 0;
 
       window.addEventListener( 'mousedown', () => {
-        foregroundCirclePath.scale( new Vector( 2, 2 ) )
-        console.log( foregroundCirclePath.bounds.toString() )
+        i++;
+        this._titleLabel.fontFamily =  i % 2 === 0 ? 'Arial' : 'Times';
+        // foregroundCirclePath.scale( new Vector( 2, 2 ) )
+        console.log( this._titleLabel.bounds.toString() )
       })
     }
 
