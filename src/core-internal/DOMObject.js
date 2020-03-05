@@ -120,7 +120,7 @@ define( require => {
       //----------------------------------------------------------------------------------------
       this.setAttribute( 'id', this._id );        // validates options.id and sets the id.
       this.setAttribute( 'class', this._class );  // validates options.class and sets the class.
-      this.setText( this._text );                 // validates options.text and sets the text.
+      this._text && this.setText( this._text );   // validates options.text and sets the text.
       this.setAttribute( 'src', this._src );      // validates options.src and sets the src, if this._type is a image.
       this.setAttribute( 'href', this._href );    // validates options.href and sets the href, if this._type is a link.
       this.setChildren( options.children );       // validates options.children and sets the children.

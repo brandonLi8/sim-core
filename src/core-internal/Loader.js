@@ -111,10 +111,12 @@ define( require => {
       this.addChild( this._screenView );
 
       // @private
-      this._titleLabel = new Text( 'sadfadsfdsafasdfasdfasdfasdfasdfasdfasdfadsfadlskfhasdasdfasdfasdfahfkljadshfklsjdh', {
-        center: this._screenView.viewBounds.center.subtractXY( 0, 150 ),
+      this._titleLabel = new Text( 'asdf', {
+        // center: this._screenView.viewBounds.center.subtractXY( 0, 150 ),
         fill: 'white',
-        fontSize: 30
+        fontSize: 39,
+        left: 200,
+        bottom: this._screenView.viewBounds.maxY
       } );
       this._screenView.addChild( this._titleLabel );
 

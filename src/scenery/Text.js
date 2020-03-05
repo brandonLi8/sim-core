@@ -19,9 +19,6 @@ define( require => {
   const Node = require( 'SIM_CORE/scenery/Node' );
   const DOMObject = require( 'SIM_CORE/core-internal/DOMObject' );
 
-  // Test Text element, used to find the size of text elements with SVG
-  const scratchTextElement = new DOMObject( { type: 'text', });
-
   class Text extends Node {
 
     /**
@@ -53,12 +50,7 @@ define( require => {
         ...options
       };
       options.type = 'text'; // Set the type to a text element.
-      options.text = text;
       super( options );
-
-      const textMetrics = Text._getTextMetrics( text, this._generateCSS3FontString() );
-      this.width = textMetrics.width;
-      this.height = textMetrics.height;
 
       // @private {*} - see options declaration for documentation. Contains getters and setters. Set to null for now and
       //                to be set in the mutate() call in Text's constructor.
@@ -72,7 +64,9 @@ define( require => {
       this._strokeWidth;
       this._textRendering;
 
+      options.text = text;
       this.mutate( options );
+      this.setAttribute( 'dominant-baseline', 'hanging' );
     }
 
     /**
@@ -93,6 +87,26 @@ define( require => {
     get textRendering() { return this._textRendering; }
 
     //----------------------------------------------------------------------------------------
+
+    /**
+     * @override
+     * Sets the text of the TextNode of this DOMObject. If this DOMObject is visible, the text will be displayed inside.
+     * For background, see https://developer.mozilla.org/en-US/docs/Web/API/Document/createTextNode.
+     * @public
+     *
+     * @param {string|null} text - if null, nothing is displayed
+     * @returns {DOMObject} - Returns 'this' reference, for chaining
+     */
+    setText( text ) {
+      super.setText( text );
+      console.log( this._generateCSS3FontString()  );
+      // Update bounds.
+      const textBoundingRect = Text._computeTextBoundingBox( text, this._generateCSS3FontString() );
+      this.width = textBoundingRect.width;
+      this.height = textBoundingRect.height;
+      console.log( this.width, this.height )
+    }
+    set text( text ) { this.setText( text ); }
 
     /**
      * Sets the font-style of the Text. See https://www.w3schools.com/cssref/pr_font_font-style.asp.
@@ -133,7 +147,7 @@ define( require => {
       assert( [ 'normal', 'ultra-condensed', 'extra-condensed', 'condensed', 'semi-condensed', 'semi-expanded',
         'expanded', 'extra-expanded', 'ultra-expanded' ].includes( fontStretch ), `invalid stretch: ${ fontStretch }` );
       this._fontStretch = fontStretch;
-      this.style.font = this._generateCSS3FontString();
+      this.layout( this._screenViewScale );
     }
 
     /**
@@ -146,7 +160,7 @@ define( require => {
       if ( fontSize === this._fontSize ) return; // Exit if setting to the same 'fontSize'
       assert( typeof fontSize === 'number', `invalid fontSize: ${ fontSize }` );
       this._fontSize = fontSize;
-      this.style.font = this._generateCSS3FontString();
+      this.layout( this._screenViewScale );
     }
 
     /**
@@ -159,7 +173,7 @@ define( require => {
       if ( fontFamily === this._fontFamily ) return; // Exit if setting to the same 'fontFamily'
       assert( typeof fontFamily === 'string', `invalid fontFamily: ${ fontFamily }` );
       this._fontFamily = fontFamily;
-      this.style.font = this._generateCSS3FontString();
+      this.layout( this._screenViewScale );
     }
 
     /**
@@ -236,46 +250,44 @@ define( require => {
       return result;
     }
 
-    /**
-     * Computes the metrics of a text string, which gives the width and height of the text.
-     * See https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/measureText.
-     * @private
-     *
-     * @param {String} text - The text to be rendered.
-     * @param {String} font - The CSS3 combined font shorthand string.
-     * @returns {TextMetrics} - Object with width and height fields.
-     */
-    static _getTextMetrics( text, font ) {
-      scratchCanvasContext.font = font; // Set the font of the scratchCanvasContext;
-      return scratchCanvasContext.measureText( text );
+
+
+    layout( scale ) {
+      if ( !scale ) return; // Exit if no scale was provided.
+      super.layout( scale );
+
+      this.style.font = this._generateCSS3FontString();
+            console.log( 'layout', this.width, this.height, scale )
+
     }
 
-// console.log(getTextWidth("hello there!", "bold 12pt arial"));  // close to 86
-
-    // get fontSize() { return this._fontSize; }
-    // get fontFamily() { return this._fontFamily; }
-    // set fontSize( fontSize ) {
-    //   this._fontSize = fontSize;
-    //   this.layout( this.scale );
-    // }
-    // set fontFamily( fontFamily ) {
-    //   this._fontFamily = fontFamily;
-    //   this.layout( this.scale );
-    // }
-
-    // layout( scale ) {
-    //   super.layout( scale );
-    //   this.addAttributes( {
-
-    //     'font-size': `${ this.fontSize * scale }px`,
-    //     'font-family': `${ this.fontFamily }`
-    //   } );
-    // }
+    static _computeTextBoundingBox( text, font ) {
+      if ( !Text.testDOMObject ) {
+        Text.testDOMObject = new DOMObject( {
+          style: {
+            opacity: 0,
+            id: 'test-text-size-element',
+            whiteSpace: 'nowrap',
+            position: 'absolute',
+            left: '-65535px', // Ensure that it is not visible to the user.
+            top: '-65535px'
+          }
+        } );
+        document.body.appendChild( Text.testDOMObject.element );
+      }
+      // Set the scratch element to the text to determine its width and height.
+      Text.testDOMObject.text = text;
+      Text.testDOMObject.style.font = font;
+      return Text.testDOMObject.element.getBoundingClientRect();
+    }
   }
+
+  // @private {DOMObject} - Test DOMObject element, used to find the size of text elements.
+  Text.testDOMObject;
 
   // @protected @override {string[]} - setter names specific to Text. See Node.MUTATOR_KEYS for documentation.
   Text.MUTATOR_KEYS = [ 'fontSize', 'fontFamily', 'fontStyle', 'fontWeight', 'fontStretch',
-                        'shape', 'fill', 'stroke', 'strokeWidth', 'shapeRendering', ...Node.MUTATOR_KEYS ];
+                        'fill', 'stroke', 'strokeWidth', 'shapeRendering', 'text', ...Node.MUTATOR_KEYS ];
 
   return Text;
 } );
