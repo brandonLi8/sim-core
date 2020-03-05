@@ -106,13 +106,12 @@ define( require => {
 
       super( options );
 
-      // @private {ScreenView} - the screen view of the loader, for resizing purposes.
+      // @private {ScreenView} - the screen view of the loader.
       this._screenView = new ScreenView( { id: 'loader-screen-view' } );
       this.addChild( this._screenView );
 
       // @private
-      this._titleLabel = new Text( {
-        text: simName,
+      this._titleLabel = new Text( 'sadfadsfdsafasdfasdfasdfasdfasdfasdfasdfadsfadlskfhasdasdfasdfasdfahfkljadshfklsjdh', {
         center: this._screenView.viewBounds.center.subtractXY( 0, 150 ),
         fill: 'white',
         fontSize: 30
@@ -300,43 +299,6 @@ function isReady( callback ) {
     if ( document.readyState === 'complete' ) callback();
   } );
 }
-
-
-  /**
-   * Creates the 'd' attribute data structure for SVG descriptions for a circle arc path.
-   * Assumes that the path starts at angle 0 and rotates about the origin. Angle 360 fills an entire circular path while
-   * 0 fills none of it. For more details, see https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/d.
-   *
-   * @param {number} percentage - the percentage of the arc length relative to a full circle
-   * @returns {string} - the SVG data.
-   */
-  function getCirclePathData( percentage ) {
-
-    // Get the angle of rotation by multiplying the percentage (as a decimal) by 2PI radians.
-    const angle = percentage / 100 * Math.PI * 2; // in radians
-
-    // Adjust the angle so that it is relative to the y-axis. (For instance, angle: 90 is really angle 0 when drawn)
-    const adjustedAngle = Math.PI / 2 - angle;
-
-    // Get the starting and end Vectors as points.
-    const endVector = new Vector( 0, LOADER_CIRCLE_INNER_RADIUS ).setAngle( adjustedAngle );
-    const startVector = new Vector( 0, LOADER_CIRCLE_INNER_RADIUS );
-
-    const largeArcFlag = percentage > 50 ? 1 : 0;
-    const sweepFlag = 0;
-
-    return [
-
-      // The first step is to move to the starting coordinate.
-      // Represented as M X Y in the result string
-      'M', startVector.x, startVector.y,
-
-      // The second step is to move to the end coordinate in a circular path
-      // Represented as A startRadius endRadius startAngle largeArcFlag sweepFlag endX endY
-      'A', LOADER_CIRCLE_INNER_RADIUS, LOADER_CIRCLE_INNER_RADIUS, 0, largeArcFlag, sweepFlag, endVector.x, endVector.y
-
-    ].join( ' ' );
-  }
 
   return Loader;
 } );
