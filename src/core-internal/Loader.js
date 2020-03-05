@@ -115,8 +115,8 @@ define( require => {
         // center: this._screenView.viewBounds.center.subtractXY( 0, 150 ),
         fill: 'white',
         fontSize: 39,
-        left: 200,
-        bottom: this._screenView.viewBounds.maxY
+        right: this._screenView.viewBounds.maxX,
+        top: 0
       } );
       this._screenView.addChild( this._titleLabel );
 

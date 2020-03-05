@@ -262,8 +262,9 @@ define( require => {
     }
 
     static _computeTextBoundingBox( text, font ) {
-      if ( !Text.testDOMObject ) {
-        Text.testDOMObject = new DOMObject( {
+      if ( !Text.testSVGText ) {
+        Text.testSVGTextParent = new DOMObject( {
+          type: 'svg',
           style: {
             opacity: 0,
             id: 'test-text-size-element',
@@ -273,17 +274,21 @@ define( require => {
             top: '-65535px'
           }
         } );
-        document.body.appendChild( Text.testDOMObject.element );
+        Text.testSVGText = new DOMObject( { type: 'text', attributes: { 'text-rendering': 'geometricPrecision' } } );
+        Text.testSVGTextParent.addChild( Text.testSVGText );
+        document.body.appendChild( Text.testSVGTextParent.element );
       }
       // Set the scratch element to the text to determine its width and height.
-      Text.testDOMObject.text = text;
-      Text.testDOMObject.style.font = font;
-      return Text.testDOMObject.element.getBoundingClientRect();
+      Text.testSVGText.text = text;
+      Text.testSVGText.style.font = font;
+      return Text.testSVGText.element.getBBox();
     }
   }
-
   // @private {DOMObject} - Test DOMObject element, used to find the size of text elements.
-  Text.testDOMObject;
+  Text.testSVGText;
+
+  // @private {DOMObject} - Container for the SVG test element, which will be connected to the document body.
+  Text.testSVGTextParent;
 
   // @protected @override {string[]} - setter names specific to Text. See Node.MUTATOR_KEYS for documentation.
   Text.MUTATOR_KEYS = [ 'fontSize', 'fontFamily', 'fontStyle', 'fontWeight', 'fontStretch',
