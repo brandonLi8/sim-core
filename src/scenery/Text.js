@@ -94,8 +94,8 @@ define( require => {
 
     /**
      * @override
-     * Sets the text displayed of the Text Node. NOTE: setting the text will change the width of the Text. Changing the
-     * width keeps the minX the same but expands/contracts the right border See `Node.set width()` for documentation.
+     * Sets the text displayed of the Text Node. NOTE: setting the text will change the width of the Text, which
+     * keeps the minX the same but expands/contracts the right border See `Node.set width()` for documentation.
      * @public
      *
      * @param {string|null} text - if null, nothing is displayed
@@ -118,7 +118,6 @@ define( require => {
       assert( [ 'normal', 'italic', 'oblique' ].includes( fontStyle ), `invalid fontStyle: ${ fontStyle }` );
       this._fontStyle = fontStyle;
       this._updateTextBounds();
-      this.layout( this._screenViewScale );
     }
 
     /**
@@ -133,7 +132,6 @@ define( require => {
               [ 'normal', 'bold', 'bolder', 'lighter' ].includes( fontWeight ), `invalid fontWeight: ${ fontWeight }` );
       this._fontWeight = fontWeight;
       this._updateTextBounds();
-      this.layout( this._screenViewScale );
     }
 
     /**
@@ -144,10 +142,9 @@ define( require => {
      */
     set fontSize( fontSize ) {
       if ( fontSize === this._fontSize ) return; // Exit if setting to the same 'fontSize'
-      assert( typeof fontSize === 'number', `invalid fontSize: ${ fontSize }` );
+      assert( typeof fontSize === 'number' && fontSize > 0, `invalid fontSize: ${ fontSize }` );
       this._fontSize = fontSize;
       this._updateTextBounds();
-      this.layout( this._screenViewScale );
     }
 
     /**
@@ -161,7 +158,6 @@ define( require => {
       assert( typeof fontFamily === 'string', `invalid fontFamily: ${ fontFamily }` );
       this._fontFamily = fontFamily;
       this._updateTextBounds();
-      this.layout( this._screenViewScale );
     }
 
     /**
@@ -219,54 +215,92 @@ define( require => {
       this.element.setAttribute( 'text-rendering', textRendering );
     }
 
+    //----------------------------------------------------------------------------------------
+
     /**
      * Generates the combined CSS3 shorthand font string. See https://www.w3.org/TR/css-fonts-3/#propdef-font.
      * @private
      *
+     * @param {number|null} fontScale - factor to scale the font size.
      * @returns {string}
      */
-    _generateCSS3FontString() {
+    _generateCSS3FontString( fontScale ) {
+      assert( this._fontSize && this._fontFamily && this._fontStyle && this._fontWeight,
+        'cannot generate the font string of a degenerate Text Node.' );
       let result = ''; // Create a flag for the final font string.
 
       // Prepend the style, weight, and stretch if non-normal.
       if ( this._fontStyle !== 'normal' ) { result += this._fontStyle + ' '; }
       if ( this._fontWeight !== 'normal' ) { result += this._fontWeight + ' '; }
       // Add the size and font family .
-      result += this._fontSize * ( this._screenViewScale || 1 ) + 'px ' + this._fontFamily;
+      result += this._fontSize * fontScale + 'px ' + this._fontFamily;
       return result;
     }
 
-    _updateTextBounds() {
-      // Update bounds.
-      const textBoundingRect = Text._computeTextBoundingBox( this.text, this._generateCSS3FontString() );
-      if ( !textBoundingRect ) return;
-      this.width = textBoundingRect.width;
-      this.height = textBoundingRect.height;
-    }
-
-
+    /**
+     * @override
+     * Layouts the Text, ensuring that that the Text is correctly in its top-left corner with 0 transformations before
+     * calling the super class's layout method. Correctly scales the font-size pixel amount within in the ScreenView.
+     * @public (sim-core-internal)
+     *
+     * @param {number|null} scale - scenery scale, in terms of window pixels per ScreenView coordinate.
+     */
     layout( scale ) {
       if ( !scale ) return; // Exit if no scale was provided.
-      this.setAttribute( 'dominant-baseline', 'hanging' );
+
+      // Set the dominant-baseline attribute to position the Text in the top-left corner with 0 transformation.
+      if ( this.element.getAttribute( 'dominant-baseline' ) !== 'hanging' ) {
+        this.setAttribute( 'dominant-baseline', 'hanging' );
+      }
+
+      // Set the CSS font of the Text Node element, correctly passing the scale to scale the font-size pixel amount.
+      this.style.font = this._generateCSS3FontString( scale );
 
       super.layout( scale );
-
-      this.style.font = this._generateCSS3FontString();
-
     }
- // * Different methods of approximations have been discussed here:
- // * https://stackoverflow.com/questions/118241/calculate-text-width-with-javascript.
- // *
- // * For Text, both the width and the height are needed, so Canvas.measureText does not suffice. Through independent
- // * testing, I've found that using an SVG element with a text child is the most accurate of DOM-based solutions.
- // * Generally, there are two methods that get the bounds of SVG elements: getBBox() vs getBoundingClientRect().
- // * I've tested both of these methods and found that getBoundingClientRect() is by-far faster.
- // *
- // * Note that _computeTextBoundingBox( 1 ) returns the font in pixels. But since the scale is 1, the pixel amount will
- // * be in ScreenView scenery coordinates. Thus, the bounds of the text element will also be in scenery coordinates.
- // *
-    static _computeTextBoundingBox( text, font ) {
-      if ( !text ) return;
+
+    /**
+     * Update the Bounds (width and height) of the Text Node. Called when a font property or the text displayed is
+     * changed, resulting in a different width and height of the Text Node.
+     * @private
+     *
+     * Uses Text._approximateTextBounds() to approximate the Bounds of the Text.
+     */
+    _updateTextBounds() {
+      // Must be a valid Text Node.
+      if ( this._fontSize && this._fontFamily && this._fontStyle && this._fontWeight ) {
+
+        // Compute the bounds of the Text and set the width and height.
+        const approximateTextBounds = Text._approximateTextBounds( this );
+        this.width = approximateTextBounds.width;
+        this.height = approximateTextBounds.height;
+
+        // At this point, since this is called when a font property changes or when the text displayed is changed,
+        // call layout as the font has changed. Layout isn't needed as its minX and minY doesn't change.
+        this.style.font = this._generateCSS3FontString( this._screenViewScale );
+      }
+    }
+
+    /**
+     * Approximates the bounds of a Text Node using a DOM-based svg method.
+     * Different methods of approximations have been discussed here:
+     * https://stackoverflow.com/questions/118241/calculate-text-width-with-javascript.
+     *
+     * For Text, both the width and the height are needed, so Canvas.measureText does not suffice. Through independent
+     * testing, I've found that using an SVG element with a text child is the most accurate of DOM-based solutions.
+     * Generally, there are two methods that get the bounds of SVG elements: getBBox() vs getBoundingClientRect().
+     * I've tested both of these methods and found that getBoundingClientRect() is by-far faster.
+     *
+     * Note that text._generateCSS3FontString( 1 ) returns the font in pixels. But since the scale is 1, the pixel amount
+     * will be in ScreenView scenery coordinates. Thus, the bounds of the text element will also be in scenery coordinates.
+     * @public
+     *
+     * @param {Text} text
+     * @returns {DOMRect} - Object that contains width and height fields of the Text Node's bounds.
+     */
+    static _approximateTextBounds( text ) {
+
+      // Initialize the containers and elements required for SVG text measurement.
       if ( !Text.testSVGText ) {
         Text.testSVGTextParent = new DOMObject( {
           type: 'svg',
@@ -280,25 +314,18 @@ define( require => {
           }
         } );
         Text.testSVGText = new DOMObject( { type: 'text', attributes: { 'text-rendering': 'geometricPrecision' } } );
+
         Text.testSVGTextParent.addChild( Text.testSVGText );
         document.body.appendChild( Text.testSVGTextParent.element );
       }
-      // Set the scratch element to the text to determine its width and height.
-      Text.testSVGText.text = text;
-      Text.testSVGText.style.font = font;
+      // Set the text and font of the svg text element determine its width and height.
+      Text.testSVGText.text = text.text;
+      Text.testSVGText.style.font = text._generateCSS3FontString( 1 );
 
-      let timeNow = performance.now();
-      const bbBox = Text.testSVGText.element.getBBox();
-      const bbBoxTime = performance.now() - timeNow;
-
-      timeNow = performance.now();
-      const rect = Text.testSVGText.element.getBoundingClientRect();
-      const rectTime = performance.now() - timeNow;
-
-      console.log( `${ bbBox.width } ${ rect.width } bbox: ${ bbBoxTime } rect: ${ rectTime } winner: ${ bbBoxTime > rectTime ? 'rect' : 'bbBox'}` )
-      return Text.testSVGText.element.getBBox();
+      return Text.testSVGText.element.getBoundingClientRect();
     }
   }
+
   // @private {DOMObject} - Test DOMObject element, used to find the size of text elements.
   Text.testSVGText;
 

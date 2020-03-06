@@ -157,7 +157,7 @@ define( require => {
     /**
      * @override
      * Layouts the Path, ensuring that that the Shape is correctly in its top-left corner with 0 transformations before
-     * calling the super class's layout method.
+     * calling the super class's layout method. Correctly scales the shape within the ScreenView.
      * @public (sim-core-internal)
      *
      * @param {number|null} scale - scenery scale, in terms of window pixels per ScreenView coordinate.

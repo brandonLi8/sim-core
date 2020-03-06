@@ -114,7 +114,7 @@ define( require => {
       this._titleLabel = new Text( 'asddafsdfasdfdsfsdff', {
         center: this._screenView.viewBounds.center.subtractXY( 0, 150 ),
         fill: 'green',
-        fontSize: 39,
+        fontSize: 1,
         stroke: 'blue',
         fontFamily: 'times',
         fontWeight: 'bold',
@@ -141,7 +141,8 @@ define( require => {
 
       window.addEventListener( 'mousedown', () => {
         i++;
-        this._titleLabel.fontStyle = i % 2 === 0 ? 'italic' : 'normal';
+        this._titleLabel.fontSize -= 1;
+        // this._titleLabel.fontStyle = i % 2 === 0 ? 'italic' : 'normal';
         // this._titleLabel.fontStyle =  i % 2 === 0 ? 'italic' : 'normal';
         // foregroundCirclePath.scale( new Vector( 2, 2 ) )
         console.log( this._titleLabel.bounds.toString() )
