@@ -70,6 +70,7 @@ define( require => {
       this._strokeWidth;
       this._textRendering;
 
+      // At this point, set the text option and call mutate again to ensure correct ordering of mutator keys.
       options.text = text;
       this.mutate( options );
     }
@@ -96,8 +97,8 @@ define( require => {
 
     /**
      * @override
-     * Sets the text of the TextNode of this DOMObject. If this DOMObject is visible, the text will be displayed inside.
-     * For background, see https://developer.mozilla.org/en-US/docs/Web/API/Document/createTextNode.
+     * Sets the text displayed of the Text Node. NOTE: setting the text will change the width of the Text. Changing the
+     * width keeps the minX the same but expands/contracts the right border See `Node.set width()` for documentation.
      * @public
      *
      * @param {string|null} text - if null, nothing is displayed
