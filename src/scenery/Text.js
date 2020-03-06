@@ -3,8 +3,13 @@
 /**
  * A Text Node that displays text in different fonts, sizes, weights, colors, etc, for scenery.
  *
+ * Unlike other Node subtypes, Text will need to approximate its bounds based of the font and the text that is
+ * displayed (see Text._approximateTextBounds()). However, this does not guarantee that all text-content is inside of
+ * the returned bounds.
+ *
  * While code comments attempt to describe the implementation clearly, fully understanding it may require some
  * general background. Some useful references include:
+ *    - https://developer.mozilla.org/en-US/docs/Web/SVG/Element/text
  *    - http://www.w3.org/TR/css3-fonts/
  *    - https://www.w3.org/TR/css-fonts-3/#propdef-font
  *
@@ -16,40 +21,41 @@ define( require => {
 
   // modules
   const assert = require( 'SIM_CORE/util/assert' );
-  const Node = require( 'SIM_CORE/scenery/Node' );
   const DOMObject = require( 'SIM_CORE/core-internal/DOMObject' );
+  const Node = require( 'SIM_CORE/scenery/Node' );
 
   class Text extends Node {
 
     /**
-     * @param {string|number} text - The initial text to display.
+     * @param {string|number} text - The initial text to display. May use empty string if needed.
      * @param {Object} [options] - Various key-value pairs that control the appearance and behavior. See the code where
      *                             the options are set in the early portion of the constructor for details.
      */
     constructor( text, options ) {
       assert( text && ( typeof text === 'number' || typeof text === 'string' ), `invalid text: ${ text }` );
       assert( !options || Object.getPrototypeOf( options ) === Object.prototype, `invalid options: ${ options }` );
-
-      // Some options are set by Text. Assert that they weren't provided.
+      assert( !options || !options.attributes, 'Text sets attributes' );
       assert( !options || !options.width, 'Text sets width' );
       assert( !options || !options.height, 'Text sets height' );
       assert( !options || !options.type, 'Text sets type' );
+      assert( !options || !options.text, 'Text should be provided in the first argument' );
 
       options = {
-        fontStyle: 'normal',      // {string} - the font-style of the Text. See `set fontStyle()`.
-        fontWeight: 'normal',     // {string|number} - the font-weight of the Text. See `set fontWeight()`.
-        fontStretch: 'normal',    // {string} - the css font-stretch of the Text. See `set fontStretch()`.
-        fontSize: 12,             // {number} - the font-size of the Text. See `set fontSize()`.
-        fontFamily: 'Arial',      // {string} - the css font-family of the Text. See `set fontFamily()`.
-        fill: '#000000',          // {string} - Sets the fill color of the Text. See `set fill()`.
-        stroke: null,             // {string} - Sets the stroke color of the Text. See `set stroke()`.
-        strokeWidth: 0,           // {number} - Sets the stroke width of this Text. See `set strokeWidth()`.
-        textRendering: 'auto',    // {string} - Sets the shape-rendering method of this Text. See `set textRendering()`.
+        type: 'text', // Set the type to a text element. Cannot be overridden.
+
+        fontStyle: 'normal',    // {string} - the font-style of the Text. See `set fontStyle()`.
+        fontWeight: 'normal',   // {string|number} - the font-weight of the Text. See `set fontWeight()`.
+        fontStretch: 'normal',  // {string} - the css font-stretch of the Text. See `set fontStretch()`.
+        fontSize: 12,           // {number} - the font-size of the Text. See `set fontSize()`.
+        fontFamily: 'Arial',    // {string} - the css font-family of the Text. See `set fontFamily()`.
+        fill: '#000000',        // {string} - Sets the fill color of the Text. See `set fill()`.
+        stroke: null,           // {string} - Sets the stroke color of the Text. See `set stroke()`.
+        strokeWidth: 0,         // {number} - Sets the stroke width of this Text. See `set strokeWidth()`.
+        textRendering: 'auto',  // {string} - Sets the shape-rendering method of this Text. See `set textRendering()`.
 
         // Rewrite options so that it overrides the defaults.
         ...options
       };
-      options.type = 'text'; // Set the type to a text element.
       super( options );
 
       // @private {*} - see options declaration for documentation. Contains getters and setters. Set to null for now and
@@ -66,7 +72,6 @@ define( require => {
 
       options.text = text;
       this.mutate( options );
-      this.setAttribute( 'dominant-baseline', 'hanging' );
     }
 
     /**
@@ -254,6 +259,7 @@ define( require => {
     _updateTextBounds() {
       // Update bounds.
       const textBoundingRect = Text._computeTextBoundingBox( this.text, this._generateCSS3FontString() );
+      if ( !textBoundingRect ) return;
       this.width = textBoundingRect.width;
       this.height = textBoundingRect.height;
     }
@@ -261,14 +267,26 @@ define( require => {
 
     layout( scale ) {
       if ( !scale ) return; // Exit if no scale was provided.
+      this.setAttribute( 'dominant-baseline', 'hanging' );
+
       super.layout( scale );
 
       this.style.font = this._generateCSS3FontString();
-            console.log( 'layout', this.width, this.height, scale )
 
     }
-
+ // * Different methods of approximations have been discussed here:
+ // * https://stackoverflow.com/questions/118241/calculate-text-width-with-javascript.
+ // *
+ // * For Text, both the width and the height are needed, so Canvas.measureText does not suffice. Through independent
+ // * testing, I've found that using an SVG element with a text child is the most accurate of DOM-based solutions.
+ // * Generally, there are two methods that get the bounds of SVG elements: getBBox() vs getBoundingClientRect().
+ // * I've tested both of these methods and found that getBoundingClientRect() is by-far faster.
+ // *
+ // * Note that _computeTextBoundingBox( 1 ) returns the font in pixels. But since the scale is 1, the pixel amount will
+ // * be in ScreenView scenery coordinates. Thus, the bounds of the text element will also be in scenery coordinates.
+ // *
     static _computeTextBoundingBox( text, font ) {
+      if ( !text ) return;
       if ( !Text.testSVGText ) {
         Text.testSVGTextParent = new DOMObject( {
           type: 'svg',
@@ -288,6 +306,16 @@ define( require => {
       // Set the scratch element to the text to determine its width and height.
       Text.testSVGText.text = text;
       Text.testSVGText.style.font = font;
+
+      let timeNow = performance.now();
+      const bbBox = Text.testSVGText.element.getBBox();
+      const bbBoxTime = performance.now() - timeNow;
+
+      timeNow = performance.now();
+      const rect = Text.testSVGText.element.getBoundingClientRect();
+      const rectTime = performance.now() - timeNow;
+
+      console.log( `${ bbBox.width } ${ rect.width } bbox: ${ bbBoxTime } rect: ${ rectTime } winner: ${ bbBoxTime > rectTime ? 'rect' : 'bbBox'}` )
       return Text.testSVGText.element.getBBox();
     }
   }
