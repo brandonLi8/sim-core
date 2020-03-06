@@ -45,7 +45,6 @@ define( require => {
 
         fontStyle: 'normal',    // {string} - the font-style of the Text. See `set fontStyle()`.
         fontWeight: 'normal',   // {string|number} - the font-weight of the Text. See `set fontWeight()`.
-        fontStretch: 'normal',  // {string} - the css font-stretch of the Text. See `set fontStretch()`.
         fontSize: 12,           // {number} - the font-size of the Text. See `set fontSize()`.
         fontFamily: 'Arial',    // {string} - the css font-family of the Text. See `set fontFamily()`.
         fill: '#000000',        // {string} - Sets the fill color of the Text. See `set fill()`.
@@ -62,7 +61,6 @@ define( require => {
       //                to be set in the mutate() call in Text's constructor.
       this._fontStyle;
       this._fontWeight;
-      this._fontStretch;
       this._fontSize;
       this._fontFamily;
       this._fill;
@@ -84,7 +82,6 @@ define( require => {
      */
     get fontStyle() { return this._fontStyle; }
     get fontWeight() { return this._fontWeight; }
-    get fontStretch() { return this._fontStretch; }
     get fontSize() { return this._fontSize; }
     get fontFamily() { return this._fontFamily; }
     get fill() { return this._fill; }
@@ -135,22 +132,6 @@ define( require => {
       assert( typeof fontWeight === 'number' ? ( fontWeight <= 900 && fontWeight >= 100 && fontWeight % 100 === 0 ) :
               [ 'normal', 'bold', 'bolder', 'lighter' ].includes( fontWeight ), `invalid fontWeight: ${ fontWeight }` );
       this._fontWeight = fontWeight;
-      this._updateTextBounds();
-      this.layout( this._screenViewScale );
-    }
-
-    /**
-     * Sets the font-stretch of the Text. https://www.w3schools.com/cssref/css3_pr_font-stretch.asp
-     * @public
-     *
-     * @param {string} fontStretch - 'normal', 'ultra-condensed', 'extra-condensed', 'condensed', 'semi-condensed',
-     *                               'semi-expanded', 'expanded', 'extra-expanded' or 'ultra-expanded'
-     */
-    set fontStretch( fontStretch ) {
-      if ( fontStretch === this._fontStretch ) return; // Exit if setting to the same 'fontStretch'
-      assert( [ 'normal', 'ultra-condensed', 'extra-condensed', 'condensed', 'semi-condensed', 'semi-expanded',
-        'expanded', 'extra-expanded', 'ultra-expanded' ].includes( fontStretch ), `invalid stretch: ${ fontStretch }` );
-      this._fontStretch = fontStretch;
       this._updateTextBounds();
       this.layout( this._screenViewScale );
     }
@@ -250,8 +231,6 @@ define( require => {
       // Prepend the style, weight, and stretch if non-normal.
       if ( this._fontStyle !== 'normal' ) { result += this._fontStyle + ' '; }
       if ( this._fontWeight !== 'normal' ) { result += this._fontWeight + ' '; }
-      if ( this._fontStretch !== 'normal' ) { result += this._fontStretch + ' '; }
-
       // Add the size and font family .
       result += this._fontSize * ( this._screenViewScale || 1 ) + 'px ' + this._fontFamily;
       return result;

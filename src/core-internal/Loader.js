@@ -117,7 +117,6 @@ define( require => {
         fontSize: 39,
         stroke: 'blue',
         fontFamily: 'times',
-        fontStretch: 'ultra-condensed',
         fontWeight: 'bold',
         fontStyle: 'italic',
 
@@ -142,7 +141,7 @@ define( require => {
 
       window.addEventListener( 'mousedown', () => {
         i++;
-        this._titleLabel.text += 'ewr';
+        this._titleLabel.fontStyle = i % 2 === 0 ? 'italic' : 'normal';
         // this._titleLabel.fontStyle =  i % 2 === 0 ? 'italic' : 'normal';
         // foregroundCirclePath.scale( new Vector( 2, 2 ) )
         console.log( this._titleLabel.bounds.toString() )
