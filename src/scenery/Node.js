@@ -535,9 +535,9 @@ define( require => {
       const height = ( this.height * scale ).toFixed( 10 );            // Scale to convert to pixels.
 
       // Create a flag for the final transform attribute string.
-      let transformString = `translate( ${ translateX } ${ translateY } )`;
-      // if ( rotation !== 0 ) transformString += `rotate( ${ rotation } ${ width / 2 } ${ height / 2 } )`;
-      // if ( scaleX !== 1 || scaleY !== 1 ) transformString += `scale( ${ scaleX } ${ scaleY } )`;
+      const transformString = `translate( ${ translateX } ${ translateY } )`
+                              + ` rotate( ${ rotation } ${ width / 2 } ${ height / 2 } )`;
+                              + ` scale( ${ scaleX } ${ scaleY } )`;
 
       // Set the svg transform attribute and reference the new screenViewScale.
       this.setAttribute( 'transform', transformString );

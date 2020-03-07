@@ -1,4 +1,4 @@
-// Copyright © 2020 Brandon Li. All rights reserved.
+// Copyright © 2019-2020 Brandon Li. All rights reserved.
 
 /**
  * Before reading the documentation of this file, it is recommended to read `SIM_CORE/util/Shape` for context.
@@ -18,7 +18,6 @@ define( require => {
   const Node = require( 'SIM_CORE/scenery/Node' );
   const Shape = require( 'SIM_CORE/util/Shape' );
   const Util = require( 'SIM_CORE/util/Util' );
-  const Vector = require( 'SIM_CORE/util/Vector' );
 
   class Path extends Node {
 
@@ -156,7 +155,7 @@ define( require => {
 
     /**
      * @override
-     * Layouts the Path, ensuring that that the Shape is correctly in its top-left corner with 0 transformations before
+     * Layouts the Path, ensuring that the Shape is correctly in its top-left corner with 0 transformations before
      * calling the super class's layout method. Correctly scales the shape within the ScreenView.
      * @public (sim-core-internal)
      *

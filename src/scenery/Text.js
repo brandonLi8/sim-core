@@ -127,7 +127,7 @@ define( require => {
      * @param {number|string} fontWeight - 'normal', 'bold', 'bolder', 'lighter', 100, 200, 300, 400, ..., 800, or 900
      */
     set fontWeight( fontWeight ) {
-      if ( fontWeight === this._fontWeight) return; // Exit if setting to the same 'fontWeight'
+      if ( fontWeight === this._fontWeight ) return; // Exit if setting to the same 'fontWeight'
       assert( typeof fontWeight === 'number' ? ( fontWeight <= 900 && fontWeight >= 100 && fontWeight % 100 === 0 ) :
               [ 'normal', 'bold', 'bolder', 'lighter' ].includes( fontWeight ), `invalid fontWeight: ${ fontWeight }` );
       this._fontWeight = fontWeight;
@@ -239,7 +239,7 @@ define( require => {
 
     /**
      * @override
-     * Layouts the Text, ensuring that that the Text is correctly in its top-left corner with 0 transformations before
+     * Layouts the Text, ensuring that the Text is correctly in its top-left corner with 0 transformations before
      * calling the super class's layout method. Correctly scales the font-size pixel amount within in the ScreenView.
      * @public (sim-core-internal)
      *
@@ -291,8 +291,9 @@ define( require => {
      * Generally, there are two methods that get the bounds of SVG elements: getBBox() vs getBoundingClientRect().
      * I've tested both of these methods and found that getBoundingClientRect() is by-far faster.
      *
-     * Note that text._generateCSS3FontString( 1 ) returns the font in pixels. But since the scale is 1, the pixel amount
-     * will be in ScreenView scenery coordinates. Thus, the bounds of the text element will also be in scenery coordinates.
+     * Note that text._generateCSS3FontString( 1 ) returns the font in pixels. But since the scale is 1, the pixel
+     * amount will be in ScreenView scenery coordinates, meaning the bounds of the text element will also be in scenery
+     * coordinates.
      * @public
      *
      * @param {Text} text
