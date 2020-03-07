@@ -438,7 +438,7 @@ define( require => {
     }
 
     /**
-     * Modifies this bounds such that it is smallest bounds that contains this bounds and the the point (x, y).
+     * Modifies this bounds such that it is smallest bounds that contains this bounds and the point (x, y).
      * @public
      *
      * @param {Vector} point - the point to include in the bounds
