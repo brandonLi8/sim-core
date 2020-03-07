@@ -34,6 +34,7 @@ define( require => {
   const Shape = require( 'SIM_CORE/util/Shape' );
   const Text = require( 'SIM_CORE/scenery/Text' );
   const Vector = require( 'SIM_CORE/util/Vector' );
+  const Node = require( 'SIM_CORE/scenery/Node' );
 
   // constants
   const SIM_SOURCE_LOADING_BANDWIDTH = 35 + Math.random() * 10; // Random number from 35 to 45
@@ -110,20 +111,22 @@ define( require => {
       this._screenView = new ScreenView( { id: 'loader-screen-view' } );
       this.addChild( this._screenView );
 
-      // @private
-      this._titleLabel = new Text( 'asddafsdfasdfdsfsdff', {
-        center: this._screenView.viewBounds.center.subtractXY( 0, 150 ),
-        fill: 'green',
-        fontSize: 1,
-        stroke: 'blue',
-        fontFamily: 'times',
-        fontWeight: 'bold',
-        fontStyle: 'italic',
+      const node = new Node( { center: this._screenView.viewBounds.center } );
 
-        strokeWidth: 2
+      // // @private
+      // this._titleLabel = new Text( 'asddafsdfasdfdsfsdff', {
+      //   center: this._screenView.viewBounds.center.subtractXY( 0, 150 ),
+      //   fill: 'green',
+      //   fontSize: 40,
+      //   stroke: 'blue',
+      //   fontFamily: 'times',
+      //   fontWeight: 'bold',
+      //   fontStyle: 'italic',
 
-      } );
-      this._screenView.addChild( this._titleLabel );
+      //   strokeWidth: 2
+
+      // } );
+      // this._screenView.addChild( this._titleLabel );
 
       const foregroundCircleShape = new Shape()
         .moveTo( 1000, 1000 )
@@ -133,20 +136,23 @@ define( require => {
         fill: 'blue',
         stroke: 'green',
         strokeWidth: 1,
-        center: this._screenView.viewBounds.center
+        topLeft: new Vector( 300, 0 )
       } );
-      //
-      this._screenView.addChild( foregroundCirclePath );
-      let i = 0;
+            this._screenView.addChild( node.addChild( foregroundCirclePath ) );
 
-      window.addEventListener( 'mousedown', () => {
-        i++;
-        this._titleLabel.fontSize -= 1;
-        // this._titleLabel.fontStyle = i % 2 === 0 ? 'italic' : 'normal';
-        // this._titleLabel.fontStyle =  i % 2 === 0 ? 'italic' : 'normal';
-        // foregroundCirclePath.scale( new Vector( 2, 2 ) )
-        console.log( this._titleLabel.bounds.toString() )
-      })
+            console.log( node.bounds.toString(), node.globalBounds.toString(), foregroundCirclePath.bounds.toString(), foregroundCirclePath.globalBounds.toString())
+      // //
+      // this._screenView.addChild( foregroundCirclePath );
+      // let i = 0;
+
+      // window.addEventListener( 'mousedown', () => {
+      //   i++;
+      //   this._titleLabel.scale( 1.5);
+      //   // this._titleLabel.fontStyle = i % 2 === 0 ? 'italic' : 'normal';
+      //   // this._titleLabel.fontStyle =  i % 2 === 0 ? 'italic' : 'normal';
+      //   // foregroundCirclePath.scale( new Vector( 2, 2 ) )
+      //   console.log( this._titleLabel.bounds.toString() )
+      // })
     }
 
     layout( width, height ) {

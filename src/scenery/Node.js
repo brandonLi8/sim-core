@@ -70,9 +70,6 @@ define( require => {
 
         // Super-class options
         type: 'g',
-        style: {
-          position: 'absolute' // Ensure that every Node is relative to the ScreenView
-        },
 
         // Options specific to Node
         cursor: null,       // {string} - Alias of the CSS cursor of the Node. See set cursor() for doc.
@@ -529,19 +526,18 @@ define( require => {
        * attribute. See https://developer.mozilla.org/en-US/docs/JavaScript/Reference/Global_Objects/Number/toFixed
        * NOTE: the toFixed calls are inlined for performance reasons, and slight inaccuracies won't be visible.
        */
-      const globalBounds = this._computeGlobalBounds( scratchBounds );
       const scaleX = ( this._scalar instanceof Vector ? this._scalar.x : this._scalar ).toFixed( 10 );
       const scaleY = ( this._scalar instanceof Vector ? this._scalar.y : this._scalar ).toFixed( 10 );
       const rotation = ( Util.toDegrees( this.rotation ) ).toFixed( 10 );
-      const translateX = ( globalBounds.minX * scale ).toFixed( 10 ); // Scale to convert to pixels.
-      const translateY = ( globalBounds.minY * scale ).toFixed( 10 );  // Scale to convert to pixels.
-      const width = ( this.width * scale ).toFixed( 10 );             // Scale to convert to pixels.
-      const height = ( this.height * scale ).toFixed( 10 );           // Scale to convert to pixels.
+      const translateX = ( this._bounds.minX * scale ).toFixed( 10 );  // Scale to convert to pixels.
+      const translateY = ( this._bounds.minY * scale ).toFixed( 10 );  // Scale to convert to pixels.
+      const width = ( this.width * scale ).toFixed( 10 );              // Scale to convert to pixels.
+      const height = ( this.height * scale ).toFixed( 10 );            // Scale to convert to pixels.
 
       // Create a flag for the final transform attribute string.
       let transformString = `translate( ${ translateX } ${ translateY } )`;
-      if ( rotation !== 0 ) transformString += `rotate( ${ rotation } ${ width / 2 } ${ height / 2 } )`;
-      if ( scaleX !== 1 || scaleY !== 1 ) transformString += `scale( ${ scaleX } ${ scaleY } )`;
+      // if ( rotation !== 0 ) transformString += `rotate( ${ rotation } ${ width / 2 } ${ height / 2 } )`;
+      // if ( scaleX !== 1 || scaleY !== 1 ) transformString += `scale( ${ scaleX } ${ scaleY } )`;
 
       // Set the svg transform attribute and reference the new screenViewScale.
       this.setAttribute( 'transform', transformString );
