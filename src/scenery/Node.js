@@ -378,7 +378,7 @@ define( require => {
         // Calculate how much to expand our bounds
         const xExpand = this.width / 2 * ( a.x - 1 );
         const yExpand = this.height / 2 * ( a.y - 1 );
-        if ( xExpand && yExpand ) this._bounds.expand( xExpand, yExpand, xExpand, yExpand );
+        if ( xExpand || yExpand ) this._bounds.expand( xExpand, yExpand, xExpand, yExpand );
 
         // Ensure the maxWidth and maxHeight flags are satisfied.
         this._updateMaxDimension();
@@ -536,7 +536,7 @@ define( require => {
 
       // Create a flag for the final transform attribute string.
       const transformString = `translate( ${ translateX } ${ translateY } )`
-                              + ` rotate( ${ rotation } ${ width / 2 } ${ height / 2 } )`;
+                              + ` rotate( ${ rotation } ${ width / 2 } ${ height / 2 } )`
                               + ` scale( ${ scaleX } ${ scaleY } )`;
 
       // Set the svg transform attribute and reference the new screenViewScale.

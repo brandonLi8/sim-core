@@ -17,7 +17,7 @@
  *      launch really quickly). This portion of the loading will be sped up with cached images.
  *
  *  (3) Synchronously ensuring that the DOM is fully loaded and ready to be manipulated with all simulation rendering
- *      ready. This is defined as DOM_LOADING_BANDWIDTH% of the loading bandwidth, even if the DOM is fully ready
+ *      in place. This is defined as DOM_LOADING_BANDWIDTH% of the loading bandwidth, even if the DOM is fully ready
  *      already. This portion of the loading should not be greatly affected by caching.
  *
  * @author Brandon Li <brandon.li820@gmail.com>
@@ -29,16 +29,17 @@ define( require => {
   // modules
   const assert = require( 'SIM_CORE/util/assert' );
   const DOMObject = require( 'SIM_CORE/core-internal/DOMObject' );
+  const Node = require( 'SIM_CORE/scenery/Node' );
   const Path = require( 'SIM_CORE/scenery/Path' );
   const ScreenView = require( 'SIM_CORE/scenery/ScreenView' );
   const Shape = require( 'SIM_CORE/util/Shape' );
   const Text = require( 'SIM_CORE/scenery/Text' );
   const Vector = require( 'SIM_CORE/util/Vector' );
-  const Node = require( 'SIM_CORE/scenery/Node' );
+  const Util = require( 'SIM_CORE/util/Util' );
 
   // constants
   const SIM_SOURCE_LOADING_BANDWIDTH = 35 + Math.random() * 10; // Random number from 35 to 45
-  const IMAGE_LOADING_BANDWIDTH = 20 + Math.random() * 15; // Random number from 20 to 35
+  const IMAGE_LOADING_BANDWIDTH = 20 + Math.random() * 15;      // Random number from 20 to 35
   const DOM_LOADING_BANDWIDTH = 100 - IMAGE_LOADING_BANDWIDTH - SIM_SOURCE_LOADING_BANDWIDTH;
 
 
@@ -61,7 +62,7 @@ define( require => {
   class Loader extends DOMObject {
 
     /**
-     * @param {string[]} simScreens - all screens to the simulation
+     * @param {string[]} simScreens - all screens of the simulation
      * @param {string} simName - the name of the simulation, displayed in the Loader
      * @param {Object} [options] - Various key-value pairs that control the appearance and behavior of this class.
      *                             Some options are specific to this class while others are passed to the super class.
@@ -77,86 +78,79 @@ define( require => {
       assert( !options || !options.id || !options.class || !options.attributes, 'Loader sets attributes' );
       assert( !options || !options.children, 'Loader sets children.' );
 
-      // Defaults for options.
-      const defaults = {
-
-        // Options specific to this class
+      options = {
         backgroundColor: '#0f0f0f',  // {string} - the backdrop color of the loader
         loaderCircleBg: '#A5A5A5',   // {string} - the background color of the loader circle
         loaderCircleFg: '#2974b2',   // {string} - the foreground color of the loader circle
         loaderTitleColor: '#F1F1F1', // {string} - the font color of the text of the sim name near the top of the Loader
-        loaderCircleInnerRadius: 12, // {number} - the inner-radius of the loader circle, in the standard scenery frame
-        loaderCircleStrokeWidth: 12, // {number} - the stroke-width of the loader circle, in the standard scenery frame
+        loaderCircleRadius: 50,       // {number} - the inner-radius of the loader circle, in the standard scenery frame
+        loaderCircleStrokeWidth: 13, // {number} - the stroke-width of the loader circle, in the standard scenery frame
 
-        // Options specific to the super-class
-        id: 'loader',
-        style: {
-          height: '100%',
-          display: 'flex',
-          justifyContent: 'center',
-          alignContent: 'center',
-          alignItems: 'center',
-          zIndex: 999999
-        }
+        // Rewrite options so that it overrides the defaults.
+        ...options
       };
 
-      // Rewrite options so that it overrides the defaults.
-      options = { ...defaults, ...options };
-      options.style = { ...defaults.style, ...options.style };
-      options.style.backgroundColor = options.backgroundColor;
-
+      // Set the style of the Loader
+      options.style = {
+        height: '100%',
+        display: 'flex',
+        justifyContent: 'center',
+        alignContent: 'center',
+        alignItems: 'center',
+        zIndex: 999999,
+        backgroundColor: options.backgroundColor
+      };
       super( options );
 
-      // @private {ScreenView} - the screen view of the loader.
-      this._screenView = new ScreenView( { id: 'loader-screen-view' } );
-      this.addChild( this._screenView );
+      // @private {ScreenView} - initialize a ScreenView for the Loader to use scenery Nodes and to properly guarantee
+      //                         all loader content is scaled and positioned properly.
+      this._loaderScreenView = new ScreenView( { id: 'loader-screen-view' } );
 
-      const node = new Node( { center: this._screenView.viewBounds.center } );
-
-      // // @private
-      // this._titleLabel = new Text( 'asddafsdfasdfdsfsdff', {
-      //   center: this._screenView.viewBounds.center.subtractXY( 0, 150 ),
-      //   fill: 'green',
-      //   fontSize: 40,
-      //   stroke: 'blue',
-      //   fontFamily: 'times',
-      //   fontWeight: 'bold',
-      //   fontStyle: 'italic',
-
-      //   strokeWidth: 2
-
-      // } );
-      // this._screenView.addChild( this._titleLabel );
-
-      const foregroundCircleShape = new Shape()
-        .moveTo( 1000, 1000 )
-        .arc( 100, -Math.PI / 2, - 3 * Math.PI / 4, false )
-
-      const foregroundCirclePath = new Path( foregroundCircleShape, {
-        fill: 'blue',
-        stroke: 'green',
-        strokeWidth: 1,
-        topLeft: new Vector( 300, 0 )
+      // @private {Text} - Create the Text Node that displays the title of the simulation in the loader.
+      this._titleLabel = new Text( simName, {
+        center: this._loaderScreenView.viewBounds.center.subtractXY( 0, 130 ),
+        maxWidth: this._loaderScreenView.viewBounds.width,
+        fill: options.loaderTitleColor,
+        fontSize: 30,
+        strokeWidth: 2
       } );
-            this._screenView.addChild( node.addChild( foregroundCirclePath ) );
 
-            console.log( node.bounds.toString(), node.globalBounds.toString(), foregroundCirclePath.bounds.toString(), foregroundCirclePath.globalBounds.toString())
+      // @private {Shape} - Create the Shape that represents the background circle of the loader circle.
+      this._backgroundCircleShape = new Shape().moveTo( 0, 0 )
+                                               .arc( options.loaderCircleRadius, 0, 2 * Math.PI - Util.EPSILON );
+
+      // @private {Path} - Create the Path that renders the background circle of the loader circle.
+      this._backgroundCirclePath = new Path( this._backgroundCircleShape, {
+        fill: 'none', // transparent inside
+        stroke: options.loaderCircleBg,
+        strokeWidth: options.loaderCircleStrokeWidth,
+        center: this._loaderScreenView.viewBounds.center.addXY( 0, 130 / 2 ),
+      } );
+
+
+      this.addChild( this._loaderScreenView.setChildren( [ this._titleLabel, this._backgroundCirclePath ] ) );
+      // this._loaderScreenView.addChild( this._titleLabel );
+      // this.addChild( this._loaderScreenView );
+
+      // const foregroundCircleShape = new Shape()
+      //   .moveTo( 1000, 1000 )
+      //   .arc( 100, -Math.PI / 2, - 3 * Math.PI / 4, false )
+
+      // const foregroundCirclePath = new Path( foregroundCircleShape, {
+      //   fill: 'blue',
+      //   stroke: 'green',
+      //   strokeWidth: 1,
+      //   topLeft: new Vector( 300, 0 )
+      // } );
+      //       this._loaderScreenView.addChild( node.addChild( foregroundCirclePath ) );
+
       // //
-      // this._screenView.addChild( foregroundCirclePath );
-      // let i = 0;
+      // this._loaderScreenView.addChild( foregroundCirclePath );
 
-      // window.addEventListener( 'mousedown', () => {
-      //   i++;
-      //   this._titleLabel.scale( 1.5);
-      //   // this._titleLabel.fontStyle = i % 2 === 0 ? 'italic' : 'normal';
-      //   // this._titleLabel.fontStyle =  i % 2 === 0 ? 'italic' : 'normal';
-      //   // foregroundCirclePath.scale( new Vector( 2, 2 ) )
-      //   console.log( this._titleLabel.bounds.toString() )
-      // })
     }
 
     layout( width, height ) {
-      this._screenView.layout( width, height );
+      this._loaderScreenView.layout( width, height );
     }
 
 
