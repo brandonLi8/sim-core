@@ -34,30 +34,13 @@ define( require => {
   const ScreenView = require( 'SIM_CORE/scenery/ScreenView' );
   const Shape = require( 'SIM_CORE/util/Shape' );
   const Text = require( 'SIM_CORE/scenery/Text' );
-  const Vector = require( 'SIM_CORE/util/Vector' );
   const Util = require( 'SIM_CORE/util/Util' );
+  const Vector = require( 'SIM_CORE/util/Vector' );
 
   // constants
   const SIM_SOURCE_LOADING_BANDWIDTH = 35 + Math.random() * 10; // Random number from 35 to 45
   const IMAGE_LOADING_BANDWIDTH = 20 + Math.random() * 15;      // Random number from 20 to 35
   const DOM_LOADING_BANDWIDTH = 100 - IMAGE_LOADING_BANDWIDTH - SIM_SOURCE_LOADING_BANDWIDTH;
-
-
-  // // Relative size of all loader circles, as a percent.
-  // const LOADER_CIRCLE_RELATIVE = 100;
-  // const LOADER_RADIUS = LOADER_CIRCLE_RELATIVE / 2;
-
-  // // Relative view box for the loader circle content, with the origin at the center: <minX, minY, width, height>.
-  // const LOADER_CIRCLE_VIEW_BOX = `-${ LOADER_RADIUS } `.repeat( 2 ) + `${ LOADER_CIRCLE_RELATIVE } `.repeat( 2 );
-
-  // // Width of loader circle (which would match pixels with the height) relative to the window.
-  // const LOADER_CIRCLE_WIDTH = '13%';
-  // const LOADER_CIRCLE_MAX_SIZE = 120; // the largest possible loader circle size, in pixels.
-  // const LOADER_CIRCLE_MIN_SIZE = 80; // the smallest possible loader circle size, in pixels.
-
-  // // Stroke of the loader circle in percentage relative to LOADER_CIRCLE_RELATIVE.
-  // const LOADER_STROKE_WIDTH = 12;
-  // const LOADER_CIRCLE_INNER_RADIUS = ( LOADER_CIRCLE_RELATIVE - LOADER_STROKE_WIDTH ) / 2; // in percentage
 
   class Loader extends DOMObject {
 
@@ -83,8 +66,9 @@ define( require => {
         loaderCircleBg: '#A5A5A5',   // {string} - the background color of the loader circle
         loaderCircleFg: '#2974b2',   // {string} - the foreground color of the loader circle
         loaderTitleColor: '#F1F1F1', // {string} - the font color of the text of the sim name near the top of the Loader
-        loaderCircleRadius: 50,       // {number} - the inner-radius of the loader circle, in the standard scenery frame
-        loaderCircleStrokeWidth: 13, // {number} - the stroke-width of the loader circle, in the standard scenery frame
+        loaderCircleRadius: 43,      // {number} - the inner-radius of the loader circle, in the standard scenery frame
+        loaderCircleStrokeWidth: 11, // {number} - the stroke-width of the loader circle, in the standard scenery frame
+        titleCircleMargin: 90,
 
         // Rewrite options so that it overrides the defaults.
         ...options
@@ -108,45 +92,35 @@ define( require => {
 
       // @private {Text} - Create the Text Node that displays the title of the simulation in the loader.
       this._titleLabel = new Text( simName, {
-        center: this._loaderScreenView.viewBounds.center.subtractXY( 0, 130 ),
+        center: this._loaderScreenView.viewBounds.center.subtractXY( 0, options.titleCircleMargin ),
         maxWidth: this._loaderScreenView.viewBounds.width,
         fill: options.loaderTitleColor,
         fontSize: 30,
         strokeWidth: 2
       } );
 
-      // @private {Shape} - Create the Shape that represents the background circle of the loader circle.
-      this._backgroundCircleShape = new Shape().moveTo( 0, 0 )
-                                               .arc( options.loaderCircleRadius, 0, 2 * Math.PI - Util.EPSILON );
-
-      // @private {Path} - Create the Path that renders the background circle of the loader circle.
-      this._backgroundCirclePath = new Path( this._backgroundCircleShape, {
+      // @private {Path} - Create the Path that renders the background circle of the loader circle. Set it to a Shape
+      //                   with a full circle, as it does for the entirety of the Loader's lifespan.
+      this._backgroundCirclePath = new Path( new Shape().moveTo( 0, 0 )
+                                               .arc( options.loaderCircleRadius, 0, 2 * Math.PI - Util.EPSILON ), {
         fill: 'none', // transparent inside
         stroke: options.loaderCircleBg,
         strokeWidth: options.loaderCircleStrokeWidth,
-        center: this._loaderScreenView.viewBounds.center.addXY( 0, 130 / 2 ),
+        center: this._loaderScreenView.viewBounds.center.addXY( 0, options.titleCircleMargin / 2 ),
       } );
 
+      // @private {Path} - Create the Path that renders the foregroundCircle circle of the loader circle.
+      this._foregroundCirclePath = new Path( null, {
+        fill: 'none', // transparent inside
+        stroke: options.loaderCircleFg,
+        strokeWidth: options.loaderCircleStrokeWidth,
+        center: this._loaderScreenView.viewBounds.center.addXY( 0, options.titleCircleMargin / 2 ),
+      } );
 
-      this.addChild( this._loaderScreenView.setChildren( [ this._titleLabel, this._backgroundCirclePath ] ) );
-      // this._loaderScreenView.addChild( this._titleLabel );
-      // this.addChild( this._loaderScreenView );
-
-      // const foregroundCircleShape = new Shape()
-      //   .moveTo( 1000, 1000 )
-      //   .arc( 100, -Math.PI / 2, - 3 * Math.PI / 4, false )
-
-      // const foregroundCirclePath = new Path( foregroundCircleShape, {
-      //   fill: 'blue',
-      //   stroke: 'green',
-      //   strokeWidth: 1,
-      //   topLeft: new Vector( 300, 0 )
-      // } );
-      //       this._loaderScreenView.addChild( node.addChild( foregroundCirclePath ) );
-
-      // //
-      // this._loaderScreenView.addChild( foregroundCirclePath );
-
+      // Layout the scene graph of the Loader.
+      this.addChild( this._loaderScreenView
+                      .setChildren( [ this._titleLabel, this._backgroundCirclePath, this._foregroundCirclePath ]
+                    ) );
     }
 
     layout( width, height ) {
