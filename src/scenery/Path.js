@@ -113,7 +113,7 @@ define( require => {
       if ( strokeWidth === this._strokeWidth ) return; // Exit if setting to the same 'strokeWidth'
       assert( typeof strokeWidth === 'number', `invalid strokeWidth: ${ strokeWidth }` );
       this._strokeWidth = strokeWidth;
-      this.element.setAttribute( 'stroke-width', strokeWidth );
+      this.layout( this._screenViewScale );
     }
 
     /**
@@ -166,6 +166,7 @@ define( require => {
 
       if ( this._shape ) { // Set the Element's d-attribute to render the Shape.
         this.element.setAttribute( 'd', this._shape.getSVGPath( this._shape.bounds.bottomLeft.negate(), scale ) );
+        this.element.setAttribute( 'stroke-width', this._strokeWidth * scale );
       }
       super.layout( scale );
     }

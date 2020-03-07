@@ -197,7 +197,7 @@ define( require => {
       if ( strokeWidth === this._strokeWidth ) return; // Exit if setting to the same 'strokeWidth'
       assert( typeof strokeWidth === 'number', `invalid strokeWidth: ${ strokeWidth }` );
       this._strokeWidth = strokeWidth;
-      this.element.setAttribute( 'stroke-width', strokeWidth );
+      this.layout( this._screenViewScale );
     }
 
     /**
@@ -251,6 +251,7 @@ define( require => {
       // Set the dominant-baseline attribute to position the Text in the top-left corner with 0 transformation.
       if ( this.element.getAttribute( 'dominant-baseline' ) !== 'hanging' ) {
         this.setAttribute( 'dominant-baseline', 'hanging' );
+        this.element.setAttribute( 'stroke-width', this._strokeWidth * scale );
       }
 
       // Set the CSS font of the Text Node element, correctly passing the scale to scale the font-size pixel amount.
