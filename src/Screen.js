@@ -1,12 +1,13 @@
 // Copyright © 2019-2020 Brandon Li. All rights reserved.
 
 /**
- * A Screen represents the different sections of the simulation. When starting the simulation in Sim.js, Screens
- * instances are supplied in the config object.
+ * A Screen represents the different sections of the simulation. The different screens can be seen at the navigation bar
+ * at the bottom of the Sim. When starting the simulation (in Sim.js), Screens instances are supplied in the config
+ * object.
  *
- * Screens have two primary arguments that are both functions that initialize the Screen's model and view respectively.
- * The function should return the Model and ScrenView instance. These are provided through functions instead of solely
- * passing in the instance to schedule work functions that are executed and animated in the loading progress circle.
+ * Screens instantiate its Model and View Objects respectively inside of functions, with the Class itself passed in the
+ * config parameter. This is done instead of solely passing in an instance of the Objects to schedule work functions
+ * that are executed in the Loader. Each task function that is completed is animated in the loading progress circle.
  * See core-internal/Loader.js for more documentation.
  *
  * @author Brandon Li <brandon.li820@gmail.com>
@@ -18,115 +19,85 @@ define( require => {
   // modules
   const assert = require( 'SIM_CORE/util/assert' );
   const DOMObject = require( 'SIM_CORE/core-internal/DOMObject' );
-  const ScrenView = require( 'SIM_CORE/core-internal/ScreenView' );
-
+  const ScreenView = require( 'SIM_CORE/scenery/ScreenView' );
 
   class Screen extends DOMObject {
 
     /**
      * @param {Object} config - required object literal that provides configuration information for the simulation.
      *                          See the early portion of this static method for details.
-     * @param {typeof Object} createModel - function that instantiates and returns the screen Model object
-     * @param {function(Object):ScrenView} createView - function that instantiates and returns the screen's ScrenView
-     *                                                  with the model passed as the only argument.
-     * @param {Object} [options] - Various key-value pairs that control the appearance and behavior of this class.
-     *                             Some options are specific to this class while others are passed to the super class.
-     *                             See the early portion of the constructor for details.
      */
-    constructor( config createModel, createView, options ) {
+    constructor( config ) {
       assert( Object.getPrototypeOf( config ) === Object.prototype, `invalid config: ${ config }` );
 
       config = {
 
-        // {Class.<Object>} - function that instantiates and returns the screen's Model object.
-        modelGenerator: config.modelGenerator,
+        // {Class.<Object>} - the **class** (not instance) of the Model Object of the Screen. This class is instantiated
+        //                    in the Screen class (see doc at the top of this file for the reason) with no arguments.
+        model: config.model,
 
-        // {Class.<ScrenView>} createView - function that instantiates and returns the screen's ScrenView
-        //                                                 with the model passed as the only argument.
-        viewGenerator: config.viewGenerator,
+        // {Class.<Object>} - the **class** (not instance) of the ScrenView of the Screen. This class is instantiated in
+        //                    the Screen class (see doc at the top of this file for the reason), passing in the Model
+        //                    as the only argument.
+        view: config.view,
 
         // {string} - the name of the Screen, displayed in the navigation-bar.
         name: config.name,
 
+        // {string} (optional) - the background color of the Screen behind the ScrenView
+        background: config.background || 'white',
+
         ...config
       };
 
+      // If assertions were enabled with ?ea, check that the config Object that was passed in is correct.
+      if ( assert.enabled ) {
+        assert( config.model && !!config.model.constructor, `invalid config.model: ${ config.model }` );
+        assert( config.view && !!config.view.constructor && config.view.prototype instanceof ScreenView,
+          `invalid config.view: ${ config.view }` );
+        assert( typeof config.name === 'string', `invalid config.name: ${ config.name }` );
+        assert( typeof config.background === 'string', `invalid config.background: ${ config.background }` );
+      }
 
-      // Some options are set by Screen. Assert that they weren't provided.
-      assert( !options || Object.getPrototypeOf( options ) === Object.prototype, `invalid options: ${ options }` );
-      assert( !options || !options.style, 'Screen sets style.' );
-      assert( !options || !options.type, 'Screen sets type.' );
-      assert( !options || !options.text, 'Screen should not have text' );
-      assert( !options || !options.id || !options.class || !options.attributes, 'Screen sets attributes' );
-      assert( !options || !options.children, 'Screen sets children.' );
+      //----------------------------------------------------------------------------------------
 
-      assert( !options || Object.getPrototypeOf( options ) === Object.prototype, `invalid options: ${ options }` );
-
-      const defaults = {
-
-        // Custom to this class
-        // {string|null} name of the Screen, as displayed to the user.
-        name: null,
-
-        // Passed to the superclass
+      super( {
         style: {
           width: '100%',
           top: 0,
-          background: 'white',
-          display: 'flex',
+          background: config.background,
+          display: 'flex', // Create a Flex-box to center the ScreenView.
           justifyContent: 'center',
           alignContent: 'center',
           alignItems: 'center'
         }
-      };
+      } );
 
-      // Rewrite options so that it overrides the defaults.
-      options = { ...defaults, ...options };
-      options.style = { ...defaults.style, ...options.style };
+      // @public (read-only) {string} - the name of the Screen.
+      this.name = config.name;
 
-      super( options );
-
-      // @public (read-only)
-      this.name = options.name;
-
-      // @private
-      // this._createModel = createModel;
-      this._createView = createView;
-
-      // Construction of the model and view are delayed and controlled to enable features like
-      // a) faster loading when only loading certain screens
-      // b) showing a loading progress bar <not implemented>
-      this._model = null; // @private
-      this._view = null;  // @private
+      // @private {Object} - reference to the passed in config Object.
+      this._config = config;
     }
 
     /**
-     * Initialize the model.  Clients should use either this or initializeModelAndView
-     * Clients may want to use this method to gain more control over the creation process
+     * Initialize both the Screen's model and view classes, and adds the view as a child to render the Screen.
      * @public
+     *
+     * See the comment at the top of this file for documentation of why these objects are instantiated here.
+     * In essence, this method is the work function that should be executed in the Loader, and signals a percentage
+     * amount closer to finishing the loading portion of the simulation.
      */
-    initializeModel() {
-      assert( this._model === null, 'there was already a model' );
-      this._model = this._createModel();
-    }
+    start() {
 
-    /**
-     * Initialize the view.  Clients should use either this or initializeModelAndView
-     * Clients may want to use this method to gain more control over the creation process
-     * @public
-     */
-    initializeView() {
-      assert( this._view === null, 'there was already a model' );
-      // assert( this._model !== null, 'model must be created first' );
-      this._view = this._createView( );
+      // First create and instantiate the model.
+      const model = new this._config.model();
 
-      this.addChild( this._view );
-    }
+      // Create the view and pass the model in.
+      const view = new this._config.view( model );
 
-    // Initialize both the model and view
-    initializeModelAndView() {
-      // this.initializeModel();
-      this.initializeView();
+      // Add the view as a child to render the Screen.
+      this.addChild( view );
     }
   }
 
