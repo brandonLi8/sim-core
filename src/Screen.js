@@ -76,6 +76,9 @@ define( require => {
       // @public (read-only) {string} - the name of the Screen.
       this.name = config.name;
 
+      // @public (read-only) {ScreenView} view - the view of the Screen. To be set in start().
+      this.view;
+
       // @private {Object} - reference to the passed in config Object.
       this._config = config;
     }
@@ -87,17 +90,20 @@ define( require => {
      * See the comment at the top of this file for documentation of why these objects are instantiated here.
      * In essence, this method is the work function that should be executed in the Loader, and signals a percentage
      * amount closer to finishing the loading portion of the simulation.
+     *
+     * @param {Display} display - the display to add the ScreenView to as a child to be rendered. Sim.js will adjust
+     *                            visibility based on what is selected in the navigation-bar.
      */
-    start() {
+    start( display ) {
 
       // First create and instantiate the model.
       const model = new this._config.model();
 
       // Create the view and pass the model in.
-      const view = new this._config.view( model );
+      this.view = new this._config.view( model );
 
       // Add the view as a child to render the Screen.
-      this.addChild( view );
+      display.addChild( this.addChild( this.view ) );
     }
   }
 

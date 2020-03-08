@@ -90,7 +90,7 @@ define( require => {
       display.addChild( loader );
 
       // Start loading
-      loader.start( config.screens );
+      loader.load( config.screens, display );
 
       // Initialize a fps-counter if the ?fps query parameter was provided
       let fpsCounter;

@@ -39,7 +39,7 @@ define( require => {
   const Vector = require( 'SIM_CORE/util/Vector' );
 
   // constants
-  const SIM_SOURCE_LOADING_BANDWIDTH = 35 + Math.random() * 10; // Random number from 35 to 45
+  const SIM_SOURCE_LOADING_BANDWIDTH = 25 + Math.random() * 10; // Random number from 35 to 45
   const IMAGE_LOADING_BANDWIDTH = 20 + Math.random() * 15;      // Random number from 20 to 35
   const DOM_LOADING_BANDWIDTH = 100 - IMAGE_LOADING_BANDWIDTH - SIM_SOURCE_LOADING_BANDWIDTH;
 
@@ -86,6 +86,12 @@ define( require => {
       };
       super( options );
 
+      // @private {number} reference the loader circle radius.
+      this._loaderCircleRadius = options.loaderCircleRadius;
+
+      // @private {number} the percentage amount that the loader has completed.
+      this._percentage = 0;
+
       // @private {ScreenView} - initialize a ScreenView for the Loader to use scenery Nodes and to properly guarantee
       //                         all loader content is scaled and positioned properly.
       this._loaderScreenView = new ScreenView( { id: 'loader-screen-view' } );
@@ -121,27 +127,6 @@ define( require => {
       this.addChild( this._loaderScreenView
                       .setChildren( [ this._titleLabel, this._backgroundCirclePath, this._foregroundCirclePath ]
                     ) );
-
-      // @private {number} the percentage amount that the loader has completed.
-      this._percentage = 0;
-
-      // @private {number} reference the loader circle radius.
-      this._loaderCircleRadius = 43;
-    }
-
-    /**
-     * Begins loading the Loader, which will execute the tasks listed at the top of this file and incrementally
-     * increase the arc of the Loader circle, signaling the progression as the simulation is loaded.
-     * @public
-     *
-     * @param {string[]} simScreens - all screens of the simulation
-     */
-    start( simScreens ) {
-      assert( Util.isArray( simScreens ) && simScreens.length && simScreens.every( screen => screen instanceof Screen ),
-        `invalid simScreens: ${ simScreens }` );
-
-      this.incrementLoader( 90 )
-
     }
 
     /**
@@ -170,77 +155,146 @@ define( require => {
       this._foregroundCirclePath.shape = foregroundCircleShape;
 
       // Reposition the foregroundCircle to match the backgroundColor so that their arcs are on top of each other.
-      if ( this._percentage < 50 ) this._foregroundCirclePath.topLeft = this._backgroundCirclePath.topCenter;
-      else this._foregroundCirclePath.center = this._backgroundCirclePath.center;
+      this._foregroundCirclePath.topRight = this._backgroundCirclePath.topRight;
     }
+
+    /**
+     * Adds a listener to when the document DOM has been fully loaded and ready to be manipulated.
+     * @public
+     *
+     * @param {function} listener - listener function to call when the document DOM has been fully loaded.
+     */
+    addDOMFinishedListener( listener ) {
+
+      // First check if it has already been completely loaded.
+      // See https://developer.mozilla.org/en-US/docs/Web/API/Document/readyState
+      if ( document.readyState !== 'loading' ) return listener(); // Use return to exit.
+
+      // Next check if the browser supports addEventListener. If so, listen to the DOMContentLoaded event.
+      if ( document.addEventListener ) return document.body.addEventListener( 'DOMContentLoaded', listener );
+
+      // Otherwise, use document.attachEvent to listen to when the readyState is 'complete'
+      document.attachEvent( 'onreadystatechange', () => {
+        if ( document.body.readyState === 'complete' ) listener();
+      } );
+    }
+
+    /**
+     * Executes step of 1st Loading tasks: synchronously loading the entire model and view hierarchies for every screen.
+     * This has been consoldated down into one method (start()) for Screens (See Screen.js). Once this is finished, this
+     * will call the second step of Loading tasks: synchronousLoadSimImages()
+     * @public
+     *
+     * @param {string[]} simScreens - all screens of the simulation
+     * @param {Display} display - the display to add the views of the screen to.
+     */
+    synchronousLoadScreens( simScreens, display ) {
+      // Create a function that loads all Screens from a given index of simScreens.
+
+      const initializeScreensFromIndex = ( index ) => {
+        setTimeout( () => {
+          simScreens[ index ].start( display );
+
+          // Increment the loader circle.
+          this.incrementLoader( this._percentage + 1 / simScreens.length * SIM_SOURCE_LOADING_BANDWIDTH );
+
+          if ( index + 1 < simScreens.length ) initializeScreensFromIndex( index + 1 );
+          else this.synchronousLoadSimImages(); // Once this has finished, call the second step of the loading process.
+        },
+          // Add a slight delay between each initializeScreensFromIndex call to make it easier to see increments. This
+          // delay gets smaller for more screens making it move reasonably quickly for more screens.
+          300 / simScreens.length );
+      };
+      setTimeout( () => { initializeScreensFromIndex( 0 ); }, 200 ); // pause for a few milliseconds before starting
+    }
+
+    /**
+     * Executes step of 2nd Loading tasks: synchronously load registered images from the image-plugin
+     * (see ../util/image-plugin). Images are in the window.simImages field. Once this is finished, this
+     * will call the last step of Loading tasks: synchronousFinishDOM()
+     * @public
+     */
+    synchronousLoadSimImages( simScreens ) {
+      if ( window.simImages ) {
+        // Create a function that load all images from a given index of window.simImages.
+        const loadImageFromIndex = ( index ) => {
+          setTimeout( () => {
+
+            // Load the image data.
+            const simImage = window.simImages[ index ];
+            const image = simImage.image;
+            const imagePath = simImage.src;
+
+            // Listen to when the image has loaded.
+            image.element.onload = () => {
+              assert( isImageOK( image.element ), 'error while loading image' );
+
+              // Increment the loader circle.
+              this.incrementLoader( this._percentage + 1 / window.simImages.length * IMAGE_LOADING_BANDWIDTH );
+
+              if ( index + 1 < window.simImages.length ) loadImageFromIndex( index + 1 );
+              else this.synchronousFinishDOM(); // Once this has finished, call the 3rd step of the loading process.
+            };
+
+            // Now set the src of the image.
+            image.src = imagePath;
+          },
+            // Add a slight delay between each loadImageFromIndex call to make it easier to see increments. This
+            // delay gets smaller for more images making it move reasonably quickly for more images.
+            300 / window.images.length );
+        };
+        setTimeout( () => { loadImageFromIndex( 0 ); }, 200 ); // pause for a few milliseconds before starting
+      }
+      else {
+        // No images to load: go ahead and complete the rest of the IMAGE_LOADING_BANDWIDTH
+        setTimeout( () => {
+          this.incrementLoader( this._percentage + IMAGE_LOADING_BANDWIDTH );
+          this.synchronousFinishDOM(); // Once this has finished, call the 3rd step of the loading process.
+        }, 800 ); // pause for a few milliseconds before.
+      }
+    }
+
+    /**
+     * Executes step of 3rd and final Loading task: synchronously ensuring that the DOM is fully loaded and set in
+     * place. Once this is finished, this will dispose of the Loader.
+     * @public
+     *
+     * @param {string[]} simScreens - all screens of the simulation
+     */
+    synchronousFinishDOM( simScreens ) {
+      // Step of 3 Loading tasks: synchronously ensuring that the DOM is fully loaded and set in place.
+      setTimeout( () => {
+
+        // Listen to when the DOM has finished loading.
+        this.addDOMFinishedListener( () => {
+
+          // At this point the Loader has finished, so increment to the rest.
+          this.incrementLoader( 100 );
+
+          setTimeout( () => { this.dispose() }, 100 ); // Slight pause before disposing.
+        } );
+      }, DOM_LOADING_BANDWIDTH / 100 * 800 ); // pause for a few milliseconds before.
+    }
+
+    /**
+     * Begins loading the Loader, which will execute the tasks listed at the top of this file and incrementally
+     * increase the arc of the Loader circle, signaling the progression as the simulation is loaded.
+     * @public
+     *
+     * @param {string[]} simScreens - all screens of the simulation
+     * @param {Display} display - the display to add the views of the screen to.
+     */
+    load( simScreens, display ) {
+      assert( Util.isArray( simScreens ) && simScreens.length && simScreens.every( screen => screen instanceof Screen ),
+        `invalid simScreens: ${ simScreens }` );
+
+      this.synchronousLoadScreens( simScreens, display );
+    }
+
 
     layout( width, height ) {
       this._loaderScreenView.layout( width, height );
     }
-
-
-
-
-    //   //----------------------------------------------------------------------------------------
-
-    //   let loadedImages = 0;
-    //   let loadedPercentage = 0;
-
-    //   const tw = () => {
-    //     const percentage = 1 / window.simImages.length * IMAGE_LOADING_BANDWIDTH;
-    //     loadedPercentage += percentage;
-    //     foregroundCircle.setAttribute( 'd', getCirclePathData( loadedPercentage ) );
-    //   };
-
-    //   const startLoadingTime = Date.now();
-
-
-    //   const finishDom = () => {
-    //     foregroundCircle.setAttribute( 'd', getCirclePathData( IMAGE_LOADING_BANDWIDTH ) );
-
-    //     isReady( () => {
-
-    //       loadedPercentage = 99.99;
-    //       window.setTimeout( () => {
-    //         foregroundCircle.setAttribute( 'd', getCirclePathData( loadedPercentage ) );
-    //         window.setTimeout( () => this.dispose(), 400 );
-    //       }, Math.max( ( Date.now() - startLoadingTime ) * DOM_LOADING_BANDWIDTH / 100 * ( Math.random() * 3 ), 100 ) );
-    //     } );
-    //   };
-    //   if ( window.simImages ) {
-    //     let i = 0;
-
-    //     const step = () => {
-    //       const simImage = window.simImages[ i ];
-    //       const image = simImage.image;
-    //       const imagePath = simImage.src;
-
-    //       const dt = Date.now();
-
-    //       image.element.onload = () => {
-    //         loadedImages++;
-    //         assert( isImageOK( image.element ), 'error while loading image' );
-    //         tw( loadedImages );
-    //         i++;
-    //         if ( loadedImages !== window.simImages.length ) {
-    //           window.setTimeout( step, Math.max( ( Date.now() - dt ) * 4.5, 80 ) );
-    //         }
-    //         else {
-    //           finishDom();
-    //         }
-    //       };
-    //       image.src = imagePath;
-    //     };
-    //     step();
-    //   }
-    //   else {
-    //     window.setTimeout( () => {
-    //       foregroundCircle.setAttribute( 'd', getCirclePathData( 30.9 ) );
-
-    //       window.setTimeout( finishDom, 800 );
-    //     }, 500 );
-    //   }
-    // }
   }
 
   //----------------------------------------------------------------------------------------
@@ -268,18 +322,6 @@ define( require => {
     return true;
   }
 
-// function that checks if a node is ready
-function isReady( callback ) {
-  // in case the document is already rendered
-  if ( document.readyState !== 'loading' ) callback();
-  // modern browsers
-  else if ( document.addEventListener )
-    document.addEventListener( 'DOMContentLoaded', callback );
-  // IE <= 8
-  else document.attachEvent( 'onreadystatechange', function() {
-    if ( document.readyState === 'complete' ) callback();
-  } );
-}
 
   return Loader;
 } );
