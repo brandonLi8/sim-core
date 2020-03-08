@@ -29,14 +29,12 @@ define( require => {
   // modules
   const assert = require( 'SIM_CORE/util/assert' );
   const DOMObject = require( 'SIM_CORE/core-internal/DOMObject' );
-  const Node = require( 'SIM_CORE/scenery/Node' );
   const Path = require( 'SIM_CORE/scenery/Path' );
   const Screen = require( 'SIM_CORE/Screen' );
   const ScreenView = require( 'SIM_CORE/scenery/ScreenView' );
   const Shape = require( 'SIM_CORE/util/Shape' );
   const Text = require( 'SIM_CORE/scenery/Text' );
   const Util = require( 'SIM_CORE/util/Util' );
-  const Vector = require( 'SIM_CORE/util/Vector' );
 
   // constants
   const SIM_SOURCE_LOADING_BANDWIDTH = 50 + Math.random() * 10;
@@ -113,7 +111,7 @@ define( require => {
         fill: 'none', // transparent inside
         stroke: options.loaderCircleBg,
         strokeWidth: options.loaderCircleStrokeWidth,
-        center: this._loaderScreenView.viewBounds.center.addXY( 0, options.titleCircleMargin / 2 ),
+        center: this._loaderScreenView.viewBounds.center.addXY( 0, options.titleCircleMargin / 2 )
       } );
 
       // @private {Path} - Create the Path that renders the foregroundCircle circle of the loader circle.
@@ -121,7 +119,7 @@ define( require => {
         fill: 'none', // transparent inside
         stroke: options.loaderCircleFg,
         strokeWidth: options.loaderCircleStrokeWidth + 0.1, // add .1 to give illusion that it is fully filling
-        center: this._loaderScreenView.viewBounds.center.addXY( 0, options.titleCircleMargin / 2 ),
+        center: this._loaderScreenView.viewBounds.center.addXY( 0, options.titleCircleMargin / 2 )
       } );
 
       // Layout the scene graph of the Loader.
@@ -129,6 +127,30 @@ define( require => {
                       .setChildren( [ this._titleLabel, this._backgroundCirclePath, this._foregroundCirclePath ]
                     ) );
     }
+
+    /**
+     * Begins loading the Loader, which will execute the tasks listed at the top of this file and incrementally
+     * increase the arc of the Loader circle, signaling the progression as the simulation is loaded.
+     * @public
+     *
+     * @param {string[]} simScreens - all screens of the simulation
+     * @param {Display} display - the display to add the views of the screen to.
+     */
+    load( simScreens, display ) {
+      assert( Util.isArray( simScreens ) && simScreens.length && simScreens.every( screen => screen instanceof Screen ),
+        `invalid simScreens: ${ simScreens }` );
+
+      this.synchronousLoadScreens( simScreens, display );
+    }
+
+    /**
+     * Layouts the Loader, ensuring that the Loader content fully scales and fits inside of the browser window.
+     * @public (sim-core-internal)
+     *
+     * @param {number} width - window width in pixels
+     * @param {number} height - window height in pixels
+     */
+    layout( width, height ) { this._loaderScreenView.layout( width, height ); }
 
     /**
      * Increments the Loader to a new percentage by updating the arc of the foregroundCircle to signal a percentage
@@ -150,7 +172,7 @@ define( require => {
       // Create the shape rendered for the foregroundCircle.
       const foregroundCircleShape = new Shape()
         .moveTo( 0, 0 )
-        .arc( this._loaderCircleRadius, - Math.PI / 2, - Math.PI / 2 +  2 * Math.PI * this._percentage / 100 );
+        .arc( this._loaderCircleRadius, - Math.PI / 2, - Math.PI / 2 + 2 * Math.PI * this._percentage / 100 );
 
       // Set the shape of the foregroundCircle to render the new Shape.
       this._foregroundCirclePath.shape = foregroundCircleShape;
@@ -160,26 +182,6 @@ define( require => {
       else this._foregroundCirclePath.topRight = this._backgroundCirclePath.topRight;
     }
 
-    /**
-     * Adds a listener to when the document DOM has been fully loaded and ready to be manipulated.
-     * @public
-     *
-     * @param {function} listener - listener function to call when the document DOM has been fully loaded.
-     */
-    addDOMFinishedListener( listener ) {
-
-      // First check if it has already been completely loaded.
-      // See https://developer.mozilla.org/en-US/docs/Web/API/Document/readyState
-      if ( document.readyState !== 'loading' ) return listener(); // Use return to exit.
-
-      // Next check if the browser supports addEventListener. If so, listen to the DOMContentLoaded event.
-      if ( document.addEventListener ) return document.body.addEventListener( 'DOMContentLoaded', listener );
-
-      // Otherwise, use document.attachEvent to listen to when the readyState is 'complete'
-      document.attachEvent( 'onreadystatechange', () => {
-        if ( document.body.readyState === 'complete' ) listener();
-      } );
-    }
 
     /**
      * Executes step of 1st Loading tasks: synchronously loading the entire model and view hierarchies for every screen.
@@ -195,7 +197,7 @@ define( require => {
       // Create a function that loads all Screens from a given index of simScreens.
       const initializeScreensFromIndex = ( index ) => {
         setTimeout( () => {
-          // simScreens[ index ].start( display );
+          simScreens[ index ].start( display );
 
           // Increment the loader circle.
           const percentageIncrease = 1 / simScreens.length * SIM_SOURCE_LOADING_BANDWIDTH;
@@ -206,7 +208,7 @@ define( require => {
           setTimeout( () => {
             this.incrementLoader( this._percentage + finalIncrease );
             if ( index + 1 < simScreens.length ) initializeScreensFromIndex( index + 1 );
-            else this.synchronousLoadSimImages(); // Once this has finished, call the second step of the loading process.
+            else this.synchronousLoadSimImages(); // Once this has finished, call the second step of the loading process
           }, 800 / Math.pow( 2 * simScreens.length, simScreens.length * 2 ) );
         },
           // Add a slight delay between each initializeScreensFromIndex call to make it easier to see increments. This
@@ -235,7 +237,7 @@ define( require => {
 
             // Listen to when the image has loaded.
             image.element.onload = () => {
-              assert( isImageOK( image.element ), 'error while loading image' );
+              assert( this.isImageOk( image.element ), 'error while loading image' );
 
               // Increment the loader circle.
               this.incrementLoader( this._percentage + 1 / window.simImages.length * IMAGE_LOADING_BANDWIDTH );
@@ -279,57 +281,52 @@ define( require => {
           // At this point the Loader has finished, so increment to the rest.
           this.incrementLoader( 100 );
 
-          setTimeout( () => { this.dispose() }, 100 ); // Slight pause before disposing.
+          setTimeout( () => { this.dispose(); }, 100 ); // Slight pause before disposing.
         } );
       }, DOM_LOADING_BANDWIDTH * 30 ); // pause for a few milliseconds before.
     }
 
     /**
-     * Begins loading the Loader, which will execute the tasks listed at the top of this file and incrementally
-     * increase the arc of the Loader circle, signaling the progression as the simulation is loaded.
+     * Adds a listener to when the document DOM has been fully loaded and ready to be manipulated.
      * @public
      *
-     * @param {string[]} simScreens - all screens of the simulation
-     * @param {Display} display - the display to add the views of the screen to.
+     * @param {function} listener - listener function to call when the document DOM has been fully loaded.
      */
-    load( simScreens, display ) {
-      assert( Util.isArray( simScreens ) && simScreens.length && simScreens.every( screen => screen instanceof Screen ),
-        `invalid simScreens: ${ simScreens }` );
+    addDOMFinishedListener( listener ) {
 
-      this.synchronousLoadScreens( simScreens, display );
+      // First check if it has already been completely loaded.
+      // See https://developer.mozilla.org/en-US/docs/Web/API/Document/readyState
+      if ( document.readyState !== 'loading' ) return listener(); // Use return to exit.
+
+      // Next check if the browser supports addEventListener. If so, listen to the DOMContentLoaded event.
+      if ( document.addEventListener ) return document.body.addEventListener( 'DOMContentLoaded', listener );
+
+      // Otherwise, use document.attachEvent to listen to when the readyState is 'complete'
+      document.attachEvent( 'onreadystatechange', () => {
+        if ( document.body.readyState === 'complete' ) listener();
+      } );
     }
 
+    /**
+     * Checks if an image has been loaded without any errors and is correctly displayed in the document.
+     * Solution from http://stackoverflow.com/questions/1977871/check-if-an-image-is-loaded-no-errors-in-javascript.
+     * @public
+     *
+     * @param {HTMLImageElement} image
+     * @returns {boolean} - if the image is 'ok'
+     */
+    isImageOk( image ) {
+      // During the onload event, IE correctly identifies any images that weren't downloaded as not complete.
+      // Others should too. Gecko-based browsers act like NS4 in that they report this incorrectly.
+      if ( !image.complete ) return false;
 
-    layout( width, height ) {
-      this._loaderScreenView.layout( width, height );
+      // However, they do have two very useful properties: naturalWidth and naturalHeight. These give the true size of
+      // the image. If it failed to load, either of these should be zero.
+      if ( typeof image.naturalWidth !== 'undefined' && image.naturalWidth === 0 ) return false;
+
+      // No other way of checking: assume it’s ok.
+      return true;
     }
   }
-
-  //----------------------------------------------------------------------------------------
-  // Helpers
-  //----------------------------------------------------------------------------------------
-
-  // Taken from http://stackoverflow.com/questions/1977871/check-if-an-image-is-loaded-no-errors-in-javascript
-  function isImageOK( img ) {
-
-    // During the onload event, IE correctly identifies any images that
-    // weren't downloaded as not complete. Others should too. Gecko-based
-    // browsers act like NS4 in that they report this incorrectly.
-    if ( !img.complete ) {
-      return false;
-    }
-
-    // However, they do have two very useful properties: naturalWidth and
-    // naturalHeight. These give the true size of the image. If it failed
-    // to load, either of these should be zero.
-    if ( typeof img.naturalWidth !== 'undefined' && img.naturalWidth === 0 ) {
-      return false;
-    }
-
-    // No other way of checking: assume it’s ok.
-    return true;
-  }
-
-
   return Loader;
 } );

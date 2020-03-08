@@ -69,18 +69,6 @@ define( require => {
       assert( typeof config.maxDT === 'number' && config.maxDT > 0, `invalid maxDT: ${ config.maxDT }` );
       Sim.initiated = true; // Indicate that the simulation has been initiated and launched.
 
-      //----------------------------------------------------------------------------------------
-
-      // If the page is loaded from the back-forward cache, then reload the page to avoid bugginess,
-      // see https://stackoverflow.com/questions/8788802/prevent-safari-loading-from-cache-when-back-button-is-clicked
-      window.addEventListener( 'pageshow', event => { if ( event.persisted ) window.location.reload(); } );
-
-      // Log the current version of the simulation if the query parameter ?version was provided.
-      if ( StandardSimQueryParameters.version ) {
-
-        // eslint-disable-next-line no-console
-        console.log( `${ config.name }: v${ JSON.parse( require( 'text!REPOSITORY/package.json' ) ).version }` );
-      }
 
       // Initialize a display to attach to the browser window.
       const display = new Display();
@@ -100,6 +88,18 @@ define( require => {
       }
 
 
+      //----------------------------------------------------------------------------------------
+
+      // If the page is loaded from the back-forward cache, then reload the page to avoid bugginess,
+      // see https://stackoverflow.com/questions/8788802/prevent-safari-loading-from-cache-when-back-button-is-clicked
+      window.addEventListener( 'pageshow', event => { if ( event.persisted ) window.location.reload(); } );
+
+      // Log the current version of the simulation if the query parameter ?version was provided.
+      if ( StandardSimQueryParameters.version ) {
+
+        // eslint-disable-next-line no-console
+        console.log( `${ config.name }: v${ JSON.parse( require( 'text!REPOSITORY/package.json' ) ).version }` );
+      }
       // // Add the navigation bar
       // const navigationBar = new NavigationBar( config.name );
 
