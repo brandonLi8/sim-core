@@ -39,9 +39,9 @@ define( require => {
   const Vector = require( 'SIM_CORE/util/Vector' );
 
   // constants
-  const SIM_SOURCE_LOADING_BANDWIDTH = 25 + Math.random() * 10; // Random number from 35 to 45
-  const IMAGE_LOADING_BANDWIDTH = 20 + Math.random() * 15;      // Random number from 20 to 35
-  const DOM_LOADING_BANDWIDTH = 100 - IMAGE_LOADING_BANDWIDTH - SIM_SOURCE_LOADING_BANDWIDTH;
+  const SIM_SOURCE_LOADING_BANDWIDTH = 50 + Math.random() * 10;
+  const DOM_LOADING_BANDWIDTH = 15 + Math.random() * 10;
+  const IMAGE_LOADING_BANDWIDTH = 100 - SIM_SOURCE_LOADING_BANDWIDTH - DOM_LOADING_BANDWIDTH;
 
   class Loader extends DOMObject {
 
@@ -69,6 +69,7 @@ define( require => {
         loaderCircleRadius: 43,      // {number} - the inner-radius of the loader circle, in the standard scenery frame
         loaderCircleStrokeWidth: 11, // {number} - the stroke-width of the loader circle, in the standard scenery frame
         titleCircleMargin: 90,
+        titleFontSize: 30,
 
         // Rewrite options so that it overrides the defaults.
         ...options
@@ -101,7 +102,7 @@ define( require => {
         center: this._loaderScreenView.viewBounds.center.subtractXY( 0, options.titleCircleMargin ),
         maxWidth: this._loaderScreenView.viewBounds.width,
         fill: options.loaderTitleColor,
-        fontSize: 30,
+        fontSize: options.titleFontSize,
         strokeWidth: 2
       } );
 
@@ -119,7 +120,7 @@ define( require => {
       this._foregroundCirclePath = new Path( null, {
         fill: 'none', // transparent inside
         stroke: options.loaderCircleFg,
-        strokeWidth: options.loaderCircleStrokeWidth + 1, // add 1 to give illusion that it is fully filling background
+        strokeWidth: options.loaderCircleStrokeWidth + 0.1, // add .1 to give illusion that it is fully filling
         center: this._loaderScreenView.viewBounds.center.addXY( 0, options.titleCircleMargin / 2 ),
       } );
 
@@ -155,7 +156,8 @@ define( require => {
       this._foregroundCirclePath.shape = foregroundCircleShape;
 
       // Reposition the foregroundCircle to match the backgroundColor so that their arcs are on top of each other.
-      this._foregroundCirclePath.topRight = this._backgroundCirclePath.topRight;
+      if ( loadedPercentage < 50 ) this._foregroundCirclePath.topLeft = this._backgroundCirclePath.topCenter;
+      else this._foregroundCirclePath.topRight = this._backgroundCirclePath.topRight;
     }
 
     /**
@@ -189,23 +191,29 @@ define( require => {
      * @param {Display} display - the display to add the views of the screen to.
      */
     synchronousLoadScreens( simScreens, display ) {
-      // Create a function that loads all Screens from a given index of simScreens.
 
+      // Create a function that loads all Screens from a given index of simScreens.
       const initializeScreensFromIndex = ( index ) => {
         setTimeout( () => {
-          simScreens[ index ].start( display );
+          // simScreens[ index ].start( display );
 
           // Increment the loader circle.
-          this.incrementLoader( this._percentage + 1 / simScreens.length * SIM_SOURCE_LOADING_BANDWIDTH );
+          const percentageIncrease = 1 / simScreens.length * SIM_SOURCE_LOADING_BANDWIDTH;
+          const initialIncrease = percentageIncrease * ( 0.4 + Math.random() * 0.1 );
+          const finalIncrease = percentageIncrease - initialIncrease;
+          this.incrementLoader( this._percentage + initialIncrease );
 
-          if ( index + 1 < simScreens.length ) initializeScreensFromIndex( index + 1 );
-          else this.synchronousLoadSimImages(); // Once this has finished, call the second step of the loading process.
+          setTimeout( () => {
+            this.incrementLoader( this._percentage + finalIncrease );
+            if ( index + 1 < simScreens.length ) initializeScreensFromIndex( index + 1 );
+            else this.synchronousLoadSimImages(); // Once this has finished, call the second step of the loading process.
+          }, 800 / Math.pow( 2 * simScreens.length, simScreens.length * 2 ) );
         },
           // Add a slight delay between each initializeScreensFromIndex call to make it easier to see increments. This
           // delay gets smaller for more screens making it move reasonably quickly for more screens.
-          300 / simScreens.length );
+          300 / Math.pow( simScreens.length, 0.01 ) );
       };
-      setTimeout( () => { initializeScreensFromIndex( 0 ); }, 200 ); // pause for a few milliseconds before starting
+      setTimeout( () => { initializeScreensFromIndex( 0 ); }, 300 ); // pause for a few milliseconds before starting
     }
 
     /**
@@ -250,7 +258,7 @@ define( require => {
         setTimeout( () => {
           this.incrementLoader( this._percentage + IMAGE_LOADING_BANDWIDTH );
           this.synchronousFinishDOM(); // Once this has finished, call the 3rd step of the loading process.
-        }, 800 ); // pause for a few milliseconds before.
+        }, 600 ); // pause for a few milliseconds before.
       }
     }
 
@@ -273,7 +281,7 @@ define( require => {
 
           setTimeout( () => { this.dispose() }, 100 ); // Slight pause before disposing.
         } );
-      }, DOM_LOADING_BANDWIDTH / 100 * 800 ); // pause for a few milliseconds before.
+      }, DOM_LOADING_BANDWIDTH * 30 ); // pause for a few milliseconds before.
     }
 
     /**
