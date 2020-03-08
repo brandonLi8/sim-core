@@ -9,6 +9,8 @@
 
 define( require => {
   'use strict';
+
+  // Load Query Parameter first to check if assertions are enabled before loading everything else.
   const StandardSimQueryParameters = require( 'SIM_CORE/StandardSimQueryParameters' );
 
   // modules
@@ -21,22 +23,7 @@ define( require => {
   const ScreenView = require( 'SIM_CORE/scenery/ScreenView' );
   const Util = require( 'SIM_CORE/util/Util' );
 
-  const Sim = {
-
-    // @public {boolean} (read-only) - indicates if the simulation has already been initiated and launched.
-    initiated: false,
-
-    // @private {boolean} - indicates if the current window is running on a mobile device.
-    _isMobile: ( () => /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i
-                .test( navigator.userAgent || navigator.vendor || window.opera ) )(),
-
-    // @private {function} - scans through potential default `requestAnimationFrame` functions
-    _requestAnimationFrame: ( window.requestAnimationFrame
-                                || window.webkitRequestAnimationFrame
-                                || window.mozRequestAnimationFrame
-                                || window.msRequestAnimationFrame
-                                || ( ( callback ) => { window.setTimeout( callback, 1000 / 60 ); } )
-                            ).bind( window ),
+  class Sim {
 
     /**
      * Starting point of the sim: initiates and launches the simulation. Will throw an error if called more than once.
@@ -45,9 +32,8 @@ define( require => {
      * @param {Object} config - required object literal that provides configuration information for the simulation.
      *                          See the early portion of this static method for details.
      */
-    start( config ) {
-      assert.always( !Sim.initiated, 'Sim has already been launched.' ); // Ensure that the sim hasn't been launched
-      assert( Object.getPrototypeOf( config ) === Object.prototype, `invalid config: ${ config }` );
+    static start( config ) {
+      assert( !this.initiated, 'Sim has already been launched.' );
 
       config = {
 
@@ -60,6 +46,7 @@ define( require => {
         // {number} (optional) - maximum delta-time in the animation loop. Used to prevent sudden dt bursts when the
         //                       user comes back to the tab after a while or unminimizes the browser.
         maxDT: config.maxDT || 0.5,
+
         ...config
       };
 
@@ -67,12 +54,15 @@ define( require => {
       assert( config.screens.every( screen => screen instanceof Screen ), `invalid screens: ${ config.screens }` );
       assert( typeof config.name === 'string', `invalid name: ${ config.name }` );
       assert( typeof config.maxDT === 'number' && config.maxDT > 0, `invalid maxDT: ${ config.maxDT }` );
-      Sim.initiated = true; // Indicate that the simulation has been initiated and launched.
 
+      //----------------------------------------------------------------------------------------
+
+      // @public {boolean} (read-only) - indicates if the simulation has already been initiated and launched,
+      //                                 which it now true.
+      this.initiated = true;
 
       // Initialize a display to attach to the browser window.
-      const display = new Display();
-      display.initiate();
+      const display = new Display().initiate();
 
       const loader = new Loader( config.name );
       display.addChild( loader );
@@ -168,6 +158,16 @@ define( require => {
       // }
     }
   }
+
+
+  Sim.initiated = false;
+
+  // // @private {boolean} - indicates if the current window is running on a mobile device.
+  // Sim._isMobile: ( () => /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i
+  //                         .test( navigator.userAgent || navigator.vendor || window.opera ) )();
+
+
+
 
   return Sim;
 } );

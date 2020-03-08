@@ -3,6 +3,7 @@
 /**
  * Before reading the documentation of this file, it is recommended to read `./DOMObject.js` for context.
  *
+ * ## General Description
  * A Display represents the true root DOMObject of the entire simulation. All Nodes, Screens, Navigation Bars, etc.
  * should be in the sub-tree of a single Display. The Display is instantiated once at the start of the sim in Sim.js.
  * Generally, Displays shouldn't be public-facing to sim-specific code. Instead, Screens should be instantiated and
@@ -14,6 +15,16 @@
  * also provide CSS styles for the Body element for sim-specific code. If you are unfamiliar with the typical Body
  * and HTML elements in a global HTML file, visit https://www.w3.org/TR/html401/struct/global.html.
  *
+ * ## Events
+ * Currently, Display has two events that can be triggered. See the on()/off() methods for registering listeners for
+ * these events. The arguments that are passed to the listeners are forwarded from the arguments (after the first
+ * argument) of the trigger() method. These two events are:
+ *   - resize - triggered when the browser window is resized. The width and height of the window (in pixels) are passed
+ *              to registered listeners.
+ *   - frame - triggered on each new frame step of the simulation. It uses requestAnimationFrame (see
+ *             https://developer.mozilla.org/en-US/docs/Web/API/window/requestAnimationFrame). The time since the last
+ *             frame is passed to registered listeners.
+ *
  * @author Brandon Li <brandon.li820@gmail.com>
  */
 
@@ -23,6 +34,8 @@ define( require => {
   // modules
   const assert = require( 'SIM_CORE/util/assert' );
   const DOMObject = require( 'SIM_CORE/core-internal/DOMObject' );
+  const StandardSimQueryParameters = require( 'SIM_CORE/StandardSimQueryParameters' );
+  const Util = require( 'SIM_CORE/util/Util' );
 
   class Display extends DOMObject {
 
@@ -55,11 +68,15 @@ define( require => {
         ...options
       };
       super( options );
+
+      // @private {Object} - maps event names to registered listeners. See comment at the top of the file for context.
+      this._eventListeners = { 'resize': [], 'frame': [] };
     }
 
     /**
      * Initiates the Display, which will connect the inner DOMObject of the Display element to the HTML Body element to
-     * initiate rendering of the entire scene-graph. Will also provide favorable CSS styles for the Body element.
+     * initiate rendering of the entire scene-graph. Will also provide favorable CSS styles for the Body element. Will
+     * also call initiateEvents().
      * @public
      *
      * @returns {Display} - for chaining
@@ -101,9 +118,93 @@ define( require => {
         touchCallout: 'none',
         userDrag: 'none'
       } );
+
+      //----------------------------------------------------------------------------------------
+      // Set up the 'resize' event. Use throttling technique to improve performance. Throttling works by limiting how
+      // often the resize handler will be called by setting a timeout between calls, giving a more reasonable rate of
+      // calls. See https://stackoverflow.com/questions/27078285/simple-throttle-in-js.
+      let throttled = false; // flag that indicates if we need to throttle (when the resize is called to often).
+      let backupResizeScheduled = false; // flag that indicates if the resize listener has been called when throttling.
+      window.onresize = () => {
+        if ( !throttled && !backupResizeScheduled ) {
+          throttled = true;
+          this._trigger( 'resize', window.innerWidth, window.innerHeight );
+          setTimeout( () => { throttled = false; }, StandardSimQueryParameters.resizeThrottle );
+        }
+        if ( throttled && !backupResizeScheduled ) {
+          backupResizeScheduled = true;
+          setTimeout( () => {
+            this._trigger( 'resize', window.innerWidth, window.innerHeight );
+            backupTimeoutScheduled = false;
+          }, 2 * StandardSimQueryParameters.resizeThrottle );
+        }
+      };
+      window.onresize();
+
+      // Set up the 'frame' event.
+      let lastStepTime = Date.now(); // flag that tracks the last time the step listener has been called.
+      const stepper = () => {
+        const currentTime = Date.now();
+        const ellapsedTime = Util.convertFrom( currentTime - lastStepTime, Util.MILLI );
+        lastStepTime = currentTime;
+        this._trigger( 'frame', ellapsedTime );
+        Display._requestAnimationFrame( stepper );
+      };
+      Display._requestAnimationFrame( stepper );
+
       return this;
     }
+
+    /**
+     * Registers a listener such that when the eventName is triggered, the listener is called, passing the arguments
+     * (after the first argument) of the trigger() method. Use off() to unlink listeners.
+     * @public
+     *
+     * @param {string} eventName - the name for the event channel.
+     * @param {function} listener - listener that is called when the event is triggered, forwarding arguments.
+     */
+    on( eventName, listener ) {
+      assert( eventName === 'resize' || eventName === 'frame', `invalid eventName: ${ eventName }` );
+      assert( typeof listener === 'function', `invalid listener: ${ listener }` );
+      this._eventListeners[ eventName ].push( listener );
+    }
+
+    /**
+     * Remove a registered listener (added with on()) from the specified event type.
+     * @public
+     *
+     * @param {string} eventName - the name for the event channel.
+     * @param {function} listener - listener to unlink.
+     */
+    off( eventName, listener ){
+      assert( eventName === 'resize' || eventName === 'frame', `invalid eventName: ${ eventName }` );
+      assert( this._eventListeners[ eventName ].includes( listener ), `invalid listener: ${ listener }` );
+      Util.arrayRemove( this._eventListeners[ eventName ], listener );
+    }
+
+    /**
+     * Triggers an event with the specified name and arguments.
+     * @private
+     *
+     * @param {string} eventName - the name for the event channel.
+     * @param {forwardedListenerArgs...} - arguments to pass to the registered listeners of this event.
+     * @public
+     */
+    _trigger( eventName, ...forwardedListenerArgs ) {
+      assert( eventName === 'resize' || eventName === 'frame', `invalid eventName: ${ eventName }` );
+      this._eventListeners.forEach( ( listener ) => {
+        listener( ...forwardedListenerArgs );
+      } );
+    }
   }
+
+  // @private {function} - scans through potential default `requestAnimationFrame` functions
+  Display._requestAnimationFrame = ( window.requestAnimationFrame
+                                       || window.webkitRequestAnimationFrame
+                                       || window.mozRequestAnimationFrame
+                                       || window.msRequestAnimationFrame
+                                       || ( ( callback ) => { window.setTimeout( callback, 1000 / 60 ); } )
+                                   ).bind( window );
 
   return Display;
 } );
