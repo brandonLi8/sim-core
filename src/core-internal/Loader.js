@@ -7,9 +7,9 @@
  * This is shown as a progress circle while launching the simulation and is removed once finished.
  *
  * Loading tasks include:
- *  (1) Synchronously initializing the entire model and view hierarchies of the sim-specific code for every screen.
- *      This ensures that the simulation source code has been loaded and instantiated. This process is defined to be
- *      SIM_SOURCE_LOADING_BANDWIDTH% of the loading bandwidth. There must be at least one screen to load.
+ *  (1) Synchronously initializing the entire model and view hierarchies of the sim-specific code for every screen (see
+ *      Screen.js). This ensures that the simulation source code has been loaded and instantiated. This process is
+ *      defined to be SIM_SOURCE_LOADING_BANDWIDTH% of the loading bandwidth. There must be at least one screen to load.
  *
  *  (2) Synchronously loading registered images from the global window object (see ../util/image-plugin).
  *      Each image loaded adds a percentage amount depending on how many images are loaded. This process is defined
@@ -31,6 +31,7 @@ define( require => {
   const DOMObject = require( 'SIM_CORE/core-internal/DOMObject' );
   const Node = require( 'SIM_CORE/scenery/Node' );
   const Path = require( 'SIM_CORE/scenery/Path' );
+  const Screen = require( 'SIM_CORE/Screen' );
   const ScreenView = require( 'SIM_CORE/scenery/ScreenView' );
   const Shape = require( 'SIM_CORE/util/Shape' );
   const Text = require( 'SIM_CORE/scenery/Text' );
@@ -112,7 +113,7 @@ define( require => {
       this._foregroundCirclePath = new Path( null, {
         fill: 'none', // transparent inside
         stroke: options.loaderCircleFg,
-        strokeWidth: options.loaderCircleStrokeWidth,
+        strokeWidth: options.loaderCircleStrokeWidth + 1, // add 1 to give illusion that it is fully filling background
         center: this._loaderScreenView.viewBounds.center.addXY( 0, options.titleCircleMargin / 2 ),
       } );
 
@@ -120,6 +121,12 @@ define( require => {
       this.addChild( this._loaderScreenView
                       .setChildren( [ this._titleLabel, this._backgroundCirclePath, this._foregroundCirclePath ]
                     ) );
+
+      // @private {number} the percentage amount that the loader has completed.
+      this._percentage = 0;
+
+      // @private {number} reference the loader circle radius.
+      this._loaderCircleRadius = 43;
     }
 
     /**
@@ -130,9 +137,42 @@ define( require => {
      * @param {string[]} simScreens - all screens of the simulation
      */
     start( simScreens ) {
+      assert( Util.isArray( simScreens ) && simScreens.length && simScreens.every( screen => screen instanceof Screen ),
+        `invalid simScreens: ${ simScreens }` );
+
+      this.incrementLoader( 90 )
 
     }
 
+    /**
+     * Increments the Loader to a new percentage by updating the arc of the foregroundCircle to signal a percentage
+     * amount to completing the Loader portion of the simulation.
+     * @private
+     *
+     * The foregroundCircle arc is drawn in a standard loader circle orientation, starting vertically up and rotating
+     * clockwise (wihtout considierng the flipped y-axis of the view).
+     *
+     * @param {number} loadedPercentage - the percentage that the loader has completed
+     */
+    incrementLoader( loadedPercentage ) {
+      if ( loadedPercentage === this._percentage ) return; // Exit if setting to the same percentage.
+      assert( typeof loadedPercentage === 'number', `invalid loadedPercentage: ${ loadedPercentage }` );
+
+      // Update the percentage field of the Loader. Subtract EPSILON so that full circles are fully rendered.
+      this._percentage = loadedPercentage - Util.EPSILON;
+
+      // Create the shape rendered for the foregroundCircle.
+      const foregroundCircleShape = new Shape()
+        .moveTo( 0, 0 )
+        .arc( this._loaderCircleRadius, - Math.PI / 2, - Math.PI / 2 +  2 * Math.PI * this._percentage / 100 );
+
+      // Set the shape of the foregroundCircle to render the new Shape.
+      this._foregroundCirclePath.shape = foregroundCircleShape;
+
+      // Reposition the foregroundCircle to match the backgroundColor so that their arcs are on top of each other.
+      if ( this._percentage < 50 ) this._foregroundCirclePath.topLeft = this._backgroundCirclePath.topCenter;
+      else this._foregroundCirclePath.center = this._backgroundCirclePath.center;
+    }
 
     layout( width, height ) {
       this._loaderScreenView.layout( width, height );

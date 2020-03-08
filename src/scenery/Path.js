@@ -147,9 +147,14 @@ define( require => {
       this.width = shape ? shape.bounds.width : 0;
       this.height = shape ? shape.bounds.height : 0;
 
+      // Reference the previous top-left position before shifting.
+      const topLeft = this.topLeft;
+
       // Set the Bounds of this Node. This shift the Shape's bounds so that the Path's origin (0, 0) is at the top-left
       // of its bounds.
-      shape && this._bounds.set( this._shape.bounds ).shift( -shape.bounds.left, -shape.bounds.top );
+      if ( shape ) {
+        this._bounds.set( this._shape.bounds ).shift( -shape.bounds.left + topLeft.x, -shape.bounds.top + topLeft.y );
+      }
       this.layout( this._screenViewScale );
     }
 
