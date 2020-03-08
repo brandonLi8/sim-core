@@ -54,7 +54,7 @@ define( require => {
         // {Screens[]} - all screens to the sim, in order that they will appear in the home-screen and navigation-bar.
         screens: config.screens,
 
-        // {string} - the name to the simulation, displayed in the navigation-bar, loader, and home-screen
+        // {string} - the name of the simulation, displayed in the navigation-bar, loader, and home-screen
         name: config.name,
 
         // {number} (optional) - maximum delta-time in the animation loop. Used to prevent sudden dt bursts when the
@@ -86,8 +86,11 @@ define( require => {
       const display = new Display();
       display.initiate();
 
-      const loader = new Loader( config.screens, config.name );
+      const loader = new Loader( config.name );
       display.addChild( loader );
+
+      // Start loading
+      loader.start( config.screens );
 
       // Initialize a fps-counter if the ?fps query parameter was provided
       let fpsCounter;

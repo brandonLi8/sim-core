@@ -45,13 +45,12 @@ define( require => {
   class Loader extends DOMObject {
 
     /**
-     * @param {string[]} simScreens - all screens of the simulation
      * @param {string} simName - the name of the simulation, displayed in the Loader
      * @param {Object} [options] - Various key-value pairs that control the appearance and behavior of this class.
      *                             Some options are specific to this class while others are passed to the super class.
      *                             See the early portion of the constructor for details.
      */
-    constructor( simScreens, simName, options ) {
+    constructor( simName, options ) {
 
       // Some options are set by Loader. Assert that they weren't provided.
       assert( !options || Object.getPrototypeOf( options ) === Object.prototype, `invalid options: ${ options }` );
@@ -123,67 +122,23 @@ define( require => {
                     ) );
     }
 
+    /**
+     * Begins loading the Loader, which will execute the tasks listed at the top of this file and incrementally
+     * increase the arc of the Loader circle, signaling the progression as the simulation is loaded.
+     * @public
+     *
+     * @param {string[]} simScreens - all screens of the simulation
+     */
+    start( simScreens ) {
+
+    }
+
+
     layout( width, height ) {
       this._loaderScreenView.layout( width, height );
     }
 
 
-    //   //----------------------------------------------------------------------------------------
-    //   // To create the loading progress circle, overlay 2 circles on top of each other.
-    //   // First, create the circle in the background. The circle has no fill (hollow) but has a stroke and is a complete
-    //   // circle arc.
-    //   const backgroundCircle = new DOMObject( {
-    //     type: 'circle',
-    //     namespace: XML_NAMESPACE,
-    //     attributes: {
-    //       fill: 'none',
-    //       r: LOADER_CIRCLE_INNER_RADIUS, // In percentage of the container.
-    //       cx: Vector.ZERO.x, // Center the circle
-    //       cy: Vector.ZERO.y, // Center the circle
-    //       'stroke-width': LOADER_STROKE_WIDTH,
-    //       'shape-rendering': 'geometricPrecision', // Use geometricPrecision for aesthetic accuracy.
-    //       stroke: '#A5A5A5' // light colored
-    //     }
-    //   } );
-
-    //   //----------------------------------------------------------------------------------------
-    //   // Create the circle (as a path) in the foreground. The circle has no fill (hollow) but has a stroke.
-    //   // This represents the percentage of bandwidth loaded (see comment at the top of the file).
-    //   // For now, initialize with arc length 0.
-    //   const foregroundCircle = new DOMObject( {
-    //     type: 'path',
-    //     namespace: XML_NAMESPACE,
-    //     style: {
-    //       fill: 'none',
-    //       'stroke-width': LOADER_STROKE_WIDTH,
-    //       stroke: '#2974b2'
-    //     },
-    //     attributes: {
-    //       'shape-rendering': 'geometricPrecision' // Use geometricPrecision for aesthetic accuracy.
-    //     }
-    //   } );
-
-    //   //----------------------------------------------------------------------------------------
-    //   // Create the container of the background and foreground circles, using an SVG DOMObject.
-    //   // See https://developer.mozilla.org/en-US/docs/Web/SVG/Element/svg for more details.
-    //   const loaderCircleContainer = new DOMObject( {
-    //     type: 'svg',
-    //     namespace: XML_NAMESPACE,
-    //     attributes: {
-    //       viewBox: LOADER_CIRCLE_VIEW_BOX,
-    //       'shape-rendering': 'geometricPrecision' // Use geometricPrecision for aesthetic accuracy.
-    //     },
-    //     style: {
-    //       width: LOADER_CIRCLE_WIDTH,
-    //       maxWidth: LOADER_CIRCLE_MAX_SIZE,
-    //       minWidth: LOADER_CIRCLE_MIN_SIZE,
-    //       transform: 'scale( 1, -1 )'  // Invert the y-axis to match traditional cartesian coordinates.
-    //     }
-    //   } );
-
-    //   //----------------------------------------------------------------------------------------
-    //   // Set up the initial Loader scene graph.
-    //   options.children = [ loaderCircleContainer.setChildren( [ backgroundCircle, foregroundCircle ] ) ];
 
 
     //   //----------------------------------------------------------------------------------------

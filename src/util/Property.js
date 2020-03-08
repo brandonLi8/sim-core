@@ -49,9 +49,9 @@ define( require => {
 
       options = {
 
-        // {string|constructor} - the type of the value. If provided, this will check that new values match this type.
-        //                        If {string}, the string must be one of the types listed in TYPEOF_STRINGS.
-        //                        If {constructor}, this will use `instanceof` to validate new values. Ex: `Vector`.
+        // {string|Class.<*>} - the type of the value. If provided, this will check that new values match this type.
+        //                      If {string}, the string must be one of the types listed in TYPEOF_STRINGS.
+        //                      If {Class.<*>}, this will use `instanceof` to validate new values. Ex: `Vector`.
         type: null,
 
         // {*[]} - an array of valid values for this Property. If provided, this will check that new values are in
