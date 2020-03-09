@@ -6,7 +6,7 @@
     "email": "brandon.li820@gmail.com",
     "url": "https://brandonwli.com/"
   },
-  "version": "0.0.0-dev.23",
+  "version": "0.0.0-dev.24",
   "description": "",
   "repository": {
     "type": "git",
@@ -17,7 +17,7 @@
     "coverage": "c8 -x=tests/** -x=**/*QueryParameters*.js -x=**/scenery -x=**/core-internal -r=lcov -r=text-summary npm test"
   },
   "devDependencies": {
-    "@brandonli8/grunt-config": "0.0.0-dev.16",
+    "@brandonli8/grunt-config": "0.0.0-dev.15",
     "browser-env": "^3.3.0",
     "c8": "^7.1.0",
     "truenit": "^0.9.14"
