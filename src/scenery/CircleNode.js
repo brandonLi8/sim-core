@@ -1,7 +1,6 @@
 // Copyright © 2019-2020 Brandon Li. All rights reserved.
 
-// Copyright © 2019-2020 Brandon Li. All rights reserved.
-
+// NOTE: THIS DOESNT WORK ATM!!!
 /**
  * A sim-specific Circle node for SVG (scalable vector graphics).
  *
@@ -14,7 +13,6 @@ define( require => {
   // modules
   const assert = require( 'SIM_CORE/util/assert' );
   const Node = require( 'SIM_CORE/scenery/Node' );
-  const Vector = require( 'SIM_CORE/util/Vector' );
 
   // constants
 
@@ -54,7 +52,7 @@ define( require => {
       this.height = this._radius * 2;
 
       this.center = center;
-      this.layout( this._screenViewScale  );
+      this.layout( this._screenViewScale );
     }
 
     layout( scale ) {
@@ -65,7 +63,7 @@ define( require => {
       globalBounds && this.addAttributes( {
         r: `${ scale * this._radius }px`,
         cx: `${ this._radius * scale }`,
-        cy: `${ this._radius * scale }`,
+        cy: `${ this._radius * scale }`
       } );
     }
   }

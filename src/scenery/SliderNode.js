@@ -1,4 +1,5 @@
 // Copyright © 2019-2020 Brandon Li. All rights reserved.
+// NOTE: THIS DOESNT WORK ATM!!!
 
 /**
  * A sim-specific node for Sliders.

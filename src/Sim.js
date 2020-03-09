@@ -84,7 +84,7 @@ define( require => {
       if ( StandardSimQueryParameters.fps ) {
         const fpsCounter = new FPSCounter();
         this.display.addChild( fpsCounter );
-        this.display.on( 'frame', dt => { fpsCounter.registerNewFrame( dt ) } ); // doesn't need to be unlinked.
+        this.display.on( 'frame', dt => { fpsCounter.registerNewFrame( dt ); } ); // doesn't need to be unlinked.
       }
 
       // Enable the red dev border around ScreenViews if the ?dev query parameter was provided.

@@ -177,7 +177,7 @@ define( require => {
      * @param {string} eventName - the name for the event channel.
      * @param {function} listener - listener to unlink.
      */
-    off( eventName, listener ){
+    off( eventName, listener ) {
       assert( eventName === 'resize' || eventName === 'frame', `invalid eventName: ${ eventName }` );
       assert( this._eventListeners[ eventName ].includes( listener ), `invalid listener: ${ listener }` );
       Util.arrayRemove( this._eventListeners[ eventName ], listener );

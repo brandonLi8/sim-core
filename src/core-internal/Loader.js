@@ -30,7 +30,6 @@ define( require => {
   const assert = require( 'SIM_CORE/util/assert' );
   const DOMObject = require( 'SIM_CORE/core-internal/DOMObject' );
   const Path = require( 'SIM_CORE/scenery/Path' );
-  const Screen = require( 'SIM_CORE/Screen' );
   const ScreenView = require( 'SIM_CORE/scenery/ScreenView' );
   const Shape = require( 'SIM_CORE/util/Shape' );
   const Text = require( 'SIM_CORE/scenery/Text' );
@@ -243,7 +242,7 @@ define( require => {
               this.incrementLoader( this._percentage + 1 / window.simImages.length * IMAGE_LOADING_BANDWIDTH );
 
               if ( index + 1 < window.simImages.length ) loadImageFromIndex( index + 1 );
-              else this.synchronousFinishDOM( sim ); // Once this has finished, call the 3rd step of the loading process.
+              else this.synchronousFinishDOM( Sim ); // Once this has finished, call the 3rd step of the loading process
             };
 
             // Now set the src of the image.
