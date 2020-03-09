@@ -62,7 +62,7 @@ define( require => {
       this.initiated = true;
 
       // @public {string} (read-only) - reference to the name of the simulation.
-      this.name = config.name;
+      this.simName = config.name;
 
       // @public {Screens[]} (read-only) - reference to the screens of the simulation.
       this.screens = config.screens;
@@ -71,9 +71,14 @@ define( require => {
       this.display = new Display().initiate();
 
       // Create the Loader and start.
-      const loader = new Loader( this, config.name );
+      const loader = new Loader( this );
       this.display.addChild( loader );
-      loader.load( this, config.screens ); // Start loading
+      loader.load( this ); // Start loading
+
+
+      // Add the navigation bar
+      this.navigationBar = new NavigationBar( config.name );
+      this.display.addChild( this.navigationBar );
 
       // Initialize a fps-counter if the ?fps query parameter was provided.
       if ( StandardSimQueryParameters.fps ) {
@@ -97,37 +102,40 @@ define( require => {
       window.addEventListener( 'pageshow', event => { if ( event.persisted ) window.location.reload(); } );
 
 
-      // // Add the navigation bar
-      // const navigationBar = new NavigationBar( config.name );
-
-      // this.display.addChild( navigationBar );
-
-      // this.display.addChild( config.screens[ 0 ] );
-
-
-
-
-
-      // // prevent pinch and zoom https://stackoverflow.com/questions/37808180/disable-viewport-zooming-ios-10-safari
-      // // Maybe we want to detect if passive is supportive
-      // // https://developer.mozilla.org/en-US/docs/Web/API/EventTarget/addEventListener#Safely_detecting_option_support
-      // if ( window.isMobile ) {
+      // prevent pinch and zoom https://stackoverflow.com/questions/37808180/disable-viewport-zooming-ios-10-safari
+      // Maybe we want to detect if passive is supportive
+      // https://developer.mozilla.org/en-US/docs/Web/API/EventTarget/addEventListener#Safely_detecting_option_support
+      // if ( Sim.isMobile ) {
       //   document.addEventListener( 'touchmove', event => {
       //     if ( event.scale !== 1 ) { event.preventDefault(); }
       //   }, { passive: false } );
       // }
     }
+
+    /**
+     * Finishes loading the Screens by fixing their heights and resizing.
+     * @public
+     */
+    static finishLoadingScreens() {
+      // Enable the red dev border around ScreenViews if the ?dev query parameter was provided.
+      if ( StandardSimQueryParameters.dev ) { ScreenView.enableDevBorder(); }
+
+      this.display.on( 'resize', ( width, height ) => {
+        this.navigationBar.layout( width, height );
+        const screenHeight = height - parseFloat( this.navigationBar.style.height );
+
+        this.screens.forEach( screen => {
+         screen.style.height = `${ screenHeight }px`;
+
+         screen.view.layout( width, screenHeight );
+        } );
+      } );
+    }
   }
-
-
-  Sim.initiated = false;
 
   // // @private {boolean} - indicates if the current window is running on a mobile device.
   // Sim._isMobile: ( () => /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i
   //                         .test( navigator.userAgent || navigator.vendor || window.opera ) )();
-
-
-
 
   return Sim;
 } );

@@ -181,7 +181,6 @@ define( require => {
       assert( eventName === 'resize' || eventName === 'frame', `invalid eventName: ${ eventName }` );
       assert( this._eventListeners[ eventName ].includes( listener ), `invalid listener: ${ listener }` );
       Util.arrayRemove( this._eventListeners[ eventName ], listener );
-      console.log( 'removed, ', this._eventListeners[ eventName ])
     }
 
     /**

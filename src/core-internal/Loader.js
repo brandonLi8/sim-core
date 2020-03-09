@@ -45,12 +45,11 @@ define( require => {
 
     /**
      * @param {Class.<Sim>} Sim - the sim class.
-     * @param {string} simName - the name of the simulation, displayed in the Loader
      * @param {Object} [options] - Various key-value pairs that control the appearance and behavior of this class.
      *                             Some options are specific to this class while others are passed to the super class.
      *                             See the early portion of the constructor for details.
      */
-    constructor( Sim, simName, options ) {
+    constructor( Sim, options ) {
 
       // Some options are set by Loader. Assert that they weren't provided.
       assert( !options || Object.getPrototypeOf( options ) === Object.prototype, `invalid options: ${ options }` );
@@ -97,7 +96,7 @@ define( require => {
       this._loaderScreenView = new ScreenView( { id: 'loader-screen-view' } );
 
       // @private {Text} - Create the Text Node that displays the title of the simulation in the loader.
-      this._titleLabel = new Text( simName, {
+      this._titleLabel = new Text( Sim.simName, {
         center: this._loaderScreenView.viewBounds.center.subtractXY( 0, options.titleCircleMargin ),
         maxWidth: this._loaderScreenView.viewBounds.width,
         fill: options.loaderTitleColor,
@@ -138,7 +137,7 @@ define( require => {
      * @param {number} width - window width in pixels
      * @param {number} height - window height in pixels
      */
-    layout( width, height ) { this._loaderScreenView.layout( width, height ); console.log( 'erherh') }
+    layout( width, height ) { this._loaderScreenView.layout( width, height ); }
 
     /**
      * Begins loading the Loader, which will execute the tasks listed at the top of this file and incrementally
@@ -146,13 +145,10 @@ define( require => {
      * @public
      *
      * @param {Class.<Sim>} Sim - the sim class.
-     * @param {string[]} simScreens - all screens of the simulation
      */
     load( Sim, simScreens ) {
-      assert( Util.isArray( simScreens ) && simScreens.length && simScreens.every( screen => screen instanceof Screen ),
-        `invalid simScreens: ${ simScreens }` );
 
-      this.synchronousLoadScreens( Sim, simScreens, Sim.display );
+      this.synchronousLoadScreens( Sim );
     }
 
     /**
@@ -192,31 +188,30 @@ define( require => {
      * will call the second step of Loading tasks: synchronousLoadSimImages()
      * @public
      *
-     * @param {string[]} simScreens - all screens of the simulation
-     * @param {Display} display - the display to add the views of the screen to.
+     * @param {Class.<Sim>} Sim - the sim class.
      */
-    synchronousLoadScreens( sim, simScreens, display ) {
+    synchronousLoadScreens( Sim ) {
 
-      // Create a function that loads all Screens from a given index of simScreens.
+      // Create a function that loads all Screens from a given index of Sim.screens.
       const initializeScreensFromIndex = ( index ) => {
         setTimeout( () => {
-          simScreens[ index ].start( display );
+          Sim.screens[ index ].start( Sim.display );
 
           // Increment the loader circle.
-          const percentageIncrease = 1 / simScreens.length * SIM_SOURCE_LOADING_BANDWIDTH;
+          const percentageIncrease = 1 / Sim.screens.length * SIM_SOURCE_LOADING_BANDWIDTH;
           const initialIncrease = percentageIncrease * ( 0.4 + Math.random() * 0.1 );
           const finalIncrease = percentageIncrease - initialIncrease;
           this.incrementLoader( this._percentage + initialIncrease );
 
           setTimeout( () => {
             this.incrementLoader( this._percentage + finalIncrease );
-            if ( index + 1 < simScreens.length ) initializeScreensFromIndex( index + 1 );
-            else this.synchronousLoadSimImages( sim ); // Once this has finished, call the second step of the loading process
-          }, 800 / Math.pow( 2 * simScreens.length, simScreens.length * 2 ) );
+            if ( index + 1 < Sim.screens.length ) initializeScreensFromIndex( index + 1 );
+            else this.synchronousLoadSimImages( Sim ); // Once this has finished, call the second step
+          }, 800 / Math.pow( 2 * Sim.screens.length, Sim.screens.length * 2 ) );
         },
           // Add a slight delay between each initializeScreensFromIndex call to make it easier to see increments. This
           // delay gets smaller for more screens making it move reasonably quickly for more screens.
-          300 / Math.pow( simScreens.length, 0.01 ) );
+          300 / Math.pow( Sim.screens.length, 0.01 ) );
       };
       setTimeout( () => { initializeScreensFromIndex( 0 ); }, 300 ); // pause for a few milliseconds before starting
     }
@@ -226,8 +221,10 @@ define( require => {
      * (see ../util/image-plugin). Images are in the window.simImages field. Once this is finished, this
      * will call the last step of Loading tasks: synchronousFinishDOM()
      * @public
+     *
+     * @param {Class.<Sim>} Sim - the sim class.
      */
-    synchronousLoadSimImages( sim, simScreens ) {
+    synchronousLoadSimImages( Sim ) {
       if ( window.simImages ) {
         // Create a function that load all images from a given index of window.simImages.
         const loadImageFromIndex = ( index ) => {
@@ -262,7 +259,7 @@ define( require => {
         // No images to load: go ahead and complete the rest of the IMAGE_LOADING_BANDWIDTH
         setTimeout( () => {
           this.incrementLoader( this._percentage + IMAGE_LOADING_BANDWIDTH );
-          this.synchronousFinishDOM( sim ); // Once this has finished, call the 3rd step of the loading process.
+          this.synchronousFinishDOM( Sim ); // Once this has finished, call the 3rd step of the loading process.
         }, 600 ); // pause for a few milliseconds before.
       }
     }
@@ -272,11 +269,14 @@ define( require => {
      * place. Once this is finished, this will dispose of the Loader.
      * @public
      *
-     * @param {string[]} simScreens - all screens of the simulation
+     * @param {Class.<Sim>} Sim - the sim class.
      */
-    synchronousFinishDOM( sim, simScreens ) {
+    synchronousFinishDOM( Sim ) {
       // Step of 3 Loading tasks: synchronously ensuring that the DOM is fully loaded and set in place.
       setTimeout( () => {
+
+        // Tell the Sim that we have finished loading Screens.
+        Sim.finishLoadingScreens();
 
         // Listen to when the DOM has finished loading.
         this.addDOMFinishedListener( () => {
