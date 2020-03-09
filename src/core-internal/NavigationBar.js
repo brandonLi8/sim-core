@@ -72,7 +72,7 @@ define( require => {
         id: 'content',
         style: {
           height: '100%', // width set later
-          webkitFontSmoothing: 'antialiased',
+          fontSmoothing: 'antialiased',
           margin: '0 auto'
         }
       } );

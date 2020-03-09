@@ -377,7 +377,7 @@ define( require => {
       assert( Object.getPrototypeOf( style ) === Object.prototype, `invalid style object: ${ style }` );
 
       // convenience functions
-      const contains = styleKey => Object.prototype.hasOwnProperty.call( element.style, styleKey );
+      const contains = styleKey => element.style[ styleKey ] !== undefined;
       const setStyle = ( name, key ) => { element.style[ name ] = style[ key ]; };
 
       // Loop through each key of the style Object literal and add the style.
@@ -387,6 +387,7 @@ define( require => {
         if ( contains( styleKey ) ) setStyle( styleKey, styleKey );
         else if ( contains( `moz${ camelStyleKey }` ) ) setStyle( `moz${ camelStyleKey }`, styleKey );
         else if ( contains( `Moz${ camelStyleKey }` ) ) setStyle( `Moz${ camelStyleKey }`, styleKey );
+        else if ( contains( `MozOsx${ camelStyleKey }` ) ) setStyle( `MozOsx${ camelStyleKey }`, styleKey );
         else if ( contains( `webkit${ camelStyleKey }` ) ) setStyle( `webkit${ camelStyleKey }`, styleKey );
         else if ( contains( `ms${ camelStyleKey }` ) ) setStyle( `ms${ camelStyleKey }`, styleKey );
         else if ( contains( `o${ camelStyleKey }` ) ) setStyle( `o${ camelStyleKey }`, styleKey );

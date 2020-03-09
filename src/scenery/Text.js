@@ -306,9 +306,9 @@ define( require => {
       if ( !Text.testSVGText ) {
         Text.testSVGTextParent = new DOMObject( {
           type: 'svg',
+          id: 'test-text-size-element',
           style: {
             opacity: 0,
-            id: 'test-text-size-element',
             whiteSpace: 'nowrap',
             position: 'absolute',
             left: '-65535px', // Ensure that it is not visible to the user.

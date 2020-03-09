@@ -1,8 +1,19 @@
 // Copyright © 2019-2020 Brandon Li. All rights reserved.
-// NOTE: THIS DOESNT WORK ATM!!!
 
 /**
- * A sim-specific Rectangle node for SVG (scalable vector graphics).
+ * A Rectangle Node that displays a rectangular-box, with different widths and cornerRadii.
+ *
+ * The Rectangle Node inherits Path to allow for different strokes, fills, etc.
+ *
+ * Unlike other Node subtypes, Text will need to approximate its bounds based of the font and the text that is
+ * displayed (see Text._approximateTextBounds()). However, this does not guarantee that all text-content is inside of
+ * the returned bounds.
+ *
+ * While code comments attempt to describe the implementation clearly, fully understanding it may require some
+ * general background. Some useful references include:
+ *    - https://developer.mozilla.org/en-US/docs/Web/SVG/Element/text
+ *    - http://www.w3.org/TR/css3-fonts/
+ *    - https://www.w3.org/TR/css-fonts-3/#propdef-font
  *
  * @author Brandon Li <brandon.li820@gmail.com>
  */
@@ -12,8 +23,8 @@ define( require => {
 
   // modules
   const assert = require( 'SIM_CORE/util/assert' );
-  const SVGNode = require( 'SIM_CORE/scenery/SVGNode' );
-
+  const Path = require( 'SIM_CORE/scenery/Path' );
+  const Shape = require( 'SIM_CORE/uti/Shape' );
   // constants
   const XML_NAMESPACE = 'http://www.w3.org/2000/svg';
 
