@@ -23,12 +23,12 @@ define( require => {
 
   // modules
   const assert = require( 'SIM_CORE/util/assert' );
-  const Path = require( 'SIM_CORE/scenery/Path' );
-  const Shape = require( 'SIM_CORE/uti/Shape' );
+  // const Path = require( 'SIM_CORE/scenery/Path' );
+  // const Shape = require( 'SIM_CORE/uti/Shape' );
   // constants
   const XML_NAMESPACE = 'http://www.w3.org/2000/svg';
 
-  class Rectangle extends SVGNode {
+  class Rectangle {
 
     /**
      * @param {Object} [options] - Various key-value pairs that control the appearance and behavior. Subclasses
@@ -53,7 +53,7 @@ define( require => {
       // Rewrite options so that it overrides the defaults.
       options = { ...defaults, ...options };
 
-      super( options );
+      // super( options );
 
       this._x = options.x;
       this._y = options.y;
