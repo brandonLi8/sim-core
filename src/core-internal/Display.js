@@ -131,11 +131,11 @@ define( require => {
           this._trigger( 'resize', window.innerWidth, window.innerHeight );
           setTimeout( () => { throttled = false; }, StandardSimQueryParameters.resizeThrottle );
         }
-        if ( throttled && !backupResizeScheduled ) {
+        else if ( throttled && !backupResizeScheduled ) {
           backupResizeScheduled = true;
           setTimeout( () => {
             this._trigger( 'resize', window.innerWidth, window.innerHeight );
-            backupTimeoutScheduled = false;
+            backupResizeScheduled = false;
           }, 2 * StandardSimQueryParameters.resizeThrottle );
         }
       };
@@ -167,6 +167,7 @@ define( require => {
       assert( eventName === 'resize' || eventName === 'frame', `invalid eventName: ${ eventName }` );
       assert( typeof listener === 'function', `invalid listener: ${ listener }` );
       this._eventListeners[ eventName ].push( listener );
+      if ( eventName === 'resize' ) listener( window.innerWidth, window.innerHeight );
     }
 
     /**
@@ -180,6 +181,7 @@ define( require => {
       assert( eventName === 'resize' || eventName === 'frame', `invalid eventName: ${ eventName }` );
       assert( this._eventListeners[ eventName ].includes( listener ), `invalid listener: ${ listener }` );
       Util.arrayRemove( this._eventListeners[ eventName ], listener );
+      console.log( 'removed, ', this._eventListeners[ eventName ])
     }
 
     /**
@@ -192,7 +194,7 @@ define( require => {
      */
     _trigger( eventName, ...forwardedListenerArgs ) {
       assert( eventName === 'resize' || eventName === 'frame', `invalid eventName: ${ eventName }` );
-      this._eventListeners.forEach( ( listener ) => {
+      this._eventListeners[ eventName ].forEach( ( listener ) => {
         listener( ...forwardedListenerArgs );
       } );
     }

@@ -44,12 +44,13 @@ define( require => {
   class Loader extends DOMObject {
 
     /**
+     * @param {Class.<Sim>} Sim - the sim class.
      * @param {string} simName - the name of the simulation, displayed in the Loader
      * @param {Object} [options] - Various key-value pairs that control the appearance and behavior of this class.
      *                             Some options are specific to this class while others are passed to the super class.
      *                             See the early portion of the constructor for details.
      */
-    constructor( simName, options ) {
+    constructor( Sim, simName, options ) {
 
       // Some options are set by Loader. Assert that they weren't provided.
       assert( !options || Object.getPrototypeOf( options ) === Object.prototype, `invalid options: ${ options }` );
@@ -126,21 +127,8 @@ define( require => {
       this.addChild( this._loaderScreenView
                       .setChildren( [ this._titleLabel, this._backgroundCirclePath, this._foregroundCirclePath ]
                     ) );
-    }
 
-    /**
-     * Begins loading the Loader, which will execute the tasks listed at the top of this file and incrementally
-     * increase the arc of the Loader circle, signaling the progression as the simulation is loaded.
-     * @public
-     *
-     * @param {string[]} simScreens - all screens of the simulation
-     * @param {Display} display - the display to add the views of the screen to.
-     */
-    load( simScreens, display ) {
-      assert( Util.isArray( simScreens ) && simScreens.length && simScreens.every( screen => screen instanceof Screen ),
-        `invalid simScreens: ${ simScreens }` );
-
-      this.synchronousLoadScreens( simScreens, display );
+      Sim.display.on( 'resize', this.layout.bind( this ) );
     }
 
     /**
@@ -150,7 +138,22 @@ define( require => {
      * @param {number} width - window width in pixels
      * @param {number} height - window height in pixels
      */
-    layout( width, height ) { this._loaderScreenView.layout( width, height ); }
+    layout( width, height ) { this._loaderScreenView.layout( width, height ); console.log( 'erherh') }
+
+    /**
+     * Begins loading the Loader, which will execute the tasks listed at the top of this file and incrementally
+     * increase the arc of the Loader circle, signaling the progression as the simulation is loaded.
+     * @public
+     *
+     * @param {Class.<Sim>} Sim - the sim class.
+     * @param {string[]} simScreens - all screens of the simulation
+     */
+    load( Sim, simScreens ) {
+      assert( Util.isArray( simScreens ) && simScreens.length && simScreens.every( screen => screen instanceof Screen ),
+        `invalid simScreens: ${ simScreens }` );
+
+      this.synchronousLoadScreens( Sim, simScreens, Sim.display );
+    }
 
     /**
      * Increments the Loader to a new percentage by updating the arc of the foregroundCircle to signal a percentage
@@ -192,7 +195,7 @@ define( require => {
      * @param {string[]} simScreens - all screens of the simulation
      * @param {Display} display - the display to add the views of the screen to.
      */
-    synchronousLoadScreens( simScreens, display ) {
+    synchronousLoadScreens( sim, simScreens, display ) {
 
       // Create a function that loads all Screens from a given index of simScreens.
       const initializeScreensFromIndex = ( index ) => {
@@ -208,7 +211,7 @@ define( require => {
           setTimeout( () => {
             this.incrementLoader( this._percentage + finalIncrease );
             if ( index + 1 < simScreens.length ) initializeScreensFromIndex( index + 1 );
-            else this.synchronousLoadSimImages(); // Once this has finished, call the second step of the loading process
+            else this.synchronousLoadSimImages( sim ); // Once this has finished, call the second step of the loading process
           }, 800 / Math.pow( 2 * simScreens.length, simScreens.length * 2 ) );
         },
           // Add a slight delay between each initializeScreensFromIndex call to make it easier to see increments. This
@@ -224,7 +227,7 @@ define( require => {
      * will call the last step of Loading tasks: synchronousFinishDOM()
      * @public
      */
-    synchronousLoadSimImages( simScreens ) {
+    synchronousLoadSimImages( sim, simScreens ) {
       if ( window.simImages ) {
         // Create a function that load all images from a given index of window.simImages.
         const loadImageFromIndex = ( index ) => {
@@ -243,7 +246,7 @@ define( require => {
               this.incrementLoader( this._percentage + 1 / window.simImages.length * IMAGE_LOADING_BANDWIDTH );
 
               if ( index + 1 < window.simImages.length ) loadImageFromIndex( index + 1 );
-              else this.synchronousFinishDOM(); // Once this has finished, call the 3rd step of the loading process.
+              else this.synchronousFinishDOM( sim ); // Once this has finished, call the 3rd step of the loading process.
             };
 
             // Now set the src of the image.
@@ -259,7 +262,7 @@ define( require => {
         // No images to load: go ahead and complete the rest of the IMAGE_LOADING_BANDWIDTH
         setTimeout( () => {
           this.incrementLoader( this._percentage + IMAGE_LOADING_BANDWIDTH );
-          this.synchronousFinishDOM(); // Once this has finished, call the 3rd step of the loading process.
+          this.synchronousFinishDOM( sim ); // Once this has finished, call the 3rd step of the loading process.
         }, 600 ); // pause for a few milliseconds before.
       }
     }
@@ -271,7 +274,7 @@ define( require => {
      *
      * @param {string[]} simScreens - all screens of the simulation
      */
-    synchronousFinishDOM( simScreens ) {
+    synchronousFinishDOM( sim, simScreens ) {
       // Step of 3 Loading tasks: synchronously ensuring that the DOM is fully loaded and set in place.
       setTimeout( () => {
 
@@ -280,7 +283,6 @@ define( require => {
 
           // At this point the Loader has finished, so increment to the rest.
           this.incrementLoader( 100 );
-
           setTimeout( () => { this.dispose(); }, 100 ); // Slight pause before disposing.
         } );
       }, DOM_LOADING_BANDWIDTH * 30 ); // pause for a few milliseconds before.

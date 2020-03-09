@@ -61,28 +61,29 @@ define( require => {
       //                                 which it now true.
       this.initiated = true;
 
-      // Initialize a display to attach to the browser window.
-      const display = new Display().initiate();
+      // @public {string} (read-only) - reference to the name of the simulation.
+      this.name = config.name;
 
-      const loader = new Loader( config.name );
-      display.addChild( loader );
+      // @public {Screens[]} (read-only) - reference to the screens of the simulation.
+      this.screens = config.screens;
 
-      // Start loading
-      loader.load( config.screens, display );
+      // @public {Display} (read-only) - Initialize a display to attach to the browser window.
+      this.display = new Display().initiate();
 
-      // Initialize a fps-counter if the ?fps query parameter was provided
-      let fpsCounter;
+      // Create the Loader and start.
+      const loader = new Loader( this, config.name );
+      this.display.addChild( loader );
+      loader.load( this, config.screens ); // Start loading
+
+      // Initialize a fps-counter if the ?fps query parameter was provided.
       if ( StandardSimQueryParameters.fps ) {
-        fpsCounter = new FPSCounter();
-        display.addChild( fpsCounter );
+        const fpsCounter = new FPSCounter();
+        this.display.addChild( fpsCounter );
+        this.display.on( 'frame', dt => { fpsCounter.registerNewFrame( dt ) } ); // doesn't need to be unlinked.
       }
 
-
-      //----------------------------------------------------------------------------------------
-
-      // If the page is loaded from the back-forward cache, then reload the page to avoid bugginess,
-      // see https://stackoverflow.com/questions/8788802/prevent-safari-loading-from-cache-when-back-button-is-clicked
-      window.addEventListener( 'pageshow', event => { if ( event.persisted ) window.location.reload(); } );
+      // Enable the red dev border around ScreenViews if the ?dev query parameter was provided.
+      if ( StandardSimQueryParameters.dev ) { ScreenView.enableDevBorder(); }
 
       // Log the current version of the simulation if the query parameter ?version was provided.
       if ( StandardSimQueryParameters.version ) {
@@ -90,63 +91,22 @@ define( require => {
         // eslint-disable-next-line no-console
         console.log( `${ config.name }: v${ JSON.parse( require( 'text!REPOSITORY/package.json' ) ).version }` );
       }
+
+      // If the page is loaded from the back-forward cache, then reload the page to avoid bugginess,
+      // see https://stackoverflow.com/questions/8788802/prevent-safari-loading-from-cache-when-back-button-is-clicked
+      window.addEventListener( 'pageshow', event => { if ( event.persisted ) window.location.reload(); } );
+
+
       // // Add the navigation bar
       // const navigationBar = new NavigationBar( config.name );
 
-      // display.addChild( navigationBar );
+      // this.display.addChild( navigationBar );
 
-      // display.addChild( config.screens[ 0 ] );
-
-
-      if ( StandardSimQueryParameters.dev ) { ScreenView.enableDevBorder(); }
-
-      // window.onresize = () => {
-      //   const windowHeight = window.innerHeight;
-      //   const windowWidth = window.innerWidth;
-
-      //   if ( !loader.isDisposed ) loader.layout( windowWidth, windowHeight );
-      //   // Sim._resizeListeners.forEach( listener => { listener( windowWidth, windowHeight ); } );
-      //   // navigationBar.layout( windowWidth, windowHeight );
-      //   // const screenHeight = windowHeight - parseFloat( navigationBar.style.height );
-      // };
-      // window.onresize();
-
-      let throttled = false;
-      let backupTimeoutScheduled = false;
-      function resizeFunction() {
-        const windowHeight = window.innerHeight;
-        const windowWidth = window.innerWidth;
-
-        if ( !loader.isDisposed ) loader.layout( windowWidth, windowHeight );
-      };
-
-      window.onresize = () => {
-        if ( !throttled && !backupTimeoutScheduled ) {
-          throttled = true;
-          resizeFunction();
-          setTimeout( () => { throttled = false; }, StandardSimQueryParameters.resizeThrottle );
-        }
-        if ( throttled && !backupTimeoutScheduled ) {
-          backupTimeoutScheduled = true;
-          setTimeout( () => { resizeFunction(); backupTimeoutScheduled = false; }, 2 * StandardSimQueryParameters.resizeThrottle );
-        }
-      };
-      resizeFunction();
+      // this.display.addChild( config.screens[ 0 ] );
 
 
-      let lastStepTime = Date.now();
-      const stepper = () => {
 
-        const currentTime = Date.now();
-        const ellapsedTime = Math.min( Util.convertFrom( currentTime - lastStepTime, Util.MILLI ), config.maxDT );
-        lastStepTime = currentTime;
-        fpsCounter && fpsCounter.registerNewFrame( ellapsedTime );
-        // config.screens[ 0 ]._model.step && screen._model.step( ellapsedTime );
-        // Sim._stepSimulationListeners.forEach( listener => { listener( ellapsedTime ); } );
 
-        Sim._requestAnimationFrame( stepper );
-      };
-      Sim._requestAnimationFrame( stepper );
 
       // // prevent pinch and zoom https://stackoverflow.com/questions/37808180/disable-viewport-zooming-ios-10-safari
       // // Maybe we want to detect if passive is supportive
