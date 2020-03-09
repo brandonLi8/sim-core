@@ -11,7 +11,6 @@ define( require => {
 
   // modules
   const Bounds = require( 'SIM_CORE/util/Bounds' );
-  const Display = require( 'SIM_CORE/core-internal/Display' );
   const DOMObject = require( 'SIM_CORE/core-internal/DOMObject' );
   const Node = require( 'SIM_CORE/scenery/Node' );
   const ScreenView = require( 'SIM_CORE/scenery/ScreenView' );
@@ -21,7 +20,6 @@ define( require => {
   return () => {
 
     // Initialize a sample simulation setup.
-    const display = new Display().initiate();
     const screen = new DOMObject( {
       height: '100%',
       display: 'flex',
@@ -32,7 +30,7 @@ define( require => {
     } );
     const screenView = new ScreenView();
     screenView.layout( window.innerWidth, window.innerHeight );
-    display.addChild( screen.addChild( screenView ) );
+    screen.addChild( screenView );
 
     //----------------------------------------------------------------------------------------
     // Bounds Tests
