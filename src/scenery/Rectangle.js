@@ -1,19 +1,16 @@
 // Copyright © 2019-2020 Brandon Li. All rights reserved.
 
 /**
- * A Rectangle Node that displays a rectangular-box, with different widths and cornerRadii.
+ * A Rectangle Node that displays a rectangular-box, with different widths, heights and cornerRadii.
  *
- * The Rectangle Node inherits Path to allow for different strokes, fills, etc.
+ * Rectangle inherits from Path to allow for different strokes, fills, shapeRenderings, etc.
  *
- * Unlike other Node subtypes, Text will need to approximate its bounds based of the font and the text that is
- * displayed (see Text._approximateTextBounds()). However, this does not guarantee that all text-content is inside of
- * the returned bounds.
- *
- * While code comments attempt to describe the implementation clearly, fully understanding it may require some
- * general background. Some useful references include:
- *    - https://developer.mozilla.org/en-US/docs/Web/SVG/Element/text
- *    - http://www.w3.org/TR/css3-fonts/
- *    - https://www.w3.org/TR/css-fonts-3/#propdef-font
+ * Currently, Rectangles are constructed by their width and height, but has several static Rectangle creators.
+ * Possible ways of initiating Rectangles include:
+ *   - new Rectangle( width, height, [options] );
+ *   - Rectangle.byRect( x, y, width, height, [options] );
+ *   - Rectangle.byBounds( bounds, [options] );
+ * See the bottom portion of the file for documentation.
  *
  * @author Brandon Li <brandon.li820@gmail.com>
  */
@@ -23,10 +20,8 @@ define( require => {
 
   // modules
   const assert = require( 'SIM_CORE/util/assert' );
-  // const Path = require( 'SIM_CORE/scenery/Path' );
-  // const Shape = require( 'SIM_CORE/uti/Shape' );
-  // constants
-  const XML_NAMESPACE = 'http://www.w3.org/2000/svg';
+  const Path = require( 'SIM_CORE/scenery/Path' );
+  const Shape = require( 'SIM_CORE/uti/Shape' );
 
   class Rectangle {
 
@@ -36,7 +31,13 @@ define( require => {
      *                             the early portion of the constructor for details.
      */
     constructor( options ) {
+      assert( typeof width === 'number' && width >= 0, `invalid width: ${ width }` );
+      assert( typeof height === 'number' && height >= 0, `invalid height: ${ height }` );
       assert( !options || Object.getPrototypeOf( options ) === Object.prototype, `invalid options: ${ options }` );
+      assert( !options || !options.attributes, 'Rectangle sets attributes' );
+      assert( !options || !options.width, 'width should be provided in the first argument' );
+      assert( !options || !options.height, 'height should be provided in the first argument' );
+
 
 
       // Defaults for options.
