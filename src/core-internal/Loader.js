@@ -106,13 +106,13 @@ define( require => {
 
       // @private {Path} - Create the Path that renders the background circle of the loader circle. Set it to a Shape
       //                   with a full circle, as it does for the entirety of the Loader's lifespan.
-      this._backgroundCirclePath = new Path( new Shape()
-                                            .arc( Vector.ZERO, options.loaderCircleRadius, 0, 2 * Math.PI - Util.EPSILON ), {
-        fill: 'none', // transparent inside
-        stroke: options.loaderCircleBg,
-        strokeWidth: options.loaderCircleStrokeWidth,
-        center: this._loaderScreenView.viewBounds.center.addXY( 0, options.titleCircleMargin / 2 )
-      } );
+      this._backgroundCirclePath = new Path(
+        new Shape().arc( Vector.ZERO, options.loaderCircleRadius, 0, 2 * Math.PI - Util.EPSILON ), {
+          fill: 'none', // transparent inside
+          stroke: options.loaderCircleBg,
+          strokeWidth: options.loaderCircleStrokeWidth,
+          center: this._loaderScreenView.viewBounds.center.addXY( 0, options.titleCircleMargin / 2 )
+        } );
 
       // @private {Path} - Create the Path that renders the foregroundCircle circle of the loader circle.
       this._foregroundCirclePath = new Path( null, {
@@ -165,12 +165,12 @@ define( require => {
       if ( loadedPercentage === this._percentage ) return; // Exit if setting to the same percentage.
       assert( typeof loadedPercentage === 'number', `invalid loadedPercentage: ${ loadedPercentage }` );
 
-      // // Update the percentage field of the Loader. Subtract EPSILON so that full circles are fully rendered.
+      // Update the percentage field of the Loader. Subtract EPSILON so that full circles are fully rendered.
       this._percentage = loadedPercentage - Util.EPSILON;
 
       // Create the shape rendered for the foregroundCircle.
       const foregroundCircleShape = new Shape()
-        .arc( Vector.ZERO, this._loaderCircleRadius, -Math.PI / 2, - Math.PI / 2 + 2 * Math.PI * this._percentage / 100 );
+        .arc( Vector.ZERO, this._loaderCircleRadius, -Math.PI / 2, -Math.PI / 2 + Math.PI * this._percentage / 50 );
 
       // Set the shape of the foregroundCircle to render the new Shape.
       this._foregroundCirclePath.shape = foregroundCircleShape;
@@ -183,8 +183,8 @@ define( require => {
 
     /**
      * Executes step of 1st Loading tasks: synchronously loading the entire model and view hierarchies for every screen.
-     * This has been consoldated down into one method (start()) for Screens (See Screen.js). Once this is finished, this
-     * will call the second step of Loading tasks: synchronousLoadSimImages()
+     * This has been consolidated down into one method (start()) for Screens (See Screen.js). Once this is finished,
+     * this will call the second step of Loading tasks: synchronousLoadSimImages()
      * @public
      *
      * @param {Class.<Sim>} Sim - the sim class.

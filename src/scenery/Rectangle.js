@@ -24,6 +24,9 @@ define( require => {
   const Shape = require( 'SIM_CORE/util/Shape' );
   const Vector = require( 'SIM_CORE/util/Vector' );
 
+  // constants
+  const PI = Math.PI; // convenience reference
+
   class Rectangle extends Path {
 
     /**
@@ -117,16 +120,15 @@ define( require => {
 
       if ( cornerRadius ) {
         // Draw the Rectangle Shape with cornerRadii arcs.
-        return new Shape().moveTo( bounds.minX + cornerRadius, bounds.minY + cornerRadius )
-                          .arc( new Vector( bounds.minX + cornerRadius, bounds.minY + cornerRadius ), cornerRadius, Math.PI, -Math.PI / 2 )
-                          .horizontalLineTo( bounds.maxX - cornerRadius )
-                          .arc( new Vector( bounds.maxX - cornerRadius, bounds.minY + cornerRadius ), cornerRadius, -Math.PI / 2, 0 )
-                          .verticalLineTo( bounds.maxY - cornerRadius )
-                          .arc( new Vector( bounds.maxX - cornerRadius, bounds.maxY - cornerRadius ), cornerRadius, 0, Math.PI / 2 )
-                          .horizontalLineTo( bounds.minX + cornerRadius )
-                          .arc( new Vector( bounds.minX + cornerRadius, bounds.maxY - cornerRadius ), cornerRadius, Math.PI / 2, Math.PI )
-                          .verticalLineTo( bounds.minY + cornerRadius )
-                          .close()
+        return new Shape()
+          .arc( new Vector( bounds.minX + cornerRadius, bounds.minY + cornerRadius ), cornerRadius, PI, -PI / 2 )
+          .horizontalLineTo( bounds.maxX - cornerRadius )
+          .arc( new Vector( bounds.maxX - cornerRadius, bounds.minY + cornerRadius ), cornerRadius, -PI / 2, 0 )
+          .verticalLineTo( bounds.maxY - cornerRadius )
+          .arc( new Vector( bounds.maxX - cornerRadius, bounds.maxY - cornerRadius ), cornerRadius, 0, PI / 2 )
+          .horizontalLineTo( bounds.minX + cornerRadius )
+          .arc( new Vector( bounds.minX + cornerRadius, bounds.maxY - cornerRadius ), cornerRadius, PI / 2, PI )
+          .close()
       }
       else {
         return new Shape().moveTo( bounds.minX, bounds.minY )
