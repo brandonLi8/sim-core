@@ -24,25 +24,35 @@ define( require => {
   const Shape = require( 'SIM_CORE/util/Shape' );
   const Vector = require( 'SIM_CORE/util/Vector' );
 
-  class Arrow extends Polygon {
+  class Arrow extends Path {
 
     /**
-     * @param {Vector} start
-     * @param {Vector} end
+     * @param {number} tailX - the x-coordinate of the tail of the arrow
+     * @param {number} tailY - the y-coordinate of the tail of the arrow
+     * @param {number} tipX - the x-coordinate of the tip of the arrow
+     * @param {number} tipY - the y-coordinate of the tip of the arrow
      * @param {Object} [options] - Various key-value pairs that control the appearance and behavior. Subclasses
      *                             may have different options for their API. See the code where the options are set in
      *                             the early portion of the constructor for details.
      */
-    constructor( start, end, options ) {
-      // Defaults for options.
-      const defaults = {
-        headHeight: 12,
-        headWidth: 12,
-        tailWidth: 3,
-        fill: 'black',
-        stroke: 'black',
-        strokeWidth: 1
+    constructor( tailX, tailY, tipX, tipY, options ) {
+      assert( typeof tailX === 'number', `invalid tailX: ${ tailX }` );
+      assert( typeof tailY === 'number' `invalid tailY: ${ tailY }` );
+      assert( typeof tipX === 'number' `invalid tipX: ${ tipX }` );
+      assert( typeof tipY === 'number' `invalid tipY: ${ tipY }` );
+      assert( !options || Object.getPrototypeOf( options ) === Object.prototype, `invalid options: ${ options }` );
+      assert( !options || !options.attributes, 'Arrow sets attributes' );
+
+      options = {
+
+        headHeight: 12, // {number} - the head-height of the Arrow. See `set headHeight()`.
+        headWidth: 12,  // {number} - the head-width of the Arrow. See `set headWidth()`.
+        tailWidth: 3,   // {number} - the tail-width of the Arrow. See `set tailWidth()`.
+
+        // Rewrite options so that it overrides the defaults.
+        ...options
       };
+      super( options );
 
       // Rewrite options so that it overrides the defaults.
       options = { ...defaults, ...options };
