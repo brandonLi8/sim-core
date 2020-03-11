@@ -30,10 +30,6 @@ define( require => {
     constructor( shape, options ) {
       assert( !shape || shape instanceof Shape, `invalid shape: ${ shape }` );
       assert( !options || Object.getPrototypeOf( options ) === Object.prototype, `invalid options: ${ options }` );
-
-      // Some options are set by path. Assert that they weren't provided.
-      assert( !options || !options.width, 'path sets width' );
-      assert( !options || !options.height, 'path sets height' );
       assert( !options || !options.type, 'path sets type' );
 
       options = {

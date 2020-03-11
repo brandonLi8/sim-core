@@ -120,14 +120,30 @@ define( require => {
       // Enable the red dev border around ScreenViews if the ?dev query parameter was provided.
       if ( StandardSimQueryParameters.dev ) { ScreenView.enableDevBorder(); }
 
+
+         const Rectangle = require( 'SIM_CORE/scenery/Rectangle' );
+         const rect = new Rectangle( 100, 100, {
+            center: this.screens[ 0 ].view.viewBounds.center,
+            stroke: 'blue',
+            strokeWidth: 3,
+            fill: 'green',
+            cornerRadius: 20
+         } );
+         this.screens[ 0 ].view.addChild( rect );
+         console.log( rect.bounds.toString() )
+        window.addEventListener( 'mousedown', () => {
+          rect.left += 1;
+        })
+
+
       this.display.on( 'resize', ( width, height ) => {
         this.navigationBar.layout( width, height );
         const screenHeight = height - parseFloat( this.navigationBar.style.height );
 
         this.screens.forEach( screen => {
          screen.style.height = `${ screenHeight }px`;
-
          screen.view.layout( width, screenHeight );
+
         } );
       } );
     }
