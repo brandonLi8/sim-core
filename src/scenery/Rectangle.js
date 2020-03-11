@@ -91,7 +91,7 @@ define( require => {
      *
      * @param {Shape} shape
      */
-    set shape( shape ) { assert( false, `cannot call set shape of a Rectangle` ); }
+    set shape( shape ) { assert( false, 'Rectangle sets shape' ); }
 
     /**
      * Returns a Shape of a rectangle with a specified cornerRadius.
@@ -105,7 +105,7 @@ define( require => {
 
       // The maximum corner radius of the rectangle
       const maxCornerRadius = Math.min( bounds.width / 2, bounds.height / 2 );
-      cornerRadius = Math.min( cornerRadius );
+      cornerRadius = Math.min( maxCornerRadius, cornerRadius );
 
       if ( cornerRadius ) {
         // Draw the Rectangle Shape with cornerRadii arcs.
@@ -117,7 +117,7 @@ define( require => {
           .arc( new Vector( bounds.maxX - cornerRadius, bounds.maxY - cornerRadius ), cornerRadius, 0, PI / 2 )
           .horizontalLineTo( bounds.minX + cornerRadius )
           .arc( new Vector( bounds.minX + cornerRadius, bounds.maxY - cornerRadius ), cornerRadius, PI / 2, PI )
-          .close()
+          .close();
       }
       else {
         return new Shape().moveTo( bounds.minX, bounds.minY )

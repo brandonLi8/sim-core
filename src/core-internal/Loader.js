@@ -180,7 +180,6 @@ define( require => {
       else this._foregroundCirclePath.topRight = this._backgroundCirclePath.topRight;
     }
 
-
     /**
      * Executes step of 1st Loading tasks: synchronously loading the entire model and view hierarchies for every screen.
      * This has been consolidated down into one method (start()) for Screens (See Screen.js). Once this is finished,
