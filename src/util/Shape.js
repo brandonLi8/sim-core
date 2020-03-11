@@ -282,8 +282,8 @@ define( require => {
 
       // Update the bounds and _firstPoint reference on the first time something is drawn to the startPoint.
       if ( !this.bounds ) this.bounds = Bounds.withPoints( startPoint, startPoint );
-      if ( !this._firstPoint ) { this._firstPoint = startPoint.copy(); }
-      if ( this.currentPoint && !this.currentPoint.equals( startPoint ) ) this.moveToPoint( startPoint );
+      if ( !this._firstPoint ) this.moveToPoint( startPoint );
+      if ( this.currentPoint && !this.currentPoint.equals( startPoint ) ) this.lineToPoint( startPoint );
 
       // Compute the largeArcFlag and sweepFlag. See https://www.w3.org/TR/SVG/paths.html#PathDataEllipticalArcCommands.
       const largeArcFlag = deltaAngle > Math.PI ? 1 : 0;

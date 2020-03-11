@@ -106,7 +106,7 @@ define( require => {
 
       // @private {Path} - Create the Path that renders the background circle of the loader circle. Set it to a Shape
       //                   with a full circle, as it does for the entirety of the Loader's lifespan.
-      this._backgroundCirclePath = new Path( new Shape().moveToPoint( Vector.ZERO )
+      this._backgroundCirclePath = new Path( new Shape()
                                             .arc( Vector.ZERO, options.loaderCircleRadius, 0, 2 * Math.PI - Util.EPSILON ), {
         fill: 'none', // transparent inside
         stroke: options.loaderCircleBg,
@@ -170,7 +170,6 @@ define( require => {
 
       // Create the shape rendered for the foregroundCircle.
       const foregroundCircleShape = new Shape()
-        .moveToPoint( Vector.ZERO )
         .arc( Vector.ZERO, this._loaderCircleRadius, -Math.PI / 2, - Math.PI / 2 + 2 * Math.PI * this._percentage / 100 );
 
       // Set the shape of the foregroundCircle to render the new Shape.
