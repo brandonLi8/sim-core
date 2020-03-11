@@ -22,6 +22,7 @@ define( require => {
   const assert = require( 'SIM_CORE/util/assert' );
   const Path = require( 'SIM_CORE/scenery/Path' );
   const Shape = require( 'SIM_CORE/util/Shape' );
+  const Vector = require( 'SIM_CORE/util/Vector' );
 
   class Rectangle extends Path {
 
@@ -117,17 +118,13 @@ define( require => {
       if ( cornerRadius ) {
         // Draw the Rectangle Shape with cornerRadii arcs.
         return new Shape().moveTo( bounds.minX + cornerRadius, bounds.minY + cornerRadius )
-                          .lineToRelative( 0, 0 )
-                          .arc( cornerRadius, Math.PI, -Math.PI / 2 )
+                          .arc( new Vector( bounds.minX + cornerRadius, bounds.minY + cornerRadius ), cornerRadius, Math.PI, -Math.PI / 2 )
                           .horizontalLineTo( bounds.maxX - cornerRadius )
-                          .moveToRelative( 0, cornerRadius )
-                          .arc( cornerRadius, -Math.PI / 2, 0 )
+                          .arc( new Vector( bounds.maxX - cornerRadius, bounds.minY + cornerRadius ), cornerRadius, -Math.PI / 2, 0 )
                           .verticalLineTo( bounds.maxY - cornerRadius )
-                          .moveToRelative( -cornerRadius, 0 )
-                          .arc( cornerRadius, 0, Math.PI / 2 )
+                          .arc( new Vector( bounds.maxX - cornerRadius, bounds.maxY - cornerRadius ), cornerRadius, 0, Math.PI / 2 )
                           .horizontalLineTo( bounds.minX + cornerRadius )
-                          .moveToRelative( 0, -cornerRadius )
-                          .arc( cornerRadius, Math.PI / 2, Math.PI )
+                          .arc( new Vector( bounds.minX + cornerRadius, bounds.maxY - cornerRadius ), cornerRadius, Math.PI / 2, Math.PI )
                           .verticalLineTo( bounds.minY + cornerRadius )
                           .close()
       }

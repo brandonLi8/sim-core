@@ -250,9 +250,10 @@ define( require => {
     }
 
     /**
-     * Draws an arc, revolved around the current position. Angles will be normalized (see normalizeAngle()).
+     * Draws an arc revolved around the specified center position. Angles will be normalized (see normalizeAngle()).
      * @public
      *
+     * @param {Vector} center - Center of rotation of the arc
      * @param {number} radius - how far from the center the arc will be
      * @param {number} startAngle - angle (in radians) of the start of the arc, relative to the horizontal
      * @param {number} endAngle - angle (in radians) of the end of the arc, relative to the horizontal
@@ -260,18 +261,16 @@ define( require => {
      *                                     endAngle or counter-clockwise
      * @returns {Shape} - 'this' reference, for chaining
      */
-    arc( radius, startAngle, endAngle, clockwise = false ) {
+    arc( center, radius, startAngle, endAngle, clockwise = false ) {
       assert( typeof radius === 'number' && isFinite( radius ) && radius >= 0, `invalid radius: ${ radius }` );
       assert( typeof startAngle === 'number' && isFinite( startAngle ), `invalid startAngle: ${ startAngle }` );
       assert( typeof endAngle === 'number' && isFinite( endAngle ), `invalid endAngle: ${ endAngle }` );
       assert( typeof clockwise === 'boolean', `invalid clockwise: ${ clockwise }` );
       assert( !this.isClosed, 'Cannot draw arc on a closed shape' );
-      assert( this.currentPoint, 'Unknown current position. Make sure to call Shape.moveTo() to set the first point' );
 
       // Normalize angles (see normalizeAngle()) and adjust the endAngle (see adjustArcEndAngle())
       startAngle = normalizeAngle( startAngle );
       endAngle = adjustArcEndAngle( startAngle, normalizeAngle( endAngle ), clockwise );
-      const center = this.currentPoint.copy(); // Reference the currentPoint as the center of the arc.
 
       // Create a Vector that will be rotated to compute arc coordinates at specific angles, relative to the origin.
       const angleVector = new Vector( 0, radius );
@@ -283,8 +282,8 @@ define( require => {
 
       // Update the bounds and _firstPoint reference on the first time something is drawn to the startPoint.
       if ( !this.bounds ) this.bounds = Bounds.withPoints( startPoint, startPoint );
-      if ( !this._firstPoint ) this._firstPoint = startPoint.copy();
-      this.moveToPoint( startPoint ); // Move the Shape to the starting point, from where the arc will start.
+      if ( !this._firstPoint ) { this._firstPoint = startPoint.copy(); }
+      if ( this.currentPoint && !this.currentPoint.equals( startPoint ) ) this.moveToPoint( startPoint );
 
       // Compute the largeArcFlag and sweepFlag. See https://www.w3.org/TR/SVG/paths.html#PathDataEllipticalArcCommands.
       const largeArcFlag = deltaAngle > Math.PI ? 1 : 0;

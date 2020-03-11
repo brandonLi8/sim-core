@@ -34,6 +34,7 @@ define( require => {
   const Shape = require( 'SIM_CORE/util/Shape' );
   const Text = require( 'SIM_CORE/scenery/Text' );
   const Util = require( 'SIM_CORE/util/Util' );
+  const Vector = require( 'SIM_CORE/util/Vector' );
 
   // constants
   const SIM_SOURCE_LOADING_BANDWIDTH = 50 + Math.random() * 10;
@@ -105,8 +106,8 @@ define( require => {
 
       // @private {Path} - Create the Path that renders the background circle of the loader circle. Set it to a Shape
       //                   with a full circle, as it does for the entirety of the Loader's lifespan.
-      this._backgroundCirclePath = new Path( new Shape().moveTo( 0, 0 )
-                                               .arc( options.loaderCircleRadius, 0, 2 * Math.PI - Util.EPSILON ), {
+      this._backgroundCirclePath = new Path( new Shape().moveToPoint( Vector.ZERO )
+                                            .arc( Vector.ZERO, options.loaderCircleRadius, 0, 2 * Math.PI - Util.EPSILON ), {
         fill: 'none', // transparent inside
         stroke: options.loaderCircleBg,
         strokeWidth: options.loaderCircleStrokeWidth,
@@ -164,13 +165,13 @@ define( require => {
       if ( loadedPercentage === this._percentage ) return; // Exit if setting to the same percentage.
       assert( typeof loadedPercentage === 'number', `invalid loadedPercentage: ${ loadedPercentage }` );
 
-      // Update the percentage field of the Loader. Subtract EPSILON so that full circles are fully rendered.
+      // // Update the percentage field of the Loader. Subtract EPSILON so that full circles are fully rendered.
       this._percentage = loadedPercentage - Util.EPSILON;
 
       // Create the shape rendered for the foregroundCircle.
       const foregroundCircleShape = new Shape()
-        .moveTo( 0, 0 )
-        .arc( this._loaderCircleRadius, - Math.PI / 2, - Math.PI / 2 + 2 * Math.PI * this._percentage / 100 );
+        .moveToPoint( Vector.ZERO )
+        .arc( Vector.ZERO, this._loaderCircleRadius, -Math.PI / 2, - Math.PI / 2 + 2 * Math.PI * this._percentage / 100 );
 
       // Set the shape of the foregroundCircle to render the new Shape.
       this._foregroundCirclePath.shape = foregroundCircleShape;
