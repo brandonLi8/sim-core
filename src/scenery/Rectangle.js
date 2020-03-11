@@ -93,17 +93,6 @@ define( require => {
      */
     set shape( shape ) { assert( false, `cannot call set shape of a Rectangle` ); }
 
-    // layout( scale ) {
-
-    //   super.layout( scale );
-    //   this.addAttributes( {
-    //     x: `${ scale * this.x }px`,
-    //     y: `${ scale * this.y }px`,
-    //     rx: `${ scale * this.cornerRadius }px`,
-    //     ry: `${ scale * this.cornerRadius }px`
-    //   } );
-    // }
-    //
     /**
      * Returns a Shape of a rectangle with a specified cornerRadius.
      * @private
