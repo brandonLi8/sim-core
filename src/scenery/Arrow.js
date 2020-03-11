@@ -1,8 +1,15 @@
 // Copyright © 2019-2020 Brandon Li. All rights reserved.
-// NOTE: THIS DOESNT WORK ATM!!!
 
 /**
- * A sim-specific VectorNode node for SVG (scalable vector graphics).
+ * A Arrow Node that displays a single-headed pointy arrow shape, with different head widths, tail widths, etc.
+ *
+ * Arrow inherits from Path to allow for different strokes, fills, shapeRenderings, etc.
+ *
+ * Currently, Arrows are constructed by their tailX, tailY, tipX, tipY.
+ * Possible ways of initiating Arrows include:
+ *   - new Rectangle( tailX, tailY, tipX, tipY, [options] );
+ *   - Rectangle.byPoints( tailX, tailY, tipX, tipY, [options] );
+ * See the bottom portion of the file for documentation.
  *
  * @author Brandon Li <brandon.li820@gmail.com>
  */
@@ -11,11 +18,13 @@ define( require => {
   'use strict';
 
   // modules
-  const Polygon = require( 'SIM_CORE/scenery/Polygon' );
+  const assert = require( 'SIM_CORE/util/assert' );
+  const Bounds = require( 'SIM_CORE/util/Bounds' );
+  const Path = require( 'SIM_CORE/scenery/Path' );
+  const Shape = require( 'SIM_CORE/util/Shape' );
   const Vector = require( 'SIM_CORE/util/Vector' );
 
-
-  class VectorNode extends Polygon {
+  class Arrow extends Polygon {
 
     /**
      * @param {Vector} start
@@ -86,5 +95,5 @@ define( require => {
     }
   }
 
-  return VectorNode;
+  return Arrow;
 } );
