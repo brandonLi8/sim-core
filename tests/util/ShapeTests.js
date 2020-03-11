@@ -106,41 +106,37 @@ define( require => {
 
     // Test 7: Counter-Clockwise Normal Angles Arc
     const G = new Shape()
-      .moveTo( 5, 5 )
-      .arc( 10, Math.PI / 4, 5 * Math.PI / 4 ) // Max boundaries
+      .arc( new Vector( 5, 5 ), 10, Math.PI / 4, 5 * Math.PI / 4 ) // Max boundaries
       .close();
 
-    truenit.equals( G.getSVGPath(), 'M 5 5 M 12.0710678119 12.0710678119 A 10 10 0 0 1 -2.0710678119 -2.0710678119 Z' );
+    truenit.equals( G.getSVGPath(), 'M 12.0710678119 12.0710678119 A 10 10 0 0 1 -2.0710678119 -2.0710678119 Z' );
     truenit.ok( G.bounds.equalsEpsilon( new Bounds( -5, -2.0710678119, 12.0710678119, 15 ) ) );
     truenit.ok( G.currentPoint.equalsEpsilon( new Vector( 12.0710678119, 12.0710678119 ) ) );
 
 
     // Test 8: Counter-Clockwise non-normal angles Arc
     const H = new Shape()
-      .moveTo( 5, 5 )
-      .arc( 10, 19 * Math.PI / 4, -16 * Math.PI / 4 ); // equivalent: 3PI/4 to 0
+      .arc( new Vector( 5, 5 ), 10, 19 * Math.PI / 4, -16 * Math.PI / 4 ); // equivalent: 3PI/4 to 0
 
-    truenit.equals( H.getSVGPath(), 'M 5 5 M -2.0710678119 12.0710678119 A 10 10 0 1 1 15 5' );
+    truenit.equals( H.getSVGPath(), 'M -2.0710678119 12.0710678119 A 10 10 0 1 1 15 5' );
     truenit.ok( H.bounds.equalsEpsilon( new Bounds( -5, -5, 15, 12.0710678119 ) ) );
     truenit.ok( H.currentPoint.equalsEpsilon( new Vector( 15, 5 ) ) );
 
 
     // Test 9: Clockwise normal angles Arc
     const I = new Shape()
-      .moveTo( 5, 5 )
-      .arc( 10, Math.PI / 4, 3 * Math.PI / 2, true ) // clockwise
+      .arc( new Vector( 5, 5 ), 10, Math.PI / 4, 3 * Math.PI / 2, true ) // clockwise
       .close();
-    truenit.equals( I.getSVGPath(), 'M 5 5 M 12.0710678119 12.0710678119 A 10 10 0 0 0 5 -5 Z' );
+    truenit.equals( I.getSVGPath(), 'M 12.0710678119 12.0710678119 A 10 10 0 0 0 5 -5 Z' );
     truenit.ok( I.bounds.equalsEpsilon( new Bounds( 5, -5, 15, 12.0710678119 ) ) );
     truenit.ok( I.currentPoint.equalsEpsilon( new Vector( 12.0710678119, 12.0710678119 ) ) );
 
 
     // Test 10: Clockwise non-normal angles Arc
     const J = new Shape()
-      .moveTo( 5, 5 )
-      .arc( 10, 19 * Math.PI / 4, 20 * Math.PI / 4, true ); // equivalent: 3PI/4 to PI clockwise
+      .arc( new Vector( 5, 5 ), 10, 19 * Math.PI / 4, 20 * Math.PI / 4, true ); // equivalent: 3PI/4 to PI clockwise
 
-    truenit.equals( J.getSVGPath(), 'M 5 5 M -2.0710678119 12.0710678119 A 10 10 0 1 0 -5 5' );
+    truenit.equals( J.getSVGPath(), 'M -2.0710678119 12.0710678119 A 10 10 0 1 0 -5 5' );
     truenit.ok( J.bounds.equalsEpsilon( new Bounds( -5, -5, 15, 15 ) ) );
     truenit.ok( J.currentPoint.equalsEpsilon( new Vector( -5, 5 ) ) );
 
@@ -185,13 +181,12 @@ define( require => {
 
     // Test 13: lines transformations
     const M = new Shape()
-      .moveTo( 0, 0 )
-      .arc( 1, Math.PI / 6, Math.PI / 2 )
+      .arc( Vector.ZERO, 1, Math.PI / 6, Math.PI / 2 )
       .close();
 
-    truenit.equals( mvt.modelToViewShape( M ).getSVGPath(), 'M 80 90 M 83.4641016151 88.5 A 4 3 0 0 1 80 87 Z' );
+    truenit.equals( mvt.modelToViewShape( M ).getSVGPath(), 'M 83.4641016151 88.5 A 4 3 0 0 1 80 87 Z' );
     truenit.equals( mvt.viewToModelShape( M ).getSVGPath(),
-      'M -20 30 M -19.7834936491 29.8333333333 A 0.25 0.3333333333 0 0 1 -20 29.6666666667 Z' );
+      'M -19.7834936491 29.8333333333 A 0.25 0.3333333333 0 0 1 -20 29.6666666667 Z' );
     truenit.ok( mvt.modelToViewShape( M ).bounds.equalsEpsilon( new Bounds( 80, 87, 83.4641016151, 88.5 ) ) );
     truenit.ok( mvt.viewToModelShape( M ).bounds.equalsEpsilon( new Bounds( -20, 29.66666, -19.783493, 29.833333 ) ) );
     truenit.ok( mvt.modelToViewShape( M ).currentPoint.equalsEpsilon( new Vector( 83.4641016151, 88.5 ) ) );

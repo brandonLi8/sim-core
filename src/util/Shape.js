@@ -282,15 +282,15 @@ define( require => {
 
       // Update the bounds and _firstPoint reference on the first time something is drawn to the startPoint.
       if ( !this.bounds ) this.bounds = Bounds.withPoints( startPoint, startPoint );
-      if ( !this._firstPoint ) this.moveToPoint( startPoint );
-      if ( this.currentPoint && !this.currentPoint.equals( startPoint ) ) this.lineToPoint( startPoint );
+      if ( !this._firstPoint ) { this.moveToPoint( startPoint ); this._firstPoint = startPoint.copy(); }
+      if ( !this.currentPoint.equals( startPoint ) ) this.lineToPoint( startPoint );
 
       // Compute the largeArcFlag and sweepFlag. See https://www.w3.org/TR/SVG/paths.html#PathDataEllipticalArcCommands.
       const largeArcFlag = deltaAngle > Math.PI ? 1 : 0;
       const sweepFlag = clockwise ? 0 : 1;
 
       this._subpaths.push( { cmd: 'A', args: [ radius, radius, 0, largeArcFlag, sweepFlag, endPoint.x, endPoint.y ] } );
-      this.currentPoint = endPoint; // Update the currentPoint to the endPoint now that the arc has been added.
+      this.currentPoint.set( endPoint ); // Update the currentPoint to the endPoint now that the arc has been added.
 
       // Update the bounds so that it includes both the startPoint and endPoint.
       this.bounds.includePoint( startPoint );
