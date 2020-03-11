@@ -20,6 +20,7 @@ define( require => {
 
   // modules
   const assert = require( 'SIM_CORE/util/assert' );
+  const Bounds = require( 'SIM_CORE/util/Bounds' );
   const Path = require( 'SIM_CORE/scenery/Path' );
   const Shape = require( 'SIM_CORE/util/Shape' );
   const Vector = require( 'SIM_CORE/util/Vector' );
@@ -126,6 +127,43 @@ define( require => {
                           .horizontalLineTo( bounds.minX )
                           .close();
       }
+    }
+
+    /*----------------------------------------------------------------------------*
+     * Static Rectangle Creators (see comment at the top of the file)
+     *----------------------------------------------------------------------------*/
+
+    /**
+     * Creates a rectangle with the specified x, y, width, and height.
+     * @public
+     *
+     * See Rectangle's constructor for detailed parameter information.
+     *
+     * @param {number} x - the left location of the Rectangle
+     * @param {number} y - the top location of the Rectangle
+     * @param {number} width
+     * @param {number} height
+     * @param {Object} [options]
+     * @returns {Rectangle}
+     */
+    static byRect( x, y, width, height, options ) {
+      return new Rectangle( width, height, { ...options, left: x, top: y } );
+    }
+
+    /**
+     * Creates a rectangle with the specified bounds such that the x, y, width, and height matches the bounds.
+     * In other words, the bounds will be considered the parent bounds of the Rectangle.
+     * @public
+     *
+     * See Rectangle's constructor for detailed parameter information.
+     *
+     * @param {Bounds} bounds
+     * @param {Object} [options]
+     * @returns {Rectangle}
+     */
+    static byBounds( bounds, options ) {
+      assert( bounds instanceof Bounds, `invalid bounds: ${ bounds }` );
+      return Bounds.byRect( bounds.minX, bounds.minY, bounds.width, bounds.height, options );
     }
   }
 
