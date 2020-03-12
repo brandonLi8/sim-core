@@ -8,7 +8,7 @@
  * Currently, Arrows are constructed by their tailX, tailY, tipX, tipY.
  * Possible ways of initiating Arrows include:
  *   - new Rectangle( tailX, tailY, tipX, tipY, [options] );
- *   - Rectangle.byPoints( tailX, tailY, tipX, tipY, [options] );
+ *   - Rectangle.byPoints( tail, tip, [options] );
  * See the bottom portion of the file for documentation.
  *
  * @author Brandon Li <brandon.li820@gmail.com>
@@ -59,48 +59,196 @@ define( require => {
       this._headHeight = options.headHeight;
       this._headWidth = options.headWidth;
       this._tailWidth = options.tailWidth;
+
+      // @public {Vector} - create references to the coordinates of the tip and the tail of the Arrow.
+      this._tail = new Vector( tailX, tailY );
+      this._tip = new Vector( tipX, tipY );
+      this.updateArrowShape();
     }
 
-    set( start, end ) {
-      this.points = [];
-      if ( start.equalsEpsilon( end ) ) {
-        this.layout( this.scale );
-        return;
+    /**
+     * ES5 getters of properties specific to Arrow. Traditional Accessors methods aren't included to reduce the memory
+     * footprint.
+     * @public
+     *
+     * @returns {*} See the property declaration for documentation of the type.
+     */
+    get headHeight() { return this._headHeight; }
+    get headWidth() { return this._headWidth; }
+    get tailWidth() { return this._tailWidth; }
+    get tail() { return this._tail; }
+    get tip() { return this._tip; }
+
+    //----------------------------------------------------------------------------------------
+
+    /**
+     * Ensures that `set shape` is not called on a Arrow.
+     * @public
+     *
+     * @param {Shape} shape
+     */
+    set shape( shape ) { assert( false, 'Arrow sets shape' ); }
+
+    /**
+     * Sets the vertical height of the Arrow head (as a vertical arrow).
+     * @public
+     *
+     * @param {number} headHeight
+     */
+    set headHeight( headHeight ) {
+      if ( headHeight === this._headHeight ) return; // Exit if setting to the same 'headHeight'
+      assert( typeof headHeight === 'number', `invalid headHeight: ${ headHeight }` );
+      this._headHeight = headHeight;
+      this.updateArrowShape();
+    }
+
+    /**
+     * Sets the horizontal width of the Arrow head (as a vertical arrow).
+     * @public
+     *
+     * @param {number} headWidth
+     */
+    set headWidth( headWidth ) {
+      if ( headWidth === this._headWidth ) return; // Exit if setting to the same 'headWidth'
+      assert( typeof headWidth === 'number', `invalid headWidth: ${ headWidth }` );
+      this._headWidth = headWidth;
+      this.updateArrowShape();
+    }
+
+    /**
+     * Sets the horizontal width of the Arrow tail (as a vertical arrow).
+     * @public
+     *
+     * @param {number} tailWidth
+     */
+    set tailWidth( tailWidth ) {
+      if ( tailWidth === this._tailWidth ) return; // Exit if setting to the same 'tailWidth'
+      assert( typeof tailWidth === 'number', `invalid tailWidth: ${ tailWidth }` );
+      this._tailWidth = tailWidth;
+      this.updateArrowShape();
+    }
+
+    /**
+     * Sets the tail coordinate of the Arrow.
+     * @public
+     *
+     * @param {Vector} tail
+     */
+    set tail( tail ) {
+      if ( tail.equals( this._tail ) ) return; // Exit if setting to the same 'tail'
+      assert( tail instanceof Vector, `invalid tail: ${ tail }` );
+      this._tail.set( tail );
+      this.updateArrowShape();
+    }
+
+    /**
+     * Sets the tip coordinate of the Arrow.
+     * @public
+     *
+     * @param {Vector} tip
+     */
+    set tip( tip ) {
+      if ( tip.equals( this._tip ) ) return; // Exit if setting to the same 'tip'
+      assert( tip instanceof Vector, `invalid tip: ${ tip }` );
+      this._tip.set( tip );
+      this.updateArrowShape();
+    }
+
+    /**
+     * Sets the tail x-coordinate of the Arrow.
+     * @public
+     *
+     * @param {number} tailX
+     */
+    set tailX( tailX ) {
+      if ( tailX === this.tail.x ) return; // Exit if setting to the same 'tailX'
+      assert( typeof tailX === 'number', `invalid tailX: ${ tailX }` );
+      this._tail.setX( tailX );
+      this.updateArrowShape();
+    }
+
+    /**
+     * Sets the tail y-coordinate of the Arrow.
+     * @public
+     *
+     * @param {number} tailY
+     */
+    set tailY( tailY ) {
+      if ( tailY === this.tail.x ) return; // Exit if setting to the same 'tailY'
+      assert( typeof tailY === 'number', `invalid tailY: ${ tailY }` );
+      this._tail.setY( tailY );
+      this.updateArrowShape();
+    }
+
+    /**
+     * Sets the tip x-coordinate of the Arrow.
+     * @public
+     *
+     * @param {number} tipX
+     */
+    set tipX( tipX ) {
+      if ( tipX === this.tip.x ) return; // Exit if setting to the same 'tipX'
+      assert( typeof tipX === 'number', `invalid tipX: ${ tipX }` );
+      this._tip.setX( tipX );
+      this.updateArrowShape();
+    }
+
+    /**
+     * Sets the tip x-coordinate of the Arrow.
+     * @public
+     *
+     * @param {number} tipY
+     */
+    set tipY( tipY ) {
+      if ( tipY === this.tip.x ) return; // Exit if setting to the same 'tipY'
+      assert( typeof tipY === 'number', `invalid tipY: ${ tipY }` );
+      this._tip.setY( tipY );
+      this.updateArrowShape();
+    }
+
+    /**
+     * Generates a Arrow shape and updates the shape of this Arrow. Called when a property or the Arrow that is
+     * displayed is changed, resulting in a different Arrow Shape.
+     * @private
+     */
+    updateArrowShape() {
+      // Must be a valid Arrow Node.
+      if ( this._tail && this._tip && this._headWidth && this._headHeight && this._tailWidth ) {
+
+        // Invalidate the Shape if the tip and the tail are the same.
+        if ( this._tail.equalsEpsilon( this._tip ) ) super.shape = null;
+
+        // create a vector representation of the arrow
+        const vector = this._tip.copy().subtract( this._tail );
+        const length = vector.magnitude;
+
+        // Make sure that head height is less than arrow length.
+        this._headHeight = Math.min( this._headHeight, 0.99 * length );
+
+        // Set up a coordinate frame that goes from the tail of the arrow to the tip.
+        const xHatUnit = vector.copy().normalize();
+        const yHatUnit = xHatUnit.copy().rotate( Math.PI / 2 );
+
+        // Generate the points of the Arrow Shape.
+        const arrowShapePoints = [];
+
+        // Function to add a point to the shape.
+        const addPoint = ( xHat, yHat ) => {
+          const x = xHatUnit.x * xHat + yHatUnit.x * yHat + this._tail.x;
+          const y = xHatUnit.y * xHat + yHatUnit.y * yHat + this._tail.y;
+          arrowShapePoints.push( new Vector( x, y ) );
+        };
+
+        addPoint( 0, this._tailWidth / 2 );
+        addPoint( length - this._headHeight, this._tailWidth / 2 );
+        addPoint( length - this._headHeight, this._headWidth / 2 );
+        addPoint( length, 0 );
+        addPoint( length - this._headHeight, -this._headWidth / 2 );
+        addPoint( length - this._headHeight, -this._tailWidth / 2 );
+        addPoint( 0, -this._tailWidth / 2 );
+
+        super.shape = new Shape().polygon( arrowShapePoints );
       }
-
-      // create a vector representation of the arrow
-      const vector = end.copy().subtract( start );
-      const length = vector.magnitude;
-
-      // start with the dimensions specified in options
-      const headWidth = this.options.headWidth;
-      let headHeight = this.options.headHeight;
-      const tailWidth = this.options.tailWidth;
-
-      // make sure that head height is less than arrow length
-      headHeight = Math.min( headHeight, 0.99 * length );
-
-      // Set up a coordinate frame that goes from the tail of the arrow to the tip.
-      const xHatUnit = vector.copy().normalize();
-      const yHatUnit = xHatUnit.copy().rotate( Math.PI / 2 );
-
-      // Function to add a point to this.points
-      const addPoint = ( xHat, yHat ) => {
-        const x = xHatUnit.x * xHat + yHatUnit.x * yHat + start.x;
-        const y = xHatUnit.y * xHat + yHatUnit.y * yHat + start.y;
-
-        this.points.push( new Vector( x, y ) );
-      };
-
-      addPoint( 0, tailWidth / 2 );
-      addPoint( length - headHeight, tailWidth / 2 );
-      addPoint( length - headHeight, headWidth / 2 );
-      addPoint( length, 0 );
-      addPoint( length - headHeight, -headWidth / 2 );
-      addPoint( length - headHeight, -tailWidth / 2 );
-      addPoint( 0, -tailWidth / 2 );
-
-      this.layout( this.scale );
     }
   }
 
