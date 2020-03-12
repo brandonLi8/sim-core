@@ -34,7 +34,7 @@ define( require => {
 
       // @private {number} - reference to the radius of the Circle.
       this._radius = radius;
-      this.updateCircleShape();
+      this._updateCircleShape();
     }
 
     /**
@@ -66,7 +66,7 @@ define( require => {
       if ( radius === this._radius ) return; // Exit if setting to the same 'radius'
       assert( typeof radius === 'number', `invalid radius: ${ radius }` );
       this._radius = radius;
-      this.updateCircleShape();
+      this._updateCircleShape();
     }
 
     /**
@@ -74,7 +74,7 @@ define( require => {
      * displayed is changed, resulting in a different Circle Shape.
      * @private
      */
-    updateCircleShape() {
+    _updateCircleShape() {
       // Must be a valid Circle Node.
       if ( this._radius ) {
         if ( this._radius === 0 ) super.shape = null; // Set to null shape if the radius is 0.

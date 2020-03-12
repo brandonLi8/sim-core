@@ -62,7 +62,7 @@ define( require => {
       // @public {Vector} - create references to the coordinates of the tip and the tail of the Arrow.
       this._tail = new Vector( tailX, tailY );
       this._tip = new Vector( tipX, tipY );
-      this.updateArrowShape();
+      this._updateArrowShape();
     }
 
     /**
@@ -98,7 +98,7 @@ define( require => {
       if ( headHeight === this._headHeight ) return; // Exit if setting to the same 'headHeight'
       assert( typeof headHeight === 'number', `invalid headHeight: ${ headHeight }` );
       this._headHeight = headHeight;
-      this.updateArrowShape();
+      this._updateArrowShape();
     }
 
     /**
@@ -111,7 +111,7 @@ define( require => {
       if ( headWidth === this._headWidth ) return; // Exit if setting to the same 'headWidth'
       assert( typeof headWidth === 'number', `invalid headWidth: ${ headWidth }` );
       this._headWidth = headWidth;
-      this.updateArrowShape();
+      this._updateArrowShape();
     }
 
     /**
@@ -124,7 +124,7 @@ define( require => {
       if ( tailWidth === this._tailWidth ) return; // Exit if setting to the same 'tailWidth'
       assert( typeof tailWidth === 'number', `invalid tailWidth: ${ tailWidth }` );
       this._tailWidth = tailWidth;
-      this.updateArrowShape();
+      this._updateArrowShape();
     }
 
     /**
@@ -137,7 +137,7 @@ define( require => {
       if ( tail.equals( this._tail ) ) return; // Exit if setting to the same 'tail'
       assert( tail instanceof Vector, `invalid tail: ${ tail }` );
       this._tail.set( tail );
-      this.updateArrowShape();
+      this._updateArrowShape();
     }
 
     /**
@@ -150,7 +150,7 @@ define( require => {
       if ( tip.equals( this._tip ) ) return; // Exit if setting to the same 'tip'
       assert( tip instanceof Vector, `invalid tip: ${ tip }` );
       this._tip.set( tip );
-      this.updateArrowShape();
+      this._updateArrowShape();
     }
 
     /**
@@ -163,7 +163,7 @@ define( require => {
       if ( tailX === this.tail.x ) return; // Exit if setting to the same 'tailX'
       assert( typeof tailX === 'number', `invalid tailX: ${ tailX }` );
       this._tail.setX( tailX );
-      this.updateArrowShape();
+      this._updateArrowShape();
     }
 
     /**
@@ -176,7 +176,7 @@ define( require => {
       if ( tailY === this.tail.x ) return; // Exit if setting to the same 'tailY'
       assert( typeof tailY === 'number', `invalid tailY: ${ tailY }` );
       this._tail.setY( tailY );
-      this.updateArrowShape();
+      this._updateArrowShape();
     }
 
     /**
@@ -189,7 +189,7 @@ define( require => {
       if ( tipX === this.tip.x ) return; // Exit if setting to the same 'tipX'
       assert( typeof tipX === 'number', `invalid tipX: ${ tipX }` );
       this._tip.setX( tipX );
-      this.updateArrowShape();
+      this._updateArrowShape();
     }
 
     /**
@@ -202,7 +202,7 @@ define( require => {
       if ( tipY === this.tip.x ) return; // Exit if setting to the same 'tipY'
       assert( typeof tipY === 'number', `invalid tipY: ${ tipY }` );
       this._tip.setY( tipY );
-      this.updateArrowShape();
+      this._updateArrowShape();
     }
 
     /**
@@ -210,7 +210,7 @@ define( require => {
      * displayed is changed, resulting in a different Arrow Shape.
      * @private
      */
-    updateArrowShape() {
+    _updateArrowShape() {
       // Must be a valid Arrow Node.
       if ( this._tail && this._tip && this._headWidth && this._headHeight && this._tailWidth ) {
         if ( this._tail.equalsEpsilon( this._tip ) ) super.shape = null; // Set to null shape if the same tip and tail.
