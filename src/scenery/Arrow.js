@@ -37,9 +37,9 @@ define( require => {
      */
     constructor( tailX, tailY, tipX, tipY, options ) {
       assert( typeof tailX === 'number', `invalid tailX: ${ tailX }` );
-      assert( typeof tailY === 'number' `invalid tailY: ${ tailY }` );
-      assert( typeof tipX === 'number' `invalid tipX: ${ tipX }` );
-      assert( typeof tipY === 'number' `invalid tipY: ${ tipY }` );
+      assert( typeof tailY === 'number', `invalid tailY: ${ tailY }` );
+      assert( typeof tipX === 'number', `invalid tipX: ${ tipX }` );
+      assert( typeof tipY === 'number', `invalid tipY: ${ tipY }` );
       assert( !options || Object.getPrototypeOf( options ) === Object.prototype, `invalid options: ${ options }` );
       assert( !options || !options.attributes, 'Arrow sets attributes' );
 
@@ -215,8 +215,8 @@ define( require => {
       // Must be a valid Arrow Node.
       if ( this._tail && this._tip && this._headWidth && this._headHeight && this._tailWidth ) {
 
-        // Invalidate the Shape if the tip and the tail are the same.
-        if ( this._tail.equalsEpsilon( this._tip ) ) super.shape = null;
+        // // Invalidate the Shape if the tip and the tail are the same.
+        // if ( this._tail.equalsEpsilon( this._tip ) ) super.shape = null;
 
         // create a vector representation of the arrow
         const vector = this._tip.copy().subtract( this._tail );
@@ -226,17 +226,18 @@ define( require => {
         this._headHeight = Math.min( this._headHeight, 0.99 * length );
 
         // Set up a coordinate frame that goes from the tail of the arrow to the tip.
-        const xHatUnit = vector.copy().normalize();
+        const xHatUnit = length ? vector.copy().normalize() : Vector.ZERO;
         const yHatUnit = xHatUnit.copy().rotate( Math.PI / 2 );
 
-        // Generate the points of the Arrow Shape.
-        const arrowShapePoints = [];
+        // Generate the Arrow Shape.
+        const arrowShape = new Shape();
 
         // Function to add a point to the shape.
         const addPoint = ( xHat, yHat ) => {
           const x = xHatUnit.x * xHat + yHatUnit.x * yHat + this._tail.x;
           const y = xHatUnit.y * xHat + yHatUnit.y * yHat + this._tail.y;
-          arrowShapePoints.push( new Vector( x, y ) );
+          if ( !arrowShape.currentPoint ) arrowShape.moveTo( x, y );
+          else arrowShape.lineTo( x, y );
         };
 
         addPoint( 0, this._tailWidth / 2 );
@@ -247,7 +248,7 @@ define( require => {
         addPoint( length - this._headHeight, -this._tailWidth / 2 );
         addPoint( 0, -this._tailWidth / 2 );
 
-        super.shape = new Shape().polygon( arrowShapePoints );
+        super.shape = arrowShape;
       }
     }
   }
