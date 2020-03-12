@@ -119,24 +119,6 @@ define( require => {
     static finishLoadingScreens() {
       // Enable the red dev border around ScreenViews if the ?dev query parameter was provided.
       if ( StandardSimQueryParameters.dev ) { ScreenView.enableDevBorder(); }
-               const Node = require( 'SIM_CORE/scenery/Node' );
-               const Circle = require( 'SIM_CORE/scenery/Circle' );
-               const Vector = require( 'SIM_CORE/util/Vector' );
-
-        const n = new Node( { left: 100, top: 100 })
-         const Arrow = require( 'SIM_CORE/scenery/Arrow' );
-         const rect = new Circle( 100, {
-            fill: 'green',
-            strokeWidth: 2,
-            stroke: 'red',
-            center: new Vector( 100, 100 )
-         });
-
-         window.addEventListener( 'mousedown', () => {
-          // rect.tailWidth += 11;
-         })
-         this.screens[ 0 ].view.addChild( n.addChild( rect )  );
-         console.log( rect.bounds.toString())
 
       this.display.on( 'resize', ( width, height ) => {
         this.navigationBar.layout( width, height );

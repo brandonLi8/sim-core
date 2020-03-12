@@ -180,7 +180,7 @@ define( require => {
     static byPoints( start, end, options ) {
       assert( start instanceof Vector, `invalid start: ${ start }` );
       assert( end instanceof Vector, `invalid end: ${ end }` );
-      return new Line( start.x, start.y, end.x, tip.y, options );
+      return new Line( start.x, start.y, end.x, end.y, options );
     }
   }
 
