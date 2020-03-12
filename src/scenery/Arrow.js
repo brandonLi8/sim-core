@@ -52,14 +52,13 @@ define( require => {
         // Rewrite options so that it overrides the defaults.
         ...options
       };
-      super( options );
+      super( null, options );
 
-      // Rewrite options so that it overrides the defaults.
-      options = { ...defaults, ...options };
-      super( [], options );
-
-      this.options = options;
-      this.set( start, end );
+      // @private {number} - see options declaration for documentation. Contains getters and setters. Set to what was
+      //                     provided as they were set in the mutate() call in Path's constructor.
+      this._headHeight = options.headHeight;
+      this._headWidth = options.headWidth;
+      this._tailWidth = options.tailWidth;
     }
 
     set( start, end ) {
@@ -104,6 +103,9 @@ define( require => {
       this.layout( this.scale );
     }
   }
+
+  // @protected @override {string[]} - setter names specific to Arrow. See Path.MUTATOR_KEYS for documentation.
+  Arrow.MUTATOR_KEYS = [ 'headHeight', 'headWidth', 'tailWidth', ...Path.MUTATOR_KEYS ];
 
   return Arrow;
 } );
