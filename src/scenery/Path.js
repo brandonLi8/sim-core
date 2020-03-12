@@ -142,9 +142,6 @@ define( require => {
       this.width = shape ? shape.bounds.width : 0;
       this.height = shape ? shape.bounds.height : 0;
 
-      // Reference the previous top-left position before shifting.
-      const topLeft = this.topLeft;
-
       // Set the Bounds of this Node.
       if ( shape ) { this._bounds.set( this._shape.bounds ); }
       this.layout( this._screenViewScale );

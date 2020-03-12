@@ -19,7 +19,6 @@ define( require => {
 
   // modules
   const assert = require( 'SIM_CORE/util/assert' );
-  const Bounds = require( 'SIM_CORE/util/Bounds' );
   const Path = require( 'SIM_CORE/scenery/Path' );
   const Shape = require( 'SIM_CORE/util/Shape' );
   const Vector = require( 'SIM_CORE/util/Vector' );
