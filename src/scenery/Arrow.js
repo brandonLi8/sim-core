@@ -248,6 +248,23 @@ define( require => {
         super.shape = arrowShape;
       }
     }
+
+    /**
+     * Creates a arrow with the tip and tail points.
+     * @public
+     *
+     * See Arrow's constructor for detailed parameter information.
+     *
+     * @param {Vector} tail
+     * @param {Vector} tip
+     * @param {Object} [options]
+     * @returns {Arrow}
+     */
+    static byPoints( tail, tip, options ) {
+      assert( tail instanceof Vector, `invalid tail: ${ tail }` );
+      assert( tip instanceof Vector, `invalid tip: ${ tip }` );
+      return new Arrow( tail.x, tail.y, tip.x, tip.y, options );
+    }
   }
 
   // @protected @override {string[]} - setter names specific to Arrow. See Path.MUTATOR_KEYS for documentation.

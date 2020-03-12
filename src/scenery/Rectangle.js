@@ -163,7 +163,7 @@ define( require => {
      */
     static byBounds( bounds, options ) {
       assert( bounds instanceof Bounds, `invalid bounds: ${ bounds }` );
-      return Bounds.byRect( bounds.minX, bounds.minY, bounds.width, bounds.height, options );
+      return Rectangle.byRect( bounds.minX, bounds.minY, bounds.width, bounds.height, options );
     }
   }
 
