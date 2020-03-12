@@ -214,9 +214,7 @@ define( require => {
     updateArrowShape() {
       // Must be a valid Arrow Node.
       if ( this._tail && this._tip && this._headWidth && this._headHeight && this._tailWidth ) {
-
-        // // Invalidate the Shape if the tip and the tail are the same.
-        // if ( this._tail.equalsEpsilon( this._tip ) ) super.shape = null;
+        if ( this._tail.equalsEpsilon( this._tip ) ) super.shape = null; // Set to null shape if the same tip and tail.
 
         // create a vector representation of the arrow
         const vector = this._tip.copy().subtract( this._tail );
@@ -247,7 +245,6 @@ define( require => {
         addPoint( length - this._headHeight, -this._headWidth / 2 );
         addPoint( length - this._headHeight, -this._tailWidth / 2 );
         addPoint( 0, -this._tailWidth / 2 );
-
         super.shape = arrowShape;
       }
     }

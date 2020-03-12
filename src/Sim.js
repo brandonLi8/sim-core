@@ -132,7 +132,7 @@ define( require => {
          } );
 
          window.addEventListener( 'mousedown', () => {
-          rect.left = 0;
+          rect.tailWidth += 11;
          })
          this.screens[ 0 ].view.addChild( n.addChild( rect ) );
 
