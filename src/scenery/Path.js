@@ -42,19 +42,18 @@ define( require => {
         ...options
       };
       options.type = 'path'; // Set the type to a path element.
+      options.shape = shape; // Set to the provided shape so that the shape is set in the mutate() call in Node.
       super( options );
 
-      // @private {*} - see options declaration for documentation. Contains getters and setters. Set to null for now and
-      //                to be set in the mutate() call in Path's constructor.
-      this._fill;
-      this._stroke;
-      this._strokeWidth;
-      this._shapeRendering;
+      // @private {*} - see options declaration for documentation. Contains getters and setters. Set to what was
+      //                provided as they were set in the mutate() call in Node's constructor.
+      this._fill = options.fill;
+      this._stroke = options.stroke;
+      this._strokeWidth = options.strokeWidth;
+      this._shapeRendering = options.shapeRendering;
 
       // @private {Shape|null} - the Shape object of this Path.
-      this._shape;
-      options.shape = shape;
-      this.mutate( options );
+      this._shape = options.shape;
     }
 
     /**

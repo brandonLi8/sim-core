@@ -55,22 +55,19 @@ define( require => {
         // Rewrite options so that it overrides the defaults.
         ...options
       };
+      options.text = text; // Set the text option to be set in the mutate() call in Node.
       super( options );
 
-      // @private {*} - see options declaration for documentation. Contains getters and setters. Set to null for now and
-      //                to be set in the mutate() call in Text's constructor.
-      this._fontStyle;
-      this._fontWeight;
-      this._fontSize;
-      this._fontFamily;
-      this._fill;
-      this._stroke;
-      this._strokeWidth;
-      this._textRendering;
-
-      // At this point, set the text option and call mutate again to ensure correct ordering of mutator keys.
-      options.text = text;
-      this.mutate( options );
+      // @private {*} - see options declaration for documentation. Contains getters and setters. Set to what was
+      //                provided as they were set in the mutate() call in Node's constructor.
+      this._fontStyle = options.fontStyle;
+      this._fontWeight = options.fontWeight;
+      this._fontSize = options.fontSize;
+      this._fontFamily = options.fontFamily;
+      this._fill = options.fill;
+      this._stroke = options.stroke;
+      this._strokeWidth = options.strokeWidth;
+      this._textRendering = options.textRendering;
     }
 
     /**
@@ -232,7 +229,7 @@ define( require => {
       // Prepend the style, weight, and stretch if non-normal.
       if ( this._fontStyle !== 'normal' ) { result += this._fontStyle + ' '; }
       if ( this._fontWeight !== 'normal' ) { result += this._fontWeight + ' '; }
-      // Add the size and font family .
+      // Add the size and font family.
       result += this._fontSize * fontScale + 'px ' + this._fontFamily;
       return result;
     }
