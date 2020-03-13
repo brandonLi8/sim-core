@@ -1,4 +1,5 @@
 // Copyright © 2019-2020 Brandon Li. All rights reserved.
+// NOTE: THIS DOESNT WORK ATM!!!
 
 /**
  * Play pause button for starting/stopping the sim. Often appears at the bottom center of the screen.
