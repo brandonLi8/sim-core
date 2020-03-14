@@ -109,6 +109,36 @@ define( require => {
       }
     }
 
+    /**
+     * Disposes the press and release listeners from the targetNode's HTML element and releasing references.
+     * @public
+     *
+     * This is the opposite of the _initiate() method.
+     */
+    dispose() {
+
+      // Remove event listeners in the same order as they were added in the _initiate() method.
+      if ( PressListener.canUsePointerEvents ) {
+        this._pressListener && this._targetNode.element.removeEventListener( 'pointerdown', this._pressHandler );
+        this._releaseListener && this._targetNode.element.removeEventListener( 'pointerup', this._releaseHandler );
+      }
+      else if ( PressListener.canUseMSPointerEvents ) {
+        this._pressListener && this._targetNode.element.removeEventListener( 'MSPointerDown', this._pressHandler );
+        this._releaseListener && this._targetNode.element.removeEventListener( 'MSPointerUp', this._releaseHandler );
+      }
+      else {
+        this._pressListener && this._targetNode.element.removeEventListener( 'touchstart', this._pressHandler );
+        this._pressListener && this._targetNode.element.removeEventListener( 'mousedown', this._pressHandler );
+        this._releaseListener && this._targetNode.element.removeEventListener( 'touchend', this._releaseHandler );
+        this._releaseListener && this._targetNode.element.removeEventListener( 'mouseup', this._releaseHandler );
+      }
+
+      // Release references to ensure that the PressListener can be garbage collected.
+      this._pressHandler = null;
+      this._releaseHandler = null;
+      this._pressListener = null;
+      this._releaseListener = null;
+    }
   }
 
   // @public (read-only) {boolean} - indicates if pointer events are supported.
