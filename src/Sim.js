@@ -118,7 +118,7 @@ define( require => {
       // Enable the red dev border around ScreenViews if the ?dev query parameter was provided.
       if ( StandardSimQueryParameters.dev ) { ScreenView.enableDevBorder(); }
       const Circle = require( 'SIM_CORE/scenery/Circle' );
-      const PressListener = require( 'SIM_CORE/scenery/events/PressListener' );
+      const HoverListener = require( 'SIM_CORE/scenery/events/HoverListener' );
       const Node = require( 'SIM_CORE/scenery/Node' );
       const p = new Node( {
         left: 100,
@@ -130,12 +130,19 @@ define( require => {
         fill: 'green',
 
       } );
-      const h = new PressListener( c, {
-        press: ( position ) => {
-          console.log( 'press: ', position.toString() );
+      let i = 0;
+      const h = new HoverListener( c, {
+        enter: () => {
+          i++;
+          console.log( 'enter: ' + i );
         },
-        release: () => {
-          console.log( 'release' );
+        exit: () => {
+          i++;
+          console.log( 'exit: ' + i );
+        },
+        movement: () => {
+          i++;
+          console.log( 'movement: ' + i );
         }
       } );
 

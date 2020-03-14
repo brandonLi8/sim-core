@@ -72,7 +72,7 @@ define( require => {
       //----------------------------------------------------------------------------------------
 
       // @private {HTMLElment} - the target Node element that HoverListener listens to for hover-related events.
-      this._targetElement = node.elemnt;
+      this._targetElement = node.element;
 
       // @private {function|null} - reference to the hover-related listeners that were passed in options.
       this._enterListener = options.enter;
@@ -82,7 +82,7 @@ define( require => {
       // @private {function} - reference our internal handlers.
       this._enterHandler = this._enter.bind( this );
       this._exitHandler = this._exit.bind( this );
-      this._movement = this._move.bind( this );
+      this._movementHandler = this._move.bind( this );
 
       // Initiate hover-related listeners for the target Node.
       this._initiate();
