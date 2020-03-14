@@ -18,7 +18,7 @@
  *
  * NOTE: A drag listener will listen to when a Node is pressed. However, is the Node is being disposed of or is no
  *       longer in use, make sure to dispose of the DragListener to allow Javascript to garbage collect the
- *       DragListener. Not disposing can result in a memory leak! See the `dispose()` method.
+ *       DragListener. Not disposing can result in a memory leak! See the `dispose()` method in the super class.
  *
  * @author Brandon Li <brandon.li820@gmail.com>
  */
