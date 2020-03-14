@@ -125,9 +125,9 @@ define( require => {
       // @protected {Bounds} - Bounds for the Node and its children in the "parent" coordinate frame.
       this._bounds = Bounds.ZERO.copy();
 
-      // @protected {number} - screenViewScale in terms of global units per local unit for converting Scenery
-      //                       coordinates to pixels. Referenced as soon as the scale is known in `layout()`
-      this._screenViewScale;
+      // @public (read-only) {number} - screenViewScale in terms of global units per local unit for converting Scenery
+      //                                coordinates to pixels. Referenced as soon as the scale is known in `layout()`
+      this.screenViewScale;
       options && this.mutate( options );
     }
 
@@ -382,7 +382,7 @@ define( require => {
 
         // Ensure the maxWidth and maxHeight flags are satisfied.
         this._updateMaxDimension();
-        this.layout( this._screenViewScale );
+        this.layout( this.screenViewScale );
       }
       else this.scale( scratchVector.setX( a ).setY( a ) ); // Forward as `scale( <a, a> )`
     }
@@ -423,7 +423,7 @@ define( require => {
       assert( translation instanceof Vector && translation.isFinite(), `invalid translation: ${ translation }` );
       if ( translation.x === 0 && translation.y === 0 ) return; // Exit if setting to the same translation.
       this._bounds.shift( translation.x, translation.y );
-      this.layout( this._screenViewScale );
+      this.layout( this.screenViewScale );
     }
 
     /**
@@ -436,7 +436,7 @@ define( require => {
       assert( translation instanceof Vector, `invalid translation: ${ translation }` );
       if ( this.translation.equals( translation ) ) return; // Exit if setting to the same translation.
       this.topLeft = translation;
-      this.layout( this._screenViewScale );
+      this.layout( this.screenViewScale );
     }
 
     /**
@@ -464,7 +464,7 @@ define( require => {
       assert( typeof rotation === 'number' && isFinite( rotation ), `invalid rotation: ${ rotation }` );
       if ( this._rotation === rotation ) return; // Exit if setting to the same rotation.
       this._rotation = rotation;
-      this.layout( this._screenViewScale );
+      this.layout( this.screenViewScale );
     }
 
     /**
@@ -541,7 +541,7 @@ define( require => {
 
       // Set the svg transform attribute and reference the new screenViewScale.
       this.setAttribute( 'transform', transformString );
-      this._screenViewScale = scale;
+      this.screenViewScale = scale;
     }
 
     /**
@@ -558,7 +558,7 @@ define( require => {
       super.addChild( child );
 
       this._recomputeAncestorBounds(); // Update this Node's bounds after removing this child.
-      this.layout( this._screenViewScale );
+      this.layout( this.screenViewScale );
       return this;
     }
 
@@ -575,7 +575,7 @@ define( require => {
       super.removeChild( child );
 
       this._recomputeAncestorBounds(); // Update this Node's bounds after removing this child.
-      this.layout( this._screenViewScale );
+      this.layout( this.screenViewScale );
       return this;
     }
 

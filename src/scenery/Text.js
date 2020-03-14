@@ -194,7 +194,7 @@ define( require => {
       if ( strokeWidth === this._strokeWidth ) return; // Exit if setting to the same 'strokeWidth'
       assert( typeof strokeWidth === 'number', `invalid strokeWidth: ${ strokeWidth }` );
       this._strokeWidth = strokeWidth;
-      this.layout( this._screenViewScale );
+      this.layout( this.screenViewScale );
     }
 
     /**
@@ -275,7 +275,7 @@ define( require => {
 
         // At this point, since this is called when a font property changes or when the text displayed is changed,
         // call layout as the font has changed. Layout isn't needed as its minX and minY doesn't change.
-        this.style.font = this._generateCSS3FontString( this._screenViewScale );
+        this.style.font = this._generateCSS3FontString( this.screenViewScale );
       }
     }
 

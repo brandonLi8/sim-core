@@ -108,7 +108,7 @@ define( require => {
       if ( strokeWidth === this._strokeWidth ) return; // Exit if setting to the same 'strokeWidth'
       assert( typeof strokeWidth === 'number', `invalid strokeWidth: ${ strokeWidth }` );
       this._strokeWidth = strokeWidth;
-      this.layout( this._screenViewScale );
+      this.layout( this.screenViewScale );
     }
 
     /**
@@ -144,7 +144,7 @@ define( require => {
 
       // Set the Bounds of this Node.
       if ( shape ) { this._bounds.set( this._shape.bounds ); }
-      this.layout( this._screenViewScale );
+      this.layout( this.screenViewScale );
     }
 
     /**
