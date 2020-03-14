@@ -82,13 +82,18 @@ define( require => {
 
       //----------------------------------------------------------------------------------------
 
-      // Tell the PressListener to call the start method to start the drag. Then call _initiate to link the listener.
+      // Set the super-class press listener to call the start method. Then call _initiate to link the listener.
       this._pressListener = ( location, event ) => { this._start( location, event ); }
       this._initiate();
     }
 
     /**
-     * The general start handler, called when drag is started. TODO doc
+     * The general start handler for drags, called when the drag is started. This should be called when the target Node
+     * is pressed.
+     *
+     * This method works by creating a HoverListener to listen to mouse-movements in the Display. This allows the user
+     * to move their pressed poitner away from the Node. Then, if the pointer is ever released, the drag is ended, and
+     * the listener is disposed.
      * @private
      *
      * @param {Vector} location - the location the drag was started, in the parent coordinate frame.
@@ -96,31 +101,44 @@ define( require => {
      */
     _start( location, event ) {
 
+      // First call the start listener if it was provided.
       if ( this._startListener ) this._startListener( location, event );
-      assert( event.dragHoverListener === undefined, `event already has dragged-start handled` );
 
+      // Reference the Display to listen to. The require statement is here to avoid circular dependency problems.
+      const display = require( 'SIM_CORE/Sim' ).display;
+
+      // Flag that tracks where the user last moved the cursor after pressing down.
       const lastDragLocation = location.copy();
-      const dragDisplacement = Vector.ZERO.copy();
 
-      // Assign a drag listener to the event object.
-      event.dragHoverListener = new HoverListener( require( 'SIM_CORE/Sim' ).display, {
-        movement: ( movementEvent ) => {
+      // Create a HoverListener to listen to mouse-movements in the Display. Will be disposed if the poitner is released
+      const displayHoverListener = new HoverListener( require( 'SIM_CORE/Sim' ).display, {
+        movement: movementEvent => {
           if ( this._dragListener ) {
+
+            // Get the cursor (or pointer) position in the parent coordinate frame.
             const cursorPosition = this._getEventParentLocation( movementEvent );
-            dragDisplacement.set( cursorPosition ).subtract( lastDragLocation );
+
+            // Get the displacement by comparing the last drag location to the current cursor position.
+            const dragDisplacement = cursorPosition.copy().subtract( lastDragLocation );
+
+            // Upudate the lastDragLocation flag.
             lastDragLocation.set( cursorPosition );
+
+            // Call the drag listener.
             this._dragListener( dragDisplacement, cursorPosition, movementEvent );
           }
         }
       } );
-      event.dragPressListener = new PressListener( require( 'SIM_CORE/Sim' ).display, {
-        press: ( pressEvent ) => {
-          console.log( 'pres', pressEvent )
-        },
-        release: ( releaseEvent ) => {
-          console.log(  event, releaseEvent );
-          event.dragHoverListener.dispose();
-          event.dragPressListener.dispose();
+
+      // Create a PressListener to listen to when the mouse is released, which cancels the drag.
+      const displayReleaseListener = new PressListener( require( 'SIM_CORE/Sim' ).display, {
+        release: releaseEvent => {
+
+          // Dispose of listeners.
+          displayHoverListener.dispose();
+          displayReleaseListener.dispose();
+
+          // Call the end listener if it exists.
           this._endListener && this._endListener( releaseEvent )
         }
       } );
