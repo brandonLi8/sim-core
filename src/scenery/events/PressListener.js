@@ -33,13 +33,13 @@ define( require => {
   class PressListener {
 
     /**
-     * @param {Node} node - the target Node that PressListener listens to for press events.
+     * @param {Node|Display} node - the target Node that PressListener listens to for press events.
      * @param {Object} [options] - key-value pairs that control the functionality of the PressListener. Subclasses
      *                             may have different options for their API. See the early portion of the constructor
      *                             for details.
      */
     constructor( node, options ) {
-      assert( node instanceof Node, `invalid node: ${ node }` );
+      assert( node instanceof Node || node instanceof Display, `invalid node: ${ node }` );
       assert( !options || Object.getPrototypeOf( options ) === Object.prototype, `invalid options: ${ options }` );
 
       options = {
@@ -61,10 +61,10 @@ define( require => {
 
       //----------------------------------------------------------------------------------------
 
-      // @private {Node} - the target Node that PressListener listens to for press events.
+      // @protected {Node} - the target Node that PressListener listens to for press events.
       this._targetNode = node;
 
-      // @private {function|null} - reference to the press down and release listeners that were passed in options.
+      // @protected {function|null} - reference to the press down and release listeners that were passed in options.
       this._pressListener = options.press;
       this._releaseListener = options.release;
 

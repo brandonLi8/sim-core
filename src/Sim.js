@@ -117,28 +117,34 @@ define( require => {
     static finishLoadingScreens() {
       // Enable the red dev border around ScreenViews if the ?dev query parameter was provided.
       if ( StandardSimQueryParameters.dev ) { ScreenView.enableDevBorder(); }
-      // const Circle = require( 'SIM_CORE/scenery/Circle' );
-      // const PressListener = require( 'SIM_CORE/scenery/events/PressListener' );
-      // const Node = require( 'SIM_CORE/scenery/Node' );
-      // const p = new Node( {
-      //   left: 100,
-      //   top: 100
-      // })
-      // const c = new Circle( 100, {
-      //   left: 0,
-      //   top: 0,
-      //   fill: 'green',
+      const Circle = require( 'SIM_CORE/scenery/Circle' );
+      const DragListener = require( 'SIM_CORE/scenery/events/DragListener' );
+      const Node = require( 'SIM_CORE/scenery/Node' );
+      const p = new Node( {
+        left: 100,
+        top: 100
+      })
+      const c = new Circle( 100, {
+        left: 0,
+        top: 0,
+        fill: 'green',
 
-      // } );
-      // let i = 0;
-      // const h = new PressListener( c, {
-      //   press: () => {
-      //     console.log( 'down')
-      //   }
-      // } );
+      } );
+      let i = 0;
+      const h = new DragListener( c, {
+        start: ( location ) => {
+          console.log( 'start: ', location )
+        },
+        end: () => {
+          console.log( 'end' )
+        },
+        drag: ( displacement, location ) => {
+          console.log( 'drag: ', displacement, location )
+        }
+      } );
 
 
-      // this.screens[ 0 ].view.addChild( p.addChild( c ) );
+      this.screens[ 0 ].view.addChild( p.addChild( c ) );
 
       this.display.on( 'resize', ( width, height ) => {
 
