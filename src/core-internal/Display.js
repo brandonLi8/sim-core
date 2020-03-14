@@ -211,7 +211,7 @@ define( require => {
   Display.canUsePointerEvents = !!( window.navigator && window.navigator.pointerEnabled || window.PointerEvent );
 
   // @public (read-only) {boolean} - indicates if pointer events (MS specification) are supported for the DOM.
-  Display.canUseMSPointerEvents = !!( window.navigator && window.navigator.msPointerEnabled ) ;
+  Display.canUseMSPointerEvents = !!( window.navigator && window.navigator.msPointerEnabled );
 
   return Display;
 } );

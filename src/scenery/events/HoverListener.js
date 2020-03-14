@@ -97,14 +97,14 @@ define( require => {
     _initiate() {
 
       // Prefer the pointer event specification. See https://developer.mozilla.org/en-US/docs/Web/API/Pointer_events.
-      if ( HoverListener.canUsePointerEvents ) {
+      if ( Display.canUsePointerEvents ) {
 
         // Add event listeners for all 3 events via the pointer event specification, only if listeners  were provided.
         this._enterListener && this._targetElement.addEventListener( 'pointerover', this._enterHandler );
         this._exitListener && this._targetElement.addEventListener( 'pointerout', this._exitHandler );
         this._movementListener && this._targetElement.addEventListener( 'pointermove', this._movementHandler );
       }
-      else if ( HoverListener.canUseMSPointerEvents ) {
+      else if ( Display.canUseMSPointerEvents ) {
 
         // Add event listeners for all 3 events via the MS pointer event specification, only if listeners were provided.
         this._enterListener && this._targetElement.addEventListener( 'MSPointerOver', this._enterHandler );
@@ -123,51 +123,54 @@ define( require => {
     }
 
     /**
-     * The general enter handler, called when enter down event occurs, such as a finger enter or a mouse click.
+     * The general enter handler, called when hover enter event occurs (see the comment at the top of the file).
      * If called, assumes that there is a enter listener.
-     * @protected
-     *
-     * This can be overridden (with super-calls) when custom enter behavior is needed for a sub-type.
+     * @private
      *
      * @param {Event} event
      */
     _enter( event ) {
       assert( event, `invalid event: ${ event }` );
 
-      // Assign a `pressHandled` flag field in the event object. This is done so that the same event isn't 'pressed'
-      // twice, particularly in devices that register both a 'mouse-down' and a 'touchstart'. This `pressHandled`
-      // field is undefined in the event, but set to true in this method.
-      if ( !!event.pressHandled ) return; // If the field is defined, the event has already been handled, so do nothing.
-      event.pressHandled = true; // Set the pressHandled event to true in case the _enter is called with the same event.
-
       // Prevents further propagation of the current event into ancestors in the scene graph.
       event.stopPropagation();
 
       // Prevents the default action from taken place if the event isn't handled.
       event.preventDefault();
 
-      // Call the pressListener of this Listener.
-      this._enterListener( this._getEventParentLocation( event ), event );
+      // Call the enterListener of this Listener.
+      this._enterListener( event );
     }
 
     /**
-     * The general exit handler, called when enter exit event occurs, such as a finger exit or a mouse exit.
-     * If called, assumes that there is a exit listener. Will only fire if the pointer exit occurs on top of the
-     * Node.
-     * @protected
-     *
-     * This can be overridden (with super-calls) when custom exit behavior is needed for a sub-type.
+     * The general exit handler, called when hover exit event occurs (see the comment at the top of the file).
+     * If called, assumes that there is a exit listener.
+     * @private
      *
      * @param {Event} event
      */
     _exit( event ) {
       assert( event, `invalid event: ${ event }` );
 
-      // Assign a `releaseHandled` flag field in the event object. This is done so that the same event isn't 'released'
-      // twice, particularly in devices that register both a 'mouse-up' and a 'touchend'. This `releaseHandled`
-      // field is undefined in the event, but set to true in this method.
-      if ( !!event.releaseHandled ) return;
-      event.releaseHandled = true;
+      // Prevents further propagation of the current event into ancestors in the scene graph.
+      event.stopPropagation();
+
+      // Prevents the default action from taken place if the event isn't handled.
+      event.preventDefault();
+
+      // Call the exitListener of this Listener.
+      this._exitListener( event );
+    }
+
+    /**
+     * The general movement handler, called when hover movement event occurs (see the comment at the top of the file).
+     * If called, assumes that there is a movement listener.
+     * @private
+     *
+     * @param {Event} event
+     */
+    _move( event ) {
+      assert( event, `invalid event: ${ event }` );
 
       // Prevents further propagation of the current event into ancestors in the scene graph.
       event.stopPropagation();
@@ -175,47 +178,8 @@ define( require => {
       // Prevents the default action from taken place if the event isn't handled.
       event.preventDefault();
 
-      // Call the releaseListener of this Listener.
-      this._exitListener( event );
-    }
-
-    /**
-     * Gets where an event took place, in the browsers window coordinate frame.
-     * @protected
-     *
-     * @param {Event} event
-     * @returns {Vector}
-     */
-    _getEventWindowLocation( event ) {
-      return new Vector(
-        !!event.clientX ? event.clientX : event.touches[ 0 ].clientX,
-        !!event.clientY ? event.clientY : event.touches[ 0 ].clientY
-      );
-    }
-
-    /**
-     * Gets where an event took place, in the targetNode's parent coordinate frame.
-     * @protected
-     *
-     * @param {Event} event
-     * @returns {Vector}
-     */
-    _getEventParentLocation( event ) {
-
-      // First compute the target Node's window coordinates in pixels.
-      const nodeWindowBounds = this._targetElement.element.getBoundingClientRect();
-
-      // Get where the event took place in the window coordinate frame.
-      const windowPressLocation = this._getEventWindowLocation( event );
-
-      // Using the window enter location, subtract the top-left of the Node's window bounds and divide by the
-      // screenViewScale to get the location of the event in the target Node's local coordinate system.
-      const nodeLocalPressLocation = windowPressLocation
-                                      .subtractXY( nodeWindowBounds.x, nodeWindowBounds.y )
-                                      .divide( this._targetElement.screenViewScale );
-
-      // Convert the location to the target Node's parent coordinate system.
-      return this._targetElement.topLeft.add( nodeLocalPressLocation );
+      // Call the movementListener of this Listener.
+      this._movementListener( event );
     }
 
     /**
@@ -227,34 +191,32 @@ define( require => {
     dispose() {
 
       // Remove event listeners in the same order as they were added in the _initiate() method.
-      if ( HoverListener.canUsePointerEvents ) {
-        this._enterListener && this._targetElement.element.removeEventListener( 'pointerdown', this._enterHandler );
-        this._exitListener && this._targetElement.element.removeEventListener( 'pointerup', this._exitHandler );
+      if ( Display.canUsePointerEvents ) {
+        this._enterListener && this._targetElement.removeEventListener( 'pointerover', this._enterHandler );
+        this._exitListener && this._targetElement.removeEventListener( 'pointerout', this._exitHandler );
+        this._movementListener && this._targetElement.removeEventListener( 'pointermove', this._movementHandler );
       }
-      else if ( HoverListener.canUseMSPointerEvents ) {
-        this._enterListener && this._targetElement.element.removeEventListener( 'MSPointerDown', this._enterHandler );
-        this._exitListener && this._targetElement.element.removeEventListener( 'MSPointerUp', this._exitHandler );
+      else if ( Display.canUseMSPointerEvents ) {
+        this._enterListener && this._targetElement.removeEventListener( 'MSPointerOver', this._enterHandler );
+        this._exitListener && this._targetElement.removeEventListener( 'MSPointerOut', this._exitHandler );
+        this._movementListener && this._targetElement.removeEventListener( 'MSPointerMove', this._movementHandler );
       }
       else {
-        this._enterListener && this._targetElement.element.removeEventListener( 'touchstart', this._enterHandler );
-        this._enterListener && this._targetElement.element.removeEventListener( 'mousedown', this._enterHandler );
-        this._exitListener && this._targetElement.element.removeEventListener( 'touchend', this._exitHandler );
-        this._exitListener && this._targetElement.element.removeEventListener( 'mouseup', this._exitHandler );
+        this._enterListener && this._targetElement.removeEventListener( 'mouseover', this._enterHandler );
+        this._exitListener && this._targetElement.removeEventListener( 'mouseout', this._exitHandler );
+        this._movementListener && this._targetElement.removeEventListener( 'mousemove', this._movementHandler );
+        this._movementListener && this._targetElement.removeEventListener( 'touchmove', this._movementHandler );
       }
 
       // Release references to ensure that the HoverListener can be garbage collected.
       this._enterHandler = null;
       this._exitHandler = null;
+      this._movementHandler = null;
       this._enterListener = null;
       this._exitListener = null;
+      this._movementListener = null;
     }
   }
-
-  // @public (read-only) {boolean} - indicates if pointer events are supported.
-  HoverListener.canUsePointerEvents = !!( window.navigator && window.navigator.pointerEnabled || window.PointerEvent );
-
-  // @public (read-only) {boolean} - indicates if pointer events (MS specification) are supported.
-  HoverListener.canUseMSPointerEvents = !!( window.navigator && window.navigator.msPointerEnabled ) ;
 
   return HoverListener;
 } );
