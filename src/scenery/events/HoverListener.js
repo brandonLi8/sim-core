@@ -1,22 +1,28 @@
-// Copyright © 2019-2020 Brandon Li. All rights reserved.
+// Copyright © 2020 Brandon Li. All rights reserved.
 
 /**
- * Listens to all presses and down events, such as mouse clicks and finger presses. Has an API to allow for listeners
- * to attach to both the press and the release event of Nodes.
+ * Listens to all hover-related events on top of a Node, such as pointer hovers and pointer movements.
  *
- * PressListener uses some specific terminology regarding Node's and their coordinate systems. Please read the
- * documentation in `scenery/Node` before using this class.
+ * ## Description of Hover Events:
+ *    - Hovers - Hovers occur when a user places a mouse over a Node, but not when the mouse is pressed down. Generally,
+ *               hovers are exclusive to desktop-like devices that use a mouse, and don't trigger on purely touch-screen
+ *               devices. HoverListener contains an API to listen to both the entering and leaving portions of hovering.
  *
- * A typical PressListener usage would look something like:
+ *    - Movements - Movements occur when a user moves a mouse over a Node. Movements on mobile occur when moving a
+ *                  touch pointer across the touch surface. Unlike Drag events, these movements stop as soon as the
+ *                  mouse/pointer exits the Node.
+
+ * A typical HoverListener usage would look something like:
  * ```
- *   const nodePressListener = new PressListener( someNode, {
- *     press: ( location ) => { ... },
- *     release: () => { ... }
+ *   const nodeHoverListener = new HoverListener( someNode, {
+ *     enter: () => { ... },
+ *     release: () => { ... },
+ *     movement: () => { ... }
  *   } );
  * ```
- * NOTE: A press listener will listen to when a Node is pressed. However, is the Node is being disposed of or is no
- *       longer in use, make sure to dispose of the PressListener to allow Javascript to garbage collect the
- *       PressListener. Not disposing can result in a memory leak! See the `dispose()` method.
+ * NOTE: A hover listener will add listeners to the Node. However, if the Node is being disposed of or is no
+ *       longer in use, make sure to dispose of the HoverListener to allow Javascript to garbage collect the
+ *       HoverListener. Not disposing can result in a memory leak! See the `dispose()` method.
  *
  * @author Brandon Li <brandon.li820@gmail.com>
  */
@@ -29,11 +35,11 @@ define( require => {
   const Node = require( 'SIM_CORE/scenery/Node' );
   const Vector = require( 'SIM_CORE/util/Vector' );
 
-  class PressListener {
+  class HoverListener {
 
     /**
-     * @param {Node} node - the target Node that PressListener listens to for press events.
-     * @param {Object} [options] - key-value pairs that control the functionality of the PressListener.  Subclasses
+     * @param {Node} node - the target Node that HoverListener listens to for press events.
+     * @param {Object} [options] - key-value pairs that control the functionality of the HoverListener.  Subclasses
      *                             may have different options for their API. See the early portion of the constructor
      *                             for details.
      */
@@ -60,7 +66,7 @@ define( require => {
 
       //----------------------------------------------------------------------------------------
 
-      // @private {Node} - the target Node that PressListener listens to for press events.
+      // @private {Node} - the target Node that HoverListener listens to for press events.
       this._targetNode = node;
 
       // @private {function|null} - reference to the press down and release listeners that were passed in options.
@@ -84,14 +90,14 @@ define( require => {
     _initiate() {
 
       // Prefer the pointer event specification. See https://developer.mozilla.org/en-US/docs/Web/API/Pointer_events.
-      if ( PressListener.canUsePointerEvents ) {
+      if ( HoverListener.canUsePointerEvents ) {
 
         // Add event listeners for both presses and releases via the pointer event specification, only if listeners
         // were provided.
         this._pressListener && this._targetNode.element.addEventListener( 'pointerdown', this._pressHandler );
         this._releaseListener && this._targetNode.element.addEventListener( 'pointerup', this._releaseHandler );
       }
-      else if ( PressListener.canUseMSPointerEvents ) {
+      else if ( HoverListener.canUseMSPointerEvents ) {
 
         // Add event listeners for both presses and releases via the MS pointer event specification, only if listeners
         // were provided.
@@ -216,11 +222,11 @@ define( require => {
     dispose() {
 
       // Remove event listeners in the same order as they were added in the _initiate() method.
-      if ( PressListener.canUsePointerEvents ) {
+      if ( HoverListener.canUsePointerEvents ) {
         this._pressListener && this._targetNode.element.removeEventListener( 'pointerdown', this._pressHandler );
         this._releaseListener && this._targetNode.element.removeEventListener( 'pointerup', this._releaseHandler );
       }
-      else if ( PressListener.canUseMSPointerEvents ) {
+      else if ( HoverListener.canUseMSPointerEvents ) {
         this._pressListener && this._targetNode.element.removeEventListener( 'MSPointerDown', this._pressHandler );
         this._releaseListener && this._targetNode.element.removeEventListener( 'MSPointerUp', this._releaseHandler );
       }
@@ -231,7 +237,7 @@ define( require => {
         this._releaseListener && this._targetNode.element.removeEventListener( 'mouseup', this._releaseHandler );
       }
 
-      // Release references to ensure that the PressListener can be garbage collected.
+      // Release references to ensure that the HoverListener can be garbage collected.
       this._pressHandler = null;
       this._releaseHandler = null;
       this._pressListener = null;
@@ -240,10 +246,10 @@ define( require => {
   }
 
   // @public (read-only) {boolean} - indicates if pointer events are supported.
-  PressListener.canUsePointerEvents = !!( window.navigator && window.navigator.pointerEnabled || window.PointerEvent );
+  HoverListener.canUsePointerEvents = !!( window.navigator && window.navigator.pointerEnabled || window.PointerEvent );
 
   // @public (read-only) {boolean} - indicates if pointer events (MS specification) are supported.
-  PressListener.canUseMSPointerEvents = !!( window.navigator && window.navigator.msPointerEnabled ) ;
+  HoverListener.canUseMSPointerEvents = !!( window.navigator && window.navigator.msPointerEnabled ) ;
 
-  return PressListener;
+  return HoverListener;
 } );

@@ -132,8 +132,7 @@ define( require => {
         fill: 'green',
 
       } );
-      console.log( c.bounds )
-      new PressListener( c, {
+      const h = new PressListener( c, {
         press: ( position ) => {
           console.log( 'press: ', position.toString() );
         },
