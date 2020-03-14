@@ -28,11 +28,9 @@ define( require => {
 
   // modules
   const assert = require( 'SIM_CORE/util/assert' );
-  const Display = require( 'SIM_CORE/core-internal/Display' );
+  const HoverListener = require( 'SIM_CORE/scenery/events/HoverListener' );
   const Node = require( 'SIM_CORE/scenery/Node' );
   const PressListener = require( 'SIM_CORE/scenery/events/PressListener' );
-  const Vector = require( 'SIM_CORE/util/Vector' );
-  const HoverListener = require( 'SIM_CORE/scenery/events/HoverListener' );
 
   class DragListener extends PressListener {
 
@@ -82,8 +80,8 @@ define( require => {
 
       //----------------------------------------------------------------------------------------
 
-      // Set the super-class press listener to call the start method. Then call _initiate to link the listener.
-      this._pressListener = ( location, event ) => { this._start( location, event ); }
+      // Set the super-class press listener to the start method. Then call _initiate to link the listener.
+      this._pressListener = this._start.bind( this );
       this._initiate();
     }
 
@@ -111,7 +109,7 @@ define( require => {
       const lastDragLocation = location.copy();
 
       // Create a HoverListener to listen to mouse-movements in the Display. Will be disposed if the poitner is released
-      const displayHoverListener = new HoverListener( require( 'SIM_CORE/Sim' ).display, {
+      const displayHoverListener = new HoverListener( display, {
         movement: movementEvent => {
           if ( this._dragListener ) {
 
@@ -131,7 +129,7 @@ define( require => {
       } );
 
       // Create a PressListener to listen to when the mouse is released, which cancels the drag.
-      const displayReleaseListener = new PressListener( require( 'SIM_CORE/Sim' ).display, {
+      const displayReleaseListener = new PressListener( display, {
         release: releaseEvent => {
 
           // Dispose of listeners.
@@ -139,7 +137,7 @@ define( require => {
           displayReleaseListener.dispose();
 
           // Call the end listener if it exists.
-          this._endListener && this._endListener( releaseEvent )
+          this._endListener && this._endListener( releaseEvent );
         }
       } );
     }
