@@ -138,6 +138,7 @@ define( require => {
         },
         drag: ( displacement, location ) => {
           console.log( 'drag: ', displacement, location )
+          c.center = location;
         }
       } );
 
