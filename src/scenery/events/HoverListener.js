@@ -13,15 +13,8 @@
  *    - Movements - Movements occur each time a user moves a mouse over a Node. Movements on mobile occur when moving a
  *                  touch pointer across the touch surface. Unlike Drag events, these movements stop as soon as the
  *                  mouse/pointer exits the Node.
-
- * A typical HoverListener usage would look something like:
- * ```
- *   const nodeHoverListener = new HoverListener( someNode, {
- *     enter: () => { ... },
- *     exit: () => { ... },
- *     movement: () => { ... }
- *   } );
- * ```
+ *                  HoverListener will use a throttling technique to improve performance. See core-internal/Throttle.js
+ *
  * NOTE: A hover listener will add listeners to the Node. However, if the Node is being disposed of or is no
  *       longer in use, make sure to dispose of the HoverListener to allow Javascript to garbage collect the
  *       HoverListener. Not disposing can result in a memory leak! See the `dispose()` method.
@@ -36,6 +29,7 @@ define( require => {
   const assert = require( 'SIM_CORE/util/assert' );
   const Display = require( 'SIM_CORE/core-internal/Display' );
   const Node = require( 'SIM_CORE/scenery/Node' );
+  const Throttle = require( 'SIM_CORE/core-internal/Throttle' );
   const Vector = require( 'SIM_CORE/util/Vector' );
 
   class HoverListener {
@@ -61,6 +55,10 @@ define( require => {
         // {function(Event)|null} - Called when mouse or pressed pointer moves over the node (see comment at the top).
         movement: null,
 
+        // {number} - throttle amount for the movement listener. See comment at the top of this file for documentation on
+        //            how throttling works. This specific option controls the timeout time for timeout calls.
+        movementThrottle: 1000,
+
         // Rewrite options so that it overrides the defaults.
         ...options
       };
@@ -68,6 +66,7 @@ define( require => {
       assert( !options.enter || typeof options.enter === 'function', `invalid enter: ${ options.enter }` );
       assert( !options.exit || typeof options.exit === 'function', `invalid exit: ${ options.exit }` );
       assert( !options.movement || typeof options.movement === 'function', `invalid movement: ${ options.movement }` );
+      assert( typeof options.movementThrottle === 'number', `invalid movementThrottle: ${ options.movementThrottle }` );
 
       //----------------------------------------------------------------------------------------
 
@@ -82,7 +81,7 @@ define( require => {
       // @private {function} - reference our internal handlers.
       this._enterHandler = this._enter.bind( this );
       this._exitHandler = this._exit.bind( this );
-      this._movementHandler = this._move.bind( this );
+      this._movementHandler = Throttle.throttle( this._move.bind( this ), options.movementThrottle );
 
       // Initiate hover-related listeners for the target Node.
       this._initiate();
@@ -164,7 +163,7 @@ define( require => {
 
     /**
      * The general movement handler, called when hover movement event occurs (see the comment at the top of the file).
-     * If called, assumes that there is a movement listener.
+     * If called, assumes that there is a movement listener. Should be called with a throttle technique implementation.
      * @private
      *
      * @param {Event} event
