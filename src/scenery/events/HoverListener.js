@@ -4,11 +4,13 @@
  * Listens to all hover-related events on top of a Node, such as pointer hovers and pointer movements.
  *
  * ## Description of Hover Events:
- *    - Hovers - Hovers occur when a user places a mouse over a Node, but not when the mouse is pressed down. Generally,
- *               hovers are exclusive to desktop-like devices that use a mouse, and don't trigger on purely touch-screen
- *               devices. HoverListener contains an API to listen to both the entering and leaving portions of hovering.
+ *    - Enters - Occurs when a user moves a un-pressed mouse or a pressed pointer/finger over and into a Node. The event
+ *               only fires ONCE each time a pointer is moved into the Node.
  *
- *    - Movements - Movements occur when a user moves a mouse over a Node. Movements on mobile occur when moving a
+ *    - Exits - Occurs when a user moves a un-pressed mouse or a pressed pointer/finger from the Node to out of the
+ *              Node. The event only fires ONCE each time a pointer is moved out of the Node.
+ *
+ *    - Movements - Movements occur each time a user moves a mouse over a Node. Movements on mobile occur when moving a
  *                  touch pointer across the touch surface. Unlike Drag events, these movements stop as soon as the
  *                  mouse/pointer exits the Node.
 
@@ -16,7 +18,7 @@
  * ```
  *   const nodeHoverListener = new HoverListener( someNode, {
  *     enter: () => { ... },
- *     release: () => { ... },
+ *     exit: () => { ... },
  *     movement: () => { ... }
  *   } );
  * ```
@@ -32,57 +34,61 @@ define( require => {
 
   // modules
   const assert = require( 'SIM_CORE/util/assert' );
+  const Display = require( 'SIM_CORE/scenery/Display' );
   const Node = require( 'SIM_CORE/scenery/Node' );
   const Vector = require( 'SIM_CORE/util/Vector' );
 
   class HoverListener {
 
     /**
-     * @param {Node} node - the target Node that HoverListener listens to for press events.
-     * @param {Object} [options] - key-value pairs that control the functionality of the HoverListener.  Subclasses
+     * @param {Node|Display} node - the target Node that HoverListener listens to for hover-related events.
+     * @param {Object} [options] - key-value pairs that control the functionality of the HoverListener. Subclasses
      *                             may have different options for their API. See the early portion of the constructor
      *                             for details.
      */
     constructor( node, options ) {
-      assert( node instanceof Node, `invalid node: ${ node }` );
+      assert( node instanceof Node || node instanceof Display, `invalid node: ${ node }` );
       assert( !options || Object.getPrototypeOf( options ) === Object.prototype, `invalid options: ${ options }` );
 
       options = {
 
-        // {function(Vector, Event)|null} - Called when the press down (mouse-down) event is fired, or, in other words,
-        //                                  when the Node is pressed, with the press location (parent-coordinate) passed
-        press: null,
+        // {function(Event)|null} - Called once when the mouse enters the hover state (see comment at the top).
+        enter: null,
 
-        // {function(Event)|null} - Called when the press release (mouse-up) event is fired. Will only fire if the
-        //                          pointer release occurs on top of the Node.
-        release: null,
+        // {function(Event)|null} - Called once when the mouse leaves the hover state (see comment at the top).
+        exit: null,
+
+        // {function(Event)|null} - Called when mouse or pressed pointer moves over the node (see comment at the top).
+        movement: null,
 
         // Rewrite options so that it overrides the defaults.
         ...options
       };
 
-      assert( !options.press || typeof options.press === 'function', `invalid press: ${ options.press }` );
-      assert( !options.release || typeof options.release === 'function', `invalid release: ${ options.release }` );
+      assert( !options.enter || typeof options.enter === 'function', `invalid enter: ${ options.enter }` );
+      assert( !options.exit || typeof options.exit === 'function', `invalid exit: ${ options.exit }` );
+      assert( !options.movement || typeof options.movement === 'function', `invalid movement: ${ options.movement }` );
 
       //----------------------------------------------------------------------------------------
 
-      // @private {Node} - the target Node that HoverListener listens to for press events.
+      // @private {Node} - the target Node that HoverListener listens to for hover-related events.
       this._targetNode = node;
 
-      // @private {function|null} - reference to the press down and release listeners that were passed in options.
-      this._pressListener = options.press;
-      this._releaseListener = options.release;
+      // @private {function|null} - reference to the hover-related listeners that were passed in options.
+      this._enterListener = options.enter;
+      this._exitListener = options.exit;
+      this._movementListener = options.movement;
 
-      // @private {function} - reference our internal press and release handlers.
-      this._pressHandler = this._press.bind( this );
-      this._releaseHandler = this._release.bind( this );
+      // @private {function} - reference our internal handlers.
+      this._enterHandler = this._enter.bind( this );
+      this._exitHandler = this._exit.bind( this );
 
-      // Initiate press and release listeners for the target Node.
+      // Initiate enter and exit listeners for the target Node.
       this._initiate();
     }
 
     /**
-     * Initiates the press and release listeners for the targetNode's HTML element.
+     * Initiates the enter and exit listeners for the targetNode's HTML element.
      * @private
      *
      * This is the opposite of the dispose() method.
@@ -94,46 +100,46 @@ define( require => {
 
         // Add event listeners for both presses and releases via the pointer event specification, only if listeners
         // were provided.
-        this._pressListener && this._targetNode.element.addEventListener( 'pointerdown', this._pressHandler );
-        this._releaseListener && this._targetNode.element.addEventListener( 'pointerup', this._releaseHandler );
+        this._enterListener && this._targetNode.element.addEventListener( 'pointerdown', this._enterHandler );
+        this._exitListener && this._targetNode.element.addEventListener( 'pointerup', this._exitHandler );
       }
       else if ( HoverListener.canUseMSPointerEvents ) {
 
         // Add event listeners for both presses and releases via the MS pointer event specification, only if listeners
         // were provided.
-        this._pressListener && this._targetNode.element.addEventListener( 'MSPointerDown', this._pressHandler );
-        this._releaseListener && this._targetNode.element.addEventListener( 'MSPointerUp', this._releaseHandler );
+        this._enterListener && this._targetNode.element.addEventListener( 'MSPointerDown', this._enterHandler );
+        this._exitListener && this._targetNode.element.addEventListener( 'MSPointerUp', this._exitHandler );
       }
       else {
 
         // Otherwise, if pointer events are not supported, resort to the touchstart (mobile) and mousedown (mouse-click)
         // specification. Both listeners are added to support devices that are both touchscreen and on mouse and
         // keyboard.
-        this._pressListener && this._targetNode.element.addEventListener( 'touchstart', this._pressHandler );
-        this._pressListener && this._targetNode.element.addEventListener( 'mousedown', this._pressHandler );
+        this._enterListener && this._targetNode.element.addEventListener( 'touchstart', this._enterHandler );
+        this._enterListener && this._targetNode.element.addEventListener( 'mousedown', this._enterHandler );
 
-        this._releaseListener && this._targetNode.element.addEventListener( 'touchend', this._releaseHandler );
-        this._releaseListener && this._targetNode.element.addEventListener( 'mouseup', this._releaseHandler );
+        this._exitListener && this._targetNode.element.addEventListener( 'touchend', this._exitHandler );
+        this._exitListener && this._targetNode.element.addEventListener( 'mouseup', this._exitHandler );
       }
     }
 
     /**
-     * The general press handler, called when press down event occurs, such as a finger press or a mouse click.
-     * If called, assumes that there is a press listener.
+     * The general enter handler, called when enter down event occurs, such as a finger enter or a mouse click.
+     * If called, assumes that there is a enter listener.
      * @protected
      *
-     * This can be overridden (with super-calls) when custom press behavior is needed for a sub-type.
+     * This can be overridden (with super-calls) when custom enter behavior is needed for a sub-type.
      *
      * @param {Event} event
      */
-    _press( event ) {
+    _enter( event ) {
       assert( event, `invalid event: ${ event }` );
 
       // Assign a `pressHandled` flag field in the event object. This is done so that the same event isn't 'pressed'
       // twice, particularly in devices that register both a 'mouse-down' and a 'touchstart'. This `pressHandled`
       // field is undefined in the event, but set to true in this method.
       if ( !!event.pressHandled ) return; // If the field is defined, the event has already been handled, so do nothing.
-      event.pressHandled = true; // Set the pressHandled event to true in case the _press is called with the same event.
+      event.pressHandled = true; // Set the pressHandled event to true in case the _enter is called with the same event.
 
       // Prevents further propagation of the current event into ancestors in the scene graph.
       event.stopPropagation();
@@ -142,20 +148,20 @@ define( require => {
       event.preventDefault();
 
       // Call the pressListener of this Listener.
-      this._pressListener( this._getEventParentLocation( event ), event );
+      this._enterListener( this._getEventParentLocation( event ), event );
     }
 
     /**
-     * The general release handler, called when press release event occurs, such as a finger release or a mouse release.
-     * If called, assumes that there is a release listener. Will only fire if the pointer release occurs on top of the
+     * The general exit handler, called when enter exit event occurs, such as a finger exit or a mouse exit.
+     * If called, assumes that there is a exit listener. Will only fire if the pointer exit occurs on top of the
      * Node.
      * @protected
      *
-     * This can be overridden (with super-calls) when custom release behavior is needed for a sub-type.
+     * This can be overridden (with super-calls) when custom exit behavior is needed for a sub-type.
      *
      * @param {Event} event
      */
-    _release( event ) {
+    _exit( event ) {
       assert( event, `invalid event: ${ event }` );
 
       // Assign a `releaseHandled` flag field in the event object. This is done so that the same event isn't 'released'
@@ -171,7 +177,7 @@ define( require => {
       event.preventDefault();
 
       // Call the releaseListener of this Listener.
-      this._releaseListener( event );
+      this._exitListener( event );
     }
 
     /**
@@ -203,7 +209,7 @@ define( require => {
       // Get where the event took place in the window coordinate frame.
       const windowPressLocation = this._getEventWindowLocation( event );
 
-      // Using the window press location, subtract the top-left of the Node's window bounds and divide by the
+      // Using the window enter location, subtract the top-left of the Node's window bounds and divide by the
       // screenViewScale to get the location of the event in the target Node's local coordinate system.
       const nodeLocalPressLocation = windowPressLocation
                                       .subtractXY( nodeWindowBounds.x, nodeWindowBounds.y )
@@ -214,7 +220,7 @@ define( require => {
     }
 
     /**
-     * Disposes the press and release listeners from the targetNode's HTML element and releasing references.
+     * Disposes the enter and exit listeners from the targetNode's HTML element and releasing references.
      * @public
      *
      * This is the opposite of the _initiate() method.
@@ -223,25 +229,25 @@ define( require => {
 
       // Remove event listeners in the same order as they were added in the _initiate() method.
       if ( HoverListener.canUsePointerEvents ) {
-        this._pressListener && this._targetNode.element.removeEventListener( 'pointerdown', this._pressHandler );
-        this._releaseListener && this._targetNode.element.removeEventListener( 'pointerup', this._releaseHandler );
+        this._enterListener && this._targetNode.element.removeEventListener( 'pointerdown', this._enterHandler );
+        this._exitListener && this._targetNode.element.removeEventListener( 'pointerup', this._exitHandler );
       }
       else if ( HoverListener.canUseMSPointerEvents ) {
-        this._pressListener && this._targetNode.element.removeEventListener( 'MSPointerDown', this._pressHandler );
-        this._releaseListener && this._targetNode.element.removeEventListener( 'MSPointerUp', this._releaseHandler );
+        this._enterListener && this._targetNode.element.removeEventListener( 'MSPointerDown', this._enterHandler );
+        this._exitListener && this._targetNode.element.removeEventListener( 'MSPointerUp', this._exitHandler );
       }
       else {
-        this._pressListener && this._targetNode.element.removeEventListener( 'touchstart', this._pressHandler );
-        this._pressListener && this._targetNode.element.removeEventListener( 'mousedown', this._pressHandler );
-        this._releaseListener && this._targetNode.element.removeEventListener( 'touchend', this._releaseHandler );
-        this._releaseListener && this._targetNode.element.removeEventListener( 'mouseup', this._releaseHandler );
+        this._enterListener && this._targetNode.element.removeEventListener( 'touchstart', this._enterHandler );
+        this._enterListener && this._targetNode.element.removeEventListener( 'mousedown', this._enterHandler );
+        this._exitListener && this._targetNode.element.removeEventListener( 'touchend', this._exitHandler );
+        this._exitListener && this._targetNode.element.removeEventListener( 'mouseup', this._exitHandler );
       }
 
       // Release references to ensure that the HoverListener can be garbage collected.
-      this._pressHandler = null;
-      this._releaseHandler = null;
-      this._pressListener = null;
-      this._releaseListener = null;
+      this._enterHandler = null;
+      this._exitHandler = null;
+      this._enterListener = null;
+      this._exitListener = null;
     }
   }
 

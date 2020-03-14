@@ -14,7 +14,7 @@
  *     release: () => { ... }
  *   } );
  * ```
- * NOTE: A press listener will listen to when a Node is pressed. However, is the Node is being disposed of or is no
+ * NOTE: A press listener will listen to when a Node is pressed. However, if the Node is being disposed of or is no
  *       longer in use, make sure to dispose of the PressListener to allow Javascript to garbage collect the
  *       PressListener. Not disposing can result in a memory leak! See the `dispose()` method.
  *
@@ -33,7 +33,7 @@ define( require => {
 
     /**
      * @param {Node} node - the target Node that PressListener listens to for press events.
-     * @param {Object} [options] - key-value pairs that control the functionality of the PressListener.  Subclasses
+     * @param {Object} [options] - key-value pairs that control the functionality of the PressListener. Subclasses
      *                             may have different options for their API. See the early portion of the constructor
      *                             for details.
      */
