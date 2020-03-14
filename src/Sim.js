@@ -101,15 +101,13 @@ define( require => {
       // see https://stackoverflow.com/questions/8788802/prevent-safari-loading-from-cache-when-back-button-is-clicked
       window.addEventListener( 'pageshow', event => { if ( event.persisted ) window.location.reload(); } );
 
-
-      // prevent pinch and zoom https://stackoverflow.com/questions/37808180/disable-viewport-zooming-ios-10-safari
-      // Maybe we want to detect if passive is supportive
-      // https://developer.mozilla.org/en-US/docs/Web/API/EventTarget/addEventListener#Safely_detecting_option_support
-      // if ( Sim.isMobile ) {
-      //   document.addEventListener( 'touchmove', event => {
-      //     if ( event.scale !== 1 ) { event.preventDefault(); }
-      //   }, { passive: false } );
-      // }
+      // Fixes pinch and zoom problems, as well as view-port positioning problems on mobile.
+      if ( Sim._isMobile ) {
+        window.addEventListener( 'touchmove', event => { event.preventDefault(); }, { passive: false } );
+        this.display.element.style.height = window.innerHeight + 'px';
+        this.display.element.style.width = window.innerWidth + 'px';
+        window.scrollTo( 0, 0 );
+      }
     }
 
     /**
@@ -141,26 +139,31 @@ define( require => {
         }
       } );
 
+
       this.screens[ 0 ].view.addChild( p.addChild( c ) );
 
       this.display.on( 'resize', ( width, height ) => {
+
+        // Fixes view-port positioning problems with the tab-bar on mobile.
+        if ( Sim._isMobile ) {
+          this.display.element.style.height = window.innerHeight + 'px';
+          this.display.element.style.width = window.innerWidth + 'px';
+          window.scrollTo( 0, 0 );
+        }
         this.navigationBar.layout( width, height );
         const screenHeight = height - parseFloat( this.navigationBar.style.height );
 
         this.screens.forEach( screen => {
          screen.style.height = `${ screenHeight }px`;
-
-
          screen.view.layout( width, screenHeight );
-
         } );
       } );
     }
   }
 
-  // // @private {boolean} - indicates if the current window is running on a mobile device.
-  // Sim._isMobile: ( () => /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i
-  //                         .test( navigator.userAgent || navigator.vendor || window.opera ) )();
+  // @private {boolean} - indicates if the current window is running on a mobile device.
+  Sim._isMobile = ( () => /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i
+                          .test( navigator.userAgent || navigator.vendor || window.opera ) )();
 
   return Sim;
 } );
