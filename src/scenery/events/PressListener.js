@@ -26,6 +26,7 @@ define( require => {
 
   // modules
   const assert = require( 'SIM_CORE/util/assert' );
+  const Display = require( 'SIM_CORE/core-internal/Display' );
   const Node = require( 'SIM_CORE/scenery/Node' );
   const Vector = require( 'SIM_CORE/util/Vector' );
 
@@ -84,14 +85,14 @@ define( require => {
     _initiate() {
 
       // Prefer the pointer event specification. See https://developer.mozilla.org/en-US/docs/Web/API/Pointer_events.
-      if ( PressListener.canUsePointerEvents ) {
+      if ( Display.canUsePointerEvents ) {
 
         // Add event listeners for both presses and releases via the pointer event specification, only if listeners
         // were provided.
         this._pressListener && this._targetNode.element.addEventListener( 'pointerdown', this._pressHandler );
         this._releaseListener && this._targetNode.element.addEventListener( 'pointerup', this._releaseHandler );
       }
-      else if ( PressListener.canUseMSPointerEvents ) {
+      else if ( Display.canUseMSPointerEvents ) {
 
         // Add event listeners for both presses and releases via the MS pointer event specification, only if listeners
         // were provided.
@@ -216,11 +217,11 @@ define( require => {
     dispose() {
 
       // Remove event listeners in the same order as they were added in the _initiate() method.
-      if ( PressListener.canUsePointerEvents ) {
+      if ( Display.canUsePointerEvents ) {
         this._pressListener && this._targetNode.element.removeEventListener( 'pointerdown', this._pressHandler );
         this._releaseListener && this._targetNode.element.removeEventListener( 'pointerup', this._releaseHandler );
       }
-      else if ( PressListener.canUseMSPointerEvents ) {
+      else if ( Display.canUseMSPointerEvents ) {
         this._pressListener && this._targetNode.element.removeEventListener( 'MSPointerDown', this._pressHandler );
         this._releaseListener && this._targetNode.element.removeEventListener( 'MSPointerUp', this._releaseHandler );
       }
@@ -238,12 +239,6 @@ define( require => {
       this._releaseListener = null;
     }
   }
-
-  // @public (read-only) {boolean} - indicates if pointer events are supported.
-  PressListener.canUsePointerEvents = !!( window.navigator && window.navigator.pointerEnabled || window.PointerEvent );
-
-  // @public (read-only) {boolean} - indicates if pointer events (MS specification) are supported.
-  PressListener.canUseMSPointerEvents = !!( window.navigator && window.navigator.msPointerEnabled ) ;
 
   return PressListener;
 } );

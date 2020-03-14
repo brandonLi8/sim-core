@@ -207,5 +207,11 @@ define( require => {
                                        || ( ( callback ) => { window.setTimeout( callback, 1000 / 60 ); } )
                                    ).bind( window );
 
+  // @public (read-only) {boolean} - indicates if pointer events are supported for the DOM.
+  Display.canUsePointerEvents = !!( window.navigator && window.navigator.pointerEnabled || window.PointerEvent );
+
+  // @public (read-only) {boolean} - indicates if pointer events (MS specification) are supported for the DOM.
+  Display.canUseMSPointerEvents = !!( window.navigator && window.navigator.msPointerEnabled ) ;
+
   return Display;
 } );
