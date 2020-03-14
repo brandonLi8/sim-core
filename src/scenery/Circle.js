@@ -35,6 +35,9 @@ define( require => {
       // @private {number} - reference to the radius of the Circle.
       this._radius = radius;
       this._updateCircleShape();
+
+      // At this point, call mutate to ensure that any location setters provided are correctly mutated in Node.mutate().
+      this.mutate( options );
     }
 
     /**

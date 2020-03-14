@@ -121,12 +121,18 @@ define( require => {
       if ( StandardSimQueryParameters.dev ) { ScreenView.enableDevBorder(); }
       const Circle = require( 'SIM_CORE/scenery/Circle' );
       const PressListener = require( 'SIM_CORE/scenery/events/PressListener' );
-
+      const Node = require( 'SIM_CORE/scenery/Node' );
+      const p = new Node( {
+        left: 100,
+        top: 100
+      })
       const c = new Circle( 100, {
-        center: this.screens[ 0 ].view.viewBounds.center,
+        left: 0,
+        top: 0,
         fill: 'green',
 
       } );
+      console.log( c.bounds )
       new PressListener( c, {
         press: ( position ) => {
           console.log( 'press: ', position.toString() );
@@ -136,7 +142,7 @@ define( require => {
         }
       } );
 
-      this.screens[ 0 ].view.addChild( c );
+      this.screens[ 0 ].view.addChild( p.addChild( c ) );
 
       this.display.on( 'resize', ( width, height ) => {
         this.navigationBar.layout( width, height );
