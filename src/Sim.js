@@ -119,6 +119,24 @@ define( require => {
     static finishLoadingScreens() {
       // Enable the red dev border around ScreenViews if the ?dev query parameter was provided.
       if ( StandardSimQueryParameters.dev ) { ScreenView.enableDevBorder(); }
+      const Circle = require( 'SIM_CORE/scenery/Circle' );
+      const PressListener = require( 'SIM_CORE/scenery/events/PressListener' );
+
+      const c = new Circle( 100, {
+        center: this.screens[ 0 ].view.viewBounds.center,
+        fill: 'green',
+
+      } );
+      new PressListener( c, {
+        press: ( position ) => {
+          console.log( 'press: ', position.toString() );
+        },
+        release: () => {
+          console.log( 'release' );
+        }
+      } );
+
+      this.screens[ 0 ].view.addChild( c );
 
       this.display.on( 'resize', ( width, height ) => {
         this.navigationBar.layout( width, height );
