@@ -74,5 +74,11 @@ define( require => {
     }
   }
 
+  // @public (read-only) {boolean} - indicates if pointer events are supported.
+  PressListener.canUsePointerEvents = !!( window.navigator && window.navigator.pointerEnabled || window.PointerEvent );
+
+  // @public (read-only) {boolean} - indicates if pointer events (MS specification) are supported.
+  PressListener.canUseMSPointerEvents = !!( window.navigator && window.navigator.msPointerEnabled ) ;
+
   return PressListener;
 } );
