@@ -117,37 +117,28 @@ define( require => {
     static finishLoadingScreens() {
       // Enable the red dev border around ScreenViews if the ?dev query parameter was provided.
       if ( StandardSimQueryParameters.dev ) { ScreenView.enableDevBorder(); }
-      const Circle = require( 'SIM_CORE/scenery/Circle' );
-      const HoverListener = require( 'SIM_CORE/scenery/events/HoverListener' );
-      const Node = require( 'SIM_CORE/scenery/Node' );
-      const p = new Node( {
-        left: 100,
-        top: 100
-      })
-      const c = new Circle( 100, {
-        left: 0,
-        top: 0,
-        fill: 'green',
+      // const Circle = require( 'SIM_CORE/scenery/Circle' );
+      // const PressListener = require( 'SIM_CORE/scenery/events/PressListener' );
+      // const Node = require( 'SIM_CORE/scenery/Node' );
+      // const p = new Node( {
+      //   left: 100,
+      //   top: 100
+      // })
+      // const c = new Circle( 100, {
+      //   left: 0,
+      //   top: 0,
+      //   fill: 'green',
 
-      } );
-      let i = 0;
-      const h = new HoverListener( c, {
-        enter: () => {
-          i++;
-          console.log( 'enter: ' + i );
-        },
-        exit: () => {
-          i++;
-          console.log( 'exit: ' + i );
-        },
-        movement: () => {
-          i++;
-          console.log( 'movement: ' + i );
-        }
-      } );
+      // } );
+      // let i = 0;
+      // const h = new PressListener( c, {
+      //   press: () => {
+      //     console.log( 'down')
+      //   }
+      // } );
 
 
-      this.screens[ 0 ].view.addChild( p.addChild( c ) );
+      // this.screens[ 0 ].view.addChild( p.addChild( c ) );
 
       this.display.on( 'resize', ( width, height ) => {
 

@@ -1,4 +1,4 @@
-// Copyright © 2020 Brandon Li. All rights reserved.
+// Copyright © 2019-2020 Brandon Li. All rights reserved.
 
 /**
  * Listens to all hover-related events on top of a Node, such as pointer hovers and pointer movements.
@@ -30,7 +30,6 @@ define( require => {
   const Display = require( 'SIM_CORE/core-internal/Display' );
   const Node = require( 'SIM_CORE/scenery/Node' );
   const Throttle = require( 'SIM_CORE/core-internal/Throttle' );
-  const Vector = require( 'SIM_CORE/util/Vector' );
 
   class HoverListener {
 
@@ -55,9 +54,9 @@ define( require => {
         // {function(Event)|null} - Called when mouse or pressed pointer moves over the node (see comment at the top).
         movement: null,
 
-        // {number} - throttle amount for the movement listener. See comment at the top of this file for documentation on
-        //            how throttling works. This specific option controls the timeout time for timeout calls.
-        movementThrottle: 1000,
+        // {number} - throttle amount for the movement listener. See comment at the top of this file for documentation
+        //            on how throttling works. This specific option controls the timeout time for timeout calls.
+        movementThrottle: 15,
 
         // Rewrite options so that it overrides the defaults.
         ...options

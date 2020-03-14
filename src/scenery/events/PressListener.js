@@ -127,7 +127,7 @@ define( require => {
       // Assign a `pressHandled` flag field in the event object. This is done so that the same event isn't 'pressed'
       // twice, particularly in devices that register both a 'mouse-down' and a 'touchstart'. This `pressHandled`
       // field is undefined in the event, but set to true in this method.
-      if ( !!event.pressHandled ) return; // If the field is defined, the event has already been handled, so do nothing.
+      if ( event.pressHandled !== undefined ) return; // If the field is defined, the event has already been handled.
       event.pressHandled = true; // Set the pressHandled event to true in case the _press is called with the same event.
 
       // Prevents further propagation of the current event into ancestors in the scene graph.
@@ -156,7 +156,7 @@ define( require => {
       // Assign a `releaseHandled` flag field in the event object. This is done so that the same event isn't 'released'
       // twice, particularly in devices that register both a 'mouse-up' and a 'touchend'. This `releaseHandled`
       // field is undefined in the event, but set to true in this method.
-      if ( !!event.releaseHandled ) return;
+      if ( event.releaseHandled !== undefined ) return;
       event.releaseHandled = true;
 
       // Prevents further propagation of the current event into ancestors in the scene graph.
@@ -178,8 +178,8 @@ define( require => {
      */
     _getEventWindowLocation( event ) {
       return new Vector(
-        !!event.clientX ? event.clientX : event.touches[ 0 ].clientX,
-        !!event.clientY ? event.clientY : event.touches[ 0 ].clientY
+        event.clientX !== undefined ? event.clientX : event.touches[ 0 ].clientX,
+        event.clientY !== undefined ? event.clientY : event.touches[ 0 ].clientY
       );
     }
 

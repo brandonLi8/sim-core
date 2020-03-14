@@ -40,6 +40,8 @@ define( require => {
      * @returns {function(..*)} - the throttled optimized function
      */
     static throttle( listener, waitTime, implementBackupDebounce = false ) {
+      assert( typeof listener === 'function', `invalid listener: ${ listener }` );
+      assert( typeof waitTime === 'number' && waitTime >= 0, `invalid waitTime: ${ waitTime }` );
 
       // Flag that indicates if we need to throttle and temporarily stop invocations of the listener.
       let throttled = false;
