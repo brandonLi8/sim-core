@@ -102,11 +102,9 @@ define( require => {
       window.addEventListener( 'pageshow', event => { if ( event.persisted ) window.location.reload(); } );
 
       // Fixes pinch and zoom problems, as well as view-port positioning problems on mobile.
-      if ( Sim._isMobile ) {
+      if ( Display.isMobile ) {
         window.addEventListener( 'touchmove', event => { event.preventDefault(); }, { passive: false } );
-        this.display.element.style.height = window.innerHeight + 'px';
-        this.display.element.style.width = window.innerWidth + 'px';
-        window.scrollTo( 0, 0 );
+        window.addEventListener( 'touchend', event => { event.preventDefault(); } );
       }
     }
 
@@ -148,12 +146,6 @@ define( require => {
 
       this.display.on( 'resize', ( width, height ) => {
 
-        // Fixes view-port positioning problems with the tab-bar on mobile.
-        if ( Sim._isMobile ) {
-          this.display.element.style.height = window.innerHeight + 'px';
-          this.display.element.style.width = window.innerWidth + 'px';
-          window.scrollTo( 0, 0 );
-        }
         this.navigationBar.layout( width, height );
         const screenHeight = height - parseFloat( this.navigationBar.style.height );
 
@@ -164,10 +156,6 @@ define( require => {
       } );
     }
   }
-
-  // @private {boolean} - indicates if the current window is running on a mobile device.
-  Sim._isMobile = ( () => /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i
-                          .test( navigator.userAgent || navigator.vendor || window.opera ) )();
 
   return Sim;
 } );

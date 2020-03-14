@@ -124,6 +124,12 @@ define( require => {
 
       // Set up the 'resize' event. Use throttling technique to improve performance. See core-internal/Throttle.js.
       window.onresize = Throttle.throttle( () => {
+        // Fixes view-port positioning problems with the tab-bar on mobile.
+        if ( Display.isMobile ) {
+          window.scrollTo( 0, 0 );
+          this.element.style.height = window.innerHeight + 'px';
+          this.element.style.width = window.innerWidth + 'px';
+        }
         this._trigger( 'resize', window.innerWidth, window.innerHeight );
       }, StandardSimQueryParameters.resizeThrottle, true );
 
@@ -201,6 +207,11 @@ define( require => {
 
   // @public (read-only) {boolean} - indicates if pointer events (MS specification) are supported for the DOM.
   Display.canUseMSPointerEvents = !!( window.navigator && window.navigator.msPointerEnabled );
+
+
+  // @private {boolean} - indicates if the current window is running on a mobile device.
+  Display.isMobile = ( () => /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i
+                          .test( navigator.userAgent || navigator.vendor || window.opera ) )();
 
   return Display;
 } );

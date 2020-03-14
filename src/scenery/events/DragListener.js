@@ -114,7 +114,11 @@ define( require => {
         }
       } );
       event.dragPressListener = new PressListener( require( 'SIM_CORE/Sim' ).display, {
+        press: ( pressEvent ) => {
+          console.log( 'pres', pressEvent )
+        },
         release: ( releaseEvent ) => {
+          console.log(  event, releaseEvent );
           event.dragHoverListener.dispose();
           event.dragPressListener.dispose();
           this._endListener && this._endListener( releaseEvent )
