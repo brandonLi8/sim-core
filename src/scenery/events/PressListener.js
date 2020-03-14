@@ -4,6 +4,9 @@
  * Listens to all presses and down events, such as mouse clicks and finger presses. Has an API to allow for listeners
  * to attach to both the press and the release event of Nodes.
  *
+ * PressListener uses some specific terminology regarding Node's and their coordinate systems. Please read the
+ * documentation in `scenery/Node` before using this class.
+ *
  * A typical PressListener usage would look something like:
  * ```
  *   const nodePressListener = new PressListener( someNode, {
