@@ -72,6 +72,43 @@ define( require => {
       // Initiate press and release listeners for the target Node.
       this._initiate();
     }
+
+    /**
+     * Initiates the press and release listeners for the targetNode's HTML element.
+     * @private
+     *
+     * This is the opposite of the dispose() method.
+     */
+    _initiate() {
+
+      // Prefer the pointer event specification. See https://developer.mozilla.org/en-US/docs/Web/API/Pointer_events.
+      if ( PressListener.canUsePointerEvents ) {
+
+        // Add event listeners for both presses and releases via the pointer event specification, only if listeners
+        // were provided.
+        this._pressListener && this._targetNode.element.addEventListener( 'pointerdown', this._pressHandler );
+        this._releaseListener && this._targetNode.element.addEventListener( 'pointerup', this._releaseHandler );
+      }
+      else if ( PressListener.canUseMSPointerEvents ) {
+
+        // Add event listeners for both presses and releases via the MS pointer event specification, only if listeners
+        // were provided.
+        this._pressListener && this._targetNode.element.addEventListener( 'MSPointerDown', this._pressHandler );
+        this._releaseListener && this._targetNode.element.addEventListener( 'MSPointerUp', this._releaseHandler );
+      }
+      else {
+
+        // Otherwise, if pointer events are not supported, resort to the touchstart (mobile) and mousedown (mouse-click)
+        // specification. Both listeners are added to support devices that are both touchscreen and on mouse and
+        // keyboard.
+        this._pressListener && this._targetNode.element.addEventListener( 'touchstart', this._pressHandler );
+        this._pressListener && this._targetNode.element.addEventListener( 'mousedown', this._pressHandler );
+
+        this._releaseListener && this._targetNode.element.addEventListener( 'touchend', this._releaseHandler );
+        this._releaseListener && this._targetNode.element.addEventListener( 'mouseup', this._releaseHandler );
+      }
+    }
+
   }
 
   // @public (read-only) {boolean} - indicates if pointer events are supported.
