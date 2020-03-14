@@ -125,7 +125,7 @@ define( require => {
       // Set up the 'resize' event. Use throttling technique to improve performance. See core-internal/Throttle.js.
       window.onresize = Throttle.throttle( () => {
         this._trigger( 'resize', window.innerWidth, window.innerHeight );
-      }, StandardSimQueryParameters.resizeThrottle );
+      }, StandardSimQueryParameters.resizeThrottle, true );
 
       // Immediately invoke the resize event.
       window.onresize();
