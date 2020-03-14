@@ -167,6 +167,45 @@ define( require => {
     }
 
     /**
+     * Gets where an event took place, in the browsers window coordinate frame.
+     * @protected
+     *
+     * @param {Event} event
+     * @returns {Vector}
+     */
+    _getEventWindowLocation( event ) {
+      return new Vector(
+        !!event.clientX ? event.clientX : event.touches[ 0 ].clientX,
+        !!event.clientY ? event.clientY : event.touches[ 0 ].clientY
+      );
+    }
+
+    /**
+     * Gets where an event took place, in the targetNode's parent coordinate frame.
+     * @protected
+     *
+     * @param {Event} event
+     * @returns {Vector}
+     */
+    _getEventParentLocation( event ) {
+
+      // First compute the target Node's window coordinates in pixels.
+      const nodeWindowBounds = this._targetNode.element.getBoundingClientRect();
+
+      // Get where the event took place in the window coordinate frame.
+      const windowPressLocation = this._getEventWindowLocation( event );
+
+      // Using the window press location, subtract the top-left of the Node's window bounds and divide by the
+      // screenViewScale to get the location of the event in the target Node's local coordinate system.
+      const nodeLocalPressLocation = windowPressLocation
+                                      .subtractXY( nodeWindowBounds.x, nodeWindowBounds.y )
+                                      .divide( this._targetNode.screenViewScale );
+
+      // Convert the location to the target Node's parent coordinate system.
+      return this._targetNode.topLeft.add( nodeLocalPressLocation );
+    }
+
+    /**
      * Disposes the press and release listeners from the targetNode's HTML element and releasing references.
      * @public
      *
