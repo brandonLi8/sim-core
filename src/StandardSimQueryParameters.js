@@ -53,7 +53,7 @@ define( require => {
     },
 
     /**
-     * Throttle amount for the main resize layout listener in Sim.js. Throttling works by limiting how often the
+     * Throttle amount for the main resize layout listener in Display.js. Throttling works by limiting how often the
      * resize handler will be called by setting a timeout between calls, giving a more reasonable rate of calls.
      * This query parameter controls the timeout time for the timeout call in between resize calls.
      * Currently, this is intended for internal testing only.

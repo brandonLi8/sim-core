@@ -35,6 +35,7 @@ define( require => {
   const assert = require( 'SIM_CORE/util/assert' );
   const DOMObject = require( 'SIM_CORE/core-internal/DOMObject' );
   const StandardSimQueryParameters = require( 'SIM_CORE/StandardSimQueryParameters' );
+  const Throttle = require( 'SIM_CORE/core-internal/Throttle' );
   const Util = require( 'SIM_CORE/util/Util' );
 
   class Display extends DOMObject {
@@ -120,25 +121,13 @@ define( require => {
       } );
 
       //----------------------------------------------------------------------------------------
-      // Set up the 'resize' event. Use throttling technique to improve performance. Throttling works by limiting how
-      // often the resize handler will be called by setting a timeout between calls, giving a more reasonable rate of
-      // calls. See https://stackoverflow.com/questions/27078285/simple-throttle-in-js.
-      let throttled = false; // flag that indicates if we need to throttle (when the resize is called to often).
-      let backupResizeScheduled = false; // flag that indicates if the resize listener has been called when throttling.
-      window.onresize = () => {
-        if ( !throttled && !backupResizeScheduled ) {
-          throttled = true;
-          this._trigger( 'resize', window.innerWidth, window.innerHeight );
-          setTimeout( () => { throttled = false; }, StandardSimQueryParameters.resizeThrottle );
-        }
-        else if ( throttled && !backupResizeScheduled ) {
-          backupResizeScheduled = true;
-          setTimeout( () => {
-            this._trigger( 'resize', window.innerWidth, window.innerHeight );
-            backupResizeScheduled = false;
-          }, 2 * StandardSimQueryParameters.resizeThrottle );
-        }
-      };
+
+      // Set up the 'resize' event. Use throttling technique to improve performance. See core-internal/Throttle.js.
+      window.onresize = Throttle.throttle( () => {
+        this._trigger( 'resize', window.innerWidth, window.innerHeight );
+      }, StandardSimQueryParameters.resizeThrottle );
+
+      // Immediately invoke the resize event.
       window.onresize();
 
       // Set up the 'frame' event.
