@@ -24,8 +24,10 @@ define( require => {
   // modules
   const assert = require( 'SIM_CORE/util/assert' );
   const DragListener = require( 'SIM_CORE/scenery/events/DragListener' );
+  const HoverListener = require( 'SIM_CORE/scenery/events/HoverListener' );
   const Line = require( 'SIM_CORE/scenery/Line' );
   const Node = require( 'SIM_CORE/scenery/Node' );
+  const PressListener = require( 'SIM_CORE/scenery/events/PressListener' );
   const Property = require( 'SIM_CORE/util/Property' );
   const Range = require( 'SIM_CORE/util/Range' );
   const Rectangle = require( 'SIM_CORE/scenery/Rectangle' );
@@ -99,110 +101,56 @@ define( require => {
         cursor: 'pointer'
       } );
 
-      // @private {Rectangle} - create the slider thumb. See the comment at the top of the file for context.
-      this._thumb = new Rectangle( options.thumbWidth, options.thumbHeight, {
+      // @private {Rectangle} - create the slider thumb Rectangle.
+      this._thumbRectangle = new Rectangle( options.thumbWidth, options.thumbHeight, {
         fill: options.thumbFill,
-        centerY: this._track.centerY,
-        centerX: this._track.centerX,
         stroke: options.thumbStroke,
         strokeWidth: options.thumbStrokeWidth,
-        cornerRadius: options.thumbCornerRadius,
-        cursor: 'pointer'
+        cornerRadius: options.thumbCornerRadius
       } );
 
       // @private {Line} - the line that runs through the center of the thumb, for visual aesthetic purposes.
-      this._thumbCenterLine = new Line( this._thumb.centerX, this._thumb.top + options.thumbCenterLineYMargin,
-                                  this._thumb.centerX, this._thumb.bottom - options.thumbCenterLineYMargin, {
-          stroke: options.thumbCenterLineStroke,
-          cursor: 'pointer'
+      this._thumbCenterLine = new Line(
+          this._thumbRectangle.centerX, this._thumbRectangle.top + options.thumbCenterLineYMargin,
+          this._thumbRectangle.centerX, this._thumbRectangle.bottom - options.thumbCenterLineYMargin, {
+            stroke: options.thumbCenterLineStroke,
+            cursor: 'pointer'
+        } );
+
+      // @private {Node} - create the Slider thumb. See the comment at the top of the file for context.
+      this._thumb = new Node( {
+        center: this._track.center,
+        children: [ this._thumbRectangle, this._thumbCenterLine ],
+        cursor: 'pointer'
       } );
 
       // Set the children, in the correct rendering order.
-      this.setChildren( [ this._track, this._thumb, this._thumbCenterLine ] );
+      this.setChildren( [ this._track, this._thumb ] );
 
-      // //----------------------------------------------------------------------------------------
-      // // Create the Major and Minor Ticks
-      // const tickNodes = [];
-      // const numberOfTicks = ( range.y - range.x ) / options.minorTickIncrement + 1;
-      // const tickSpacing = options.trackSize.x / ( numberOfTicks - 1 );
+      //----------------------------------------------------------------------------------------
 
-      // for ( let i = 0; i < numberOfTicks; i++ ) {
-      //   const isMajor = ( i === 0 || i === numberOfTicks - 1 );
-
-      //   const start = new Vector(
-      //     i * tickSpacing + sliderTrack.x,
-      //     isMajor ? centerY - options.majorTickHeight / 2 : centerY - options.minorTickHeight
-      //   );
-      //   const end = new Vector(
-      //     i * tickSpacing + sliderTrack.x,
-      //     isMajor ? centerY + options.majorTickHeight / 2 : centerY
-      //   );
-
-      //   const tick = new Line( start, end, {
-      //     stroke: !isMajor ? options.minorTickStroke : options.majorTickStroke,
-      //     strokeWidth: !isMajor ? options.minorTickStrokeWidth : options.majorTickStrokeWidth
-      //   } );
-
-      //   tickNodes.push( tick );
-      // }
-
-      // //----------------------------------------------------------------------------------------
-
-
-
-      // //----------------------------------------------------------------------------------------
-      // // Create the Drag Logic
-      // let percentage;
-      // numberProperty.link( number => {
-      //   percentage = ( number - range.x ) / ( range.y - range.x );
-      //   thumb.x = percentage * ( options.trackSize.x ) - options.thumbSize.x / 2 + sliderTrack.x;
-
-      //   thumbLine.start = thumbLine.start.setX( thumb.x + options.thumbSize.x / 2 );
-      //   thumbLine.end = thumbLine.end.setX( thumbLine.start.x );
+      // // @private {DragListener} - create a DragListener for when the user drags the thumb, which moves the slider value
+      // this._thumbDragListener = new DragListener( this._thumb, {
+      //   // drag: this._dragThumb.bind( this )
       // } );
 
-      // const startDrag = () => { options.startDrag && options.startDrag(); };
-      // const dragListener = ( displacement ) => {
-      //   percentage += displacement.x / ( options.trackSize.x + options.majorTickStrokeWidth );
-      //   percentage = Util.clamp( percentage, 0, 1 );
-      //   numberProperty.value = percentage * ( range.y - range.x ) + range.x;
-      // };
-      // const endDrag = () => { options.endDrag && options.endDrag(); };
-
-      // thumb.drag( { start: startDrag, end: endDrag, listener: dragListener } );
-      // thumbLine.drag( { start: startDrag, end: endDrag, listener: dragListener } );
-
-      // //----------------------------------------------------------------------------------------
-      // // Create the logic when the track is clicked
-      // sliderTrack.mousedown = localPosition => {
-      //   percentage = localPosition.x / ( options.trackSize.x + options.majorTickStrokeWidth );
-      //   percentage = Util.clamp( percentage, 0, 1 );
-      //   numberProperty.value = percentage * ( range.y - range.x ) + range.x;
-      // };
-
-      // //----------------------------------------------------------------------------------------
-      // // Create the Labels
-      // const leftLabel = new Text( {
-      //   text: options.leftLabel ? options.leftLabel : `${ range.x }`,
-      //   x: sliderTrack.x,
-      //   y: -10
+      // // @private {PressListener} - create a PressListener for when the user clicks on the track, which moves the slider
+      // this._trackPressListener = new PressListener( this._track, {
+      //   // press: this._pressTrack.bind( this )
       // } );
 
-      // const rightLabel = new Text( {
-      //   text: options.rightLabel ? options.rightLabel : `${ range.y }`,
-      //   x: sliderTrack.x + sliderTrack.width,
-      //   y: -10
+      // // @private {DragListener} - create a DragListener for when the user drags the line of the thumb
+      // this._thumbLineDragListener = new DragListener( this._thumb, {
+      //   // drag: this._dragThumb.bind( this ) // Same functionality as when the thumb is dragged
       // } );
 
-      // //----------------------------------------------------------------------------------------
-      // const sliderContent = new SVGNode( {
+      // @private {HoverListener} - create a HoverListener for when the user hovers of the thumb, which changes the fill
+      this._thumbPressListener = new HoverListener( this._thumb, {
+        enter: () => { this._thumbRectangle.fill = options.thumbFillHighlighted; }, // change the fill when hovered
+        exit: () => { this._thumbRectangle.fill = options.thumbFill; }              // change back when un-hovered
+      } );
 
-      //   children: [ ...tickNodes, sliderTrack, thumb, thumbLine, leftLabel, rightLabel ],
-      //   width: this.width,
-      //   height: this.height
-      // } );
 
-      // this.addChild( sliderContent );
     }
   }
 

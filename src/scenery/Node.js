@@ -108,6 +108,9 @@ define( require => {
       options = { ...defaults, ...options };
       options.style = { ...defaults.style, ...options.style }; // Preserve default styles.
 
+      const children = options.children;
+      options.children = [];
+
       super( options );
 
       //----------------------------------------------------------------------------------------
@@ -128,6 +131,9 @@ define( require => {
       // @public (read-only) {number} - screenViewScale in terms of global units per local unit for converting Scenery
       //                                coordinates to pixels. Referenced as soon as the scale is known in `layout()`
       this.screenViewScale;
+
+      console.log( this.children )
+      children && this.setChildren( children );
       options && this.mutate( options );
     }
 
