@@ -65,6 +65,7 @@ define( require => {
 
       // @private {number} - the corner radii of each corner of the Rectangle.
       this._cornerRadius = options.cornerRadius;
+      super.shape = Rectangle._computeRectangleShape( this.bounds, this._cornerRadius );
     }
 
     /**
