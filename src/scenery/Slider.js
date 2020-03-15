@@ -11,6 +11,7 @@
  * The slider thumb always lies vertically on a horizontal line, called the "slider track," which allows the user to
  * visualize the range of the numeric Property. Additionally, the slider track may have vertical lines that space
  * laterally across the slider track to indicate increments across the numeric Range, if specified in options.
+ * See the `addMajorTick()` and `addMinorTick()` methods.
  *
  * Slider has a vast options API so that you can specify exactly how the slider should look.
  *
@@ -27,7 +28,6 @@ define( require => {
   const Node = require( 'SIM_CORE/scenery/Node' );
   const Range = require( 'SIM_CORE/util/Range' );
   const Rectangle = require( 'SIM_CORE/scenery/Rectangle' );
-  const Text = require( 'SIM_CORE/scenery/Text' );
   const Util = require( 'SIM_CORE/util/Util' );
   const Vector = require( 'SIM_CORE/util/Vector' );
 
@@ -50,45 +50,44 @@ define( require => {
       options = {
 
         // track
-        trackFill: '#646464',
-        trackStroke: 'black',
-        trackStrokeWidth: 1.5,
-        trackHeight: 2,
-        trackWidth: 180,
-        trackCornerRadius: 0,
+        trackFill: '#646464',   // {string} - the fill color the the slider track
+        trackStroke: 'black',   // {string} - the stroke color of the slider track
+        trackStrokeWidth: 1.5,  // {number} - the stroke width of the slider track
+        trackHeight: 2,         // {number} - the height of the track, in scenery coordinates
+        trackWidth: 180,        // {number} - the width of the track, in scenery coordinates
+        trackCornerRadius: 0,   // {number} - the corner radius of the track
 
         // thumb
-        thumbWidth: 12,
-        thumbHeight: 25,
-        thumbFill: '#3291B8',
-        thumbFillHover: '#47CFFF',
-        thumbStroke: 'black',
-        thumbStrokeWidth: 1,
-        thumbCenterLineStroke: 'white',
-        thumbCornerRadius: 3,
+        thumbWidth: 12,                  // {number} - the width of the thumb Rectangle
+        thumbHeight: 25,                 // {number} - the height of the thumb Rectangle
+        thumbFill: '#3291B8',            // {string} - the fill color of the thumb Rectangle
+        thumbFillHighlighted: '#47CFFF', // {string} - the fill color of the thumb when it is highlighted or hovered
+        thumbStroke: 'black',            // {string} - the stroke color of the thumb Rectangle
+        thumbStrokeWidth: 1,             // {number} - the stroke width of the line that runs through the thumb
+        thumbCenterLineStroke: 'white',  // {string} - the stroke color of the line that runs through the thumb
+        thumbCornerRadius: 3,            // {number} - the corner radius of the thumb Rectangle
 
         // ticks
-        includeMajorTicks: true,
-        minorTickIncrement: null, // must be smaller and the range's width must be exactly divisible by this
-        majorTickLength: 35,
-        majorTickStroke: 'black',
-        majorTickStrokeWidth: 1.3,
-        minorTickLength: 8,
-        minorTickStroke: '#323232',
-        minorTickStrokeWidth: 1,
+        majorTickHeight: 35,        // {number} - the height of the major tick lines that lie along the track
+        majorTickStroke: 'black',   // {string} - the stroke color of the major tick lines that lie along the track
+        majorTickStrokeWidth: 1.3,  // {number} - the stroke width the major tick lines that lie along the track
+        minorTickHeight: 8,         // {number} - the height of the minor tick lines that lie along the track
+        minorTickStroke: '#323232', // {string} - the stroke color of the minor tick lines that lie along the track
+        minorTickStrokeWidth: 1,    // {number} - the stroke width of the minor tick lines that lie along the track
 
         // other
-        startDrag: null, // called when a drag sequence starts
-        endDrag: null, // called when a drag sequence ends
-        rightLabel: null, // overrides
-        leftLabel: null,  // overrides
+        startDrag: null,  // {function} - if provided, this will be called when the slider drag sequence starts.
+        endDrag: null,    // {function} - if provided, this will be called when the slider drag sequence ends.
+        constrain: null,  // {function(number):number} - if provided, this will called before the numberProperty is set
+                          //                             to constrain the value. The return value will be the new value.
 
+        // Rewrite options so that it overrides the defaults.
         ...options
       };
 
       super( options );
 
-      this.height = Math.max( options.majorTickLength, 2 * options.minorTickLength, options.thumbSize.y );
+      this.height = Math.max( options.majorTickHeight, 2 * options.minorTickHeight, options.thumbSize.y );
       this.width = options.trackSize.x + options.thumbSize.x + 2 * options.thumbStrokeWidth;
       const centerY = this.height / 2;
       const centerX = this.width / 2;
@@ -120,11 +119,11 @@ define( require => {
 
         const start = new Vector(
           i * tickSpacing + sliderTrack.x,
-          isMajor ? centerY - options.majorTickLength / 2 : centerY - options.minorTickLength
+          isMajor ? centerY - options.majorTickHeight / 2 : centerY - options.minorTickHeight
         );
         const end = new Vector(
           i * tickSpacing + sliderTrack.x,
-          isMajor ? centerY + options.majorTickLength / 2 : centerY
+          isMajor ? centerY + options.majorTickHeight / 2 : centerY
         );
 
         const tick = new Line( start, end, {
