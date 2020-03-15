@@ -25,38 +25,43 @@ define( require => {
   const DragListener = require( 'SIM_CORE/scenery/events/DragListener' );
   const Line = require( 'SIM_CORE/scenery/Line' );
   const Node = require( 'SIM_CORE/scenery/Node' );
+  const Range = require( 'SIM_CORE/util/Range' );
   const Rectangle = require( 'SIM_CORE/scenery/Rectangle' );
   const Text = require( 'SIM_CORE/scenery/Text' );
   const Util = require( 'SIM_CORE/util/Util' );
   const Vector = require( 'SIM_CORE/util/Vector' );
 
-  class SliderNode extends Node {
+  class Slider extends Node {
 
     /**
-     * @param {Vector} range
-     * @param {Property.<number>} numberProperty - must be already inside the range
-     * @param {Object} [options] - Various key-value pairs that control the appearance and behavior. Subclasses
-     *                             may have different options for their API. See the code where the options are set in
-     *                             the early portion of the constructor for details.
+     * @param {Range} range - the numeric range to constrain the setting of numberProperty
+     * @param {Property.<number>} numberProperty - the number property to change when the slider thumb is dragged.
+     *                                             The current value must be already inside the passed-in range.
+     * @param {Object} [options] - Various key-value pairs that control the appearance and behavior. See the code
+     *                             where the options are set in the early portion of the constructor for details.
      */
     constructor( range, numberProperty, options ) {
-
-      assert( range instanceof Vector, `invalid range: ${ range }` );
+      assert( range instanceof Range, `invalid range: ${ range }` );
       assert( !options || Object.getPrototypeOf( options ) === Object.prototype, `invalid options: ${ options }` );
+      assert( !options || !options.style, 'Slider sets attributes' );
+      assert( numberProperty instanceof Property && typeof numberProperty.value === 'number',
+        `invalid numberProperty: ${ numberProperty }` );
 
       options = {
 
         // track
-        trackFill: 'rgb( 100, 100, 100 )',
+        trackFill: '#646464',
         trackStroke: 'black',
         trackStrokeWidth: 1.5,
-        trackSize: new Vector( 180, 2 ),
+        trackHeight: 2,
+        trackWidth: 180,
         trackCornerRadius: 0,
 
         // thumb
-        thumbSize: new Vector( 12, 25 ),
-        thumbFill: 'rgb( 50, 145, 184) ',
-        thumbFillHover: 'rgb( 71, 207, 255 )',
+        thumbWidth: 12,
+        thumbHeight: 25,
+        thumbFill: '#3291B8',
+        thumbFillHover: '#47CFFF',
         thumbStroke: 'black',
         thumbStrokeWidth: 1,
         thumbCenterLineStroke: 'white',
@@ -69,7 +74,7 @@ define( require => {
         majorTickStroke: 'black',
         majorTickStrokeWidth: 1.3,
         minorTickLength: 8,
-        minorTickStroke: 'rgb( 50, 50, 50 )',
+        minorTickStroke: '#323232',
         minorTickStrokeWidth: 1,
 
         // other
@@ -214,5 +219,5 @@ define( require => {
     }
   }
 
-  return SliderNode;
+  return Slider;
 } );
