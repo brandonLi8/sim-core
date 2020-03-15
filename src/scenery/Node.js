@@ -89,7 +89,7 @@ define( require => {
         topRight: null,     // {Vector} - The upper-right corner of this Node's bounds.
         centerLeft: null,   // {Vector} - The left-center of this Node's bounds.
         center: null,       // {Vector} - The center of this Node's bounds.
-        centerRight: null,  // {Vector} - The center-right of this Node's bounds. See seLocation() for more doc.
+        centerRight: null,  // {Vector} - The center-right of this Node's bounds. See setLocation() for more doc.
         bottomLeft: null,   // {Vector} - The bottom-left of this Node's bounds.
         bottomCenter: null, // {Vector} - The middle center of this Node's bounds.
         bottomRight: null,  // {Vector} - The bottom right of this Node's bounds.
