@@ -65,8 +65,9 @@ define( require => {
         thumbFillHighlighted: '#47CFFF', // {string} - the fill color of the thumb when it is highlighted or hovered
         thumbStroke: 'black',            // {string} - the stroke color of the thumb Rectangle
         thumbStrokeWidth: 1,             // {number} - the stroke width of the line that runs through the thumb
-        thumbCenterLineStroke: 'white',  // {string} - the stroke color of the line that runs through the thumb
-        thumbCornerRadius: 3,            // {number} - the corner radius of the thumb Rectangle
+        thumbCenterLineStroke: '#333',   // {string} - the stroke color of the line that runs through the thumb
+        thumbCenterLineYMargin: 3,       // {number} - the vertical margin from the top of the thumb for the center line
+        thumbCornerRadius: 2.5,          // {number} - the corner radius of the thumb Rectangle
 
         // ticks
         majorTickHeight: 35,        // {number} - the height of the major tick lines that lie along the track
@@ -109,9 +110,15 @@ define( require => {
         cursor: 'pointer'
       } );
 
+      // @private {Line} - the line that runs through the center of the thumb, for visual aesthetic purposes.
+      this._thumbCenterLine = new Line( this._thumb.centerX, this._thumb.top + options.thumbCenterLineYMargin,
+                                  this._thumb.centerX, this._thumb.bottom - options.thumbCenterLineYMargin, {
+          stroke: options.thumbCenterLineStroke,
+          cursor: 'pointer'
+      } );
 
-
-      this.setChildren( [ this._track, this._thumb ] );
+      // Set the children, in the correct rendering order.
+      this.setChildren( [ this._track, this._thumb, this._thumbCenterLine ] );
 
       // //----------------------------------------------------------------------------------------
       // // Create the Major and Minor Ticks
@@ -142,18 +149,6 @@ define( require => {
       // //----------------------------------------------------------------------------------------
 
 
-      // //----------------------------------------------------------------------------------------
-      // // Create a line in the center
-      // const thumbLineHeight = options.thumbSize.y * 0.75;
-      // const thumbLine = new Line(
-      //   new Vector( 0, centerY - thumbLineHeight / 2 ),
-      //   new Vector( 0, centerY + thumbLineHeight / 2 ), {
-      //     stroke: options.thumbCenterLineStroke,
-      //     strokeWidth: options.thumbSize.x * 0.08,
-      //     style: {
-      //       cursor: 'pointer'
-      //     }
-      //   } );
 
       // //----------------------------------------------------------------------------------------
       // // Create the Drag Logic
