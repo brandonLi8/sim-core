@@ -115,33 +115,19 @@ define( require => {
     static finishLoadingScreens() {
       // Enable the red dev border around ScreenViews if the ?dev query parameter was provided.
       if ( StandardSimQueryParameters.dev ) { ScreenView.enableDevBorder(); }
-      // const Circle = require( 'SIM_CORE/scenery/Circle' );
-      // const DragListener = require( 'SIM_CORE/scenery/events/DragListener' );
-      // const Node = require( 'SIM_CORE/scenery/Node' );
-      // const p = new Node( {
-      //   left: 100,
-      //   top: 100
-      // })
-      // const c = new Circle( 100, {
-      //   left: 0,
-      //   top: 0,
-      //   fill: 'green',
+      const Slider = require( 'SIM_CORE/scenery/Slider' );
+      const Property = require( 'SIM_CORE/util/Property' );
+      const Node = require( 'SIM_CORE/scenery/Node' );
+      const Rectangle = require( 'SIM_CORE/scenery/Rectangle' );
 
-      // } );
-      // let i = 0;
-      // const h = new DragListener( c, {
-      //   start: ( location ) => {
-      //     console.log( 'start: ', location )
-      //   },
-      //   end: () => {
-      //     console.log( 'end' )
-      //   },
-      //   drag: ( displacement, location ) => {
-      //     console.log( 'drag: ', displacement, location )
-      //     c.center = location;
-      //   }
-      // } );
-      // this.screens[ 0 ].view.addChild( p.addChild( c ) );
+      const Range = require( 'SIM_CORE/util/Range' );
+
+      const slider = new Slider( new Range( 0, 10 ), new Property( 4 ), {
+        center: this.screens[ 0 ].view.viewBounds.center
+      } );
+
+
+      this.screens[ 0 ].view.addChild( slider );
 
       this.display.on( 'resize', ( width, height ) => {
 
