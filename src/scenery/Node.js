@@ -72,6 +72,7 @@ define( require => {
         type: 'g',
 
         // Options specific to Node
+        children: [],       // {Node[]} - ordered array of the children. See `set children()` (in super-class) for doc.
         cursor: null,       // {string} - Alias of the CSS cursor of the Node. See set cursor() for doc.
         visible: true,      // {boolean} - Indicates if the Node is visible. See set visible() for more doc.
         opacity: 1,         // {number} - Alias of the CSS opacity of the Node. See set opacity() for more doc.
@@ -108,9 +109,6 @@ define( require => {
       options = { ...defaults, ...options };
       options.style = { ...defaults.style, ...options.style }; // Preserve default styles.
 
-      const children = options.children;
-      options.children = [];
-
       super( options );
 
       //----------------------------------------------------------------------------------------
@@ -132,8 +130,6 @@ define( require => {
       //                                coordinates to pixels. Referenced as soon as the scale is known in `layout()`
       this.screenViewScale;
 
-      console.log( this.children )
-      children && this.setChildren( children );
       options && this.mutate( options );
     }
 
@@ -659,7 +655,7 @@ define( require => {
 
   // @protected {string[]} - setter names used in Node.mutate(), in the order that the setters are called.
   //                         The order is important! Don't change this without knowing the implications.
-  Node.MUTATOR_KEYS = [ 'opacity', 'cursor', 'visible', 'rotation', 'width', 'height', 'scale',
+  Node.MUTATOR_KEYS = [ 'children', 'opacity', 'cursor', 'visible', 'rotation', 'width', 'height', 'scale',
                         'maxWidth', 'maxHeight', 'translation', 'topLeft', 'topCenter', 'topRight',
                         'centerLeft', 'center', 'centerRight', 'bottomLeft', 'bottomCenter',
                         'bottomRight', 'left', 'right', 'centerX', 'top', 'bottom', 'centerY' ];

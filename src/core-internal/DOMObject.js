@@ -63,9 +63,6 @@ define( require => {
         // {string|null} - if not null, adds a text string that the object displays. See `setText()` for documentation.
         text: null,
 
-        // {DOMObject[]} - ordered array of the children of the DOM object. See `setChildren()` for documentation.
-        children: [],
-
         // Attributes
         id: null,     // {string|null} adds the id attribute for the object. See `setID()` for documentation.
         class: null,  // {string|null} adds the class attribute for the object. See `setClass()` for documentation.
@@ -123,7 +120,6 @@ define( require => {
       this._text && this.setText( this._text );   // validates options.text and sets the text.
       this.setAttribute( 'src', this._src );      // validates options.src and sets the src, if this._type is a image.
       this.setAttribute( 'href', this._href );    // validates options.href and sets the href, if this._type is a link.
-      this.setChildren( options.children );       // validates options.children and sets the children.
     }
 
     //========================================================================================
