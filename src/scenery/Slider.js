@@ -1,8 +1,18 @@
 // Copyright © 2019-2020 Brandon Li. All rights reserved.
-// NOTE: THIS DOESNT WORK ATM!!!
 
 /**
- * A sim-specific node for Sliders.
+ * A Slider Node that displays a numeric slider, with slider thumb, track, and tick customizability.
+ *
+ * A slider is a simulation component which, most notably, contains a so-called "slider thumb." The slider thumb is a
+ * rounded Rectangle that can be dragged laterally to change the numeric value of a Property, within a provided Range.
+ * The slider moves left-to-right, where dragging the thumb all the way to the left sets the Property to the minimum
+ * value in the range and, likewise, dragging the thumb to the far right sets the number Property to the max value in.
+ *
+ * The slider thumb always lies vertically on a horizontal line, called the "slider track," which allows the user to
+ * visualize the range of the numeric Property. Additionally, the slider track may have vertical lines that space
+ * laterally across the slider track to indicate increments across the numeric Range, if specified in options.
+ *
+ * Slider has a vast options API so that you can specify exactly how the slider should look.
  *
  * @author Brandon Li <brandon.li820@gmail.com>
  */
@@ -12,14 +22,15 @@ define( require => {
 
   // modules
   const assert = require( 'SIM_CORE/util/assert' );
-  const LineNode = require( 'SIM_CORE/scenery/LineNode' );
+  const DragListener = require( 'SIM_CORE/scenery/events/DragListener' );
+  const Line = require( 'SIM_CORE/scenery/Line' );
+  const Node = require( 'SIM_CORE/scenery/Node' );
   const Rectangle = require( 'SIM_CORE/scenery/Rectangle' );
-  const SVGNode = require( 'SIM_CORE/scenery/SVGNode' );
   const Text = require( 'SIM_CORE/scenery/Text' );
   const Util = require( 'SIM_CORE/util/Util' );
   const Vector = require( 'SIM_CORE/util/Vector' );
 
-  class SliderNode extends SVGNode {
+  class SliderNode extends Node {
 
     /**
      * @param {Vector} range
@@ -111,7 +122,7 @@ define( require => {
           isMajor ? centerY + options.majorTickLength / 2 : centerY
         );
 
-        const tick = new LineNode( start, end, {
+        const tick = new Line( start, end, {
           stroke: !isMajor ? options.minorTickStroke : options.majorTickStroke,
           strokeWidth: !isMajor ? options.minorTickStrokeWidth : options.majorTickStrokeWidth
         } );
@@ -137,7 +148,7 @@ define( require => {
       //----------------------------------------------------------------------------------------
       // Create a line in the center
       const thumbLineHeight = options.thumbSize.y * 0.75;
-      const thumbLine = new LineNode(
+      const thumbLine = new Line(
         new Vector( 0, centerY - thumbLineHeight / 2 ),
         new Vector( 0, centerY + thumbLineHeight / 2 ), {
           stroke: options.thumbCenterLineStroke,
