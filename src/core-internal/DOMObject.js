@@ -322,7 +322,7 @@ define( require => {
 
       if ( this._children[ index ] !== child ) {
         // Use element.insertBefore. See https://developer.mozilla.org/en-US/docs/Web/API/Node/insertBefore
-        const referenceNode = index < this._children.length - 1 ? this._children[ index + 1 ].element : null;
+        const referenceNode = index < this._children.length - 1 ? this._children[ index ].element : null;
         this.element.insertBefore( child.element, referenceNode );
         Util.arrayRemove( this._children, child );
         this._children.splice( index, 0, child ); // inserts child at index

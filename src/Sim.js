@@ -128,8 +128,8 @@ define( require => {
         constrain: value => Util.toFixed( value, 2 )
       } );
       slider.addMajorTick( 0, new Text( 4, { fontSize: 14 }) );
-      slider.addMinorTick( 2, new Text( 4, { fontSize: 14 }) );
-      slider.addMinorTick( 4, new Text( 4, { fontSize: 14 }) );
+      slider.addMajorTick( 2, new Text( 4, { fontSize: 14 }) );
+      slider.addMajorTick( 4, new Text( 4, { fontSize: 14 }) );
       this.screens[ 0 ].view.addChild( slider );
 
 
