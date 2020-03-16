@@ -615,8 +615,6 @@ define( require => {
       // amount (which will be negative) so that all children have positive parent bounds.
       if ( negativeChildrenBounds ) {
         this.children.forEach( child => {
-          child.bounds.shift( childBounds.minX < 0 ? -childBounds.minX : 0, childBounds.minY < 0 ? -childBounds.minY : 0 );
-
           // Shifts only strictly apply on negative values. Otherwise, no shift.
           child.bounds.shift( Math.max( -childBounds.minX, 0 ), Math.max( -childBounds.minY, 0 ) );
         } );
