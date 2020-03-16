@@ -92,7 +92,6 @@ define( require => {
 
       // @private {*} - see options declaration for documentation. Referenced for use in our methods.
       this._constrain = options.constrain;
-      this._thumbFillHighlighted = options.thumbFillHighlighted;
       this._majorTickHeight = options.majorTickHeight;
       this._majorTickStroke = options.majorTickStroke;
       this._majorTickStrokeWidth = options.majorTickStrokeWidth;
@@ -146,7 +145,10 @@ define( require => {
 
       // @private {DragListener} - create a DragListener for when the user drags the thumb, which moves the slider value
       this._thumbDragListener = new DragListener( this._thumb, {
-        drag: ( displacement, location ) => { this._setThumbPosition( location ); },
+        drag: ( displacement, location ) => {
+          this._thumbRectangle.fill = options.thumbFillHighlighted;
+          this._setThumbPosition( location );
+        },
         start: options.startDrag,
         end: () => {
           this._thumbRectangle.fill = options.thumbFill; // change back when drag sequence ends
@@ -219,7 +221,7 @@ define( require => {
         labelX, isMajor ? this._track.top - this._majorTickHeight / 2: this._track.top,
         labelX, isMajor ? this._track.top + this._majorTickHeight / 2 : this._track.top - this._minorTickHeight, {
           stroke: isMajor ? this._majorTickStroke : this._minorTickStroke,
-          strokeWidth: isMajor ? this._majorTickWidth : this._minorTickWidth
+          strokeWidth: isMajor ? this._majorTickStrokeWidth : this._minorTickStrokeWidth
       } );
       this.addChild( tick );
 
