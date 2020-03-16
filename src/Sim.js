@@ -123,7 +123,8 @@ define( require => {
       const Range = require( 'SIM_CORE/util/Range' );
 
       const slider = new Slider( new Range( 0, 10 ), new Property( 4 ), {
-        center: this.screens[ 0 ].view.viewBounds.center
+        center: this.screens[ 0 ].view.viewBounds.center,
+        constrain: value => Util.toFixed( value, 2 )
       } );
 
 

@@ -53,18 +53,18 @@ define( require => {
       options = {
 
         // track
-        trackFill: '#BCBCBC',   // {string} - the fill color the the slider track
-        trackStroke: 'black',   // {string} - the stroke color of the slider track
-        trackStrokeWidth: 1.5,  // {number} - the stroke width of the slider track
-        trackHeight: 3.5,       // {number} - the height of the track, in scenery coordinates
-        trackWidth: 180,        // {number} - the width of the track, in scenery coordinates
-        trackCornerRadius: 0,   // {number} - the corner radius of the track
+        trackFill: '#BCBCBC',  // {string} - the fill color the the slider track
+        trackStroke: 'black',  // {string} - the stroke color of the slider track
+        trackStrokeWidth: 1,   // {number} - the stroke width of the slider track
+        trackHeight: 3,        // {number} - the height of the track, in scenery coordinates
+        trackWidth: 180,       // {number} - the width of the track, in scenery coordinates
+        trackCornerRadius: 0,  // {number} - the corner radius of the track
 
         // thumb
         thumbWidth: 12,                  // {number} - the width of the thumb Rectangle
         thumbHeight: 25,                 // {number} - the height of the thumb Rectangle
-        thumbFill: '#89FF53',            // {string} - the fill color of the thumb Rectangle
-        thumbFillHighlighted: '#47CFFF', // {string} - the fill color of the thumb when it is highlighted or hovered
+        thumbFill: '#99FF69',            // {string} - the fill color of the thumb Rectangle
+        thumbFillHighlighted: '#CCF199', // {string} - the fill color of the thumb when it is highlighted or hovered
         thumbStroke: 'black',            // {string} - the stroke color of the thumb Rectangle
         thumbStrokeWidth: 1,             // {number} - the stroke width of the line that runs through the thumb
         thumbCenterLineStroke: '#333',   // {string} - the stroke color of the line that runs through the thumb
@@ -90,6 +90,21 @@ define( require => {
       };
       super( options );
 
+      // @private {*} - see options declaration for documentation. Referenced for use in our methods.
+      this._constrain = options.constrain;
+      this._thumbFillHighlighted = options.thumbFillHighlighted;
+      this._majorTickHeight = options.majorTickHeight;
+      this._majorTickStroke = options.majorTickStroke;
+      this._majorTickStrokeWidth = options.majorTickStrokeWidth;
+      this._minorTickHeight = options.minorTickHeight;
+      this._minorTickStroke = options.minorTickStroke;
+      this._minorTickStrokeWidth = options.minorTickStrokeWidth;
+      this._range = range;
+      this._numberProperty = numberProperty;
+
+      // @public (read-only) {number} - the percentage that that the number property value has passed the range.
+      this._percentage;
+
       //----------------------------------------------------------------------------------------
 
       // @private {Rectangle} - create the slider Track. See the comment at the top of the file for context.
@@ -113,8 +128,7 @@ define( require => {
       this._thumbCenterLine = new Line(
           this._thumbRectangle.centerX, this._thumbRectangle.top + options.thumbCenterLineYMargin,
           this._thumbRectangle.centerX, this._thumbRectangle.bottom - options.thumbCenterLineYMargin, {
-            stroke: options.thumbCenterLineStroke,
-            cursor: 'pointer'
+            stroke: options.thumbCenterLineStroke
         } );
 
       // @private {Node} - create the Slider thumb. See the comment at the top of the file for context.
@@ -129,28 +143,66 @@ define( require => {
 
       //----------------------------------------------------------------------------------------
 
-      // // @private {DragListener} - create a DragListener for when the user drags the thumb, which moves the slider value
-      // this._thumbDragListener = new DragListener( this._thumb, {
-      //   // drag: this._dragThumb.bind( this )
-      // } );
+      // @private {DragListener} - create a DragListener for when the user drags the thumb, which moves the slider value
+      this._thumbDragListener = new DragListener( this._thumb, {
+        drag: this._dragThumb.bind( this ),
+        start: () => {
+          this.h = ( numberProperty.value - this._range.min ) / this._range.length;
+          options.startDrag && options.startDrag();
+        },
+        end: () => {
+          this._thumbRectangle.fill = options.thumbFill; // change back when drag sequence ends
+          options.endDrag && options.endDrag();
+        }
+      } );
 
-      // // @private {PressListener} - create a PressListener for when the user clicks on the track, which moves the slider
-      // this._trackPressListener = new PressListener( this._track, {
-      //   // press: this._pressTrack.bind( this )
-      // } );
+      // @private {PressListener} - create a PressListener for when the user clicks on the track, which moves the slider
+      this._trackPressListener = new PressListener( this._track, {
+        press: this._pressTrack.bind( this )
+      } );
 
-      // // @private {DragListener} - create a DragListener for when the user drags the line of the thumb
-      // this._thumbLineDragListener = new DragListener( this._thumb, {
-      //   // drag: this._dragThumb.bind( this ) // Same functionality as when the thumb is dragged
-      // } );
-
-      // @private {HoverListener} - create a HoverListener for when the user hovers of the thumb, which changes the fill
+      // @private {HoverListener} - create a HoverListener for when the user hovers over the thumb, changing the fill
       this._thumbPressListener = new HoverListener( this._thumb, {
         enter: () => { this._thumbRectangle.fill = options.thumbFillHighlighted; }, // change the fill when hovered
         exit: () => { this._thumbRectangle.fill = options.thumbFill; }              // change back when un-hovered
       } );
 
+      numberProperty.link( number => {
+        this._percentage = ( number - this._range.min ) / this._range.length;
+        console.log( number)
+        this._thumb.centerX = this._percentage * this._track.width + this._track.left;
+      } );
+    }
 
+    /**
+     * Called every time the Slider thumb is dragged to a different location, which elicits a change in the value of the
+     * Slider. Will constrain the drag-area to keep the thumb on-top of the Slider.
+     * @public
+     *
+     * Will also call the constrain function provided in the options object in the constructor.
+     * @param {Vector} displacement - the displacement of the slider thumb
+     */
+    _dragThumb( displacement, location ) {
+      this._pressTrack( location );
+    }
+
+    /**
+     * Called every time the Slider track is pressed, which changes the slider to a different value.
+     * @public
+     *
+     * Will also call the constrain function provided in the options object in the constructor.
+     *
+     * @param {Vector} location - the location of the press-down
+     */
+    _pressTrack( location ) {
+
+      // Convert the press-location to the thumb's local coordinates.
+      const localDragLocation = location.subtract( this._track.topLeft ).subtractXY( 2 * this._track.strokeWidth, 0 );
+      const percentage = Util.clamp( localDragLocation.x / this._track.width, 0, 1 );
+      const newValue = percentage * this._range.length + this._range.min;
+
+      // Update the number Property, which will change the location of the slider thumb.
+      this._numberProperty.value = this._constrain ? this._constrain( newValue ) : newValue;
     }
   }
 
