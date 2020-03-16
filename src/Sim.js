@@ -123,34 +123,15 @@ define( require => {
 
       const Range = require( 'SIM_CORE/util/Range' );
 
-      const slider = new Slider( new Range( 0, 10 ), new Property( 4 ), {
+      let slider = new Slider( new Range( 0, 10 ), new Property( 4 ), {
         center: this.screens[ 0 ].view.viewBounds.center,
         constrain: value => Util.toFixed( value, 2 )
       } );
-
-
-      // slider.addMinorTick( 2 );
-      // slider.addMajorTick( 0, new Text( 4, { fontSize: 14 }) );
-      // slider.addMinorTick( 2, new Text( 4, { fontSize: 14 }) );
-      // slider.addMinorTick( 3, new Text( 4, { fontSize: 14 }) );
-      // slider.addMinorTick( 4, new Text( 4, { fontSize: 14 }) );
-      // slider.addMinorTick( 5, new Text( 4, { fontSize: 14 }) );
-      // slider.addMinorTick( 6, new Text( 4, { fontSize: 14 }) );
-      // slider.addMinorTick( 7 );
-
-      // slider.addMajorTick( 9 );
-      // slider.addMajorTick( 5 );
-      // slider.center = this.screens[ 0 ].view.viewBounds.center;
-      //
-
-      let i = 0;
-      window.addEventListener( 'mousedown', () => {
-              slider.addMinorTick( i, new Text( i, { fontSize: 14} ) );
-        i ++;
-        slider.center = this.screens[ 0 ].view.viewBounds.center
-        slider.layout( slider.screenViewScale );
-      })
+      slider.addMajorTick( 0, new Text( 4, { fontSize: 14 }) );
+      slider.addMinorTick( 2, new Text( 4, { fontSize: 14 }) );
+      slider.addMinorTick( 4, new Text( 4, { fontSize: 14 }) );
       this.screens[ 0 ].view.addChild( slider );
+
 
       this.display.on( 'resize', ( width, height ) => {
 

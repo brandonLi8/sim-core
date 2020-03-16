@@ -60,7 +60,10 @@ define( require => {
      */
     addChild( child ) {
       // assert( child instanceof ( require( 'SIM_CORE/scenery/Node' ) ), `invalid child: ${ child }` );
-      return super.addChild( child );
+      super.addChild( child );
+
+      child.layout( this._scale );
+      return this;
     }
 
     /**
@@ -75,7 +78,7 @@ define( require => {
       const scale = Math.min( width / this.viewBounds.width, height / this.viewBounds.height );
       const screenViewHeight = scale * this.viewBounds.height;
       const screenViewWidth = scale * this.viewBounds.width;
-
+      this._scale = scale;
       this.style.height = `${ screenViewHeight }px`;
       this.style.width = `${ screenViewWidth }px`;
       const layoutChildren = ( children ) => {

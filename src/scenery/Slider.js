@@ -169,6 +169,19 @@ define( require => {
     }
 
     /**
+     * @override
+     * Disposes the Slider and its listeners so that it can be garbage collected.
+     * @public
+     */
+    dispose() {
+      this._numberProperty.unlink( this._numberPropertyObserver );
+      this._thumbPressListener.dispose();
+      this._trackPressListener.dispose();
+      this._thumbDragListener.dispose();
+      super.dispose();
+    }
+
+    /**
      * Adds a major tick mark, which crosses vertically through the track.
      * @public
      *
@@ -195,6 +208,9 @@ define( require => {
      * @param {boolean} isMajor - whether or not the tick is a major or minor tick.
      */
     _addTick( value, label, isMajor ) {
+      assert( typeof value === 'number' && this._range.contains( value ), `invalid value: ${ value }` );
+      assert( label instanceof Node, `invalid label: ${ label }` );
+
       // Calculate the x-coordinate of the label, in scenery coordinates.
       const labelX = ( value - this._range.min ) / this._range.length * this._track.width + this._track.left;
 

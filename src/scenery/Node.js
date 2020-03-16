@@ -565,7 +565,6 @@ define( require => {
 
       this._recomputeAncestorBounds(); // Update this Node's bounds after removing this child.
       this.layout( this.screenViewScale );
-      child.layout( this.screenViewScale );
       return this;
     }
 
