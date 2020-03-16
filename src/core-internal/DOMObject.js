@@ -306,6 +306,53 @@ define( require => {
     }
 
     /**
+     * Moves a child DOMObject to a provided index and adjusts the rest of our children list. Index must be less than the
+     * number of children that this DOMObject has.
+     * @public
+     *
+     * @param {DOMObject} child - the child DOMObject to move
+     * @param {number} index - the desired index (into the children array) of the child.
+     * @returns {DOMObject} - Returns 'this' reference, for chaining
+     */
+    moveChildToIndex( child, index ) {
+      assert( this.hasChild( child ), `invalid child: ${ child }` );
+      assert( typeof index === 'number' && index % 1 === 0 && index >= 0 && index < this._children.length,
+        `invalid index: ${ index }` );
+
+      if ( this._children[ index ] !== child ) {
+        // Use element.insertBefore. See https://developer.mozilla.org/en-US/docs/Web/API/Node/insertBefore
+        this.element.insertBefore( child, index < this._children.length - 1 ? this._children[ index ] : null );
+        Util.arrayRemove( this._children, child );
+        this._children.splice( index, 0, child ); // inserts child at index
+      }
+      return this;
+    }
+
+    /**
+     * Moves this DOMObject to the front of the view-port by moving it to the end of its parent's children array.
+     * @public
+     *
+     * @returns {DOMObject} - Returns 'this' reference, for chaining
+     */
+    moveToFront() {
+      if ( this._parent ) {
+        return this._parent.moveChildToIndex( this, this._parent.children.length - 1 );
+      }
+    }
+
+    /**
+     * Moves this DOMObject to the back of the view-port by moving it to the start of its parent's children array.
+     * @public
+     *
+     * @returns {DOMObject} - Returns 'this' reference, for chaining
+     */
+    moveToBack() {
+      if ( this._parent ) {
+        return this._parent.moveChildToIndex( this, 0 );
+      }
+    }
+
+    /**
      * Adds onto this DOMObject's CSS style. See DOMObject.addElementStyles for more documentation.
      * @public
      *
