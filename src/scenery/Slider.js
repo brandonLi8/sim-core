@@ -78,6 +78,7 @@ define( require => {
         minorTickHeight: 8,         // {number} - the height of the minor tick lines that lie along the track
         minorTickStroke: '#323232', // {string} - the stroke color of the minor tick lines that lie along the track
         minorTickStrokeWidth: 1,    // {number} - the stroke width of the minor tick lines that lie along the track
+        tickLabelSpacing: 6,        // {number} - the spacing between label Nodes and tick Lines
 
         // other
         startDrag: null,  // {function} - if provided, this will be called when the slider drag sequence starts.
@@ -99,6 +100,7 @@ define( require => {
       this._minorTickHeight = options.minorTickHeight;
       this._minorTickStroke = options.minorTickStroke;
       this._minorTickStrokeWidth = options.minorTickStrokeWidth;
+      this._tickLabelSpacing = options.tickLabelSpacing;
       this._range = range;
       this._numberProperty = numberProperty;
 
@@ -128,6 +130,7 @@ define( require => {
             stroke: options.thumbCenterLineStroke
         } );
 
+
       // @private {Node} - create the Slider thumb. See the comment at the top of the file for context.
       this._thumb = new Node( {
         center: this._track.center,
@@ -135,8 +138,11 @@ define( require => {
         cursor: 'pointer'
       } );
 
+
       // Set the children, in the correct rendering order.
       this.setChildren( [ this._track, this._thumb ] );
+      this.mutate( options );
+      console.log( this._thumb.bounds.toString(), this._computeMinChildBounds() ) // should return (0, 0 )
 
       //----------------------------------------------------------------------------------------
 
@@ -159,9 +165,70 @@ define( require => {
         exit: () => { this._thumbRectangle.fill = options.thumbFill; }              // change back when un-hovered
       } );
 
-      // @private {function} - observer of the numberProperty
-      this._numberPropertyObserver = this._updateSlider.bind( this );
-      numberProperty.link(  this._numberPropertyObserver );
+      // // @private {function} - observer of the numberProperty
+      // this._numberPropertyObserver = this._updateSlider.bind( this );
+      // numberProperty.link(  this._numberPropertyObserver );
+      // // console.log( this.bounds.toString())
+
+      // At this point, call mutate to ensure validity of location setters in options.
+      // this.mutate( options );
+            // console.log( 'erherherh', this.bounds.toString())
+
+    }
+
+    /**
+     * Adds a major tick mark, which crosses vertically through the track.
+     * @public
+     *
+     * @param {number} value - the numeric value the tick represents along the range of the slider.
+     * @param {Node} [label] - optional label Node (usually a Text Node), placed above the Node.
+     */
+    addMajorTick( value, label ) { this._addTick( value, label, true ); }
+
+    /**
+     * Adds a minor tick mark, which starts from the top of the track and extrudes upwards.
+     * @public
+     *
+     * @param {number} value - the numeric value the tick represents along the range of the slider.
+     * @param {Node} [label] - optional label Node (usually a Text Node), placed above the Node.
+     */
+    addMinorTick( value, label ) { this._addTick( value, label, false ); }
+
+    /*
+     * Adds a tick mark above the track. To be used internally ONLY.
+     * @private
+     *
+     * @param {number} value - the numeric value the tick represents along the range of the slider.
+     * @param {Node} [label] - optional label Node (usually a Text Node), placed above the Node.
+     * @param {boolean} isMajor - whether or not the tick is a major or minor tick.
+     */
+    _addTick( value, label, isMajor ) {
+      // Calculate the x-coordinate of the label, in scenery coordinates.
+      const labelX = ( value - this._range.min ) / this._range.length * this._track.width + this._track.left;
+
+      // Create the tick and add it as a child.
+      const tick = new Line(
+        labelX, isMajor ? this._track.top - this._majorTickHeight / 2: this._track.top,
+        labelX, isMajor ? this._track.top + this._majorTickHeight / 2 : this._track.top - this._minorTickHeight, {
+          stroke: isMajor ? this._majorTickStroke : this._minorTickStroke,
+          strokeWidth: isMajor ? this._majorTickWidth : this._minorTickWidth
+      } );
+
+      console.log('before')
+      console.log( 'this:', this.bounds.toString(), this.localBounds.toString())
+      console.log( 'track:', this._track.bounds.toString())
+      console.log( 'tick:', tick.bounds.toString())
+      this.addChild( tick );
+
+      console.log('after')
+      console.log( 'this:', this.bounds.toString(), this.localBounds.toString())
+      console.log( 'track:', this._track.bounds.toString())
+      // If the label was provided, add the label Node and position it correctly.
+      if ( label ) {
+        this.addChild( label );
+        label.centerX = tick.centerX;
+        label.bottom = tick.top - this._tickLabelSpacing;
+      }
     }
 
     /**

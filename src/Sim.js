@@ -119,6 +119,7 @@ define( require => {
       const Property = require( 'SIM_CORE/util/Property' );
       const Node = require( 'SIM_CORE/scenery/Node' );
       const Rectangle = require( 'SIM_CORE/scenery/Rectangle' );
+      const Text = require( 'SIM_CORE/scenery/Text' );
 
       const Range = require( 'SIM_CORE/util/Range' );
 
@@ -128,6 +129,25 @@ define( require => {
       } );
 
 
+      // slider.addMinorTick( 1 );
+      // slider.addMinorTick( 2 );
+      // slider.addMajorTick( 0 );
+      // slider.addMinorTick( 2 );
+      // slider.addMinorTick( 3 );
+      // slider.addMinorTick( 4 );
+      // slider.addMinorTick( 5 );
+      // slider.addMinorTick( 6 );
+      // slider.addMinorTick( 7 );
+
+      // slider.addMajorTick( 9 );
+      // slider.addMajorTick( 5 );
+      // slider.center = this.screens[ 0 ].view.viewBounds.center;
+      //
+      window.addEventListener( 'mousedown', () => {
+        console.log( 'erherhehrehrehre\n\n\n\n\n' );
+        slider._recomputeAncestorBounds();
+        slider.layout( slider.screenViewScale )
+      })
       this.screens[ 0 ].view.addChild( slider );
 
       this.display.on( 'resize', ( width, height ) => {

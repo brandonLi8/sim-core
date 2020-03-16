@@ -591,21 +591,38 @@ define( require => {
      */
     _recomputeAncestorBounds() {
 
-      // First step: Set this Node's parent bounds to include just its upper-left corner for now.
-      this._bounds.setAll( this.left, this.top, this.left, this.top );
+      const min = this._computeMinChildBounds();
 
+      // First step: Set this Node's parent bounds to include just its upper-left corner for now.
+      this._bounds.setAll( this.left - min.x, this.top - min.y, this.left - min.x, this.top - min.y );
+
+      // console.log( 'set to ', this._bounds.toString())
       // Next include the Bounds of each of this Node's first generation children, in parent coordinate frame.
       this.children.forEach( child => {
         // Shift child's bounds (which is in the child's parent coordinate frame, or in other words in this Node's
         // local coordinate frame) by this Node's top-left, which converts the child bounds to this Node's parent
         // coordinate frame. Use scratchBounds to eliminate new Bounds instances on each recursive layer.
         const childBounds = scratchBounds.set( child.bounds ).shift( this.left, this.top );
+        // console.log( 'in here', child.constructor.name, this._bounds.toString(), child.bounds.toString(), childBounds.toString() );
         this._bounds.includeBounds( childBounds );
+        // console.log( 'included: ', this._bounds.toString() )
       } );
 
       // Recursively call this method for each parent up to either the ScreenView or to the point where a Node doesn't
       // have a parent, making all bounds correct.
       if ( this.parent && !( this.parent instanceof ScreenView ) ) this.parent._recomputeAncestorBounds();
+    }
+
+    _computeMinChildBounds() {
+      let minX = 0;
+      let minY = 0;
+
+      this.children.forEach( child => {
+        if ( child.bounds.minX < minX ) minX = child.bounds.minX;
+        if ( child.bounds.minY < minY ) minY = child.bounds.minY;
+      } );
+
+      return scratchVector.setX( minX ).setY( minY );
     }
 
     /**

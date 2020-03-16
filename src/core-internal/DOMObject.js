@@ -260,7 +260,6 @@ define( require => {
         `invalid children: ${ children }` );
 
       this.removeAllChildren();
-      this._children = children;
       children.forEach( child => this.addChild( child ) );
       return this;
     }
