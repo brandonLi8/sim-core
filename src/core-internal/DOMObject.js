@@ -307,8 +307,8 @@ define( require => {
     }
 
     /**
-     * Moves a child DOMObject to a provided index and adjusts the rest of our children list. Index must be less than the
-     * number of children that this DOMObject has.
+     * Moves a child DOMObject to a provided index and adjusts the rest of our children list. Index must be less than
+     * the number of children that this DOMObject has.
      * @public
      *
      * @param {DOMObject} child - the child DOMObject to move

@@ -518,7 +518,7 @@ define( require => {
       if ( assert.enabled ) { // Only assert sanity checks if assertions are enabled for performance reasons.
         // Sanity checks
         assert( this.bounds.isFinite(), 'bounds are not finite.' );
-        assert( this._computeGlobalBounds( scratchBounds ).isFinite(), 'globalBounds are not finite.' );
+        assert( !this.parent || this._computeGlobalBounds( scratchBounds ).isFinite(), 'globalBounds are not finite.' );
       }
       /**
        * Access and reference all necessary information to generate the svg transform attribute string.
