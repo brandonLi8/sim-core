@@ -119,7 +119,7 @@ define( require => {
             // Get the displacement by comparing the last drag location to the current cursor position.
             const dragDisplacement = cursorPosition.copy().subtract( lastDragLocation );
 
-            // Upudate the lastDragLocation flag.
+            // Update the lastDragLocation flag.
             lastDragLocation.set( cursorPosition );
 
             // Call the drag listener.
