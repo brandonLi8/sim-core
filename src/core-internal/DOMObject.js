@@ -35,6 +35,7 @@ define( require => {
 
   // modules
   const assert = require( 'SIM_CORE/util/assert' );
+  const Util = require( 'SIM_CORE/util/Util' );
 
   class DOMObject {
 
@@ -321,7 +322,8 @@ define( require => {
 
       if ( this._children[ index ] !== child ) {
         // Use element.insertBefore. See https://developer.mozilla.org/en-US/docs/Web/API/Node/insertBefore
-        this.element.insertBefore( child, index < this._children.length - 1 ? this._children[ index ] : null );
+        const referenceNode = index < this._children.length - 1 ? this._children[ index + 1 ].element : null;
+        this.element.insertBefore( child.element, referenceNode );
         Util.arrayRemove( this._children, child );
         this._children.splice( index, 0, child ); // inserts child at index
       }
