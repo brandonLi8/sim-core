@@ -222,15 +222,14 @@ define( require => {
           strokeWidth: isMajor ? this._majorTickWidth : this._minorTickWidth
       } );
       this.addChild( tick );
-      tick.moveToBack(); // Correct rendering order.
 
       // If the label was provided, add the label Node and position it correctly.
       if ( label ) {
         this.addChild( label );
         label.centerX = tick.centerX;
         label.bottom = tick.top - this._tickLabelSpacing;
-        label.moveToBack(); // Correct rendering order.
       }
+      this._thumb.moveToFront();
       this.layout( this.screenViewScale );
     }
 
