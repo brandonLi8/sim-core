@@ -590,23 +590,41 @@ define( require => {
      * @private
      */
     _recomputeAncestorBounds() {
+      const childBounds = this._computeChildBounds( scratchBounds );
+      // console.log( this._bounds.toString())
+      // console.log( childBounds.toString() )
+      // console.log( 'shift to our parent', childBounds.shift( this.left, this.top ).toString() )
+      // console.log( 'include top-left', childBounds.includePoint( this.topLeft ).toString() )
 
-      const min = this._computeMinChildBounds();
 
+      if ( this.children.length && ( childBounds.minX < 0 || childBounds.minY < 0 ) ) {
+        this.children.forEach( child => {
+          child.bounds.shift( childBounds.minX < 0 ? -childBounds.minX : 0, childBounds.minY < 0 ? -childBounds.minY : 0 );
+        } );
+      }
+      if ( childBounds.minX < 0 || childBounds.minY < 0 ) {
+        this._bounds.set( childBounds.shift( this.left, this.top ).includePoint( this.bottomRight ) );
+      }
+      else {
+        this._bounds.set( childBounds.shift( this.left, this.top ).includePoint( this.topLeft ) );
+      }
+      // this._bounds.set( childBounds )
+      // console.log( min );
       // First step: Set this Node's parent bounds to include just its upper-left corner for now.
-      this._bounds.setAll( this.left - min.x, this.top - min.y, this.left - min.x, this.top - min.y );
+      // this._bounds.setAll( 0, 0, childBounds.width, childBounds.height ).shift( childBounds.left, childBounds.top );
+      // console.log( this._bounds.toString())
 
-      // console.log( 'set to ', this._bounds.toString())
-      // Next include the Bounds of each of this Node's first generation children, in parent coordinate frame.
-      this.children.forEach( child => {
-        // Shift child's bounds (which is in the child's parent coordinate frame, or in other words in this Node's
-        // local coordinate frame) by this Node's top-left, which converts the child bounds to this Node's parent
-        // coordinate frame. Use scratchBounds to eliminate new Bounds instances on each recursive layer.
-        const childBounds = scratchBounds.set( child.bounds ).shift( this.left, this.top );
-        // console.log( 'in here', child.constructor.name, this._bounds.toString(), child.bounds.toString(), childBounds.toString() );
-        this._bounds.includeBounds( childBounds );
-        // console.log( 'included: ', this._bounds.toString() )
-      } );
+      // // console.log( 'set to ', this._bounds.toString())
+      // // Next include the Bounds of each of this Node's first generation children, in parent coordinate frame.
+      // this.children.forEach( child => {
+      //   // Shift child's bounds (which is in the child's parent coordinate frame, or in other words in this Node's
+      //   // local coordinate frame) by this Node's top-left, which converts the child bounds to this Node's parent
+      //   // coordinate frame. Use scratchBounds to eliminate new Bounds instances on each recursive layer.
+      //   const childBounds = scratchBounds.set( child.bounds ).shift( this.left, this.top );
+      //   // console.log( 'in here', child.constructor.name, this._bounds.toString(), child.bounds.toString(), childBounds.toString() );
+      //   this._bounds.includeBounds( childBounds );
+      //   // console.log( 'included: ', this._bounds.toString() )
+      // } );
 
       // Recursively call this method for each parent up to either the ScreenView or to the point where a Node doesn't
       // have a parent, making all bounds correct.
@@ -623,6 +641,19 @@ define( require => {
       } );
 
       return scratchVector.setX( minX ).setY( minY );
+    }
+
+    _computeChildBounds( resultBounds ) {
+
+      if ( this.children.length ) {
+        resultBounds.set( this.children[ 0 ].bounds );
+
+        this.children.forEach( child => {
+          resultBounds.includeBounds( child.bounds );
+        } );
+        return resultBounds;
+      }
+      else { return resultBounds.set( Bounds.ZERO ); }
     }
 
     /**

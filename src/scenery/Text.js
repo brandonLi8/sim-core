@@ -32,7 +32,7 @@ define( require => {
      *                             the options are set in the early portion of the constructor for details.
      */
     constructor( text, options ) {
-      assert( text && ( typeof text === 'number' || typeof text === 'string' ), `invalid text: ${ text }` );
+      assert( typeof text === 'number' || typeof text === 'string', `invalid text: ${ text }` );
       assert( !options || Object.getPrototypeOf( options ) === Object.prototype, `invalid options: ${ options }` );
       assert( !options || !options.attributes, 'Text sets attributes' );
       assert( !options || !options.width, 'Text sets width' );
@@ -55,7 +55,7 @@ define( require => {
         // Rewrite options so that it overrides the defaults.
         ...options
       };
-      options.text = text; // Set the text option to be set in the mutate() call in Node.
+      options.text = `${ text }`; // Set the text option to be set in the mutate() call in Node.
       super( options );
 
       // @private {*} - see options declaration for documentation. Contains getters and setters. Set to what was

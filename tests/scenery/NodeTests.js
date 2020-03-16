@@ -40,9 +40,9 @@ define( require => {
     const A = new Node( { left: 15, top: 10 } );
     screenView.addChild( A );
 
-    truenit.ok( A.localBounds.equals( Bounds.ZERO ) );
-    truenit.ok( A.bounds.equals( new Bounds( 15, 10, 15, 10 ) ) );
-    truenit.ok( A.globalBounds.equals( new Bounds( 15, 10, 15, 10 ) ) );
+    // truenit.ok( A.localBounds.equals( Bounds.ZERO ) );
+    // truenit.ok( A.bounds.equals( new Bounds( 15, 10, 15, 10 ) ) );
+    // truenit.ok( A.globalBounds.equals( new Bounds( 15, 10, 15, 10 ) ) );
 
     // Test 2: Child of Root Node
     const B = new Node( { left: 5, top: 4, width: 3, height: 4 } );
@@ -96,12 +96,43 @@ define( require => {
     truenit.ok( C.localBounds.equals( new Bounds( 0, 0, 3, 3 ) ) );
     truenit.ok( C.parentBounds.equals( new Bounds( 6, 6, 9, 9 ) ) );
 
+    // Test 5: Negative Bounds
+    A.removeAllChildren(); // reset scene graph
+    B.removeAllChildren();
+    truenit.ok( A.bounds.equals( new Bounds( 15, 10, 15, 10 ) ) );
+    B.topLeft = new Vector( -10, -5 );
+    B.width = 5;
+    B.height = 4;
+    A.addChild( B );
+
+    truenit.ok( B.bounds.equals( new Bounds( 0, 0, 5, 4 ) ) );
+    truenit.ok( B.localBounds.equals( new Bounds( 0, 0, 5, 4 ) ) );
+    truenit.ok( B.globalBounds.equals( new Bounds( 5, 5, 10, 9 ) ) );
+    truenit.ok( A.bounds.equals( new Bounds( 5, 5, 15, 10 ) ) );
+    truenit.ok( A.localBounds.equals( new Bounds( 0, 0, 10, 5 ) ) );
+    truenit.ok( A.globalBounds.equals( new Bounds( 5, 5, 15, 10 ) ) );
+
+    C.topLeft = new Vector( -1, -5 );
+    C.width = 10;
+    C.height = 1;
+    B.addChild( C );
+
+    truenit.ok( B.bounds.equals( new Bounds( 0, 0, 10, 9 ) ) );
+    truenit.ok( B.localBounds.equals( new Bounds( 0, 0, 10, 9 ) ) );
+    truenit.ok( B.globalBounds.equals( new Bounds( 4, 0, 14, 9 ) ) );
+    truenit.ok( C.bounds.equals( new Bounds( 0, 0, 10, 1 ) ) );
+    truenit.ok( C.localBounds.equals( new Bounds( 0, 0, 10, 1 ) ) );
+    truenit.ok( C.globalBounds.equals( new Bounds( 4, 0, 14, 1 ) ) );
+    truenit.ok( A.bounds.equals( new Bounds( 4, 0, 15, 10 ) ) );
+    truenit.ok( A.localBounds.equals( new Bounds( 0, 0, 11, 10 ) ) );
+    truenit.ok( A.globalBounds.equals( new Bounds( 4, 0, 15, 10 ) ) );
+
     //----------------------------------------------------------------------------------------
     // Location Tests
     //----------------------------------------------------------------------------------------
     const E = new Node( { left: 5, top: 4, width: 3, height: 4 } );
 
-    // Test 5: Location getters
+    // Test 6: Location getters
     truenit.ok( E.translation.equals( new Vector( 5, 4 ) ) );
     truenit.ok( E.topLeft.equals( new Vector( 5, 4 ) ) );
     truenit.ok( E.topCenter.equals( new Vector( 6.5, 4 ) ) );
@@ -119,7 +150,7 @@ define( require => {
     truenit.equals( E.top, 4 );
     truenit.equals( E.bottom, 8 );
 
-    // Test 6: Location setters
+    // Test 7: Location setters
     [ 'topLeft', 'topCenter', 'topRight',
       'centerLeft', 'center', 'centerRight',
       'bottomLeft', 'bottomCenter', 'bottomRight' ].forEach( location => {
@@ -145,7 +176,7 @@ define( require => {
     // Node Features
     //----------------------------------------------------------------------------------------
 
-    // Test 7: Scale
+    // Test 8: Scale
     const F = new Node( { left: 5, top: 4, width: 4, height: 8, scale: 2 } ); // should scale last
 
     truenit.ok( F.parentBounds.equals( new Bounds( 5, 4, 13, 20 ) ) );

@@ -129,25 +129,27 @@ define( require => {
       } );
 
 
-      // slider.addMinorTick( 1 );
       // slider.addMinorTick( 2 );
-      // slider.addMajorTick( 0 );
-      // slider.addMinorTick( 2 );
-      // slider.addMinorTick( 3 );
-      // slider.addMinorTick( 4 );
-      // slider.addMinorTick( 5 );
-      // slider.addMinorTick( 6 );
+      // slider.addMajorTick( 0, new Text( 4, { fontSize: 14 }) );
+      // slider.addMinorTick( 2, new Text( 4, { fontSize: 14 }) );
+      // slider.addMinorTick( 3, new Text( 4, { fontSize: 14 }) );
+      // slider.addMinorTick( 4, new Text( 4, { fontSize: 14 }) );
+      // slider.addMinorTick( 5, new Text( 4, { fontSize: 14 }) );
+      // slider.addMinorTick( 6, new Text( 4, { fontSize: 14 }) );
       // slider.addMinorTick( 7 );
 
       // slider.addMajorTick( 9 );
       // slider.addMajorTick( 5 );
       // slider.center = this.screens[ 0 ].view.viewBounds.center;
       //
-      window.addEventListener( 'mousedown', () => {
-        console.log( 'erherhehrehrehre\n\n\n\n\n' );
-        slider._recomputeAncestorBounds();
-        slider.layout( slider.screenViewScale )
-      })
+
+      // let i = 0;
+      // window.addEventListener( 'mousedown', () => {
+      //         slider.addMinorTick( i, new Text( i, { fontSize: 14} ) );
+      //   i ++;
+      //   console.log( slider.bounds.center, slider.bounds.toString() )
+
+      // })
       this.screens[ 0 ].view.addChild( slider );
 
       this.display.on( 'resize', ( width, height ) => {
