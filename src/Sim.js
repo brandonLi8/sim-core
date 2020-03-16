@@ -130,7 +130,7 @@ define( require => {
 
 
       // slider.addMinorTick( 2 );
-      // slider.addMajorTick( 0, new Text( 4, { fontSize: 14 }) );
+      slider.addMajorTick( 0, new Text( 4, { fontSize: 14 }) );
       // slider.addMinorTick( 2, new Text( 4, { fontSize: 14 }) );
       // slider.addMinorTick( 3, new Text( 4, { fontSize: 14 }) );
       // slider.addMinorTick( 4, new Text( 4, { fontSize: 14 }) );

@@ -28,7 +28,7 @@
  * - Window coordinates: Coordinate frame of a node relative to the browser, in pixels.
  * - Global coordinates: Coordinate frame of a node relative to the ScreenView (specifically in its local coordinates).
  * - Parent coordinates: Coordinate frame of a node relative to the parent of each Node's local bounds.
- * - Local coordinates: Coordinate frame of a node relative to itself, where (0, 0) is at the top left of the Node.
+ * - Local coordinates: Coordinate frame of a node relative to itself, where (0, 0) is always the top left of the Node.
  *
  * @author Brandon Li <brandon.li820@gmail.com>
  */
@@ -548,7 +548,8 @@ define( require => {
 
     /**
      * @override
-     * Ensures that all children are Node types, and updates this Node's bounds after adding the child.
+     * Ensures that all children are Node types, and recomputes this Node's bounds after adding the child. See
+     * _recomputeAncestorBounds() for information.
      * @override
      * @public
      *
@@ -567,7 +568,8 @@ define( require => {
 
     /**
      * @override
-     * Removes a child Node, and update this Node's bounds after removing this child.
+     * Removes a child Node, and update this Node's bounds after removing this child. See _recomputeAncestorBounds() for
+     * more information.
      * @public
      *
      * @param {Node} child
@@ -588,72 +590,50 @@ define( require => {
      * addChild() and removeChild() methods to ensure that Bounds are correct after adding/removing children for
      * all Nodes in its ancestor tree.
      * @private
+     *
+     * NOTE: if any children have negative parent bounds, all of this Node's children's Bounds, and this Node's bounds,
+     *       will be shifted so that all children have positive parent bounds. This Node's bounds will also be adjusted
+     *       oppositely so that global positioning of the children is still correct.
      */
     _recomputeAncestorBounds() {
-      const childBounds = this._computeChildBounds( scratchBounds );
-      // console.log( this._bounds.toString())
-      // console.log( childBounds.toString() )
-      // console.log( 'shift to our parent', childBounds.shift( this.left, this.top ).toString() )
-      // console.log( 'include top-left', childBounds.includePoint( this.topLeft ).toString() )
 
+      // First step: Compute the child Bounds of this Node in our local coordinate frame. For now, set to the origin.
+      // Use scratchBounds to eliminate new Bounds instances on each recursive layer.
+      const childBounds = scratchBounds.set( Bounds.ZERO );
 
-      if ( this.children.length && ( childBounds.minX < 0 || childBounds.minY < 0 ) ) {
+      // Next include the Bounds of each of this Node's first generation children, in our local coordinate frame.
+      this.children.forEach( child => {
+        // Include entirely the bounds of the child. Their bounds is in their parent coordinate frame, which is this
+        // Node's local coordinate frame.
+        childBounds.includeBounds( child.bounds );
+      } );
+
+      // Flag that indicates if any of this Node's children contains negative parent bounds.
+      const negativeChildrenBounds = this.children.length && ( childBounds.minX < 0 || childBounds.minY < 0 );
+
+      // If any children have negative parent bounds, shift all of this Node's children's Bounds by the smallest
+      // amount (which will be negative) so that all children have positive parent bounds.
+      if ( negativeChildrenBounds ) {
         this.children.forEach( child => {
           child.bounds.shift( childBounds.minX < 0 ? -childBounds.minX : 0, childBounds.minY < 0 ? -childBounds.minY : 0 );
+
+          // Shifts only strictly apply on negative values. Otherwise, no shift.
+          child.bounds.shift( Math.max( -childBounds.minX, 0 ), Math.max( -childBounds.minY, 0 ) );
         } );
       }
-      if ( childBounds.minX < 0 || childBounds.minY < 0 ) {
-        this._bounds.set( childBounds.shift( this.left, this.top ).includePoint( this.bottomRight ) );
-      }
-      else {
-        this._bounds.set( childBounds.shift( this.left, this.top ).includePoint( this.topLeft ) );
-      }
-      // this._bounds.set( childBounds )
-      // console.log( min );
-      // First step: Set this Node's parent bounds to include just its upper-left corner for now.
-      // this._bounds.setAll( 0, 0, childBounds.width, childBounds.height ).shift( childBounds.left, childBounds.top );
-      // console.log( this._bounds.toString())
 
-      // // console.log( 'set to ', this._bounds.toString())
-      // // Next include the Bounds of each of this Node's first generation children, in parent coordinate frame.
-      // this.children.forEach( child => {
-      //   // Shift child's bounds (which is in the child's parent coordinate frame, or in other words in this Node's
-      //   // local coordinate frame) by this Node's top-left, which converts the child bounds to this Node's parent
-      //   // coordinate frame. Use scratchBounds to eliminate new Bounds instances on each recursive layer.
-      //   const childBounds = scratchBounds.set( child.bounds ).shift( this.left, this.top );
-      //   // console.log( 'in here', child.constructor.name, this._bounds.toString(), child.bounds.toString(), childBounds.toString() );
-      //   this._bounds.includeBounds( childBounds );
-      //   // console.log( 'included: ', this._bounds.toString() )
-      // } );
+      // Shift child bounds (which is in the children's parent coordinate frame, or in other words in this Node's
+      // local coordinate frame) by this Node's top-left, which converts the child bounds to this Node's parent
+      // coordinate frame.
+      const childBoundsParent = childBounds.shift( this.left, this.top ); // Child bounds in our parent coordinate frame
+
+      // Set our bounds to child bounds in our parent coordinate frame. We also must include our topLeft for when
+      // children are added to keep our bounds consistent. Use the bottom right for negative children bounds.
+      this._bounds.set( childBoundsParent.includePoint( negativeChildrenBounds ? this.bottomRight : this.topLeft ) );
 
       // Recursively call this method for each parent up to either the ScreenView or to the point where a Node doesn't
       // have a parent, making all bounds correct.
       if ( this.parent && !( this.parent instanceof ScreenView ) ) this.parent._recomputeAncestorBounds();
-    }
-
-    _computeMinChildBounds() {
-      let minX = 0;
-      let minY = 0;
-
-      this.children.forEach( child => {
-        if ( child.bounds.minX < minX ) minX = child.bounds.minX;
-        if ( child.bounds.minY < minY ) minY = child.bounds.minY;
-      } );
-
-      return scratchVector.setX( minX ).setY( minY );
-    }
-
-    _computeChildBounds( resultBounds ) {
-
-      if ( this.children.length ) {
-        resultBounds.set( this.children[ 0 ].bounds );
-
-        this.children.forEach( child => {
-          resultBounds.includeBounds( child.bounds );
-        } );
-        return resultBounds;
-      }
-      else { return resultBounds.set( Bounds.ZERO ); }
     }
 
     /**

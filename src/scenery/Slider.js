@@ -142,7 +142,6 @@ define( require => {
       // Set the children, in the correct rendering order.
       this.setChildren( [ this._track, this._thumb ] );
       this.mutate( options );
-      console.log( this._thumb.bounds.toString(), this._computeMinChildBounds() ) // should return (0, 0 )
 
       //----------------------------------------------------------------------------------------
 
