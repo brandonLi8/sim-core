@@ -130,7 +130,7 @@ define( require => {
 
 
       // slider.addMinorTick( 2 );
-      slider.addMajorTick( 0, new Text( 4, { fontSize: 14 }) );
+      // slider.addMajorTick( 0, new Text( 4, { fontSize: 14 }) );
       // slider.addMinorTick( 2, new Text( 4, { fontSize: 14 }) );
       // slider.addMinorTick( 3, new Text( 4, { fontSize: 14 }) );
       // slider.addMinorTick( 4, new Text( 4, { fontSize: 14 }) );
@@ -143,13 +143,13 @@ define( require => {
       // slider.center = this.screens[ 0 ].view.viewBounds.center;
       //
 
-      // let i = 0;
-      // window.addEventListener( 'mousedown', () => {
-      //         slider.addMinorTick( i, new Text( i, { fontSize: 14} ) );
-      //   i ++;
-      //   console.log( slider.bounds.center, slider.bounds.toString() )
-
-      // })
+      let i = 0;
+      window.addEventListener( 'mousedown', () => {
+              slider.addMinorTick( i, new Text( i, { fontSize: 14} ) );
+        i ++;
+        slider.center = this.screens[ 0 ].view.viewBounds.center
+        slider.layout( slider.screenViewScale );
+      })
       this.screens[ 0 ].view.addChild( slider );
 
       this.display.on( 'resize', ( width, height ) => {

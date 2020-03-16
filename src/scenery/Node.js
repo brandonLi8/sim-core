@@ -490,9 +490,9 @@ define( require => {
     }
 
     /**
-     * Layouts the Node, ensuring correct pixel positioning in the window based off this Node's global bounds.
-     * Also applies other transformations, including rotation and scale. Requires a scale, in terms of window pixels
-     * per ScreenView coordinate, for determining exact pixel coordinates.
+     * Layouts the Node and its entire sub-tree, ensuring correct pixel positioning in the window based off this Node's
+     * global bounds. Also applies other transformations, including rotation and scale. Requires a scale, in terms of
+     * window pixels per ScreenView coordinate, for determining exact pixel coordinates.
      *
      * This method may be overridden in sub-types, but it is required to call the super class's layout method. Node's
      * layout method will position the Node's top-left, meaning sub-types must have their origin at the top-left corner
@@ -544,6 +544,9 @@ define( require => {
       // Set the svg transform attribute and reference the new screenViewScale.
       this.setAttribute( 'transform', transformString );
       this.screenViewScale = scale;
+
+      // Call the layout method on the rest of the sub-tree of this Node.
+      this.children.forEach( child => { child.layout( scale ); } );
     }
 
     /**

@@ -81,8 +81,6 @@ define( require => {
       const layoutChildren = ( children ) => {
         children.forEach( ( child ) => {
           child.layout( scale );
-
-          layoutChildren( child.children );
         } );
       };
       layoutChildren( this.children );

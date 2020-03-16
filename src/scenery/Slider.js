@@ -32,7 +32,6 @@ define( require => {
   const Range = require( 'SIM_CORE/util/Range' );
   const Rectangle = require( 'SIM_CORE/scenery/Rectangle' );
   const Util = require( 'SIM_CORE/util/Util' );
-  const Vector = require( 'SIM_CORE/util/Vector' );
 
   class Slider extends Node {
 
@@ -53,7 +52,7 @@ define( require => {
       options = {
 
         // track
-        trackFill: '#BCBCBC',  // {string} - the fill color the the slider track
+        trackFill: '#BCBCBC',  // {string} - the fill color the slider track
         trackStroke: 'black',  // {string} - the stroke color of the slider track
         trackStrokeWidth: 1,   // {number} - the stroke width of the slider track
         trackHeight: 3,        // {number} - the height of the track, in scenery coordinates
@@ -130,7 +129,6 @@ define( require => {
             stroke: options.thumbCenterLineStroke
         } );
 
-
       // @private {Node} - create the Slider thumb. See the comment at the top of the file for context.
       this._thumb = new Node( {
         center: this._track.center,
@@ -138,9 +136,10 @@ define( require => {
         cursor: 'pointer'
       } );
 
-
       // Set the children, in the correct rendering order.
       this.setChildren( [ this._track, this._thumb ] );
+
+      // At this point, call mutate to ensure validity of location setters in options.
       this.mutate( options );
 
       //----------------------------------------------------------------------------------------
@@ -164,15 +163,9 @@ define( require => {
         exit: () => { this._thumbRectangle.fill = options.thumbFill; }              // change back when un-hovered
       } );
 
-      // // @private {function} - observer of the numberProperty
-      // this._numberPropertyObserver = this._updateSlider.bind( this );
-      // numberProperty.link(  this._numberPropertyObserver );
-      // // console.log( this.bounds.toString())
-
-      // At this point, call mutate to ensure validity of location setters in options.
-      // this.mutate( options );
-            // console.log( 'erherherh', this.bounds.toString())
-
+      // @private {function} - observer of the numberProperty
+      this._numberPropertyObserver = this._updateSlider.bind( this );
+      numberProperty.link( this._numberPropertyObserver );
     }
 
     /**
@@ -212,22 +205,15 @@ define( require => {
           stroke: isMajor ? this._majorTickStroke : this._minorTickStroke,
           strokeWidth: isMajor ? this._majorTickWidth : this._minorTickWidth
       } );
-
-      console.log('before')
-      console.log( 'this:', this.bounds.toString(), this.localBounds.toString())
-      console.log( 'track:', this._track.bounds.toString())
-      console.log( 'tick:', tick.bounds.toString())
       this.addChild( tick );
 
-      console.log('after')
-      console.log( 'this:', this.bounds.toString(), this.localBounds.toString())
-      console.log( 'track:', this._track.bounds.toString())
       // If the label was provided, add the label Node and position it correctly.
       if ( label ) {
         this.addChild( label );
         label.centerX = tick.centerX;
         label.bottom = tick.top - this._tickLabelSpacing;
       }
+      this.layout( this.screenViewScale );
     }
 
     /**
