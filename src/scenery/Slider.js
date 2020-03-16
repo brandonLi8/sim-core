@@ -102,9 +102,6 @@ define( require => {
       this._range = range;
       this._numberProperty = numberProperty;
 
-      // @public (read-only) {number} - the percentage that that the number property value has passed the range.
-      this._percentage;
-
       //----------------------------------------------------------------------------------------
 
       // @private {Rectangle} - create the slider Track. See the comment at the top of the file for context.
@@ -145,11 +142,8 @@ define( require => {
 
       // @private {DragListener} - create a DragListener for when the user drags the thumb, which moves the slider value
       this._thumbDragListener = new DragListener( this._thumb, {
-        drag: this._dragThumb.bind( this ),
-        start: () => {
-          this.h = ( numberProperty.value - this._range.min ) / this._range.length;
-          options.startDrag && options.startDrag();
-        },
+        drag: ( displacement, location ) => { this._setThumbPosition( location ); },
+        start: options.startDrag,
         end: () => {
           this._thumbRectangle.fill = options.thumbFill; // change back when drag sequence ends
           options.endDrag && options.endDrag();
@@ -157,9 +151,7 @@ define( require => {
       } );
 
       // @private {PressListener} - create a PressListener for when the user clicks on the track, which moves the slider
-      this._trackPressListener = new PressListener( this._track, {
-        press: this._pressTrack.bind( this )
-      } );
+      this._trackPressListener = new PressListener( this._track, { press: this._setThumbPosition.bind( this ) } );
 
       // @private {HoverListener} - create a HoverListener for when the user hovers over the thumb, changing the fill
       this._thumbPressListener = new HoverListener( this._thumb, {
@@ -167,42 +159,46 @@ define( require => {
         exit: () => { this._thumbRectangle.fill = options.thumbFill; }              // change back when un-hovered
       } );
 
-      numberProperty.link( number => {
-        this._percentage = ( number - this._range.min ) / this._range.length;
-        console.log( number)
-        this._thumb.centerX = this._percentage * this._track.width + this._track.left;
-      } );
+      // @private {function} - observer of the numberProperty
+      this._numberPropertyObserver = this._updateSlider.bind( this );
+      numberProperty.link(  this._numberPropertyObserver );
     }
 
     /**
-     * Called every time the Slider thumb is dragged to a different location, which elicits a change in the value of the
-     * Slider. Will constrain the drag-area to keep the thumb on-top of the Slider.
-     * @public
+     * Called when the Slider thumb is set to a different position due to input from the user, like by dragging the
+     * thumb or pressing on the Slider track.
      *
+     * Will constrain the drag-area to keep the thumb on-top of the Slider track.
      * Will also call the constrain function provided in the options object in the constructor.
-     * @param {Vector} displacement - the displacement of the slider thumb
-     */
-    _dragThumb( displacement, location ) {
-      this._pressTrack( location );
-    }
-
-    /**
-     * Called every time the Slider track is pressed, which changes the slider to a different value.
-     * @public
+     * @private
      *
-     * Will also call the constrain function provided in the options object in the constructor.
-     *
-     * @param {Vector} location - the location of the press-down
+     * @param {Vector} location - the attempted center location to move the thumb to
      */
-    _pressTrack( location ) {
+    _setThumbPosition( location ) {
 
-      // Convert the press-location to the thumb's local coordinates.
+      // Convert the location to the thumb's local coordinates.
       const localDragLocation = location.subtract( this._track.topLeft ).subtractXY( 2 * this._track.strokeWidth, 0 );
       const percentage = Util.clamp( localDragLocation.x / this._track.width, 0, 1 );
       const newValue = percentage * this._range.length + this._range.min;
 
       // Update the number Property, which will change the location of the slider thumb.
       this._numberProperty.value = this._constrain ? this._constrain( newValue ) : newValue;
+    }
+
+    /**
+     * Called when the slider needs to be updated, usually when the numberProperty of the Slider changes.
+     * @private
+     *
+     * Updates the thumb center location to match the numberProperty's value.
+     */
+    _updateSlider() {
+      assert( this._range.contains( this._numberProperty.value ), 'numberProperty outside of range of slider' );
+
+      // Calculate the percentage that the thumb is across the slider track.
+      const percentage = ( this._numberProperty.value - this._range.min ) / this._range.length;
+
+      // Update the slider thumb center-x position based on the numberProperty's value.
+      this._thumb.centerX = percentage * this._track.width + this._track.left;
     }
   }
 
