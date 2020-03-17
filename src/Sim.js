@@ -115,22 +115,22 @@ define( require => {
     static finishLoadingScreens() {
       // Enable the red dev border around ScreenViews if the ?dev query parameter was provided.
       if ( StandardSimQueryParameters.dev ) { ScreenView.enableDevBorder(); }
-       const Slider = require( 'SIM_CORE/scenery/Slider' );
-       const Property = require( 'SIM_CORE/util/Property' );
-       const Node = require( 'SIM_CORE/scenery/Node' );
-       const Rectangle = require( 'SIM_CORE/scenery/Rectangle' );
-       const Text = require( 'SIM_CORE/scenery/Text' );
+      // const Slider = require( 'SIM_CORE/scenery/Slider' );
+      // const Property = require( 'SIM_CORE/util/Property' );
+      // const Node = require( 'SIM_CORE/scenery/Node' );
+      // const Rectangle = require( 'SIM_CORE/scenery/Rectangle' );
+      // const Text = require( 'SIM_CORE/scenery/Text' );
 
-       const Range = require( 'SIM_CORE/util/Range' );
+      // const Range = require( 'SIM_CORE/util/Range' );
 
-       let slider = new Slider( new Range( 0, 10 ), new Property( 4 ), {
-         center: this.screens[ 0 ].view.viewBounds.center,
-         constrain: value => Util.toFixed( value, 2 )
-       } );
-       slider.addMajorTick( 0, new Text( 4, { fontSize: 14 }) );
-       slider.addMajorTick( 2, new Text( 4, { fontSize: 14 }) );
-       slider.addMajorTick( 4, new Text( 4, { fontSize: 14 }) );
-       this.screens[ 0 ].view.addChild( slider );
+      // let slider = new Slider( new Range( 0, 10 ), new Property( 4 ), {
+      //   center: this.screens[ 0 ].view.viewBounds.center,
+      //   constrain: value => Util.toFixed( value, 2 )
+      // } );
+      // slider.addMajorTick( 0, new Text( 4, { fontSize: 14 }) );
+      // slider.addMajorTick( 2, new Text( 4, { fontSize: 14 }) );
+      // slider.addMajorTick( 4, new Text( 4, { fontSize: 14 }) );
+      // this.screens[ 0 ].view.addChild( slider );
 
 
       this.display.on( 'resize', ( width, height ) => {
