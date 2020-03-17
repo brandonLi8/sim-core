@@ -408,10 +408,5 @@ define( require => {
   // @public (read-only) {Vector} ZERO - immutable vector that represents the zero vector.
   Vector.ZERO = Util.deepFreeze( new Vector( 0, 0 ) );
 
-  // @public {Vector} - Mutable Vector used within methods/functions to reduce the memory footprint by minimizing the
-  //                    number of new Vector instances when recursing, layouting, etc. Don't rely on states saving as
-  //                    other methods/functions can mutate. Used mostly to temporarily save a state within a method.
-  Vector.scratch = Vector.ZERO.copy();
-
   return Vector;
 } );
