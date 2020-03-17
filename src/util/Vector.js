@@ -205,7 +205,7 @@ define( require => {
     set y( y ) { this.setY( y ); }
 
     /**
-     * Sets the values of this Vector to another Vector. Does not change immutability.
+     * Sets the values of this Vector to another Vector.
      * @public
      *
      * @param {Vector} vector
@@ -217,12 +217,22 @@ define( require => {
     }
 
     /**
+     * Sets the values of this Vector to another Vector given as <x, y>.
+     * @public
+     *
+     * @param {number} x
+     * @param {number} y
+     * @returns {Vector} - for chaining
+     */
+    setXY( x, y ) { return this.set( Vector.scratch.setX( x ).setY( y ) ); }
+
+    /**
      * Rounds each the edges of this range with Util.roundSymmetric.
      * @public
      *
      * @returns {Range} - for chaining
      */
-    roundSymmetric() { return this.setX( Util.roundSymmetric( this.x ) ).setY( Util.roundSymmetric( this.y ) ); }
+    roundSymmetric() { return this.setXY( Util.roundSymmetric( this.x ), Util.roundSymmetric( this.y ) ); }
 
     /**
      * Multiplies this Vector by a scalar. To NOT mutate this Vector, call copy() and multiply that Vector.
@@ -233,7 +243,7 @@ define( require => {
      */
     multiply( scalar ) {
       assert( typeof scalar === 'number', `invalid scalar: ${ scalar }` );
-      return this.setX( this._x * scalar ).setY( this._y * scalar );
+      return this.setXY( this._x * scalar, this._y * scalar );
     }
 
     /**
@@ -245,7 +255,7 @@ define( require => {
      */
     componentMultiply( vector ) {
       assert( vector instanceof Vector, `invalid vector: ${ vector }` );
-      return this.setX( this._x * vector.x ).setY( this._y * vector.y );
+      return this.setXY( this._x * vector.x, this._y * vector.y );
     }
 
     /**
@@ -277,7 +287,7 @@ define( require => {
       assert( typeof x === 'number', `invalid x: ${ x }` );
       assert( typeof y === 'number', `invalid y: ${ y }` );
 
-      return this.setX( this._x + x ).setY( this._y + y );
+      return this.setXY( this._x + x, this._y + y );
     }
 
     /**
@@ -304,7 +314,7 @@ define( require => {
       assert( typeof x === 'number', `invalid x: ${ x }` );
       assert( typeof y === 'number', `invalid y: ${ y }` );
 
-      return this.setX( this._x - x ).setY( this._y - y );
+      return this.setXY( this._x - x, this._y - y );
     }
 
     /**
@@ -401,7 +411,7 @@ define( require => {
   // @public {Vector} - Mutable Vector used within methods/functions to reduce the memory footprint by minimizing the
   //                    number of new Vector instances when recursing, layouting, etc. Don't rely on states saving as
   //                    other methods/functions can mutate. Used mostly to temporarily save a state within a method.
-  Vector.scratch = Bounds.ZERO.copy();
+  Vector.scratch = Vector.ZERO.copy();
 
   return Vector;
 } );
