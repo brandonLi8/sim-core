@@ -172,10 +172,9 @@ define( require => {
     isFinite() { return isFinite( this._x ) && isFinite( this._y ); }
 
 
-    //========================================================================================
-    // Mutators
-    //========================================================================================
-
+    /*----------------------------------------------------------------------------*
+     * Mutators
+     *----------------------------------------------------------------------------*/
     /**
      * Sets the x value, returning this.
      * @public
@@ -393,12 +392,10 @@ define( require => {
 
   //----------------------------------------------------------------------------------------
   // Constants
+  //----------------------------------------------------------------------------------------
 
-  // @public {Vector} ZERO - represents the zero vector.
-  Vector.ZERO = new Vector( 0, 0 );
-
-  // Conditionally freeze Vector.ZERO to ensure that it is constant and not modified.
-  Util.deepFreeze( Vector.ZERO );
+  // @public (read-only) {Vector} ZERO - immutable vector that represents the zero vector.
+  Vector.ZERO = Util.deepFreeze( new Vector( 0, 0 ) );
 
   return Vector;
 } );

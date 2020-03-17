@@ -283,10 +283,9 @@ define( require => {
       return Bounds.withRanges( this.xRange.intersection( bounds.xRange ), this.yRange.intersection( bounds.yRange ) );
     }
 
-    //========================================================================================
-    // Mutators
-    //========================================================================================
-
+    /*----------------------------------------------------------------------------*
+     * Mutators
+     *----------------------------------------------------------------------------*/
     /**
      * Sets the value of minX.
      * @public
@@ -484,9 +483,9 @@ define( require => {
     }
   }
 
-  //========================================================================================
-  // Static References
-  //========================================================================================
+  /*----------------------------------------------------------------------------*
+   * Static Bounds Creators
+   *----------------------------------------------------------------------------*/
 
   /**
    * Returns a new Bounds object, constructed with <minX, minY, width, height>.
@@ -499,6 +498,7 @@ define( require => {
    * @returns {Bounds}
    */
   Bounds.rect = ( x, y, width, height ) => new Bounds( x, y, x + width, y + height );
+
   /**
    * Returns a new Bounds object, constructed with points <minPoint, maxPoint>.
    * @public
@@ -523,16 +523,22 @@ define( require => {
     return new Bounds( xRange.min, yRange.min, xRange.max, yRange.max );
   };
 
-  // @public {Bounds} ZERO - a static Bounds that represents an empty Bounds with 0 width and height
+  // @public (read-only) {Bounds} ZERO - a static Bounds that represents an empty Bounds with 0 width and height
   Bounds.ZERO = Util.deepFreeze( new Bounds( 0, 0, 0, 0 ) );
 
-  // @public {Bounds} EVERYTHING - a static Bounds that contains infinite width and height and contains all real numbers
+  // @public (read-only) {Bounds} EVERYTHING - a static Bounds that contains infinite width and height and contains all
+  //                                           real numbers within its ranges
   Bounds.EVERYTHING = Util.deepFreeze( new Bounds(
     Number.NEGATIVE_INFINITY,
     Number.NEGATIVE_INFINITY,
     Number.POSITIVE_INFINITY,
     Number.POSITIVE_INFINITY
   ) );
+
+  // @public {Bounds} - Mutable Bounds used within methods/functions to reduce the memory footprint by minimizing the
+  //                    number of new Bounds instances when recursing, layouting, etc. Don't rely on states saving as
+  //                    other methods/functions can mutate. Used mostly to temporarily save a state within a method.
+  Bounds.scratch = Bounds.ZERO.copy();
 
   return Bounds;
 } );
