@@ -303,7 +303,7 @@ define( require => {
       if ( !Text.testSVGText ) {
         Text.testSVGTextParent = new DOMObject( {
           type: 'svg',
-          id: 'test-text-size-element',
+          id: 'scenery-test-text-size-element',
           style: {
             opacity: 0,
             whiteSpace: 'nowrap',

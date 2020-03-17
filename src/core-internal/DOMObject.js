@@ -454,6 +454,7 @@ define( require => {
     'text',
     'image',
     'defs',
+    'stop',
     'radialGradient',
     'linearGradient' ];
 
