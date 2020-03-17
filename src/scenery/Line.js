@@ -8,7 +8,7 @@
  * Currently, Lines are constructed by their x1, x2, y1, y2, but has other static Line creators.
  * Possible ways of initiating Lines include:
  *   - new Line( x1, x2, y1, y2, [options] );
- *   - Line.byPoints( p1, p2, [options] );
+ *   - Line.withPoints( p1, p2, [options] );
  * See the bottom portion of the file for documentation.
  *
  * @author Brandon Li <brandon.li820@gmail.com>
@@ -177,7 +177,7 @@ define( require => {
      * @param {Object} [options]
      * @returns {Line}
      */
-    static byPoints( start, end, options ) {
+    static withPoints( start, end, options ) {
       assert( start instanceof Vector, `invalid start: ${ start }` );
       assert( end instanceof Vector, `invalid end: ${ end }` );
       return new Line( start.x, start.y, end.x, end.y, options );

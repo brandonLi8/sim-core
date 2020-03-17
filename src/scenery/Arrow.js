@@ -7,8 +7,8 @@
  *
  * Currently, Arrows are constructed by their tailX, tailY, tipX, tipY.
  * Possible ways of initiating Arrows include:
- *   - new Rectangle( tailX, tailY, tipX, tipY, [options] );
- *   - Rectangle.byPoints( tail, tip, [options] );
+ *   - new Arrow( tailX, tailY, tipX, tipY, [options] );
+ *   - Arrow.withPoints( tail, tip, [options] );
  * See the bottom portion of the file for documentation.
  *
  * @author Brandon Li <brandon.li820@gmail.com>
@@ -259,7 +259,7 @@ define( require => {
      * @param {Object} [options]
      * @returns {Arrow}
      */
-    static byPoints( tail, tip, options ) {
+    static withPoints( tail, tip, options ) {
       assert( tail instanceof Vector, `invalid tail: ${ tail }` );
       assert( tip instanceof Vector, `invalid tip: ${ tip }` );
       return new Arrow( tail.x, tail.y, tip.x, tip.y, options );
