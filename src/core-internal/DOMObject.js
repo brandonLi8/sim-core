@@ -453,6 +453,7 @@ define( require => {
     'polygon',
     'text',
     'image',
+    'defs',
     'radialGradient',
     'linearGradient' ];
 
