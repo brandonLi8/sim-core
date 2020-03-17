@@ -19,6 +19,7 @@ define( require => {
   'use strict';
 
   // modules
+  const assert = require( 'SIM_CORE/util/assert' );
   const DOMObject = require( 'SIM_CORE/core-internal/DOMObject' );
 
   // flags
@@ -40,7 +41,7 @@ define( require => {
       // @private {string} - each Gradient needs to have a unique id to be referenced.
       this._id = `scenery-gradient-${ globalId++ }`;
 
-      // @private {DOMObject} - create the DOMObject that represents the definition of the gradient in the scene graph.
+      // @protected {DOMObject} - create the DOMObject that represents the definition of the gradient in the scene graph
       this._definitionElement = new DOMObject( { id: this._id, type } );
 
       // @private {number} - tracks the percentage of the last stop, to ensure stops are added in increasing order.
