@@ -481,47 +481,46 @@ define( require => {
       this.yRange.intersectRange( bounds.yRange );
       return this;
     }
+
+    /*----------------------------------------------------------------------------*
+     * Static Bounds Creators
+     *----------------------------------------------------------------------------*/
+    /**
+     * Returns a new Bounds object, constructed with <minX, minY, width, height>.
+     * @public
+     *
+     * @param {number} x - the minimum value of X for the bounds.
+     * @param {number} y - the minimum value of Y for the bounds.
+     * @param {number} width - the width (maxX - minX) of the bounds.
+     * @param {number} height - the height (maxY - minY) of the bounds.
+     * @returns {Bounds}
+     */
+    static rect( x, y, width, height ) { return new Bounds( x, y, x + width, y + height ) }
+
+    /**
+     * Returns a new Bounds object, constructed with points <minPoint, maxPoint>.
+     * @public
+     *
+     * @param {Vector} minPoint - the minimum point for the bounds.
+     * @param {Vector} maxPoint - the minimum point for the bounds.
+     * @returns {Bounds}
+     */
+    static withPoints( minPoint, maxPoint ) { return new Bounds( minPoint.x, minPoint.y, maxPoint.x, maxPoint.y ); }
+
+    /**
+     * Returns a new Bounds object, constructed with ranges in the form <xRange, yRange>.
+     * @public
+     *
+     * @param {Range} xRange
+     * @param {Range} yRange
+     * @returns {Bounds}
+     */
+    static withRanges( xRange, yRange ) {
+      assert( xRange instanceof Range, `invalid xRange: ${ xRange }` );
+      assert( yRange instanceof Range, `invalid yRange: ${ yRange }` );
+      return new Bounds( xRange.min, yRange.min, xRange.max, yRange.max );
+    }
   }
-
-  /*----------------------------------------------------------------------------*
-   * Static Bounds Creators
-   *----------------------------------------------------------------------------*/
-
-  /**
-   * Returns a new Bounds object, constructed with <minX, minY, width, height>.
-   * @public
-   *
-   * @param {number} x - the minimum value of X for the bounds.
-   * @param {number} y - the minimum value of Y for the bounds.
-   * @param {number} width - the width (maxX - minX) of the bounds.
-   * @param {number} height - the height (maxY - minY) of the bounds.
-   * @returns {Bounds}
-   */
-  Bounds.rect = ( x, y, width, height ) => new Bounds( x, y, x + width, y + height );
-
-  /**
-   * Returns a new Bounds object, constructed with points <minPoint, maxPoint>.
-   * @public
-   *
-   * @param {Vector} minPoint - the minimum point for the bounds.
-   * @param {Vector} maxPoint - the minimum point for the bounds.
-   * @returns {Bounds}
-   */
-  Bounds.withPoints = ( minPoint, maxPoint ) => new Bounds( minPoint.x, minPoint.y, maxPoint.x, maxPoint.y );
-
-  /**
-   * Returns a new Bounds object, constructed with ranges in the form <xRange, yRange>.
-   * @public
-   *
-   * @param {Range} xRange
-   * @param {Range} yRange
-   * @returns {Bounds}
-   */
-  Bounds.withRanges = ( xRange, yRange ) => {
-    assert( xRange instanceof Range, `invalid xRange: ${ xRange }` );
-    assert( yRange instanceof Range, `invalid yRange: ${ yRange }` );
-    return new Bounds( xRange.min, yRange.min, xRange.max, yRange.max );
-  };
 
   // @public (read-only) {Bounds} ZERO - a static Bounds that represents an empty Bounds with 0 width and height
   Bounds.ZERO = Util.deepFreeze( new Bounds( 0, 0, 0, 0 ) );
