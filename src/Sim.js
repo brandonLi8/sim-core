@@ -131,12 +131,14 @@ define( require => {
       // slider.addMajorTick( 0, new Text( 4, { fontSize: 14 }) );
       // slider.addMajorTick( 2, new Text( 4, { fontSize: 14 }) );
       // slider.addMajorTick( 4, new Text( 4, { fontSize: 14 }) );
-      const rect = new Rectangle( 100, 100, {
+      const rect = new Rectangle( 500, 500, {
         cornerRadius: 15,
-        fill: LinearGradient.withPercentages( 0, 0, 100, 0 ).addColorStop( 'blue', 0 ).addColorStop( 'green', 100 ),
         top: 10,
         left: 10
       })
+
+      const g = new LinearGradient( 0, 0, 100, 100, true ).addColorStop( 'blue', 0 ).addColorStop( 'green', 50 ).addColorStop( 'red', 75 );
+      rect.fill = g;
       const n = new Node( {
         children: [ rect ],
         top: 10,
@@ -145,13 +147,7 @@ define( require => {
       this.screens[ 0 ].view.addChild( n );
 
 
-      let h = new DragListener( rect, {
-        drag( displacment, locaiton ) {
-          rect.translate( displacment)
-          console.log( n.bounds.toString())
 
-        }
-      } )
       this.display.on( 'resize', ( width, height ) => {
 
         this.navigationBar.layout( width, height );

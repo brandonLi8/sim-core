@@ -64,8 +64,10 @@ define( require => {
      */
     addColorStop( color, percentage ) {
       assert( typeof color === 'string', `invalid color: ${ color }` );
-      assert( typeof percentage === 'number' && percentage >= this._lastStopPercentage && percentage <= 100,
+      assert( typeof percentage === 'number' && percentage >= 0 && percentage <= 100,
         `invalid percentage: ${ percentage }` );
+      assert( this._lastStopPercentage === 0 || percentage > this._lastStopPercentage,
+        'gradient stop percentages must be monotonically increasing' );
 
       // Update the _lastStopPercentage flag
       this._lastStopPercentage = percentage;
