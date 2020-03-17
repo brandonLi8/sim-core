@@ -224,7 +224,7 @@ define( require => {
      * @param {number} y
      * @returns {Vector} - for chaining
      */
-    setXY( x, y ) { return this.set( Vector.scratch.setX( x ).setY( y ) ); }
+    setXY( x, y ) { return this.setX( x ).setY( y ); }
 
     /**
      * Rounds each the edges of this range with Util.roundSymmetric.
