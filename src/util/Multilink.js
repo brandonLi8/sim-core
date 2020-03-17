@@ -82,18 +82,23 @@ define( require => {
       // Indicate that this Multilink has been disposed.
       this._isDisposed = true;
     }
+
+    /*----------------------------------------------------------------------------*
+     * Static Multilink Creators
+     *----------------------------------------------------------------------------*/
+
+    /**
+     * Returns a new Multilink object that is lazily constructed. Usage: `Multilink.lazy( ... )`
+     * @public
+     *
+     * @param {Property[]} dependencies - array of Properties to link to.
+     * @param {function} callback - function called when any of the Properties in dependencies change. The values of the
+     *                              dependencies are passed (in the same order) to this function.
+     * @returns {Multilink}
+     */
+    static lazy( dependencies, callback ) { return new Multilink( dependencies, callback, true ); }
   }
 
-  /**
-   * Returns a new Multilink object that is lazily constructed.
-   * @public
-   *
-   * @param {Property[]} dependencies - array of Properties to link to.
-   * @param {function} callback - function called when any of the Properties in dependencies change. The values of the
-   *                              dependencies are passed (in the same order) to this function.
-   * @returns {Multilink}
-   */
-  Multilink.lazy = ( dependencies, callback ) => new Multilink( dependencies, callback, true );
 
   return Multilink;
 } );
