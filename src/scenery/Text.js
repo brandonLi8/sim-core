@@ -22,6 +22,7 @@ define( require => {
   // modules
   const assert = require( 'SIM_CORE/util/assert' );
   const DOMObject = require( 'SIM_CORE/core-internal/DOMObject' );
+  const Gradient = require( 'SIM_CORE/scenery/gradients/Gradient' );
   const Node = require( 'SIM_CORE/scenery/Node' );
 
   class Text extends Node {
@@ -47,8 +48,8 @@ define( require => {
         fontWeight: 'normal',   // {string|number} - the font-weight of the Text. See `set fontWeight()`.
         fontSize: 12,           // {number} - the font-size of the Text. See `set fontSize()`.
         fontFamily: 'Arial',    // {string} - the css font-family of the Text. See `set fontFamily()`.
-        fill: '#000000',        // {string} - Sets the fill color of the Text. See `set fill()`.
-        stroke: null,           // {string} - Sets the stroke color of the Text. See `set stroke()`.
+        fill: '#000000',        // {string|Gradient} - Sets the fill color of the Text. See `set fill()`.
+        stroke: null,           // {string|Gradient} - Sets the stroke color of the Text. See `set stroke()`.
         strokeWidth: 0,         // {number} - Sets the stroke width of this Text. See `set strokeWidth()`.
         textRendering: 'auto',  // {string} - Sets the shape-rendering method of this Text. See `set textRendering()`.
 
@@ -161,26 +162,26 @@ define( require => {
      * Sets the inner-fill color of the Text. See https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/fill.
      * @public
      *
-     * @param {string|null} fill
+     * @param {string|Gradient|null} fill
      */
     set fill( fill ) {
       if ( fill === this._fill ) return; // Exit if setting to the same 'fill'
-      assert( !fill || typeof fill === 'string', `invalid fill: ${ fill }` );
+      assert( !fill || typeof fill === 'string' || fill instanceof Gradient, `invalid fill: ${ fill }` );
       this._fill = fill;
-      this.element.setAttribute( 'fill', fill );
+      this.element.setAttribute( 'fill', fill instanceof Gradient ? fill.SVGGradientString : fill );
     }
 
     /**
      * Sets the outline stroke-color of the Text. See https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/stroke
      * @public
      *
-     * @param {string|null} stroke
+     * @param {string|Gradient|null} stroke
      */
     set stroke( stroke ) {
       if ( stroke === this._stroke ) return; // Exit if setting to the same 'stroke'
-      assert( !stroke || typeof stroke === 'string', `invalid stroke: ${ stroke }` );
+      assert( !stroke || typeof stroke === 'string' || stroke instanceof Gradient, `invalid stroke: ${ stroke }` );
       this._stroke = stroke;
-      this.element.setAttribute( 'stroke', stroke );
+      this.element.setAttribute( 'stroke', stroke instanceof Gradient ? stroke.SVGGradientString : stroke );
     }
 
     /**

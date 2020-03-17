@@ -120,6 +120,7 @@ define( require => {
       const Node = require( 'SIM_CORE/scenery/Node' );
       const Rectangle = require( 'SIM_CORE/scenery/Rectangle' );
       // const Text = require( 'SIM_CORE/scenery/Text' );
+      const LinearGradient = require( 'SIM_CORE/scenery/gradients/LinearGradient' );
 
       // const Range = require( 'SIM_CORE/util/Range' );
 
@@ -132,8 +133,8 @@ define( require => {
       // slider.addMajorTick( 4, new Text( 4, { fontSize: 14 }) );
       const rect = new Rectangle( 100, 100, {
         cornerRadius: 15,
-        fill: 'blue',
-                top: 10,
+        fill: LinearGradient.withPercentages( 0, 0, 100, 0 ).addColorStop( 'blue', 0 ).addColorStop( 'green', 100 ),
+        top: 10,
         left: 10
       })
       const n = new Node( {

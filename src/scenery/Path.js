@@ -15,6 +15,7 @@ define( require => {
 
   // modules
   const assert = require( 'SIM_CORE/util/assert' );
+  const Gradient = require( 'SIM_CORE/scenery/gradients/Gradient' );
   const Node = require( 'SIM_CORE/scenery/Node' );
   const Shape = require( 'SIM_CORE/util/Shape' );
   const Util = require( 'SIM_CORE/util/Util' );
@@ -33,8 +34,8 @@ define( require => {
       assert( !options || !options.type, 'path sets type' );
 
       options = {
-        fill: null,             // {string} - Sets the fill color of the Path. See `set fill()`.
-        stroke: null,           // {string} - Sets the stroke color of the Path. See `set stroke()`.
+        fill: null,             // {string|Gradient} - Sets the fill color of the Path. See `set fill()`.
+        stroke: null,           // {string|Gradient} - Sets the stroke color of the Path. See `set stroke()`.
         strokeWidth: 1,         // {number} - Sets the stroke width of this Path. See `set strokeWidth()`.
         shapeRendering: 'auto', // {string} - Sets the shape-rendering method of this Path. See `set shapeRendering()`.
 
@@ -75,26 +76,26 @@ define( require => {
      * Sets the inner-fill color of the Shape. See https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/fill.
      * @public
      *
-     * @param {string|null} fill
+     * @param {string|Gradient|null} fill
      */
     set fill( fill ) {
       if ( fill === this._fill ) return; // Exit if setting to the same 'fill'
-      assert( !fill || typeof fill === 'string', `invalid fill: ${ fill }` );
+      assert( !fill || typeof fill === 'string' || fill instanceof Gradient, `invalid fill: ${ fill }` );
       this._fill = fill;
-      this.element.setAttribute( 'fill', fill );
+      this.element.setAttribute( 'fill', fill instanceof Gradient ? fill.SVGGradientString : fill );
     }
 
     /**
      * Sets the outline stroke-color of the Shape. See https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/stroke
      * @public
      *
-     * @param {string|null} stroke
+     * @param {string|Gradient|null} stroke
      */
     set stroke( stroke ) {
       if ( stroke === this._stroke ) return; // Exit if setting to the same 'stroke'
-      assert( !stroke || typeof stroke === 'string', `invalid stroke: ${ stroke }` );
+      assert( !stroke || typeof stroke === 'string' || stroke instanceof Gradient, `invalid stroke: ${ stroke }` );
       this._stroke = stroke;
-      this.element.setAttribute( 'stroke', stroke );
+      this.element.setAttribute( 'stroke', stroke instanceof Gradient ? stroke.SVGGradientString : stroke );
     }
 
     /**

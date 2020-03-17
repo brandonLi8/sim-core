@@ -46,6 +46,9 @@ define( require => {
 
       // @private {number} - tracks the percentage of the last stop, to ensure stops are added in increasing order.
       this._lastStopPercentage = 0;
+
+      // Add the _definitionElement to the _embededDefsElement container.
+      Gradient._embededDefsElement.addChild( this._definitionElement );
     }
 
     /**
@@ -72,7 +75,7 @@ define( require => {
         type: 'stop',
         attributes: {
           offset: `${ percentage }%`,
-          stop-color: color
+          'stop-color': color
         }
       } );
 
@@ -98,7 +101,7 @@ define( require => {
 
       // Create a SVG element as the parent of the definitions element and connect it to the document body.
       Gradient._SVGElement = new DOMObject( { type: 'svg', id: 'scenery-gradients' } );
-      document.body.appendChild( Gradient._SVGElement );
+      document.body.appendChild( Gradient._SVGElement.element );
 
       // Create the definitions container element and connect it to the SVG element.
       Gradient._embededDefsElement = new DOMObject( { type: 'defs' } );
