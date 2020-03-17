@@ -537,5 +537,10 @@ define( require => {
     Number.POSITIVE_INFINITY
   ) );
 
+  // @public {Bounds} - Mutable Bounds used within methods/functions to reduce the memory footprint by minimizing the
+  //                    number of new Bounds instances when recursing, layouting, etc. Don't rely on states saving as
+  //                    other methods/functions can mutate. Used mostly to temporarily save a state within a method.
+  Bounds.scratch = Bounds.ZERO.copy();
+
   return Bounds;
 } );
