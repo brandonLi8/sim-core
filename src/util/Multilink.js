@@ -99,6 +99,5 @@ define( require => {
     static lazy( dependencies, callback ) { return new Multilink( dependencies, callback, true ); }
   }
 
-
   return Multilink;
 } );
