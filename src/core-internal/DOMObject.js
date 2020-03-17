@@ -157,6 +157,7 @@ define( require => {
     /*----------------------------------------------------------------------------*
      * Mutators
      *----------------------------------------------------------------------------*/
+
     /**
      * Sets an attribute of this DOMObject, updating this Object's properties.
      * @public

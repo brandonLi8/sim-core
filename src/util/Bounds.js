@@ -522,6 +522,10 @@ define( require => {
     }
   }
 
+  /*----------------------------------------------------------------------------*
+   * Static Fields
+   *----------------------------------------------------------------------------*/
+
   // @public (read-only) {Bounds} ZERO - a static Bounds that represents an empty Bounds with 0 width and height
   Bounds.ZERO = Util.deepFreeze( new Bounds( 0, 0, 0, 0 ) );
 
