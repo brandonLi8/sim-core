@@ -425,6 +425,7 @@ define( require => {
       assert( translation instanceof Vector && translation.isFinite(), `invalid translation: ${ translation }` );
       if ( translation.x === 0 && translation.y === 0 ) return; // Exit if setting to the same translation.
       this._bounds.shift( translation.x, translation.y );
+      if ( this.parent instanceof Node ) this.parent._recomputeAncestorBounds();
       this.layout( this.screenViewScale );
     }
 
@@ -438,7 +439,6 @@ define( require => {
       assert( translation instanceof Vector, `invalid translation: ${ translation }` );
       if ( this.translation.equals( translation ) ) return; // Exit if setting to the same translation.
       this.topLeft = translation;
-      this.layout( this.screenViewScale );
     }
 
     /**
@@ -475,6 +475,9 @@ define( require => {
      * @private
      */
     _updateMaxDimension() {
+      // Ensure that our ancestor's bounds are correct after updating width/height
+      if ( this.parent instanceof Node ) this.parent._recomputeAncestorBounds();
+
       // Only update if the maxWidth and/or the maxWidth of this Node is not satisfied.
       if ( ( this.maxHeight && this.height > this.maxHeight ) || ( this.maxWidth && this.width > this.maxWidth ) ) {
 
