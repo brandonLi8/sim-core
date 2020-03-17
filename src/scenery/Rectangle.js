@@ -26,7 +26,7 @@ define( require => {
   const Vector = require( 'SIM_CORE/util/Vector' );
 
   // constants
-  const PI = Math.PI; // convenience reference
+  const V = ( x, y ) => Vector.scratch.setXY( x, y ); // convenience function to return the scratch Vector with <x, y>
 
   class Rectangle extends Path {
 
@@ -110,15 +110,16 @@ define( require => {
       cornerRadius = Math.min( maxCornerRadius, cornerRadius );
 
       if ( cornerRadius ) {
-        // Draw the Rectangle Shape with cornerRadii arcs.
+        // Draw the Rectangle Shape with cornerRadii arcs. Use scratchVector to eliminate new Vector instances on
+        // each arc call.
         return new Shape()
-          .arc( new Vector( bounds.minX + cornerRadius, bounds.minY + cornerRadius ), cornerRadius, PI, -PI / 2 )
+          .arc( V( bounds.minX + cornerRadius, bounds.minY + cornerRadius ), cornerRadius, Math.PI, -Math.PI / 2 )
           .horizontalLineTo( bounds.maxX - cornerRadius )
-          .arc( new Vector( bounds.maxX - cornerRadius, bounds.minY + cornerRadius ), cornerRadius, -PI / 2, 0 )
+          .arc( V( bounds.maxX - cornerRadius, bounds.minY + cornerRadius ), cornerRadius, -Math.PI / 2, 0 )
           .verticalLineTo( bounds.maxY - cornerRadius )
-          .arc( new Vector( bounds.maxX - cornerRadius, bounds.maxY - cornerRadius ), cornerRadius, 0, PI / 2 )
+          .arc( V( bounds.maxX - cornerRadius, bounds.maxY - cornerRadius ), cornerRadius, 0, Math.PI / 2 )
           .horizontalLineTo( bounds.minX + cornerRadius )
-          .arc( new Vector( bounds.minX + cornerRadius, bounds.maxY - cornerRadius ), cornerRadius, PI / 2, PI )
+          .arc( V( bounds.minX + cornerRadius, bounds.maxY - cornerRadius ), cornerRadius, Math.PI / 2, Math.PI )
           .close();
       }
       else {
