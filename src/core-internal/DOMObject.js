@@ -123,10 +123,9 @@ define( require => {
       this.setAttribute( 'href', this._href );    // validates options.href and sets the href, if this._type is a link.
     }
 
-    //========================================================================================
-    // Accessors
-    //========================================================================================
-
+    /*----------------------------------------------------------------------------*
+     * Accessors
+     *----------------------------------------------------------------------------*/
     /**
      * ES5 getters of a private property of this DOM object. Traditional accessors not included to reduce the
      * memory footprint of this class.
