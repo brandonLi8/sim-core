@@ -8,8 +8,8 @@
  * Currently, Rectangles are constructed by their width and height, but has several static Rectangle creators.
  * Possible ways of initiating Rectangles include:
  *   - new Rectangle( width, height, [options] );
- *   - Rectangle.byRect( x, y, width, height, [options] );
- *   - Rectangle.byBounds( bounds, [options] );
+ *   - Rectangle.withRect( x, y, width, height, [options] );
+ *   - Rectangle.withBounds( bounds, [options] );
  * See the bottom portion of the file for documentation.
  *
  * @author Brandon Li <brandon.li820@gmail.com>
@@ -148,7 +148,7 @@ define( require => {
      * @param {Object} [options]
      * @returns {Rectangle}
      */
-    static byRect( x, y, width, height, options ) {
+    static withRect( x, y, width, height, options ) {
       return new Rectangle( width, height, { ...options, left: x, top: y } );
     }
 
@@ -163,9 +163,9 @@ define( require => {
      * @param {Object} [options]
      * @returns {Rectangle}
      */
-    static byBounds( bounds, options ) {
+    static withBounds( bounds, options ) {
       assert( bounds instanceof Bounds, `invalid bounds: ${ bounds }` );
-      return Rectangle.byRect( bounds.minX, bounds.minY, bounds.width, bounds.height, options );
+      return Rectangle.withRect( bounds.minX, bounds.minY, bounds.width, bounds.height, options );
     }
   }
 
