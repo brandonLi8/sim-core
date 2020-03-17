@@ -52,8 +52,8 @@ define( require => {
       options = {
 
         // track
-        trackFill: '#BCBCBC',  // {string} - the fill color the slider track
-        trackStroke: 'black',  // {string} - the stroke color of the slider track
+        trackFill: '#BCBCBC',  // {string|Gradient} - the fill color the slider track
+        trackStroke: 'black',  // {string|Gradient} - the stroke color of the slider track
         trackStrokeWidth: 1,   // {number} - the stroke width of the slider track
         trackHeight: 3,        // {number} - the height of the track, in scenery coordinates
         trackWidth: 180,       // {number} - the width of the track, in scenery coordinates
@@ -62,20 +62,20 @@ define( require => {
         // thumb
         thumbWidth: 12,                  // {number} - the width of the thumb Rectangle
         thumbHeight: 25,                 // {number} - the height of the thumb Rectangle
-        thumbFill: '#99FF69',            // {string} - the fill color of the thumb Rectangle
-        thumbFillHighlighted: '#CCF199', // {string} - the fill color of the thumb when it is highlighted or hovered
-        thumbStroke: 'black',            // {string} - the stroke color of the thumb Rectangle
+        thumbFill: '#99FF69',            // {string|Gradient} - the fill of the thumb Rectangle
+        thumbFillHighlighted: '#CCF199', // {string|Gradient} - the fill of the thumb when it is highlighted or hovered
+        thumbStroke: 'black',            // {string|Gradient} - the stroke color of the thumb Rectangle
         thumbStrokeWidth: 1,             // {number} - the stroke width of the line that runs through the thumb
-        thumbCenterLineStroke: '#333',   // {string} - the stroke color of the line that runs through the thumb
+        thumbCenterLineStroke: '#333',   // {string|Gradient} - the stroke color of the line that runs through the thumb
         thumbCenterLineYMargin: 3,       // {number} - the vertical margin from the top of the thumb for the center line
         thumbCornerRadius: 2.5,          // {number} - the corner radius of the thumb Rectangle
 
         // ticks
         majorTickHeight: 35,        // {number} - the height of the major tick lines that lie along the track
-        majorTickStroke: 'black',   // {string} - the stroke color of the major tick lines that lie along the track
+        majorTickStroke: 'black',   // {string|Gradient} - the stroke of the major tick lines that lie along the track
         majorTickStrokeWidth: 1.3,  // {number} - the stroke width the major tick lines that lie along the track
         minorTickHeight: 8,         // {number} - the height of the minor tick lines that lie along the track
-        minorTickStroke: '#323232', // {string} - the stroke color of the minor tick lines that lie along the track
+        minorTickStroke: '#323232', // {string|Gradient} - the stroke of the minor tick lines that lie along the track
         minorTickStrokeWidth: 1,    // {number} - the stroke width of the minor tick lines that lie along the track
         tickLabelSpacing: 6,        // {number} - the spacing between label Nodes and tick Lines
 
