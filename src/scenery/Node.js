@@ -44,11 +44,6 @@ define( require => {
   const Util = require( 'SIM_CORE/util/Util' );
   const Vector = require( 'SIM_CORE/util/Vector' );
 
-  // Mutable Bounds & Vector used temporarily in methods to reduce the memory footprint by minimizing the number of
-  // new Bounds and Vector instances when recursing, layouting, etc.
-  const scratchBounds = Bounds.ZERO.copy();
-  const scratchVector = Vector.ZERO.copy();
-
   class Node extends DOMObject {
 
     /**
@@ -226,17 +221,17 @@ define( require => {
       // Horizontal shift
       if ( [ 'left', 'right', 'centerX' ].includes( name ) ) {
         assert( isFinite( location ), `${ name } should be finite.` );
-        return this.translate( scratchVector.setX( location - this[ name ] ).setY( 0 ) ); // translate and exit
+        return this.translate( Vector.scratch.setXY( location - this[ name ], 0 ) ); // translate and exit
       }
 
       // Vertical shift
       if ( [ 'top', 'bottom', 'centerY' ].includes( name ) ) {
         assert( isFinite( location ), `${ name } should be finite.` );
-        return this.translate( scratchVector.setX( 0 ).setY( location - this[ name ] ) ); // translate and exit
+        return this.translate( Vector.scratch.setXY( 0, location - this[ name ] ) ); // translate and exit
       }
       // At this point, the location must be a point location
       assert( location instanceof Vector && location.isFinite(), `${ name } should be a finite Vector` );
-      this.translate( scratchVector.set( location ).subtract( this[ name ] ) );
+      this.translate( Vector.scratch.set( location ).subtract( this[ name ] ) );
     }
 
     /**
@@ -386,7 +381,7 @@ define( require => {
         this._updateMaxDimension();
         this.layout( this.screenViewScale );
       }
-      else this.scale( scratchVector.setX( a ).setY( a ) ); // Forward as `scale( <a, a> )`
+      else this.scale( Vector.scratch.setXY( a, a ) ); // Forward as `scale( <a, a> )`
     }
 
     /**
@@ -409,9 +404,9 @@ define( require => {
         const currentScalarX = this._scalar instanceof Vector ? this._scalar.x : this._scalar;
         const currentScalarY = this._scalar instanceof Vector ? this._scalar.y : this._scalar;
 
-        this.scale( scratchVector.setX( a.x / currentScalarX ).setY( a.y / currentScalarY ) );
+        this.scale( Vector.scratch.setXY( a.x / currentScalarX, a.y / currentScalarY ) );
       }
-      else this.scalar = scratchVector.setX( a ).setY( a ); // Forward as `set scalar( <a, a> )`
+      else this.scalar = Vector.scratch.setXY( a, a ); // Forward as `set scalar( <a, a> )`
     }
 
     /**
@@ -521,7 +516,7 @@ define( require => {
       if ( assert.enabled ) { // Only assert sanity checks if assertions are enabled for performance reasons.
         // Sanity checks
         assert( this.bounds.isFinite(), 'bounds are not finite.' );
-        assert( !this.parent || this._computeGlobalBounds( scratchBounds ).isFinite(), 'globalBounds are not finite.' );
+        assert( !this.parent || this._computeGlobalBounds( Bounds.scratch ).isFinite(), 'globalBounds are not finite.' );
       }
       /**
        * Access and reference all necessary information to generate the svg transform attribute string.
@@ -604,7 +599,7 @@ define( require => {
 
       // First step: Compute the child Bounds of this Node in our local coordinate frame. For now, set to the origin.
       // Use scratchBounds to eliminate new Bounds instances on each recursive layer.
-      const childBounds = scratchBounds.set( Bounds.ZERO );
+      const childBounds = Bounds.scratch.set( Bounds.ZERO );
 
       // Next include the Bounds of each of this Node's first generation children, in our local coordinate frame.
       this.children.forEach( child => {

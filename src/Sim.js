@@ -116,9 +116,9 @@ define( require => {
       // Enable the red dev border around ScreenViews if the ?dev query parameter was provided.
       if ( StandardSimQueryParameters.dev ) { ScreenView.enableDevBorder(); }
       // const Slider = require( 'SIM_CORE/scenery/Slider' );
-      // const Property = require( 'SIM_CORE/util/Property' );
-      // const Node = require( 'SIM_CORE/scenery/Node' );
-      // const Rectangle = require( 'SIM_CORE/scenery/Rectangle' );
+      const DragListener = require( 'SIM_CORE/scenery/events/DragListener' );
+      const Node = require( 'SIM_CORE/scenery/Node' );
+      const Rectangle = require( 'SIM_CORE/scenery/Rectangle' );
       // const Text = require( 'SIM_CORE/scenery/Text' );
 
       // const Range = require( 'SIM_CORE/util/Range' );
@@ -130,9 +130,27 @@ define( require => {
       // slider.addMajorTick( 0, new Text( 4, { fontSize: 14 }) );
       // slider.addMajorTick( 2, new Text( 4, { fontSize: 14 }) );
       // slider.addMajorTick( 4, new Text( 4, { fontSize: 14 }) );
-      // this.screens[ 0 ].view.addChild( slider );
+      const rect = new Rectangle( 100, 100, {
+        cornerRadius: 15,
+        fill: 'blue',
+                top: 10,
+        left: 10
+      })
+      const n = new Node( {
+        children: [ rect ],
+        top: 10,
+        left: 10
+      })
+      this.screens[ 0 ].view.addChild( n );
 
 
+      let h = new DragListener( rect, {
+        drag( displacment, locaiton ) {
+          rect.translate( displacment)
+          console.log( n.bounds.toString())
+
+        }
+      } )
       this.display.on( 'resize', ( width, height ) => {
 
         this.navigationBar.layout( width, height );
