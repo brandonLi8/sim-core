@@ -494,7 +494,7 @@ define( require => {
      * @param {number} height - the height (maxY - minY) of the bounds.
      * @returns {Bounds}
      */
-    static rect( x, y, width, height ) { return new Bounds( x, y, x + width, y + height ) }
+    static rect( x, y, width, height ) { return new Bounds( x, y, x + width, y + height ); }
 
     /**
      * Returns a new Bounds object, constructed with points <minPoint, maxPoint>.

@@ -92,7 +92,7 @@ define( require => {
      *
      * @returns {string}
      */
-    get SVGGradientString () { return `url(#${ this._id })`; }
+    get SVGGradientString() { return `url(#${ this._id })`; }
 
     /**
      * Static method that initializes containers and elements needed for SVG gradients.

@@ -115,38 +115,6 @@ define( require => {
     static finishLoadingScreens() {
       // Enable the red dev border around ScreenViews if the ?dev query parameter was provided.
       if ( StandardSimQueryParameters.dev ) { ScreenView.enableDevBorder(); }
-      // const Slider = require( 'SIM_CORE/scenery/Slider' );
-      const DragListener = require( 'SIM_CORE/scenery/events/DragListener' );
-      const Node = require( 'SIM_CORE/scenery/Node' );
-      const Rectangle = require( 'SIM_CORE/scenery/Rectangle' );
-      // const Text = require( 'SIM_CORE/scenery/Text' );
-      const RadialGradient = require( 'SIM_CORE/scenery/gradients/RadialGradient' );
-
-      // const Range = require( 'SIM_CORE/util/Range' );
-
-      // let slider = new Slider( new Range( 0, 10 ), new Property( 4 ), {
-      //   center: this.screens[ 0 ].view.viewBounds.center,
-      //   constrain: value => Util.toFixed( value, 2 )
-      // } );
-      // slider.addMajorTick( 0, new Text( 4, { fontSize: 14 }) );
-      // slider.addMajorTick( 2, new Text( 4, { fontSize: 14 }) );
-      // slider.addMajorTick( 4, new Text( 4, { fontSize: 14 }) );
-      const rect = new Rectangle( 500, 500, {
-        cornerRadius: 15,
-        top: 10,
-        left: 10
-      })
-
-      const g = new RadialGradient( 50, 50, 50, 50, 0 ).addColorStop( 'blue', 0 ).addColorStop( 'green', 50 ).addColorStop( 'red', 100 );
-      rect.fill = g;
-      const n = new Node( {
-        children: [ rect ],
-        top: 10,
-        left: 10
-      })
-      this.screens[ 0 ].view.addChild( n );
-
-
 
       this.display.on( 'resize', ( width, height ) => {
 
