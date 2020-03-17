@@ -81,6 +81,14 @@ define( require => {
     }
 
     /**
+     * Gets the SVG fill/stroke attribute for the string to reference this gradient.
+     * @public (sim-core-internal)
+     *
+     * @returns {string}
+     */
+    get SVGGradientString () { return `url(#${ this._id })`; }
+
+    /**
      * Static method that initializes containers and elements needed for SVG gradients.
      * See https://developer.mozilla.org/en-US/docs/Web/SVG/Element/defs for documentation and background.
      * @private
