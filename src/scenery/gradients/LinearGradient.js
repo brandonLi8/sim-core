@@ -20,7 +20,6 @@ define( require => {
   // modules
   const assert = require( 'SIM_CORE/util/assert' );
   const Gradient = require( 'SIM_CORE/scenery/gradients/Gradient' );
-  const Vector = require( 'SIM_CORE/util/Vector' );
 
   class LinearGradient extends Gradient {
 

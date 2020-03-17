@@ -120,7 +120,7 @@ define( require => {
       const Node = require( 'SIM_CORE/scenery/Node' );
       const Rectangle = require( 'SIM_CORE/scenery/Rectangle' );
       // const Text = require( 'SIM_CORE/scenery/Text' );
-      const LinearGradient = require( 'SIM_CORE/scenery/gradients/LinearGradient' );
+      const RadialGradient = require( 'SIM_CORE/scenery/gradients/RadialGradient' );
 
       // const Range = require( 'SIM_CORE/util/Range' );
 
@@ -137,7 +137,7 @@ define( require => {
         left: 10
       })
 
-      const g = new LinearGradient( 0, 0, 100, 100, true ).addColorStop( 'blue', 0 ).addColorStop( 'green', 50 ).addColorStop( 'red', 75 );
+      const g = new RadialGradient( 50, 50, 50, 50, 0 ).addColorStop( 'blue', 0 ).addColorStop( 'green', 50 ).addColorStop( 'red', 100 );
       rect.fill = g;
       const n = new Node( {
         children: [ rect ],
