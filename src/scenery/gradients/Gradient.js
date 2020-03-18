@@ -102,7 +102,18 @@ define( require => {
     static _initializeGradientDOMObjects() {
 
       // Create a SVG element as the parent of the definitions element and connect it to the document body.
-      Gradient._SVGElement = new DOMObject( { type: 'svg', id: 'scenery-gradients' } );
+      Gradient._SVGElement = new DOMObject( {
+        type: 'svg',
+        id: 'scenery-gradients',
+        style: {
+          opacity: 0,
+          position: 'absolute',
+          left: '-65535px', // Ensure that it is not visible to the user.
+          top: '-65535px',
+          width: 0,
+          hegiht: 0
+        }
+      } );
       document.body.appendChild( Gradient._SVGElement.element );
 
       // Create the definitions container element and connect it to the SVG element.
