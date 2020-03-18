@@ -162,7 +162,7 @@ define( require => {
      * Sets the inner-fill color of the Text. See https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/fill.
      * @public
      *
-     * @param {string|Gradient|null} fill - any valid css color string or a Gradient instance.
+     * @param {string|Gradient|null} fill - any CSS-compatible color string or a Gradient instance.
      */
     set fill( fill ) {
       if ( fill === this._fill ) return; // Exit if setting to the same 'fill'
@@ -175,7 +175,7 @@ define( require => {
      * Sets the outline stroke-color of the Text. See https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/stroke
      * @public
      *
-     * @param {string|Gradient|null} stroke - any valid css color string or a Gradient instance.
+     * @param {string|Gradient|null} stroke - any CSS-compatible color string or a Gradient instance.
      */
     set stroke( stroke ) {
       if ( stroke === this._stroke ) return; // Exit if setting to the same 'stroke'
