@@ -7,6 +7,9 @@
  * top-left of its localBounds. Contains an API to specify the fill, stroke, etc of the rendered Path. See
  * https://developer.mozilla.org/en-US/docs/Web/SVG/Element/path.
  *
+ * The fill and stroke can be either a Gradient instance of any valid css color string. See
+ * https://www.w3schools.com/colors/default.asp for context.
+ *
  * @author Brandon Li <brandon.li820@gmail.com>
  */
 
@@ -76,7 +79,7 @@ define( require => {
      * Sets the inner-fill color of the Shape. See https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/fill.
      * @public
      *
-     * @param {string|Gradient|null} fill
+     * @param {string|Gradient|null} fill - any valid css color string or a Gradient instance.
      */
     set fill( fill ) {
       if ( fill === this._fill ) return; // Exit if setting to the same 'fill'
@@ -89,7 +92,7 @@ define( require => {
      * Sets the outline stroke-color of the Shape. See https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/stroke
      * @public
      *
-     * @param {string|Gradient|null} stroke
+     * @param {string|Gradient|null} stroke - any valid css color string or a Gradient instance.
      */
     set stroke( stroke ) {
       if ( stroke === this._stroke ) return; // Exit if setting to the same 'stroke'

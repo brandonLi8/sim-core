@@ -58,7 +58,7 @@ define( require => {
      * IMPORTANT: Color stops should be added in order (monotonically increasing ratio values).
      * @public
      *
-     * @param {string} - the color string at the specific stop
+     * @param {string} - the css color string at the specific stop. See https://www.w3schools.com/colors/default.asp.
      * @param {number} percentage - percentage along the gradient, in the range of 0 to 100
      * @returns {Gradient} - 'this' reference, for chaining
      */
