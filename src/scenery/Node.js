@@ -589,7 +589,7 @@ define( require => {
      * parent up to either the ScreenView or to the point where a Node doesn't have a parent. This is called after the
      * addChild() and removeChild() methods to ensure that Bounds are correct after adding/removing children for
      * all Nodes in its ancestor tree.
-     * @private
+     * @protected
      *
      * NOTE: if any children have negative parent bounds, all of this Node's children's Bounds, and this Node's bounds,
      *       will be shifted so that all children have positive parent bounds. This Node's bounds will also be adjusted
