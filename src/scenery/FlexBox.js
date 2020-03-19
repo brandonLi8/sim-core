@@ -1,4 +1,4 @@
-// Copyright © 2019-2020 Brandon Li. All rights reserved.
+// Copyright © 2020 Brandon Li. All rights reserved.
 
 /**
  * FlexBox is a Node sub-type that lays out its children in either a horizontal row or a vertical column, loosely
@@ -28,7 +28,6 @@ define( require => {
 
   // modules
   const assert = require( 'SIM_CORE/util/assert' );
-  const Bounds = require( 'SIM_CORE/util/Bounds' );
   const Node = require( 'SIM_CORE/scenery/Node' );
 
   class FlexBox extends Node {

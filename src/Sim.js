@@ -115,26 +115,6 @@ define( require => {
     static finishLoadingScreens() {
       // Enable the red dev border around ScreenViews if the ?dev query parameter was provided.
       if ( StandardSimQueryParameters.dev ) { ScreenView.enableDevBorder(); }
-      // const Slider = require( 'SIM_CORE/scenery/Slider' );
-      // const Text = require( 'SIM_CORE/scenery/Text' );
-
-      // const Range = require( 'SIM_CORE/util/Range' );
-      // const Property = require( 'SIM_CORE/util/Property' );
-
-      // let c  =new Property( 4 );
-      // let slider = new Slider( new Range( 0, 10 ), c , {
-      //   center: this.screens[ 0 ].view.viewBounds.center,
-      //   constrain: value => Util.toFixed( value, 2 )
-      // } );
-      // slider.addMajorTick( 0, new Text( 4, { fontSize: 14 }) );
-      // slider.addMajorTick( 2, new Text( 4, { fontSize: 14 }) );
-      // slider.addMajorTick( 4, new Text( 4, { fontSize: 14 }) );
-
-      // this.screens[ 0 ].view.addChild( slider );
-      // c.link(  value => {
-      //   console.log( value )
-      // } )
-
 
       this.display.on( 'resize', ( width, height ) => {
 
