@@ -277,7 +277,7 @@ define( require => {
     removeChild( child ) {
       assert( this.hasChild( child ), 'Attempted to removeChild with a DOMObject that was not a child.' );
 
-      this._children.splice( this._children.indexOf( child ), 1 );
+      Util.arrayRemove( this.children, child );
       this._element.removeChild( child.element );
       child._parent = null;
       return this;
@@ -290,7 +290,8 @@ define( require => {
      * @returns {DOMObject} - Returns 'this' reference, for chaining
      */
     removeAllChildren() {
-      this._children.forEach( child => this.removeChild( child ) );
+      this._children.forEach( child => this._element.removeChild( child.element ) );
+      this._children = [];
       return this;
     }
 
