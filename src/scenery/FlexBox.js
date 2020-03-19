@@ -29,6 +29,7 @@ define( require => {
   // modules
   const assert = require( 'SIM_CORE/util/assert' );
   const Node = require( 'SIM_CORE/scenery/Node' );
+  const Bounds = require( 'SIM_CORE/scenery/Bounds' );
 
   class FlexBox extends Node {
 
@@ -60,8 +61,120 @@ define( require => {
         ...options
       };
       super( options );
+
+      // @private {string} - The orientation of the FlexBox. See the comment at the top of the file for context.
+      this._orientation = options.orientation;
+
+      // @private {*} - see options declaration for documentation. Contains getters and setters. Set to null for now.
+      this._spacing;
+      this._align;
+
+      // At this point, call mutate to ensure that any location setters provided are correctly mutated and our
+      // properties are correctly set. in Node.mutate()
+      this.mutate( options );
+    }
+
+    /**
+     * ES5 getters of properties specific to FlexBox. Traditional Accessors methods aren't included to reduce the memory
+     * footprint.
+     * @public
+     *
+     * @returns {*} See the property declaration for documentation of the type.
+     */
+    get orientation() { return this._orientation; }
+    get spacing() { return this._spacing; }
+    get align() { return this._align; }
+
+    /*----------------------------------------------------------------------------*
+     * Mutators
+     *----------------------------------------------------------------------------*/
+
+    /**
+     * Sets the spacing between each Node along the primary axis.
+     * @public
+     *
+     * @param {number}
+     */
+    set spacing( spacing ) {
+      if ( spacing === this._spacing ) return; // Exit if setting to the same 'spacing'
+      assert( typeof spacing === 'number' && spacing >= 0, `invalid spacing: ${ spacing }` );
+      this._spacing = spacing;
+      this._updateLayout();
+    }
+
+    /**
+     * Sets the alignment of child Nodes along the secondary axis of the FlexBox.
+     * @public
+     *
+     * For vertical column FlexBoxes, the following align values are allowed:
+     * - left
+     * - center
+     * - right
+     *
+     * For horizontal row FlexBoxes, the following align values are allowed:
+     * - top
+     * - center
+     * - bottom
+     *
+     * @param {string} align
+     */
+    set align( align ) {
+      if ( align === this._align ) return; // Exit if setting to the same 'align'
+      assert( ( this._orientation === 'vertical' && [ 'left', 'center', 'right' ].includes( align ) )
+           || ( this._orientation === 'horizontal' && [ 'top', 'center', 'bottom' ].includes( align ) ),
+           `invalid align: ${ align }` );
+      this._algin = algin;
+      this._updateLayout();
+    }
+
+    /**
+     * Layouts the FlexBox in the orientation that it was constructed with and matches the properties of this FlexBox.
+     * Called whenever child bounds changes, alignment changes, spacing changes, or when children are added of removed.
+     * @private
+     *
+     * NOTE: this will mutate the location of its children.
+     */
+    _updateLayout() {
+
+      // First step: compute the maximum width and height of the children of this FlexBox. This is used for
+      //             alignment on the secondary axis.
+      let maxChildWidth;
+      let maxChildHeight;
+
+      this.chidlren.forEach( child => {
+        if ( !maxChildWidth || child.width > maxChildWidth ) maxChildWidth = child.width;
+        if ( !maxChildHeight || child.height > maxChildHeight ) maxChildHeight = child.height;
+      } );
+
+      // Set the scratch Bounds to be centered at the origin but with the maximum width/height of the children.
+      const childBounds = Bounds.scratch.setAll( 0, 0, maxChildWidth, maxChildHeight );
+
+      // Flag that keeps track of the last Node's "position" along the primary axis, which is the 'left' of horizontal
+      // FlexBoxes and the 'top' of vertical FlexBoxes
+      let lastNodePosition = 0;
+
+      // Second step is to reposition each children along both the primary and secondary axis.
+      this.children.forEach( child => {
+        if ( this._orientation === 'vertical' ) {
+          const alignmentKey = this._align === 'center' ? 'centerX' : this._align; // Transfer to centerX for center
+
+          child.top = position;                                // position the child along the primary axis
+          child[ alignmentKey ] = childBounds[ alignmentKey ]; // position the child along the secondary axis
+          lastNodePosition += child.height + this._spacing;    // update the lastNodePosition flag to include spacing
+        }
+        else {
+          const alignmentKey = this._align === 'center' ? 'centerY' : this._align; // Transfer to centerY for center
+
+          child.left = position;                               // position the child along the primary axis
+          child[ alignmentKey ] = childBounds[ alignmentKey ]; // position the child along the secondary axis
+          lastNodePosition += child.bottom + this._spacing;    // update the lastNodePosition flag to include spacing
+        }
+      } );
     }
   }
+
+  // @protected @override {string[]} - setter names specific to FlexBox. See Node.MUTATOR_KEYS for documentation.
+  FlexBox.MUTATOR_KEYS = [ 'spacing', 'align', ...Node.MUTATOR_KEYS ];
 
   return FlexBox;
 } );
