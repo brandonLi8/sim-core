@@ -256,6 +256,7 @@ define( require => {
      * @returns {DOMObject} - Returns 'this' reference, for chaining
      */
     setChildren( children ) {
+      if ( children.every( child => this._children.includes( child ) ) ) return this; // Setting to the same children
       assert( Array.isArray( children ) && children.every( child => child instanceof DOMObject ),
         `invalid children: ${ children }` );
 
