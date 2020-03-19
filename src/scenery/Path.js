@@ -8,7 +8,7 @@
  * https://developer.mozilla.org/en-US/docs/Web/SVG/Element/path.
  *
  * The fill and stroke can be either a Gradient instance of any CSS-compatible color string. See
- * https://www.w3schools.com/colors/default.asp for context.
+ * https://developer.mozilla.org/en-US/docs/Web/CSS/color_value for context.
  *
  * @author Brandon Li <brandon.li820@gmail.com>
  */
