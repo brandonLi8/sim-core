@@ -146,37 +146,45 @@ define( require => {
       //             alignment on the secondary axis.
       let maxChildWidth = 0;
       let maxChildHeight = 0;
-
       this.children.forEach( child => {
         if ( child.width > maxChildWidth ) maxChildWidth = child.width;
         if ( child.height > maxChildHeight ) maxChildHeight = child.height;
       } );
 
-      // Define the child Bounds to be centered at the origin but with the maximum width/height of the children.
-      const childBounds = new Bounds( 0, 0, maxChildWidth, maxChildHeight );
 
       // Flag that keeps track of the last Node's "position" along the primary axis, which is the 'left' of horizontal
       // FlexBoxes and the 'top' of vertical FlexBoxes
       let lastNodePosition = 0;
 
+      // Object that maps information necessary for layouting
+      // Position Key: the modifying key of the child along the primary axis
+      // Alignment Key: the location key of the child along the secondary axis
+      // Alignment Value: the location value of the alignment key of the child along the secondary axis
+      const layoutInformation = this._orientation === 'vertical' ? {
+        positionKey: 'top',
+        sizeKey: 'height',
+        alignmentKey: this._align === 'center' ? 'centerX' : this._align,
+        alignmentValue: { left: 0, right: maxChildWidth, center: maxChildWidth / 2 }
+      } : {
+        positionKey: 'left',
+        sizeKey: 'width',
+        alignmentKey: this._align === 'center' ? 'centerY' : this._align,
+        alignmentValue: { top: 0, bottom: maxChildHeight, center: maxChildHeight / 2 }
+      };
+
       // Second step is to reposition each children along both the primary and secondary axis.
       this.children.forEach( child => {
-        if ( this._orientation === 'vertical' ) {
-          const alignmentKey = this._align === 'center' ? 'centerX' : this._align; // Transfer to centerX for center
+        // position the child along the primary axis
+        child[ layoutInformation.positionKey ] = lastNodePosition;
 
-          child.top = lastNodePosition;                        // position the child along the primary axis
-          child[ alignmentKey ] = childBounds[ alignmentKey ]; // position the child along the secondary axis
-          lastNodePosition += child.height + this._spacing;    // update the lastNodePosition flag to include spacing
-        }
-        else {
-          const alignmentKey = this._align === 'center' ? 'centerY' : this._align; // Transfer to centerY for center
+        // position the child along the secondary axis
+        child[ layoutInformation.alignmentKey ] = layoutInformation.alignmentValue[ this._align ];
 
-          child.left = lastNodePosition;                       // position the child along the primary axis
-          child[ alignmentKey ] = childBounds[ alignmentKey ]; // position the child along the secondary axis
-          lastNodePosition += child.width + this._spacing;     // update the lastNodePosition flag to include spacing
-        }
+        // update the lastNodePosition flag to include spacing
+        lastNodePosition += child[ layoutInformation.sizeKey ] + this._spacing;
       } );
       this._isUpdatingLayout = false; // Indicate that we are now done updating our layout of our children.
+      super._recomputeAncestorBounds();
     }
 
     /**
