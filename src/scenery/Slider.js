@@ -106,6 +106,7 @@ define( require => {
 
       // @private {Rectangle} - create the slider Track. See the comment at the top of the file for context.
       this._track = new Rectangle( options.trackWidth, options.trackHeight, {
+        left: options.thumbWidth / 2,
         fill: options.trackFill,
         stroke: options.trackStroke,
         strokeWidth: options.trackStrokeWidth,
@@ -135,8 +136,13 @@ define( require => {
         cursor: 'pointer'
       } );
 
+      // Add invisible rectangles on either side of the track to account for potential added width if the thumb is
+      // dragged to the extremes of the track.
+      const leftBufferRectange = new Rectangle( this._thumb.width / 2, 0, { right: this._track.left } );
+      const rightBufferRectange = new Rectangle( this._thumb.width / 2, 0, { left: this._track.right } );
+
       // Set the children, in the correct rendering order.
-      this.setChildren( [ this._track, this._thumb ] );
+      this.setChildren( [ this._track, this._thumb, leftBufferRectange, rightBufferRectange ] );
 
       // At this point, call mutate to ensure validity of location setters in options.
       options && this.mutate( options );
