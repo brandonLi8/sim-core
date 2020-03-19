@@ -28,8 +28,8 @@ define( require => {
 
   // modules
   const assert = require( 'SIM_CORE/util/assert' );
+  const Bounds = require( 'SIM_CORE/util/Bounds' );
   const Node = require( 'SIM_CORE/scenery/Node' );
-  const Bounds = require( 'SIM_CORE/scenery/Bounds' );
 
   class FlexBox extends Node {
 
@@ -63,7 +63,7 @@ define( require => {
       super( options );
 
       // @private {string} - The orientation of the FlexBox. See the comment at the top of the file for context.
-      this._orientation = options.orientation;
+      this._orientation = orientation;
 
       // @private {*} - see options declaration for documentation. Contains getters and setters. Set to null for now.
       this._spacing;
@@ -96,7 +96,7 @@ define( require => {
      * @param {number}
      */
     set spacing( spacing ) {
-      if ( spacing === this._spacing ) return; // Exit if setting to the same 'spacing'
+      if ( !this._orientation || spacing === this._spacing ) return; // Exit if setting to the same 'spacing'
       assert( typeof spacing === 'number' && spacing >= 0, `invalid spacing: ${ spacing }` );
       this._spacing = spacing;
       this._updateLayout();
@@ -119,11 +119,11 @@ define( require => {
      * @param {string} align
      */
     set align( align ) {
-      if ( align === this._align ) return; // Exit if setting to the same 'align'
+      if ( !this._orientation || align === this._align ) return; // Exit if setting to the same 'align'
       assert( ( this._orientation === 'vertical' && [ 'left', 'center', 'right' ].includes( align ) )
            || ( this._orientation === 'horizontal' && [ 'top', 'center', 'bottom' ].includes( align ) ),
            `invalid align: ${ align }` );
-      this._algin = algin;
+      this._align = align;
       this._updateLayout();
     }
 
@@ -135,13 +135,19 @@ define( require => {
      * NOTE: this will mutate the location of its children.
      */
     _updateLayout() {
+      if ( !this._align || this._spacing === undefined ) return; // Exit if the FlexBox is degenerate.
+      if ( !this.children.length ) {
+        this.width = 0;
+        this.height = 0;
+        return;
+      }
 
       // First step: compute the maximum width and height of the children of this FlexBox. This is used for
       //             alignment on the secondary axis.
       let maxChildWidth;
       let maxChildHeight;
 
-      this.chidlren.forEach( child => {
+      this.children.forEach( child => {
         if ( !maxChildWidth || child.width > maxChildWidth ) maxChildWidth = child.width;
         if ( !maxChildHeight || child.height > maxChildHeight ) maxChildHeight = child.height;
       } );
@@ -158,16 +164,16 @@ define( require => {
         if ( this._orientation === 'vertical' ) {
           const alignmentKey = this._align === 'center' ? 'centerX' : this._align; // Transfer to centerX for center
 
-          child.top = position;                                // position the child along the primary axis
+          child.top = lastNodePosition;                        // position the child along the primary axis
           child[ alignmentKey ] = childBounds[ alignmentKey ]; // position the child along the secondary axis
           lastNodePosition += child.height + this._spacing;    // update the lastNodePosition flag to include spacing
         }
         else {
           const alignmentKey = this._align === 'center' ? 'centerY' : this._align; // Transfer to centerY for center
 
-          child.left = position;                               // position the child along the primary axis
+          child.left = lastNodePosition;                       // position the child along the primary axis
           child[ alignmentKey ] = childBounds[ alignmentKey ]; // position the child along the secondary axis
-          lastNodePosition += child.bottom + this._spacing;    // update the lastNodePosition flag to include spacing
+          lastNodePosition += child.width + this._spacing;     // update the lastNodePosition flag to include spacing
         }
       } );
     }
@@ -184,10 +190,6 @@ define( require => {
     _recomputeAncestorBounds() {
       this._updateLayout();
       super._recomputeAncestorBounds();
-
-      // // Recursively call this method for each parent up to either the ScreenView or to the point where a Node doesn't
-      // // have a parent, making all bounds correct.
-      // if ( this.parent && !( this.parent instanceof ScreenView ) ) this.parent._recomputeAncestorBounds();
     }
   }
 
