@@ -65,6 +65,10 @@ define( require => {
       // @private {string} - The orientation of the FlexBox. See the comment at the top of the file for context.
       this._orientation = orientation;
 
+      // @private {boolean} - Indicates if we are in the process of updating the layout of the FlexBox. Used
+      //                      to reduce the number of _recomputeAncestorBounds calls while layouting.
+      this._isUpdatingLayout = false;
+
       // @private {*} - see options declaration for documentation. Contains getters and setters. Set to null for now.
       this._spacing;
       this._align;
@@ -136,24 +140,20 @@ define( require => {
      */
     _updateLayout() {
       if ( !this._align || this._spacing === undefined ) return; // Exit if the FlexBox is degenerate.
-      if ( !this.children.length ) {
-        this.width = 0;
-        this.height = 0;
-        return;
-      }
+      this._isUpdatingLayout = true; // Indicate that we are now updating our layout.
 
       // First step: compute the maximum width and height of the children of this FlexBox. This is used for
       //             alignment on the secondary axis.
-      let maxChildWidth;
-      let maxChildHeight;
+      let maxChildWidth = 0;
+      let maxChildHeight = 0;
 
       this.children.forEach( child => {
-        if ( !maxChildWidth || child.width > maxChildWidth ) maxChildWidth = child.width;
-        if ( !maxChildHeight || child.height > maxChildHeight ) maxChildHeight = child.height;
+        if ( child.width > maxChildWidth ) maxChildWidth = child.width;
+        if ( child.height > maxChildHeight ) maxChildHeight = child.height;
       } );
 
-      // Set the scratch Bounds to be centered at the origin but with the maximum width/height of the children.
-      const childBounds = Bounds.scratch.setAll( 0, 0, maxChildWidth, maxChildHeight );
+      // Define the child Bounds to be centered at the origin but with the maximum width/height of the children.
+      const childBounds = new Bounds( 0, 0, maxChildWidth, maxChildHeight );
 
       // Flag that keeps track of the last Node's "position" along the primary axis, which is the 'left' of horizontal
       // FlexBoxes and the 'top' of vertical FlexBoxes
@@ -176,6 +176,7 @@ define( require => {
           lastNodePosition += child.width + this._spacing;     // update the lastNodePosition flag to include spacing
         }
       } );
+      this._isUpdatingLayout = false; // Indicate that we are now done updating our layout of our children.
     }
 
     /**
@@ -188,7 +189,7 @@ define( require => {
      * This is overridden so that the layout of the FlexBox updates when a child changes.
      */
     _recomputeAncestorBounds() {
-      this._updateLayout();
+      if ( this._isUpdatingLayout === false ) this._updateLayout();
       super._recomputeAncestorBounds();
     }
   }
