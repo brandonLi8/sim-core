@@ -171,6 +171,24 @@ define( require => {
         }
       } );
     }
+
+    /**
+     * @override
+     * Called when this Node's Bounds changes due to a child's Bounds changing or when a child is added or removed.
+     * Also responsible for recursively calling the method for each parent up to either the ScreenView or to the
+     * point where a Node doesn't have a parent.
+     * @protected
+     *
+     * This is overridden so that the layout of the FlexBox updates when a child changes.
+     */
+    _recomputeAncestorBounds() {
+      this._updateLayout();
+      super._recomputeAncestorBounds();
+
+      // // Recursively call this method for each parent up to either the ScreenView or to the point where a Node doesn't
+      // // have a parent, making all bounds correct.
+      // if ( this.parent && !( this.parent instanceof ScreenView ) ) this.parent._recomputeAncestorBounds();
+    }
   }
 
   // @protected @override {string[]} - setter names specific to FlexBox. See Node.MUTATOR_KEYS for documentation.
