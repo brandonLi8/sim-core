@@ -290,8 +290,7 @@ define( require => {
      * @returns {DOMObject} - Returns 'this' reference, for chaining
      */
     removeAllChildren() {
-      this._children.forEach( child => this._element.removeChild( child.element ) );
-      this._children = [];
+      [ ...this._children ].forEach( this.removeChild.bind( this ) );
       return this;
     }
 
