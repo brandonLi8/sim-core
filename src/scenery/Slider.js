@@ -139,7 +139,7 @@ define( require => {
       this.setChildren( [ this._track, this._thumb ] );
 
       // At this point, call mutate to ensure validity of location setters in options.
-      this.mutate( options );
+      options && this.mutate( options );
 
       //----------------------------------------------------------------------------------------
 

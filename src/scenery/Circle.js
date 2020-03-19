@@ -37,7 +37,7 @@ define( require => {
       this._updateCircleShape();
 
       // At this point, call mutate to ensure that any location setters provided are correctly mutated in Node.mutate().
-      this.mutate( options );
+      options && this.mutate( options );
     }
 
     /**
