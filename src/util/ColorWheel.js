@@ -11,7 +11,7 @@
  *   - hex        e.g. '#1BC4FD', '#DDD'
  *   - hex-alpha  e.g. '#1BC4FDF2', '#DDDA'
  *   - hsl        e.g. 'hsl(270, 60%, 70%)`
- *   - hsla       e.g. 'hsla(240, 100%, 50%, 0.7)'
+ *   - Hsla       e.g. 'hsla(240, 100%, 50%, 0.7)'
  *   - keywords   e.g. 'aqua', 'transparent', etc.
  *
  * NOTE: Currently, Color Wheel doesn't support space-separated values in functional notation. Additionally,
@@ -56,10 +56,9 @@ define( require => {
      */
     static shade( color, factor ) {
       assert( typeof color === 'string', `invalid color: ${ color }` );
-
       if ( factor === 0 ) return color; // return the color if the factor is 0
 
-      // Convert the color to rgb
+      // Convert the color string given to rgba.
       let rgb;
       if ( color.includes( 'rgb' ) ) rgb = ColorWheel.parseRgb( color );
       if ( color.includes( 'hsl' ) ) rgb = ColorWheel.hslToRgba( color );
@@ -67,7 +66,7 @@ define( require => {
       if ( ColorWheel.isKeyword( color ) ) rgb = ColorWheel.keywordToRgba( color );
       assert( rgb, `invalid color: ${ color }` );
 
-      // Apply the Shade algorithm
+      // Apply the Shade algorithm, adapted implementation from https://stackoverflow.com/a/13532993
       if ( factor > 0 ) {
         const red = Math.min( 255, rgb[ 0 ] + Math.floor( factor * ( 255 - rgb[ 0 ] ) ) );
         const green = Math.min( 255, rgb[ 1 ] + Math.floor( factor * ( 255 - rgb[ 1 ] ) ) );
@@ -96,7 +95,7 @@ define( require => {
     static isRgba( color ) { return FORMAT_PARSERS.rgba.test( color ); }
     static isHex( color ) { return FORMAT_PARSERS.hex.test( color ); }
     static isHsl( color ) { return FORMAT_PARSERS.hsl.test( color ); }
-    static ishsla( color ) { return FORMAT_PARSERS.hsla.test( color ); }
+    static isHsla( color ) { return FORMAT_PARSERS.hsla.test( color ); }
     static isKeyword( color ) {
       if ( !ColorWheel._testElement ) ColorWheel._initializeColorTesting();
       ColorWheel._testElement.style.background = null;
@@ -141,7 +140,7 @@ define( require => {
      * @returns {string[]}
      */
     static hslToRgba( hsl ) {
-      assert.enabled && assert( ColorWheel.isHsl( hsl ) || ColorWheel.ishsla( hsl ), `invalid hsl: ${ hsl }` );
+      assert.enabled && assert( ColorWheel.isHsl( hsl ) || ColorWheel.isHsla( hsl ), `invalid hsl: ${ hsl }` );
       const hslArray = ColorWheel._parseToArguments( hsl );
       const hue = ( parseFloat( hslArray[ 0 ] ) % 360 ) / 360;
       const saturation = Util.clamp( parseInt( hslArray[ 1 ].replace( '%', '' ), 10 ) / 100, 0, 1 );
