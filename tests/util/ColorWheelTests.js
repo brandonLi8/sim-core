@@ -39,7 +39,7 @@ define( require => {
     truenit.ok( ColorWheel.isHex( '#FFF' ) );
     truenit.ok( ColorWheel.isHex( '#FFFD' ) );
     truenit.notOk( ColorWheel.isHex( '#ABCD5' ) );
-    truenit.ok( ColorWheel.isHex( '#ABCD56' ) );
+    truenit.ok( ColorWheel.isHex( '#AbCD56' ) );
     truenit.notOk( ColorWheel.isHex( '#ABCD567' ) );
     truenit.ok( ColorWheel.isHex( '#ABCD5678' ) );
 
@@ -80,12 +80,34 @@ define( require => {
     truenit.arrayEquals( ColorWheel.parseRgb( 'rgba(100, 10, 0, 100%)' ), [ 100, 10, 0, 1 ] );
     truenit.arrayEquals( ColorWheel.parseRgb( 'rgba( 100%, 100%, 50%, 50%)' ), [ 255, 255, 128, 0.5 ] );
 
+    // hexToRgba
+    truenit.arrayEquals( ColorWheel.hexToRgba( '#640a00' ), [ 100, 10, 0, 1 ] );
+    truenit.arrayEquals( ColorWheel.hexToRgba( '#ABC' ), [ 170, 187, 204, 1 ] );
+    truenit.arrayEquals( ColorWheel.hexToRgba( '#ABcd' ), [ 170, 187, 204, ( 221 / 255 ) ] );
+    truenit.arrayEquals( ColorWheel.hexToRgba( '#AABBCCDD' ), [ 170, 187, 204, ( 221 / 255 ) ] );
 
+    // hslToRgba
+    truenit.arrayEquals( ColorWheel.hslToRgba( 'hsla(6, 100%, 20%, 1)' ), [ 102, 10, 0, 1 ] );
+    truenit.arrayEquals( ColorWheel.hslToRgba( 'hsl(210, 25%, 73%)' ), [ 169, 186, 203, 1 ] );
+    truenit.arrayEquals( ColorWheel.hslToRgba( 'hsla(210, 25%, 73%, 50%)' ), [ 169, 186, 203, 0.5 ] );
+    truenit.arrayEquals( ColorWheel.hslToRgba( 'hsla(233, 31%, 47%, 0.5)' ), [ 83, 91, 157, 0.5 ] );
 
-    // truenit.ok( ColorWheel.keywordToRGBA( 'maroon' ) ); //false
-    // truenit.ok( ColorWheel.keywordToRGBA( 'blue' ) );// false
-    // truenit.ok( ColorWheel.hslToRGBA( 'hsl(270, 60%, 70%)' ) );//rgb(179, 133, 224)
-    // truenit.ok( ColorWheel.hslToRGBA( 'hsla(27, 60%, 90%, 0.5)' ) );//rgba(245, 228, 214, 0.5)
+    // keywordToRgba
+    truenit.arrayEquals( ColorWheel.keywordToRgba( 'maroon' ), [ 128, 0, 0, 1 ] );
+    truenit.arrayEquals( ColorWheel.keywordToRgba( 'blue' ), [ 0, 0, 255, 1 ] );
+    truenit.arrayEquals( ColorWheel.keywordToRgba( 'blue' ), [ 0, 0, 255, 1 ] );
+    truenit.arrayEquals( ColorWheel.keywordToRgba( 'crimson' ), [ 220, 20, 60, 1 ] );
+    truenit.arrayEquals( ColorWheel.keywordToRgba( 'grey' ), [ 128, 128, 128, 1 ] );
+
+    //----------------------------------------------------------------------------------------
+    // Shade
+    //----------------------------------------------------------------------------------------
+
+    // shade
+    truenit.equals( ColorWheel.shade( '#DDD', 0 ), '#DDD' );
+    truenit.equals( ColorWheel.shade( 'rgb( 221, 221, 221 )', 1 ), 'rgb(255, 255, 255)' );
+    truenit.equals( ColorWheel.shade( 'hsla(0, 0%, 50%, 0.5)', -1 ), 'rgba(0, 0, 0, 0.5)' );
+    truenit.equals( ColorWheel.shade( 'blue', -1 ), 'rgb(0, 0, 0)' );
 
   };
 } );

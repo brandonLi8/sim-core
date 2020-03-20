@@ -136,8 +136,7 @@ define( require => {
       // Convert to rgba using parseInt
       const array = [ 0, 1, 2 ].map( i => parseInt( hex.substring( 2 * i, ( i + 1 ) * 2 ), 16 ) );
       array.push( parseInt( hex.substring( 6, 8 ), 16 ) / 255 ); // Alpha channel should be from 0 to 1
-      ColorWheel._clampRgbaArray( array );
-      CACHED_COLORS[ hex ] = array; // Cache the color
+      CACHED_COLORS[ hex ] = ColorWheel._clampRgbaArray( array ); // Cache the color
       return array;
     }
 
@@ -151,7 +150,7 @@ define( require => {
      */
     static hslToRgba( hsl ) {
       assert.enabled && assert( ColorWheel.isHsl( hsl ) || ColorWheel.isHsla( hsl ), `invalid hsl: ${ hsl }` );
-      if ( Object.prototype.hasOwnProperty.call( CACHED_COLORS, hxl ) ) return CACHED_COLORS[ hxl ];
+      if ( Object.prototype.hasOwnProperty.call( CACHED_COLORS, hsl ) ) return CACHED_COLORS[ hsl ];
 
       const hslArray = ColorWheel._parseToArguments( hsl );
       const hue = ( parseFloat( hslArray[ 0 ] ) % 360 ) / 360;
