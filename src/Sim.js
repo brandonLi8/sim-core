@@ -116,6 +116,9 @@ define( require => {
       // Enable the red dev border around ScreenViews if the ?dev query parameter was provided.
       if ( StandardSimQueryParameters.dev ) { ScreenView.enableDevBorder(); }
 
+      const ColorWheel = require( 'SIM_CORE/util/ColorWheel' );
+
+
       this.display.on( 'resize', ( width, height ) => {
 
         this.navigationBar.layout( width, height );
