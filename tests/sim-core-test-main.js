@@ -17,6 +17,7 @@ define( require => {
 
   // Start up the browser environment
   require( 'browser-env' )();
+  require( 'canvas' );
 
   // Enable assertions
   assert.enableAssertions();
@@ -32,6 +33,7 @@ define( require => {
   truenit.registerTest( 'DerivedProperty', () => { require( 'TESTS/util/DerivedPropertyTests' )(); } );
   truenit.registerTest( 'Enum', () => { require( 'TESTS/util/EnumTests' )(); } );
   truenit.registerTest( 'Shape', () => { require( 'TESTS/util/ShapeTests' )(); } );
+  truenit.registerTest( 'ColorWheel', () => { require( 'TESTS/util/ColorWheelTests' )(); } );
   truenit.registerTest( 'Node', () => { require( 'TESTS/scenery/NodeTests' )(); } );
 
   // Run tests

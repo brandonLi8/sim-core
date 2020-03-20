@@ -36,10 +36,10 @@ define( require => {
   // that specific format.
   const FORMAT_PARSERS = {
     rgb: /^rgb\(\s*(\d{1,3}%?)\s*,\s*(\d{1,3}%?)\s*,\s*(\d{1,3}%?)\s*\)$/,
-    rgba: /^rgba\(\s*(\d{1,3}%?)\s*,\s*(\d{1,3}%?)\s*,\s*(\d{1,3}%?)\s*,\s*(\d+|\d*\.\d+%?)\s*\)$/,
+    rgba: /^rgba\(\s*(\d{1,3}%?)\s*,\s*(\d{1,3}%?)\s*,\s*(\d{1,3}%?)\s*,\s*((\d+|\d*\.\d+)%?)\s*\)$/,
     hex: /^#((?:[A-Fa-f0-9]{2}){3,4}|(?:[A-Fa-f0-9]{1}){3,4})$/,
     hsl: /^hsl\(\s*(\d{1,3})\s*,\s*(\d{1,3})%\s*,\s*(\d{1,3})%\s*\)$/,
-    hsla: /^hsla\(\s*(\d{1,3})\s*,\s*(\d{1,3})%\s*,\s*(\d{1,3})%\s*,\s*(\d+|\d*\.\d+%?)\s*\)$/,
+    hsla: /^hsla\(\s*(\d{1,3})\s*,\s*(\d{1,3})%\s*,\s*(\d{1,3})%\s*,\s*((\d+|\d*\.\d+)%?)\s*\)$/,
     keyword: /^[a-z]+$/
   };
 
@@ -214,8 +214,11 @@ define( require => {
       const rgbArray = ColorWheel._parseToArguments( rgb );
       if ( rgbArray.length === 3 ) rgbArray.push( '1' );
 
-      CACHED_COLORS[ rgb ] = ColorWheel._clampRgbaArray( rgbArray.map( value => {
-        return value.includes( '%' ) ? parseInt( value.replace( '%', '' ) / 100, 10 ) : parseInt( value, 10 );
+      CACHED_COLORS[ rgb ] = ColorWheel._clampRgbaArray( rgbArray.map( ( value, index ) => {
+        if ( index !== 3 ) {
+          return value.includes( '%' ) ? parseFloat( value.replace( '%', '' ) ) / 100 * 255 : parseFloat( value );
+        }
+        else return value.includes( '%' ) ? parseFloat( value.replace( '%', '' ) ) / 100 : parseFloat( value );
       } ) );
       return CACHED_COLORS[ rgb ];
     }
@@ -244,11 +247,11 @@ define( require => {
      * @param {number[]} rgba
      * @returns {number[]} returns the modified array
      */
-    _clampRgbaArray( rgba ) {
-      rgba[ 0 ] = Util.clamp( rgbArray[ 0 ], 0, 255 );
-      rgba[ 1 ] = Util.clamp( rgbArray[ 1 ], 0, 255 );
-      rgba[ 2 ] = Util.clamp( rgbArray[ 2 ], 0, 255 );
-      rgba[ 3 ] = Util.clamp( rgbArray[ 3 ], 0, 1 );
+    static _clampRgbaArray( rgba ) {
+      rgba[ 0 ] = Util.clamp( Util.roundSymmetric( rgba[ 0 ] ), 0, 255 );
+      rgba[ 1 ] = Util.clamp( Util.roundSymmetric( rgba[ 1 ] ), 0, 255 );
+      rgba[ 2 ] = Util.clamp( Util.roundSymmetric( rgba[ 2 ] ), 0, 255 );
+      rgba[ 3 ] = Util.clamp( rgba[ 3 ], 0, 1 );
       return rgba;
     }
 
