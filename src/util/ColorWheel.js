@@ -29,6 +29,11 @@ define( require => {
   const Util = require( 'SIM_CORE/util/Util' );
 
   // constants
+  // Maps color strings of all formats to an array that represents the corresponding rgba values.
+  const CACHED_COLORS = {};
+
+  // Object literal that maps color formats described at the top of the file to reg-ex to test if a color string is in
+  // that specific format.
   const FORMAT_PARSERS = {
     rgb: /^rgb\(\s*(\d{1,3}%?)\s*,\s*(\d{1,3}%?)\s*,\s*(\d{1,3}%?)\s*\)$/,
     rgba: /^rgba\(\s*(\d{1,3}%?)\s*,\s*(\d{1,3}%?)\s*,\s*(\d{1,3}%?)\s*,\s*(\d+|\d*\.\d+%?)\s*\)$/,
@@ -113,10 +118,12 @@ define( require => {
      * @public
      *
      * @param {string} hex - the hex color string
-     * @returns {string[]}
+     * @returns {string[]} - do not mutate the returned value!
      */
     static hexToRgba( hex ) {
       assert.enabled && assert( ColorWheel.isHex( hex ), `invalid hex: ${ hex }` );
+      if ( Object.prototype.hasOwnProperty.call( CACHED_COLORS, hex ) ) return CACHED_COLORS[ hex ];
+
       hex = hex.replace( '#', '' ); // Remove the '#'
 
       // Expand shorthand form of hex
@@ -128,6 +135,7 @@ define( require => {
       // Convert to rgba using parseInt
       const array = [ 0, 1, 2 ].map( i => parseInt( hex.substring( 2 * i, ( i + 1 ) * 2 ), 16 ) );
       array.push( parseInt( hex.substring( 6, 8 ), 16 ) / 255 ); // Alpha channel should be from 0 to 1
+      CACHED_COLORS[ hex ] = array; // Cache the color
       return array;
     }
 
@@ -137,10 +145,12 @@ define( require => {
      * @public
      *
      * @param {string} hsl - the hsl color string
-     * @returns {string[]}
+     * @returns {string[]} - do not mutate the returned value!
      */
     static hslToRgba( hsl ) {
       assert.enabled && assert( ColorWheel.isHsl( hsl ) || ColorWheel.isHsla( hsl ), `invalid hsl: ${ hsl }` );
+      if ( Object.prototype.hasOwnProperty.call( CACHED_COLORS, hxl ) ) return CACHED_COLORS[ hxl ];
+
       const hslArray = ColorWheel._parseToArguments( hsl );
       const hue = ( parseFloat( hslArray[ 0 ] ) % 360 ) / 360;
       const saturation = Util.clamp( parseInt( hslArray[ 1 ].replace( '%', '' ), 10 ) / 100, 0, 1 );
@@ -164,7 +174,8 @@ define( require => {
       const r = Util.roundSymmetric( hueToRgb( hue + 1 / 3 ) * 255 );
       const g = Util.roundSymmetric( hueToRgb( hue ) * 255 );
       const b = Util.roundSymmetric( hueToRgb( hue - 1 / 3 ) * 255 );
-      return [ r, g, b, alpha ];
+      CACHED_COLORS[ hsl ] = [ r, g, b, alpha ]; // Cache the hsl color string
+      return CACHED_COLORS[ hsl ];
     }
 
     /**
@@ -172,17 +183,19 @@ define( require => {
      * @public
      *
      * @param {string} color - the keyword color string
-     * @returns {string[]}
+     * @returns {string[]} - do not mutate the returned value!
      */
     static keywordToRgba( color ) {
       assert.enabled && assert( ColorWheel.isKeyword( color ), `invalid keyword: ${ color }` );
+      if ( Object.prototype.hasOwnProperty.call( CACHED_COLORS, color ) ) return CACHED_COLORS[ color ];
       if ( !ColorWheel._canvasContext ) ColorWheel._initializeColorTesting();
 
       // Use a canvas test element to compute the color.
       ColorWheel._canvasContext.fillStyle = color;
       ColorWheel._canvasContext.fill();
       const imageData = ColorWheel._canvasContext.getImageData( 0, 0, 1, 1 ).data;
-      return [ imageData[ 0 ], imageData[ 1 ], imageData[ 2 ], imageData[ 3 ] / 255 ];
+      CACHED_COLORS[ color ] = [ imageData[ 0 ], imageData[ 1 ], imageData[ 2 ], imageData[ 3 ] / 255 ];
+      return CACHED_COLORS[ color ];
     }
 
     /**
@@ -190,16 +203,19 @@ define( require => {
      * @public
      *
      * @param {string} rgb - the rgb color string
-     * @returns {string[]}
+     * @returns {string[]} - do not mutate the returned value!.
      */
     static parseRgb( rgb ) {
       assert.enabled && assert( ColorWheel.isRgb( rgb ) || ColorWheel.isRgba( rgb ), `invalid rgb: ${ rgb }` );
+      if ( Object.prototype.hasOwnProperty.call( CACHED_COLORS, rgb ) ) return CACHED_COLORS[ rgb ];
+
       const rgbArray = ColorWheel._parseToArguments( rgb );
       if ( rgbArray.length === 3 ) rgbArray.push( '1' );
 
-      return rgbArray.map( value => {
+      CACHED_COLORS[ rgb ] = rgbArray.map( value => {
         return value.includes( '%' ) ? parseInt( value.replace( '%', '' ) / 100, 10 ) : parseInt( value, 10 );
       } );
+      return CACHED_COLORS[ rgb ];
     }
 
     /**
@@ -224,7 +240,7 @@ define( require => {
      * @private
      *
      * @param {string} color - the color string to parse
-     * @return {string[]}
+     * @return {string[]} - can mutate the returned value
      */
     static _parseToArguments( color ) {
       return color.substring( color.indexOf( '(' ) + 1, color.indexOf( ')' ) ).split( ',' ).map( str => str.trim() );
