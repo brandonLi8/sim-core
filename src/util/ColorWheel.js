@@ -11,7 +11,7 @@
  *   - hex        e.g. '#1BC4FD', '#DDD'
  *   - hex-alpha  e.g. '#1BC4FDF2', '#DDDA'
  *   - hsl        e.g. 'hsl(270, 60%, 70%)`
- *   - Hsla       e.g. 'hsla(240, 100%, 50%, 0.7)'
+ *   - hsla       e.g. 'hsla(240, 100%, 50%, 0.7)'
  *   - keywords   e.g. 'aqua', 'transparent', etc.
  *
  * NOTE: Currently, Color Wheel doesn't support space-separated values in functional notation. Additionally,
@@ -125,7 +125,7 @@ define( require => {
       // Expand to full #RRGGBBAA format
       if ( hex.length === 6 ) hex += 'FF';
 
-      // Convert to Rgba using parseInt
+      // Convert to rgba using parseInt
       const array = [ 0, 1, 2 ].map( i => parseInt( hex.substring( 2 * i, ( i + 1 ) * 2 ), 16 ) );
       array.push( parseInt( hex.substring( 6, 8 ), 16 ) / 255 ); // Alpha channel should be from 0 to 1
       return array;
@@ -176,6 +176,7 @@ define( require => {
      */
     static keywordToRgba( color ) {
       assert.enabled && assert( ColorWheel.isKeyword( color ), `invalid keyword: ${ color }` );
+      if ( !ColorWheel._canvasContext ) ColorWheel._initializeColorTesting();
 
       // Use a canvas test element to compute the color.
       ColorWheel._canvasContext.fillStyle = color;
@@ -202,7 +203,7 @@ define( require => {
     }
 
     /**
-     * Formats a Rgb string, preferring rgb, but uses rgba if the alpha channel isn't 1
+     * Formats a rgb string, preferring 'rgb', but uses 'rgba' if the alpha channel isn't 1
      * @public
      *
      * @param {number} red
