@@ -40,6 +40,46 @@ define( require => {
 
   class ColorWheel {
 
+    /**
+     * Shades a color string in any of the formats described above, by a factor percentage amount.
+     *
+     * Factor must be in the range [-1, 1]:
+     *   If Factor > 0 : This will lighten the color so that it becomes brighter.
+     *   If Factor < 0 : This will darken the color so that it becomes closer to black.
+     *   If Factor is 0 the color will not change.
+     *
+     * @public
+     * @param {string} color - the color string to shade
+     * @param {number} factor - from -1 (black), to 0 (no change), to 1 (white)
+     * @returns {string} - the shaded color
+     */
+    static shade( color, factor ) {
+      assert( typeof color === 'string', `invalid color: ${ color }` );
+
+      if ( factor === 0 ) return color; // return the color if the factor is 0
+
+      // Convert the color to RGB
+      let rgb;
+      if ( color.includes( 'rgb' ) ) rgb = ColorWheel.parseRGB( color );
+      if ( color.includes( 'hsl' ) ) rgb = ColorWheel.hslToRGBA( color );
+      if ( color.includes( '#' ) ) rgb = ColorWheel.hexToRGBA( color );
+      if ( ColorWheel.isKeyword( color ) ) rgb = ColorWheel.keywordToRGBA( color );
+      assert( rgb, `invalid color: ${ color }` );
+
+      // Apply the Shade algorithm
+      if ( factor > 0 ) {
+        const red = Math.min( 255, rgb[ 0 ] + Math.floor( factor * ( 255 - rgb[ 0 ] ) ) );
+        const green = Math.min( 255, rgb[ 1 ] + Math.floor( factor * ( 255 - rgb[ 1 ] ) ) );
+        const blue = Math.min( 255, rgb[ 2 ] + Math.floor( factor * ( 255 - rgb[ 2 ] ) ) );
+        return ColorWheel.formatRGBString( red, green, blue, alpha );
+      }
+      else {
+        const red = Math.max( 0, rgb[ 0 ] - Math.floor( -factor * rgb[ 0 ] ) );
+        const green = Math.max( 0, rgb[ 1 ] - Math.floor( -factor * rgb[ 1 ] ) );
+        const blue = Math.max( 0, rgb[ 2 ] - Math.floor( -factor * rgb[ 2 ] ) );
+        return ColorWheel.formatRGBString( red, green, blue, alpha );
+      }
+    }
 
     /*----------------------------------------------------------------------------*
      * Color Detections
@@ -127,7 +167,6 @@ define( require => {
       return [ r, g, b, alpha ];
     }
 
-
     /**
      * Converts a keyword color (like 'aqua') to rgba, returning each value in a array.
      * @public
@@ -143,6 +182,37 @@ define( require => {
       ColorWheel._canvasContext.fill();
       const imageData = ColorWheel._canvasContext.getImageData( 0, 0, 1, 1 ).data;
       return [ imageData[ 0 ], imageData[ 1 ], imageData[ 2 ], imageData[ 3 ] / 255 ];
+    }
+
+    /**
+     * Converts a rgb or rgba string (like 'rgb( 203, 209, 109') to rgba, returning each value in a array.
+     * @public
+     *
+     * @param {string} rgb - the rgb color string
+     * @returns {string[]}
+     */
+    static parseRGB( rgb ) {
+      assert.enabled && assert( ColorWheel.isRGB( rgb ) || ColorWheel.isRGBA( rgb ), `invalid rgb: ${ rgb }` );
+      const rgbArray = ColorWheel._parseToArguments( rgb );
+      if ( rgbArray.length === 3 ) rgbArray.push( '1' );
+
+      return rgbArray.map( value => {
+        return value.includes( '%' ) ? parseInt( value.replace( '%', '' ) / 100 ) : parseInt( value );
+      } );
+    }
+
+    /**
+     * Formats a RGB string, preferring rgb, but uses rgba if the alpha channel isn't 1
+     * @public
+     *
+     * @param {number} red
+     * @param {number} green
+     * @param {number} blue
+     * @param {number} alpha
+     * @returns {string}
+     */
+    static formatRGBString( red, green, blue, alpha ) {
+      return alpha === 1 ? `rgb(${ red }, ${ green }, ${ blue })` : `rgba(${ red }, ${ green }, ${ blue }, ${ alpha })`;
     }
 
     //----------------------------------------------------------------------------------------
