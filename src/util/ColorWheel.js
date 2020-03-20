@@ -69,7 +69,7 @@ define( require => {
      *----------------------------------------------------------------------------*/
 
     /**
-     * Converts a hex string (like '#FA45') to rgba, returning each value in a array.
+     * Converts a hex string (like '#FA45') to rgba, returning each value in a array. Supports hex-alpha and shorthands.
      * @public
      *
      * @param {string} hex - the hex color string
