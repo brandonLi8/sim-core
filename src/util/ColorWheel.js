@@ -10,7 +10,7 @@
  *   - rgba       e.g. 'rgb(104, 200, 82, 0.7)'
  *   - hex        e.g. '#1BC4FD', '#DDD'
  *   - hex-alpha  e.g. '#1BC4FDF2', '#DDDA'
- *   - hsl        e.g. 'hsl(270 60% 70%)`
+ *   - hsl        e.g. 'hsl(270, 60%, 70%)`
  *   - hsla       e.g. 'hsla(240, 100%, 50%, 0.7)'
  *   - keywords   e.g. 'aqua', 'transparent', etc.
  *
@@ -42,10 +42,10 @@ define( require => {
 
 
     /*----------------------------------------------------------------------------*
-     * Detects if a Color is in a specific format
+     * Color Detections
      *----------------------------------------------------------------------------*/
     /**
-     * Detects of a Color string is in a specific format with regular expressions.
+     * Detects if a Color string is in a specific format with regular expressions.
      * @public
      *
      * @param {string} color - a CSS color string
@@ -65,7 +65,7 @@ define( require => {
     }
 
     /*----------------------------------------------------------------------------*
-     * Conversions from formats
+     * Color Conversions
      *----------------------------------------------------------------------------*/
 
     /**
@@ -76,7 +76,7 @@ define( require => {
      * @returns {string[]}
      */
     static hexToRGBA( hex ) {
-      assert( ColorWheel.isHex( hex ), `invalid hex: ${ hex }` );
+      assert.enabled && assert( ColorWheel.isHex( hex ), `invalid hex: ${ hex }` );
       hex = hex.replace( '#', '' ); // Remove the '#'
 
       // Expand shorthand form of hex
@@ -91,8 +91,52 @@ define( require => {
       return array;
     }
 
+    /**
+     * Converts a hsl or hsla string (like 'hsl(270, 60%, 70%)') to rgba, returning each value in a array.
+     * Conversion formula from http://en.wikipedia.org/wiki/HSL_color_space.
+     * @public
+     *
+     * @param {string} hsl - the hsl color string
+     * @returns {string[]}
+     */
+    static hslToRGBA( hsl ) {
+      assert.enabled && assert( ColorWheel.isHSL( hsl ) || ColorWheel.isHSLA( hsl ), `invalid hsl: ${ hsl }` );
+      const hslArray = ColorWheel._parseToArguments( hsl );
+      const hue = ( parseFloat( hslArray[ 0 ] ) % 360 ) / 360;
+      const saturation = Util.clamp( parseInt( hslArray[ 1 ].replace( '%', '' ) ) / 100, 0, 1 );
+      const lightness = Util.clamp( parseInt( hslArray[ 2 ].replace( '%', '' ) ) / 100, 0, 1 );
+      if ( hslArray.length === 3 )  hslArray.push( '1' );
+      const alpha = hslArray[ 3 ].includes( '%' ) ?
+                      Util.clamp( parseFloat( hslArray[ 3 ].replace( '%', '' ) ) / 100, 0, 1 ) :
+                      Util.clamp( parseFloat( hslArray[ 3 ] ), 0, 1 );
+
+      const m2 = lightness < 0.5 ? lightness * ( saturation + 1 ) : lightness + saturation - lightness * saturation;
+      const m1 = lightness * 2 - m2;
+      const hueToRGB = ( hue ) => {
+        if ( hue < 0 ) hue += 1;
+        if ( hue > 1 ) hue -= 1;
+        if ( hue < 1 / 6 ) return m1 + ( m2 - m1 ) * 6 * hue;
+        if ( hue < 1 / 2 ) return m2;
+        if ( hue < 2 / 3 ) return m1 + ( m2 - m1 ) * ( 2 / 3 - hue ) * 6;
+        return m1;
+      };
+
+      const r = Util.roundSymmetric( hueToRGB( hue + 1 / 3 ) * 255 );
+      const g = Util.roundSymmetric( hueToRGB( hue ) * 255 );
+      const b = Util.roundSymmetric( hueToRGB( hue - 1 / 3 ) * 255 );
+      return [ r, g, b, alpha ];
+    }
+
+
+    /**
+     * Converts a keyword color (like 'aqua') to rgba, returning each value in a array.
+     * @public
+     *
+     * @param {string} color - the keyword color string
+     * @returns {string[]}
+     */
     static keywordToRGBA( color ) {
-      assert( ColorWheel.isKeyword( color ), `invalid keyword: ${ color }` );
+      assert.enabled && assert( ColorWheel.isKeyword( color ), `invalid keyword: ${ color }` );
 
       // Use a canvas test element to compute the color.
       ColorWheel._canvasContext.fillStyle = color;
@@ -102,6 +146,19 @@ define( require => {
     }
 
     //----------------------------------------------------------------------------------------
+
+    /**
+     * Parses a color string that is in functional notation (like rgb( r, g, b )) into an array of its arguments,
+     * removing trailing/leading whitespace.
+     * @private
+     *
+     * @param {string} color - the color string to parse
+     * @return {string[]}
+     */
+    static _parseToArguments( color ) {
+      return color.substring( color.indexOf( '(' ) + 1, color.indexOf( ')' ) ).split( ',' ).map( str => str.trim() );
+    }
+
     /**
      * Static method that initializes containers and elements for testing keyword colors.
      * @private
