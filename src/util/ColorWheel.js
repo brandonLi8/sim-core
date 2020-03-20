@@ -72,13 +72,13 @@ define( require => {
         const red = Math.min( 255, rgb[ 0 ] + Math.floor( factor * ( 255 - rgb[ 0 ] ) ) );
         const green = Math.min( 255, rgb[ 1 ] + Math.floor( factor * ( 255 - rgb[ 1 ] ) ) );
         const blue = Math.min( 255, rgb[ 2 ] + Math.floor( factor * ( 255 - rgb[ 2 ] ) ) );
-        return ColorWheel.formatRgbString( red, green, blue, alpha );
+        return ColorWheel.formatRgbString( red, green, blue, rgb[ 3 ] );
       }
       else {
         const red = Math.max( 0, rgb[ 0 ] - Math.floor( -factor * rgb[ 0 ] ) );
         const green = Math.max( 0, rgb[ 1 ] - Math.floor( -factor * rgb[ 1 ] ) );
         const blue = Math.max( 0, rgb[ 2 ] - Math.floor( -factor * rgb[ 2 ] ) );
-        return ColorWheel.formatRgbString( red, green, blue, alpha );
+        return ColorWheel.formatRgbString( red, green, blue, rgb[ 3 ] );
       }
     }
 
@@ -127,7 +127,7 @@ define( require => {
       if ( hex.length === 6 ) hex += 'FF';
 
       // Convert to Rgba using parseInt
-      const array = [ 0, 1, 2 ].map( i => parseInt( hex.substring( 2 * i, ( i + 1 ) * 2 ), 16 ) )
+      const array = [ 0, 1, 2 ].map( i => parseInt( hex.substring( 2 * i, ( i + 1 ) * 2 ), 16 ) );
       array.push( parseInt( hex.substring( 6, 8 ), 16 ) / 255 ); // Alpha channel should be from 0 to 1
       return array;
     }
@@ -144,9 +144,9 @@ define( require => {
       assert.enabled && assert( ColorWheel.isHsl( hsl ) || ColorWheel.ishsla( hsl ), `invalid hsl: ${ hsl }` );
       const hslArray = ColorWheel._parseToArguments( hsl );
       const hue = ( parseFloat( hslArray[ 0 ] ) % 360 ) / 360;
-      const saturation = Util.clamp( parseInt( hslArray[ 1 ].replace( '%', '' ) ) / 100, 0, 1 );
-      const lightness = Util.clamp( parseInt( hslArray[ 2 ].replace( '%', '' ) ) / 100, 0, 1 );
-      if ( hslArray.length === 3 )  hslArray.push( '1' );
+      const saturation = Util.clamp( parseInt( hslArray[ 1 ].replace( '%', '' ), 10 ) / 100, 0, 1 );
+      const lightness = Util.clamp( parseInt( hslArray[ 2 ].replace( '%', '' ), 10 ) / 100, 0, 1 );
+      if ( hslArray.length === 3 ) hslArray.push( '1' );
       const alpha = hslArray[ 3 ].includes( '%' ) ?
                       Util.clamp( parseFloat( hslArray[ 3 ].replace( '%', '' ) ) / 100, 0, 1 ) :
                       Util.clamp( parseFloat( hslArray[ 3 ] ), 0, 1 );
@@ -198,7 +198,7 @@ define( require => {
       if ( rgbArray.length === 3 ) rgbArray.push( '1' );
 
       return rgbArray.map( value => {
-        return value.includes( '%' ) ? parseInt( value.replace( '%', '' ) / 100 ) : parseInt( value );
+        return value.includes( '%' ) ? parseInt( value.replace( '%', '' ) / 100, 10 ) : parseInt( value, 10 );
       } );
     }
 
