@@ -6,8 +6,8 @@
  * https://developer.mozilla.org/en-US/docs/Web/CSS/color_value for the official specification.
  *
  * Color Wheel is designed to work with most CSS color strings, including:
- *   - rgb        e.g. 'rgb(104, 200, 82)' or 'rgb( 104%, 50%, 80% )'
- *   - rgba       e.g. 'rgb(104, 200, 82, 0.7)'
+ *   - rgb        e.g. 'rgb(104, 200, 82)' or 'rgb(100%, 50%, 80%)'
+ *   - rgba       e.g. 'rgba(104, 200, 82, 0.7)' or 'rgba(104, 200, 82, 70%)'
  *   - hex        e.g. '#1BC4FD', '#DDD'
  *   - hex-alpha  e.g. '#1BC4FDF2', '#DDDA'
  *   - hsl        e.g. 'hsl(270, 60%, 70%)`
@@ -15,7 +15,7 @@
  *   - keywords   e.g. 'aqua', 'transparent', etc.
  *
  * NOTE: Currently, Color Wheel doesn't support space-separated values in functional notation. Additionally,
- *       the first parameter of Hsl and hsla (hue) must be unit-less (in degrees).
+ *       the first parameter of hsl and hsla (hue) must be unit-less (in degrees).
  *
  * @author Brandon Li <brandon.li820@gmail.com>
  */
