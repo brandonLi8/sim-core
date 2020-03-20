@@ -64,7 +64,42 @@ define( require => {
       return FORMAT_PARSERS.keyword.test( color ) && !!ColorWheel._testElement.style.background.length;
     }
 
+    /*----------------------------------------------------------------------------*
+     * Conversions from formats
+     *----------------------------------------------------------------------------*/
 
+    /**
+     * Converts a hex string (like '#FA45') to rgba, returning each value in a array.
+     * @public
+     *
+     * @param {string} hex - the hex color string
+     * @returns {string[]}
+     */
+    static hexToRGBA( hex ) {
+      assert( ColorWheel.isHex( hex ), `invalid hex: ${ hex }` );
+      hex = hex.replace( '#', '' ); // Remove the '#'
+
+      // Expand shorthand form of hex
+      if ( hex.length === 3 || hex.length === 4 ) hex = [ ...hex ].map( char => char + char ).join( '' );
+
+      // Expand to full #RRGGBBAA format
+      if ( hex.length === 6 ) hex += 'FF';
+
+      // Convert to RGBA using parseInt
+      const array = [ 0, 1, 2 ].map( i => parseInt( hex.substring( 2 * i, ( i + 1 ) * 2 ), 16 ) )
+      array.push( parseInt( hex.substring( 6, 8 ), 16 ) / 255 ); // Alpha channel should be from 0 to 1
+      return array;
+    }
+
+    static keywordToRGBA( color ) {
+      assert( ColorWheel.isKeyword( color ), `invalid keyword: ${ color }` );
+
+      // Use a canvas test element to compute the color.
+      ColorWheel._canvasContext.fillStyle = color;
+      ColorWheel._canvasContext.fill();
+      const imageData = ColorWheel._canvasContext.getImageData( 0, 0, 1, 1 ).data;
+      return [ imageData[ 0 ], imageData[ 1 ], imageData[ 2 ], imageData[ 3 ] / 255 ];
+    }
 
     //----------------------------------------------------------------------------------------
     /**
