@@ -64,9 +64,30 @@ define( require => {
       return FORMAT_PARSERS.keyword.test( color ) && !!ColorWheel._testElement.style.background.length;
     }
 
+
+
+    //----------------------------------------------------------------------------------------
+    /**
+     * Static method that initializes containers and elements for testing keyword colors.
+     * @private
+     */
+    static _initializeColorTesting() {
+
+      // Create a test element to test if colors are valid.
+      ColorWheel._testElement = new DOMObject();
+
+      // Create a canvas element to compute the value of colors.
+      const canvasElement = new DOMObject( { type: 'canvas' } );
+      ColorWheel._canvasContext = canvasElement.element.getContext( '2d' );
+      ColorWheel._canvasContext.rect( 0, 0, 1, 1 );
+    }
   }
 
+  // @private {DOMObject} - Test DOMObject element, used to test if keyword colors are valid.
+  ColorWheel._testElement;
 
+  // @private {CanvasRenderingContext2D} - Test canvas context, used to compute the rgb value of keyword colors.
+  ColorWheel._canvasContext;
 
   return ColorWheel;
 } );
