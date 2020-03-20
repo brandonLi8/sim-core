@@ -15,7 +15,7 @@
  *   - keywords   e.g. 'aqua', 'transparent', etc.
  *
  * NOTE: Currently, Color Wheel doesn't support space-separated values in functional notation. Additionally,
- *       the first parameter of HSL and HSLA (hue) must be unit-less (in degrees).
+ *       the first parameter of Hsl and hsla (hue) must be unit-less (in degrees).
  *
  * @author Brandon Li <brandon.li820@gmail.com>
  */
@@ -41,7 +41,8 @@ define( require => {
   class ColorWheel {
 
     /**
-     * Shades a color string in any of the formats described above, by a factor percentage amount.
+     * Shades a color string in any of the formats described in the comment at the top of this file,
+     * by a factor percentage amount.
      *
      * Factor must be in the range [-1, 1]:
      *   If Factor > 0 : This will lighten the color so that it becomes brighter.
@@ -58,12 +59,12 @@ define( require => {
 
       if ( factor === 0 ) return color; // return the color if the factor is 0
 
-      // Convert the color to RGB
+      // Convert the color to rgb
       let rgb;
-      if ( color.includes( 'rgb' ) ) rgb = ColorWheel.parseRGB( color );
-      if ( color.includes( 'hsl' ) ) rgb = ColorWheel.hslToRGBA( color );
-      if ( color.includes( '#' ) ) rgb = ColorWheel.hexToRGBA( color );
-      if ( ColorWheel.isKeyword( color ) ) rgb = ColorWheel.keywordToRGBA( color );
+      if ( color.includes( 'rgb' ) ) rgb = ColorWheel.parseRgb( color );
+      if ( color.includes( 'hsl' ) ) rgb = ColorWheel.hslToRgba( color );
+      if ( color.includes( '#' ) ) rgb = ColorWheel.hexToRgba( color );
+      if ( ColorWheel.isKeyword( color ) ) rgb = ColorWheel.keywordToRgba( color );
       assert( rgb, `invalid color: ${ color }` );
 
       // Apply the Shade algorithm
@@ -71,13 +72,13 @@ define( require => {
         const red = Math.min( 255, rgb[ 0 ] + Math.floor( factor * ( 255 - rgb[ 0 ] ) ) );
         const green = Math.min( 255, rgb[ 1 ] + Math.floor( factor * ( 255 - rgb[ 1 ] ) ) );
         const blue = Math.min( 255, rgb[ 2 ] + Math.floor( factor * ( 255 - rgb[ 2 ] ) ) );
-        return ColorWheel.formatRGBString( red, green, blue, alpha );
+        return ColorWheel.formatRgbString( red, green, blue, alpha );
       }
       else {
         const red = Math.max( 0, rgb[ 0 ] - Math.floor( -factor * rgb[ 0 ] ) );
         const green = Math.max( 0, rgb[ 1 ] - Math.floor( -factor * rgb[ 1 ] ) );
         const blue = Math.max( 0, rgb[ 2 ] - Math.floor( -factor * rgb[ 2 ] ) );
-        return ColorWheel.formatRGBString( red, green, blue, alpha );
+        return ColorWheel.formatRgbString( red, green, blue, alpha );
       }
     }
 
@@ -91,11 +92,11 @@ define( require => {
      * @param {string} color - a CSS color string
      * @returns {boolean}
      */
-    static isRGB( color ) { return FORMAT_PARSERS.rgb.test( color ); }
-    static isRGBA( color ) { return FORMAT_PARSERS.rgba.test( color ); }
+    static isRgb( color ) { return FORMAT_PARSERS.rgb.test( color ); }
+    static isRgba( color ) { return FORMAT_PARSERS.rgba.test( color ); }
     static isHex( color ) { return FORMAT_PARSERS.hex.test( color ); }
-    static isHSL( color ) { return FORMAT_PARSERS.hsl.test( color ); }
-    static isHSLA( color ) { return FORMAT_PARSERS.hsla.test( color ); }
+    static isHsl( color ) { return FORMAT_PARSERS.hsl.test( color ); }
+    static ishsla( color ) { return FORMAT_PARSERS.hsla.test( color ); }
     static isKeyword( color ) {
       if ( !ColorWheel._testElement ) ColorWheel._initializeColorTesting();
       ColorWheel._testElement.style.background = null;
@@ -115,7 +116,7 @@ define( require => {
      * @param {string} hex - the hex color string
      * @returns {string[]}
      */
-    static hexToRGBA( hex ) {
+    static hexToRgba( hex ) {
       assert.enabled && assert( ColorWheel.isHex( hex ), `invalid hex: ${ hex }` );
       hex = hex.replace( '#', '' ); // Remove the '#'
 
@@ -125,7 +126,7 @@ define( require => {
       // Expand to full #RRGGBBAA format
       if ( hex.length === 6 ) hex += 'FF';
 
-      // Convert to RGBA using parseInt
+      // Convert to Rgba using parseInt
       const array = [ 0, 1, 2 ].map( i => parseInt( hex.substring( 2 * i, ( i + 1 ) * 2 ), 16 ) )
       array.push( parseInt( hex.substring( 6, 8 ), 16 ) / 255 ); // Alpha channel should be from 0 to 1
       return array;
@@ -139,8 +140,8 @@ define( require => {
      * @param {string} hsl - the hsl color string
      * @returns {string[]}
      */
-    static hslToRGBA( hsl ) {
-      assert.enabled && assert( ColorWheel.isHSL( hsl ) || ColorWheel.isHSLA( hsl ), `invalid hsl: ${ hsl }` );
+    static hslToRgba( hsl ) {
+      assert.enabled && assert( ColorWheel.isHsl( hsl ) || ColorWheel.ishsla( hsl ), `invalid hsl: ${ hsl }` );
       const hslArray = ColorWheel._parseToArguments( hsl );
       const hue = ( parseFloat( hslArray[ 0 ] ) % 360 ) / 360;
       const saturation = Util.clamp( parseInt( hslArray[ 1 ].replace( '%', '' ) ) / 100, 0, 1 );
@@ -152,7 +153,7 @@ define( require => {
 
       const m2 = lightness < 0.5 ? lightness * ( saturation + 1 ) : lightness + saturation - lightness * saturation;
       const m1 = lightness * 2 - m2;
-      const hueToRGB = ( hue ) => {
+      const hueToRgb = ( hue ) => {
         if ( hue < 0 ) hue += 1;
         if ( hue > 1 ) hue -= 1;
         if ( hue < 1 / 6 ) return m1 + ( m2 - m1 ) * 6 * hue;
@@ -161,9 +162,9 @@ define( require => {
         return m1;
       };
 
-      const r = Util.roundSymmetric( hueToRGB( hue + 1 / 3 ) * 255 );
-      const g = Util.roundSymmetric( hueToRGB( hue ) * 255 );
-      const b = Util.roundSymmetric( hueToRGB( hue - 1 / 3 ) * 255 );
+      const r = Util.roundSymmetric( hueToRgb( hue + 1 / 3 ) * 255 );
+      const g = Util.roundSymmetric( hueToRgb( hue ) * 255 );
+      const b = Util.roundSymmetric( hueToRgb( hue - 1 / 3 ) * 255 );
       return [ r, g, b, alpha ];
     }
 
@@ -174,7 +175,7 @@ define( require => {
      * @param {string} color - the keyword color string
      * @returns {string[]}
      */
-    static keywordToRGBA( color ) {
+    static keywordToRgba( color ) {
       assert.enabled && assert( ColorWheel.isKeyword( color ), `invalid keyword: ${ color }` );
 
       // Use a canvas test element to compute the color.
@@ -191,8 +192,8 @@ define( require => {
      * @param {string} rgb - the rgb color string
      * @returns {string[]}
      */
-    static parseRGB( rgb ) {
-      assert.enabled && assert( ColorWheel.isRGB( rgb ) || ColorWheel.isRGBA( rgb ), `invalid rgb: ${ rgb }` );
+    static parseRgb( rgb ) {
+      assert.enabled && assert( ColorWheel.isRgb( rgb ) || ColorWheel.isRgba( rgb ), `invalid rgb: ${ rgb }` );
       const rgbArray = ColorWheel._parseToArguments( rgb );
       if ( rgbArray.length === 3 ) rgbArray.push( '1' );
 
@@ -202,7 +203,7 @@ define( require => {
     }
 
     /**
-     * Formats a RGB string, preferring rgb, but uses rgba if the alpha channel isn't 1
+     * Formats a Rgb string, preferring rgb, but uses rgba if the alpha channel isn't 1
      * @public
      *
      * @param {number} red
@@ -211,7 +212,7 @@ define( require => {
      * @param {number} alpha
      * @returns {string}
      */
-    static formatRGBString( red, green, blue, alpha ) {
+    static formatRgbString( red, green, blue, alpha ) {
       return alpha === 1 ? `rgb(${ red }, ${ green }, ${ blue })` : `rgba(${ red }, ${ green }, ${ blue }, ${ alpha })`;
     }
 
