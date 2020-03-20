@@ -65,6 +65,7 @@ define( require => {
 
       // Convert the color string given to rgba.
       let rgb;
+      if ( Object.prototype.hasOwnProperty.call( CACHED_COLORS, color ) ) rgb = CACHED_COLORS[ color ];
       if ( color.includes( 'rgb' ) ) rgb = ColorWheel.parseRgb( color );
       if ( color.includes( 'hsl' ) ) rgb = ColorWheel.hslToRgba( color );
       if ( color.includes( '#' ) ) rgb = ColorWheel.hexToRgba( color );
@@ -135,6 +136,7 @@ define( require => {
       // Convert to rgba using parseInt
       const array = [ 0, 1, 2 ].map( i => parseInt( hex.substring( 2 * i, ( i + 1 ) * 2 ), 16 ) );
       array.push( parseInt( hex.substring( 6, 8 ), 16 ) / 255 ); // Alpha channel should be from 0 to 1
+      ColorWheel._clampRgbaArray( array );
       CACHED_COLORS[ hex ] = array; // Cache the color
       return array;
     }
@@ -174,7 +176,7 @@ define( require => {
       const r = Util.roundSymmetric( hueToRgb( hue + 1 / 3 ) * 255 );
       const g = Util.roundSymmetric( hueToRgb( hue ) * 255 );
       const b = Util.roundSymmetric( hueToRgb( hue - 1 / 3 ) * 255 );
-      CACHED_COLORS[ hsl ] = [ r, g, b, alpha ]; // Cache the hsl color string
+      CACHED_COLORS[ hsl ] = ColorWheel._clampRgbaArray( [ r, g, b, alpha ] ); // Cache the hsl color string
       return CACHED_COLORS[ hsl ];
     }
 
@@ -195,7 +197,7 @@ define( require => {
       ColorWheel._canvasContext.fill();
       const imageData = ColorWheel._canvasContext.getImageData( 0, 0, 1, 1 ).data;
       CACHED_COLORS[ color ] = [ imageData[ 0 ], imageData[ 1 ], imageData[ 2 ], imageData[ 3 ] / 255 ];
-      return CACHED_COLORS[ color ];
+      return ColorWheel._clampRgbaArray( CACHED_COLORS[ color ] );
     }
 
     /**
@@ -212,9 +214,9 @@ define( require => {
       const rgbArray = ColorWheel._parseToArguments( rgb );
       if ( rgbArray.length === 3 ) rgbArray.push( '1' );
 
-      CACHED_COLORS[ rgb ] = rgbArray.map( value => {
+      CACHED_COLORS[ rgb ] = ColorWheel._clampRgbaArray( rgbArray.map( value => {
         return value.includes( '%' ) ? parseInt( value.replace( '%', '' ) / 100, 10 ) : parseInt( value, 10 );
-      } );
+      } ) );
       return CACHED_COLORS[ rgb ];
     }
 
@@ -233,6 +235,22 @@ define( require => {
     }
 
     //----------------------------------------------------------------------------------------
+
+    /**
+     * Clamps each value of an rgba array ([r, g, b, a]) so that the rgb values are clamped between 0 and 255 and the
+     * alpha value is clamped from 0 to 1.
+     * @private
+     *
+     * @param {number[]} rgba
+     * @returns {number[]} returns the modified array
+     */
+    _clampRgbaArray( rgba ) {
+      rgba[ 0 ] = Util.clamp( rgbArray[ 0 ], 0, 255 );
+      rgba[ 1 ] = Util.clamp( rgbArray[ 1 ], 0, 255 );
+      rgba[ 2 ] = Util.clamp( rgbArray[ 2 ], 0, 255 );
+      rgba[ 3 ] = Util.clamp( rgbArray[ 3 ], 0, 1 );
+      return rgba;
+    }
 
     /**
      * Parses a color string that is in functional notation (like rgb( r, g, b )) into an array of its arguments,
