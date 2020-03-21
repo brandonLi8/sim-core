@@ -17,12 +17,12 @@
  * (1) Enum members are named like constants, using uppercase. See the example above.
  * (2) If an Enum is not closely related to some class, then put the Enum in its own .js file.
  *     Do not combine multiple Enumerations into one file.
- * (3) Members of the Enum are considered instances of the Enum in documentation. For example, a method
+ * (3) Members of the Enum should be documented as a Member of the instance of the Enum. For example, a method
  *     that takes an Enum value as an argument would be documented like this:
  *
- *     // @param {ColorsEnum} color - value from Colors Enum
+ *     // @param {Enum.Member.<Colors>} color - value from Colors Enum
  *     setColor( color ) {
- *       assert( ColorsEnum.includes( color ) );
+ *       assert( Colors.includes( color ) );
  *       // ...
  *     }
  *
@@ -59,11 +59,10 @@ define( require => {
 
       // Assign an enumeration object value for each key.
       keys.forEach( key => {
-        const enumValue = { name: key, toString: () => key };
 
         // Assign to this class for static referencing.
-        this[ key ] = enumValue;
-        this.MEMBERS.push( enumValue );
+        this[ key ] = new Enum.Member( key );
+        this.MEMBERS.push( this[ key ] );
       } );
 
       Util.deepFreeze( this ); // Freeze this object as it is now immutable.
@@ -80,6 +79,9 @@ define( require => {
       return this.MEMBERS.includes( value );
     }
   }
+
+  // @public {Class.<Member>} - Class definition for each individual member of an Enumeration.
+  Enum.Member = class Member { constructor( name ) { this.name = name }; toString() { return this.name; } }
 
   return Enum;
 } );
