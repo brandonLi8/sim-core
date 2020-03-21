@@ -27,6 +27,11 @@ define( require => {
   const PressListener = require( 'SIM_CORE/scenery/events/PressListener' );
   const Property = require( 'SIM_CORE/util/Property' );
   const Vector = require( 'SIM_CORE/util/Vector' );
+  const ColorWheel = require( 'SIM_CORE/util/ColorWheel' );
+  const RadialGradient = require( 'SIM_CORE/scenery/gradients/RadialGradient' );
+
+  // constants
+  const CACHED_BASE_COLOR_GRADIENTS = {}; // Maps base-colors to 3D gradients. See Button.apply3DGradients() for doc.
 
   class Button extends Node {
 
@@ -129,6 +134,54 @@ define( require => {
 
       this.content[ xAlignKey ] = this.background[ xAlignKey ];
       this.content[ yAlignKey ] = this.background[ yAlignKey ];
+    }
+
+    /**
+     * Applies the 'fill' of a Button's background to make it look 3D by using gradients that create the illusion of
+     * shadows and highlights. Will set the 'idleFill', 'hoverFill' and 'pressedFill' properties of the Button, and will
+     * automatically switch Gradients when the interaction state changes.
+     * @public
+     *
+     * @param {Button} button - the button to apply the gradents to
+     * @param {string} baseColor - any valid CSS color string
+     */
+    static apply3DGradients( button, baseColor ) {
+      assert( !button.idleFill && !button.hoverFill && !button.pressedFill, 'Button already has 3D gradients applied' );
+
+      // If the base-color is cached, used the cached values.
+      if ( CACHED_BASE_COLOR_GRADIENTS.hasOwnProperty( baseColor ) ) {
+        button.idleFill = CACHED_BASE_COLOR_GRADIENTS[ baseColor ].idleFill;
+        button.hoverFill = CACHED_BASE_COLOR_GRADIENTS[ baseColor ].hoverFill;
+        button.pressedFill = CACHED_BASE_COLOR_GRADIENTS[ baseColor ].pressedFill;
+      }
+      else {
+        // Array of an array of length 2, where the first item represents the shade factor and the second item
+        // represents the stop percentage. Each array of length 2 represents a stop of the Gradient.
+        // Values were determined through experimentation.
+        const stops = [ [ 0.75, 0 ], [ 0.5, 20 ], [ 0.3, 40 ], [ 0, 59 ], [ -0.02, 70 ], [ -0.045, 77 ],
+                        [ -0.07, 82.5 ], [ -0.11, 88 ], [ -0.17, 93 ], [ -0.21, 96 ], [ -0.25, 100 ] ];
+
+        // Create the Linear Gradients for each fill type.
+        button.idleFill = new LinearGradient( 0, 13, 100, 78 )
+        button.hoverFill = new LinearGradient( 0, 13, 100, 78 )
+        button.pressedFill = new LinearGradient( 0, 13, 100, 78 )
+
+        const hoverBaseColor = ColorWheel.shade( baseColor, 0.25 ); // lighten
+        const pressedBaseColor = ColorWheel.shade( baseColor, -0.05 ); // darken
+
+        stops.forEach( stop => {
+          button.idleFill.addColorStop( ColorWheel.shade( baseColor, stop[ 0 ] ), stop[ 1 ] );
+          button.hoverFill.addColorStop( ColorWheel.shade( hoverBaseColor, stop[ 0 ] ), stop[ 1 ] );
+          button.pressedFill.addColorStop( ColorWheel.shade( pressedBaseColor, stop[ 0 ] ), stop[ 1 ] );
+        } );
+      }
+
+      // Apply the fills by listening to the interactionStateProperty
+      button.interactionStateProperty.link( interactionState => {
+        if ( interactionState === Button.interactionStates.IDLE ) button.background.fill = button.idleFill;
+        if ( interactionState === Button.interactionStates.HOVER ) button.background.fill = button.hoverFill;
+        if ( interactionState === Button.interactionStates.PRESSED ) button.background.fill = button.pressedFill;
+      } );
     }
   }
 

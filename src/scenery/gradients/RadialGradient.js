@@ -38,7 +38,7 @@ define( require => {
       assert( typeof centerY === 'number' && centerY >= 0 && centerY <= 100, `invalid centerY: ${ centerY }` );
       assert( typeof focalX === 'number' && focalX >= 0 && focalX <= 100, `invalid focalX: ${ focalX }` );
       assert( typeof focalY === 'number' && focalY >= 0 && focalY <= 100, `invalid focalY: ${ focalY }` );
-      assert( typeof radius === 'number' && radius >= 0 && radius <= 100, `invalid radius: ${ radius }` );
+      assert( typeof radius === 'number' && radius >= 0, `invalid radius: ${ radius }` );
 
       super( 'radialGradient' );
 
@@ -48,7 +48,7 @@ define( require => {
         cy: `${ centerY }%`,
         fx: `${ focalX }%`,
         fy: `${ focalY }%`,
-        radius: `${ radius }%`
+        r: `${ radius }%`
       } );
     }
   }
