@@ -81,7 +81,7 @@ define( require => {
   }
 
   // @public {Class.<Member>} - Class definition for each individual member of an Enumeration.
-  Enum.Member = class Member { constructor( name ) { this.name = name }; toString() { return this.name; } }
+  Enum.Member = class Member { constructor( name ) { this.name = name; } toString() { return this.name; } };
 
   return Enum;
 } );

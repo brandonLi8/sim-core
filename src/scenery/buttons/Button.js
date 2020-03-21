@@ -19,6 +19,7 @@ define( require => {
 
   // modules
   const assert = require( 'SIM_CORE/util/assert' );
+  const ColorWheel = require( 'SIM_CORE/util/ColorWheel' );
   const Enum = require( 'SIM_CORE/util/Enum' );
   const HoverListener = require( 'SIM_CORE/scenery/events/HoverListener' );
   const LinearGradient = require( 'SIM_CORE/scenery/gradients/LinearGradient' );
@@ -27,8 +28,6 @@ define( require => {
   const PressListener = require( 'SIM_CORE/scenery/events/PressListener' );
   const Property = require( 'SIM_CORE/util/Property' );
   const Vector = require( 'SIM_CORE/util/Vector' );
-  const ColorWheel = require( 'SIM_CORE/util/ColorWheel' );
-  const RadialGradient = require( 'SIM_CORE/scenery/gradients/RadialGradient' );
 
   // constants
   const CACHED_BASE_COLOR_GRADIENTS = {}; // Maps base-colors to 3D gradients. See Button.apply3DGradients() for doc.
@@ -149,7 +148,7 @@ define( require => {
       assert( !button.idleFill && !button.hoverFill && !button.pressedFill, 'Button already has 3D gradients applied' );
 
       // If the base-color is cached, used the cached values.
-      if ( CACHED_BASE_COLOR_GRADIENTS.hasOwnProperty( baseColor ) ) {
+      if ( Object.hasOwnProperty.call( CACHED_BASE_COLOR_GRADIENTS, baseColor ) ) {
         button.idleFill = CACHED_BASE_COLOR_GRADIENTS[ baseColor ].idleFill;
         button.hoverFill = CACHED_BASE_COLOR_GRADIENTS[ baseColor ].hoverFill;
         button.pressedFill = CACHED_BASE_COLOR_GRADIENTS[ baseColor ].pressedFill;
@@ -162,10 +161,11 @@ define( require => {
                         [ -0.07, 82.5 ], [ -0.11, 88 ], [ -0.17, 93 ], [ -0.21, 96 ], [ -0.25, 100 ] ];
 
         // Create the Linear Gradients for each fill type.
-        button.idleFill = new LinearGradient( 0, 13, 100, 78 )
-        button.hoverFill = new LinearGradient( 0, 13, 100, 78 )
-        button.pressedFill = new LinearGradient( 0, 13, 100, 78 )
+        button.idleFill = new LinearGradient( 0, 13, 100, 78 );
+        button.hoverFill = new LinearGradient( 0, 13, 100, 78 );
+        button.pressedFill = new LinearGradient( 0, 13, 100, 78 );
 
+        // Modify the base colors for hover and press events.
         const hoverBaseColor = ColorWheel.shade( baseColor, 0.25 ); // lighten
         const pressedBaseColor = ColorWheel.shade( baseColor, -0.05 ); // darken
 
