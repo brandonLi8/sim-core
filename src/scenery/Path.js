@@ -146,8 +146,9 @@ define( require => {
       this.width = shape ? shape.bounds.width : 0;
       this.height = shape ? shape.bounds.height : 0;
 
-      // Set the Bounds of this Node.
+      // Set the Bounds of this Node and update layout.
       if ( shape ) { this._bounds.set( this._shape.bounds ); }
+      if ( this.parent instanceof Node ) this.parent._recomputeAncestorBounds();
       this.layout( this.screenViewScale );
     }
 

@@ -69,12 +69,14 @@ define( require => {
     }
 
     /**
-     * ES5 getter of the corner radius of each corner of the Rectangle.
+     * ES5 getters of the properties of this Rectangle.
      * @public
      *
      * @returns {number}
      */
     get cornerRadius() { return this._cornerRadius; }
+    get width() { return super.width; }
+    get height() { return super.height; }
 
     /**
      * Sets the corner radius of each corner of the Rectangle.
@@ -94,6 +96,34 @@ define( require => {
      * @param {Shape} shape
      */
     set shape( shape ) { assert( false, 'Rectangle sets shape' ); }
+
+    /**
+     * @override
+     * Sets the width of the Rectangle, keeping the minX the same but expanding/contracting the right border.
+     * Overridden to update the Rectangle's shape when the width changes.
+     * @public
+     *
+     * @param {number} width
+     */
+    set width( width ) {
+      if ( width === this._bounds.width ) return; // Exit if setting to the same width
+      super.width = width;
+      super.shape = Rectangle._computeRectangleShape( this.bounds, this._cornerRadius );
+    }
+
+    /**
+     * @override
+     * Sets the height of the Rectangle, keeping the minY the same but expanding/contracting the bottom maxY.
+     * Overridden to update the Rectangle's shape when the height changes.
+     * @public
+     *
+     * @param {number} height
+     */
+    set height( height ) {
+      if ( height === this._bounds.height ) return; // Exit if setting to the same height
+      super.height = height;
+      super.shape = Rectangle._computeRectangleShape( this.bounds, this._cornerRadius );
+    }
 
     /**
      * Returns a Shape of a rectangle with a specified cornerRadius.
