@@ -154,6 +154,19 @@ define( require => {
 
     /**
      * @override
+     * Since a Path is a graphical element, it and all of its sub-types cannot have children, according to the SVG
+     * specification. See https://stackoverflow.com/questions/9227128/which-svg-elements-can-be-child-and-which-cant-be.
+     *
+     * Ensures that no children can be added to graphical children.
+     * @public
+     *
+     * @param {Node} child
+     * @returns {Node} - Returns 'this' reference, for chaining
+     */
+    addChild( child ) { assert( false, 'graphical SVG elements cannot have children.' ); }
+
+    /**
+     * @override
      * Layouts the Path, ensuring that the Shape is correctly in its top-left corner with 0 transformations before
      * calling the super class's layout method. Correctly scales the shape within the ScreenView.
      * @public (sim-core-internal)
