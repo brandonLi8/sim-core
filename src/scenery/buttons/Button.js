@@ -66,7 +66,7 @@ define( require => {
       // @public (read-only) {Property.<Enum.Member.<Button.interactionStates>>} - Property of the current
       //                                                                           interaction state of the Button.
       this.interactionStateProperty = new Property( Button.interactionStates.IDLE, {
-        validValues: Button.interactionStates
+        validValues: Button.interactionStates.MEMBERS
       } );
 
       // @public (read-only) {Gradient} - references to potential 'fills' for backgrounds if this Button is passed to
@@ -88,7 +88,7 @@ define( require => {
 
       // @private {PressListener} - create a PressListener for when the user clicks on the Button
       this._pressListener = new PressListener( this, {
-        press: () => { this.interactionStateProperty.value = Button.interactionStates.PRESSED; }
+        press: () => { this.interactionStateProperty.value = Button.interactionStates.PRESSED; },
         release: () => { this.interactionStateProperty.value = Button.interactionStates.HOVER; }
       } );
 
@@ -124,8 +124,8 @@ define( require => {
       this.background.topLeft = Vector.ZERO;
 
       // Strip center to centerX or centerY
-      const xAlignKey = this._xAlign === 'center' : 'centerX' : this._xAlign;
-      const yAlignKey = this._yAlign === 'center' : 'centerY' : this._yAlign;
+      const xAlignKey = this._xAlign === 'center' ? 'centerX' : this._xAlign;
+      const yAlignKey = this._yAlign === 'center' ? 'centerY' : this._yAlign;
 
       this.content[ xAlignKey ] = this.background[ xAlignKey ];
       this.content[ yAlignKey ] = this.background[ yAlignKey ];
