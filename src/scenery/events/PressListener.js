@@ -30,6 +30,9 @@ define( require => {
   const Node = require( 'SIM_CORE/scenery/Node' );
   const Vector = require( 'SIM_CORE/util/Vector' );
 
+  // flags
+  let globalId = 1;
+
   class PressListener {
 
     /**
@@ -71,6 +74,9 @@ define( require => {
       // @private {function} - reference our internal press and release handlers.
       this._pressHandler = this._press.bind( this );
       this._releaseHandler = this._release.bind( this );
+
+      // @private {number} - each PressListener needs to have a unique id to be referenced.
+      this._id = globalId++;
 
       // Initiate press and release listeners for the target Node.
       this._initiate();
@@ -126,12 +132,10 @@ define( require => {
 
       // Assign a `pressHandled` flag field in the event object. This is done so that the same event isn't 'pressed'
       // twice, particularly in devices that register both a 'mouse-down' and a 'touchstart'. This `pressHandled`
-      // field is undefined in the event, but set to true in this method.
-      if ( event.pressHandled !== undefined ) return; // If the field is defined, the event has already been handled.
-      event.pressHandled = true; // Set the pressHandled event to true in case the _press is called with the same event.
-
-      // Prevents further propagation of the current event into ancestors in the scene graph.
-      event.stopPropagation();
+      // field is undefined in the event, but set to true in this method. Append the id to the end to ensure that
+      // multiple PressListeners on the same targetNode still fire.
+      if ( event[ 'pressHandled' + this._id ] !== undefined ) return;
+      event[ 'pressHandled' + this._id ] = true;
 
       // Prevents the default action from taken place if the event isn't handled.
       event.preventDefault();
@@ -155,12 +159,10 @@ define( require => {
 
       // Assign a `releaseHandled` flag field in the event object. This is done so that the same event isn't 'released'
       // twice, particularly in devices that register both a 'mouse-up' and a 'touchend'. This `releaseHandled`
-      // field is undefined in the event, but set to true in this method.
-      if ( event.releaseHandled !== undefined ) return;
-      event.releaseHandled = true;
-
-      // Prevents further propagation of the current event into ancestors in the scene graph.
-      event.stopPropagation();
+      // field is undefined in the event, but set to true in this method. Append the id to the end to ensure that
+      // multiple PressListeners on the same targetNode still fire.
+      if ( event[ 'releaseHandled' + this._id ] !== undefined ) return;
+      event[ 'releaseHandled' + this._id ] = true;
 
       // Prevents the default action from taken place if the event isn't handled.
       event.preventDefault();
