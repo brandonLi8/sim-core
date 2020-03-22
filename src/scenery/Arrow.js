@@ -220,7 +220,7 @@ define( require => {
         const length = vector.magnitude;
 
         // Make sure that head height is less than arrow length.
-        this._headHeight = Math.min( this._headHeight, 0.99 * length );
+        const headHeight = Math.min( this._headHeight, 0.99 * length );
 
         // Set up a coordinate frame that goes from the tail of the arrow to the tip.
         const xHatUnit = length ? vector.copy().normalize() : Vector.ZERO;
@@ -238,11 +238,11 @@ define( require => {
         };
 
         addPoint( 0, this._tailWidth / 2 );
-        addPoint( length - this._headHeight, this._tailWidth / 2 );
-        addPoint( length - this._headHeight, this._headWidth / 2 );
+        addPoint( length - headHeight, this._tailWidth / 2 );
+        addPoint( length - headHeight, this._headWidth / 2 );
         addPoint( length, 0 );
-        addPoint( length - this._headHeight, -this._headWidth / 2 );
-        addPoint( length - this._headHeight, -this._tailWidth / 2 );
+        addPoint( length - headHeight, -this._headWidth / 2 );
+        addPoint( length - headHeight, -this._tailWidth / 2 );
         addPoint( 0, -this._tailWidth / 2 );
         super.shape = arrowShape;
       }
