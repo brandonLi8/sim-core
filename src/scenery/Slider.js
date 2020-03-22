@@ -62,7 +62,7 @@ define( require => {
         // thumb
         thumbWidth: 12,                  // {number} - the width of the thumb Rectangle
         thumbHeight: 25,                 // {number} - the height of the thumb Rectangle
-        thumbBaseColor: '#99FF69',       // {string|Gradient} - the base-color fill of the thumb Rectangle
+        thumbBaseColor: '#90F360',       // {string|Gradient} - the base-color fill of the thumb Rectangle
         thumbStroke: 'black',            // {string|Gradient} - the stroke color of the thumb Rectangle
         thumbStrokeWidth: 1,             // {number} - the stroke width of the line that runs through the thumb
         thumbCenterLineStroke: '#333',   // {string|Gradient} - the stroke color of the line that runs through the thumb

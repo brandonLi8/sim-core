@@ -157,8 +157,8 @@ define( require => {
         // Array of an array of length 2, where the first item represents the shade factor and the second item
         // represents the stop percentage. Each array of length 2 represents a stop of the Gradient.
         // Values were determined through experimentation.
-        const stops = [ [ 0.75, 0 ], [ 0.5, 20 ], [ 0.3, 40 ], [ 0, 59 ], [ -0.02, 70 ], [ -0.045, 77 ],
-                        [ -0.07, 82.5 ], [ -0.11, 88 ], [ -0.17, 93 ], [ -0.21, 96 ], [ -0.25, 100 ] ];
+        const stops = [ [ 0.75, 0 ], [ 0.5, 20 ], [ 0.3, 40 ], [ 0, 59 ], [ -0.03, 69 ], [ -0.06, 75 ],
+                        [ -0.11, 81 ], [ -0.15, 87 ], [ -0.22, 92.5 ], [ -0.26, 95.5 ], [ -0.30, 100 ] ];
 
         // Create the Linear Gradients for each fill type.
         button.idleFill = new LinearGradient( 0, 13, 100, 78 );
@@ -167,7 +167,7 @@ define( require => {
 
         // Modify the base colors for hover and press events.
         const hoverBaseColor = ColorWheel.shade( baseColor, 0.25 ); // lighten
-        const pressedBaseColor = ColorWheel.shade( baseColor, -0.05 ); // darken
+        const pressedBaseColor = ColorWheel.shade( baseColor, -0.15 ); // darken
 
         stops.forEach( stop => {
           button.idleFill.addColorStop( ColorWheel.shade( baseColor, stop[ 0 ] ), stop[ 1 ] );
