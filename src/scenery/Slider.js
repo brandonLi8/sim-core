@@ -172,7 +172,6 @@ define( require => {
      */
     dispose() {
       this._numberProperty.unlink( this._numberPropertyObserver );
-      this._thumbPressListener.dispose();
       this._trackPressListener.dispose();
       this._thumbDragListener.dispose();
       super.dispose();
