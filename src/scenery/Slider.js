@@ -23,8 +23,8 @@ define( require => {
 
   // modules
   const assert = require( 'SIM_CORE/util/assert' );
+  const Button = require( 'SIM_CORE/scenery/buttons/Button' );
   const DragListener = require( 'SIM_CORE/scenery/events/DragListener' );
-  const HoverListener = require( 'SIM_CORE/scenery/events/HoverListener' );
   const Line = require( 'SIM_CORE/scenery/Line' );
   const Node = require( 'SIM_CORE/scenery/Node' );
   const PressListener = require( 'SIM_CORE/scenery/events/PressListener' );
@@ -62,8 +62,7 @@ define( require => {
         // thumb
         thumbWidth: 12,                  // {number} - the width of the thumb Rectangle
         thumbHeight: 25,                 // {number} - the height of the thumb Rectangle
-        thumbFill: '#99FF69',            // {string|Gradient} - the fill of the thumb Rectangle
-        thumbFillHighlighted: '#CCF199', // {string|Gradient} - the fill of the thumb when it is highlighted or hovered
+        thumbBaseColor: '#99FF69',       // {string|Gradient} - the base-color fill of the thumb Rectangle
         thumbStroke: 'black',            // {string|Gradient} - the stroke color of the thumb Rectangle
         thumbStrokeWidth: 1,             // {number} - the stroke width of the line that runs through the thumb
         thumbCenterLineStroke: '#333',   // {string|Gradient} - the stroke color of the line that runs through the thumb
@@ -114,27 +113,23 @@ define( require => {
         cursor: 'pointer'
       } );
 
-      // @private {Rectangle} - create the slider thumb Rectangle.
-      this._thumbRectangle = new Rectangle( options.thumbWidth, options.thumbHeight, {
-        fill: options.thumbFill,
+      // Create the slider thumb Rectangle.
+      const thumbRectangle = new Rectangle( options.thumbWidth, options.thumbHeight, {
         stroke: options.thumbStroke,
         strokeWidth: options.thumbStrokeWidth,
         cornerRadius: options.thumbCornerRadius
       } );
 
-      // @private {Line} - the line that runs through the center of the thumb, for visual aesthetic purposes.
-      this._thumbCenterLine = new Line(
-          this._thumbRectangle.centerX, this._thumbRectangle.top + options.thumbCenterLineYMargin,
-          this._thumbRectangle.centerX, this._thumbRectangle.bottom - options.thumbCenterLineYMargin, {
+      // Create the line that runs through the center of the thumb, for visual aesthetic purposes.
+      const thumbCenterLine = new Line(
+          thumbRectangle.centerX, thumbRectangle.top + options.thumbCenterLineYMargin,
+          thumbRectangle.centerX, thumbRectangle.bottom - options.thumbCenterLineYMargin, {
             stroke: options.thumbCenterLineStroke
         } );
 
-      // @private {Node} - create the Slider thumb. See the comment at the top of the file for context.
-      this._thumb = new Node( {
-        center: this._track.center,
-        children: [ this._thumbRectangle, this._thumbCenterLine ],
-        cursor: 'pointer'
-      } );
+      // @private {Button} - create the Slider thumb. See the comment at the top of the file for context.
+      this._thumb = new Button( thumbRectangle, thumbCenterLine, { centerY: this._track.centerY } );
+      Button.apply3DGradients( this._thumb, options.thumbBaseColor ); // Apply the 3D gradient for aesthetic purposes.
 
       // Add invisible rectangles on either side of the track to account for potential added width if the thumb is
       // dragged to the extremes of the track.
@@ -152,24 +147,18 @@ define( require => {
       // @private {DragListener} - create a DragListener for when the user drags the thumb, which moves the slider value
       this._thumbDragListener = new DragListener( this._thumb, {
         drag: ( displacement, location ) => {
-          this._thumbRectangle.fill = options.thumbFillHighlighted;
+          this._thumb.interactionStateProperty.value = Button.interactionStates.PRESSED;
           this._setThumbPosition( location );
         },
         start: options.startDrag,
         end: () => {
-          this._thumbRectangle.fill = options.thumbFill; // change back when drag sequence ends
+          this._thumb.interactionStateProperty.value = Button.interactionStates.IDLE;
           options.endDrag && options.endDrag();
         }
       } );
 
       // @private {PressListener} - create a PressListener for when the user clicks on the track, which moves the slider
       this._trackPressListener = new PressListener( this._track, { press: this._setThumbPosition.bind( this ) } );
-
-      // @private {HoverListener} - create a HoverListener for when the user hovers over the thumb, changing the fill
-      this._thumbPressListener = new HoverListener( this._thumb, {
-        enter: () => { this._thumbRectangle.fill = options.thumbFillHighlighted; }, // change the fill when hovered
-        exit: () => { this._thumbRectangle.fill = options.thumbFill; }              // change back when un-hovered
-      } );
 
       // @private {function} - observer of the numberProperty
       this._numberPropertyObserver = this._updateSlider.bind( this );
