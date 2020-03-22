@@ -213,7 +213,7 @@ define( require => {
     _updateArrowShape() {
       // Must be a valid Arrow Node.
       if ( this._tail && this._tip && this._headWidth && this._headHeight && this._tailWidth ) {
-        if ( this._tail.equalsEpsilon( this._tip ) ) super.shape = null; // Set to null shape if the same tip and tail.
+        if ( this._tail.equalsEpsilon( this._tip ) ) return ( super.shape = null ); // Exit if same tip and tail.
 
         // create a vector representation of the arrow
         const vector = this._tip.copy().subtract( this._tail );

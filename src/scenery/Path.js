@@ -180,6 +180,7 @@ define( require => {
         this.element.setAttribute( 'd', this._shape.getSVGPath( this._shape.bounds.bottomLeft.negate(), scale ) );
         this.element.setAttribute( 'stroke-width', this._strokeWidth * scale );
       }
+      else this.element.setAttribute( 'd', '' );
       super.layout( scale );
     }
   }
