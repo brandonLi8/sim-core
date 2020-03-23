@@ -7,6 +7,8 @@
  * A Gradient refers to smooth transition of one color to another color within a shape.
  * Gradients can be applied as 'fills' and 'strokes' in Path and Text.
  *
+ * IMPORTANT: Gradient instances should be disposed when they are no longer needed. See the dispose() method.
+ *
  * While code comments attempt to describe the implementation clearly, fully understanding it may require some
  * general background. Some useful references include:
  *    - https://www.w3.org/TR/SVG/pservers.html#Gradients
@@ -84,6 +86,17 @@ define( require => {
       this._definitionElement.addChild( stopElement );
       return this;
     }
+
+    /**
+     * IMPORTANT: Gradients immediately link DOMObjects to the window when instantiated. This may lead to memory
+     *            leaks because the window scene graph always references the Gradient even if nothing else is
+     *            referencing the Gradient, which prevents the gradient from being garbage collected.
+     *
+     * This method will ensure that the Gradient unlinks its inner DOMObjects from the scene-graph and allows
+     * the Gradient to be garbage collected if nothing else references it.
+     * @public
+     */
+    dispose() { this._definitionElement.dispose(); }
 
     /**
      * Gets the SVG fill/stroke attribute for the string to reference this gradient.
