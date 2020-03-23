@@ -64,66 +64,67 @@ define( require => {
       super( options );
 
       // Push this instance of ScreenView to the instances field.
-      ScreenView.instances.push( this );
+      ScreenView._instances.push( this );
 
       // @public (read-only) {Bounds} - reference to the layout Bounds of the ScreenView
       this.layoutBounds = Object.freeze( options.layoutBounds );
+
+      // @public (read-only) {number} - layoutScale in terms of global units per local unit for converting Scenery
+      //                                coordinates to pixels. Referenced as soon as the scale is known in `layout()`
+      this.layoutScale;
     }
 
     /**
-     * Ensures that all children are Node types.
      * @override
+     * Calls the layout method on children when they are added.
      * @public
      *
      * @param {Node} child
      * @returns {ScreenView} - Returns 'this' reference, for chaining
      */
     addChild( child ) {
-      // assert( child instanceof ( require( 'SIM_CORE/scenery/Node' ) ), `invalid child: ${ child }` );
       super.addChild( child );
-
-      child.layout( this._scale );
+      child.layout( this.layoutScale );
       return this;
     }
 
     /**
-     * Called when the navigation bar layout needs to be updated, typically when the browser window is resized.
+     * Layouts each child Node of the ScreenView, passing in the layout scale, in terms of window pixels per ScreenView
+     * coordinate, for determining exact pixel coordinates.
      * @public
      *
-     * @param {number} width - in pixels of the window
-     * @param {number} height - in pixels of the window
+     * Called at the start of the simulation and when the browser window is resized.
+     *
+     * @param {number} width - Screen width, in pixels.
+     * @param {number} height - Screen height, in pixels.
      */
     layout( width, height ) {
 
-      const scale = Math.min( width / this.layoutBounds.width, height / this.layoutBounds.height );
-      const screenViewHeight = scale * this.layoutBounds.height;
-      const screenViewWidth = scale * this.layoutBounds.width;
-      this._scale = scale;
-      this.style.height = `${ screenViewHeight }px`;
-      this.style.width = `${ screenViewWidth }px`;
-      const layoutChildren = ( children ) => {
-        children.forEach( ( child ) => {
-          child.layout( scale );
-        } );
-      };
-      layoutChildren( this.children );
+      // Compute the layout scale, defined as the max scalar such that the entire ScreenView fits inside the window
+      // without ratio changes. Use Math.min to adhere to the most limiting factor (between width and height).
+      this.layoutScale = Math.min( width / this.layoutBounds.width, height / this.layoutBounds.height );
+
+      // Change the size of the ScreenView to snuggly fit inside the Screen. Pixel coordinates are determined using
+      // the layout scale.
+      this.style.height = `${ this.layoutScale * this.layoutBounds.width }px`;
+      this.style.width = `${ this.layoutScale * this.layoutBounds.height }px`;
+
+      // Call the layout method on each child Node of the ScreenView to position the entire scene-graph.
+      this.children.forEach( child => { child.layout( this.layoutScale ); } );
     }
 
     /**
-     * Called if ?dev was provided as a Query Parameter. See Sim.js for more information.
+     * Adds a red-border around the ScreenView. Called if ?dev was provided as a Query Parameter. Used for internal
+     * testing to ensure that all simulation content resides inside of the red bounds. See Sim.js for more information.
      * @public
      */
     static enableDevBorder() {
-      ScreenView.instances.forEach( screenView => {
-        screenView.addStyles( {
-          border: '2px solid red'
-        } );
-      } );
+      ScreenView._instances.forEach( screenView => { screenView.border = '2px solid red'; } );
     }
   }
 
   // @public (read-only) {ScreenView[]} - array of all instances of this class
-  ScreenView.instances = [];
+  ScreenView._instances = [];
 
   return ScreenView;
 } );

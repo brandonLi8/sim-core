@@ -98,7 +98,7 @@ define( require => {
 
       // First create and instantiate the model.
       const model = new this._config.model();
-      console.log( this._config.view.name )
+
       // Create the view and pass the model in.
       this.view = new this._config.view( model );
 
