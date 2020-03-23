@@ -123,7 +123,10 @@ define( require => {
       const ResetButton = require( 'SIM_CORE/scenery/buttons/ResetButton' );
 
       const r = new ResetButton( {
-        center: screenView.viewBounds.center
+        center: screenView.viewBounds.center,
+        listener: () => {
+          console.log( 'reset')
+        }
       });
       screenView.addChild( r );
 

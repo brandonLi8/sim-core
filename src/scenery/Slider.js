@@ -144,7 +144,8 @@ define( require => {
 
       //----------------------------------------------------------------------------------------
 
-      // @private {DragListener} - create a DragListener for when the user drags the thumb, which moves the slider value
+      // @private {DragListener} - create a DragListener for when the user drags the thumb, which moves the slider
+      //                           value. To be disposed in the dispose() method.
       this._thumbDragListener = new DragListener( this._thumb, {
         drag: ( displacement, location ) => {
           this._thumb.interactionStateProperty.value = Button.interactionStates.PRESSED;
@@ -157,10 +158,11 @@ define( require => {
         }
       } );
 
-      // @private {PressListener} - create a PressListener for when the user clicks on the track, which moves the slider
+      // @private {PressListener} - create a PressListener for when the user clicks on the track, which moves the
+      //                            slider. To be disposed in the dispose() method.
       this._trackPressListener = new PressListener( this._track, { press: this._setThumbPosition.bind( this ) } );
 
-      // @private {function} - observer of the numberProperty
+      // @private {function} - observer of the numberProperty. To be unlinked in the dispose method.
       this._numberPropertyObserver = this._updateSlider.bind( this );
       numberProperty.link( this._numberPropertyObserver );
     }

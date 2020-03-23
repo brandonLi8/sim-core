@@ -87,8 +87,17 @@ define( require => {
 
       super( resetButtonBackground, curvedArrow, options );
 
+      //----------------------------------------------------------------------------------------
+
       // Apply the 3D Gradient strategy to allow the Reset Button to look 3D
       Button.apply3DGradients( this, options.baseColor );
+
+      // Calls the listener passed in the option when the ResetButton is pressed. The listener function is not
+      // referenced since it is unlinked when interactionStateProperty is disposed, which occurs in the dispose method
+      // of the super class.
+      options.listener && this.interactionStateProperty.link( interactionState => {
+        if ( interactionState === Button.interactionStates.PRESSED ) options.listener();
+      } );
     }
 
     /**
