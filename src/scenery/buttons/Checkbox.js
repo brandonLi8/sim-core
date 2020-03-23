@@ -17,7 +17,6 @@ define( require => {
   // modules
   const assert = require( 'SIM_CORE/util/assert' );
   const Button = require( 'SIM_CORE/scenery/buttons/Button' );
-  const Circle = require( 'SIM_CORE/scenery/Circle' );
   const Node = require( 'SIM_CORE/scenery/Node' );
   const Path = require( 'SIM_CORE/scenery/Path' );
   const Property = require( 'SIM_CORE/util/Property' );
@@ -77,7 +76,7 @@ define( require => {
         .lineToPoint( Vector.scratch.setXY( lWidth, 0 ).rotate( lRotation ) )
         .lineToPoint( Vector.scratch.setXY( lWidth, -lHeight ).rotate( lRotation ) )
         .lineToPoint( Vector.scratch.setXY( lWidth - barSize, -lHeight ).rotate( lRotation ) )
-        .lineToPoint( Vector.scratch.setXY( lWidth - barSize, -barSize  ).rotate( lRotation ) )
+        .lineToPoint( Vector.scratch.setXY( lWidth - barSize, -barSize ).rotate( lRotation ) )
         .lineToPoint( Vector.scratch.setXY( 0, -barSize ).rotate( lRotation ) )
         .close();
 
