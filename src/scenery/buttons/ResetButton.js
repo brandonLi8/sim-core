@@ -90,6 +90,41 @@ define( require => {
       // Apply the 3D Gradient strategy to allow the Reset Button to look 3D
       Button.apply3DGradients( this, options.baseColor );
     }
+
+    /**
+     * Static method that creates a clockwise curved Arrow shape used inside the ResetButton.
+     * NOTE: the center of the curved arrow will be at the origin.
+     * @public
+     *
+     * @param {number} startAngle
+     * @param {number} endAngle
+     * @param {number} radius
+     * @param {number} headHeight
+     * @param {number} headWidth
+     * @param {number} tailWidth
+     */
+    static generateCurvedArrowShape( startAngle, endAngle, radius, headHeight, headWidth, tailWidth ) {
+      assert( headWidth > tailWidth, 'tailWidth must be smaller than the headWidth' );
+      assert( radius > headWidth / 2, 'radius smaller than half of the headWidth' );
+      const innerRadius = radius - tailWidth / 2;
+      const outerRadius = radius + tailWidth / 2;
+
+      // The arrowhead subtended angle is defined as the angle between the vector from the center to the tip of the
+      // arrow and the vector of the center to first point the arc and the triangle intersect
+      const arrowheadSubtendedAngle = Math.abs( Math.asin( headHeight / radius ) );
+
+      const arrowTip = new Vector( 0, radius ).setAngle( -startAngle )
+          .add( Vector.scratch.setXY( 0, 1 ).setAngle( -startAngle + Math.PI / 2 ).multiply( headHeight ) );
+
+      return new Shape()
+        .arc( Vector.ZERO, outerRadius, -startAngle, -endAngle, true )   // draw the outer circle
+        .lineToPoint( Vector.scratch.setXY( 0, innerRadius ).setAngle( -endAngle ) )
+        .arc( Vector.ZERO, innerRadius, -endAngle, -startAngle, false )  // draw the inner circle
+        .lineToPoint( Vector.scratch.setXY( 0, radius - headWidth / 2 ).setAngle( -startAngle ) )
+        .lineToPoint( arrowTip )
+        .lineToPoint( Vector.scratch.setXY( 0, radius + headWidth / 2 ).setAngle( -startAngle ) )
+        .close();
+    }
   }
 
   return ResetButton;
