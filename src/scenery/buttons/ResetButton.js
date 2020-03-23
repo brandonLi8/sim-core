@@ -5,7 +5,8 @@
  * used to reset the state of the simulation to what was loaded in.
  *
  * The reset button is drawn programmatically (as opposed to using an image file) to allow for slight modifications
- * and customizations to the appearance of ResetButton.
+ * and customizations to the appearance of ResetButton. See ResetButton.generateCurvedArrowShape() method for more
+ * documentation.
  *
  * @author Brandon Li <brandon.li820@gmail.com>
  */
@@ -16,15 +17,11 @@ define( require => {
   // modules
   const assert = require( 'SIM_CORE/util/assert' );
   const Button = require( 'SIM_CORE/scenery/buttons/Button' );
-  const DragListener = require( 'SIM_CORE/scenery/events/DragListener' );
-  const Line = require( 'SIM_CORE/scenery/Line' );
+  const Circle = require( 'SIM_CORE/scenery/Circle' );
   const Node = require( 'SIM_CORE/scenery/Node' );
-  const PressListener = require( 'SIM_CORE/scenery/events/PressListener' );
-  const Property = require( 'SIM_CORE/util/Property' );
-  const Range = require( 'SIM_CORE/util/Range' );
-  const Rectangle = require( 'SIM_CORE/scenery/Rectangle' );
+  const Path = require( 'SIM_CORE/scenery/Path' );
   const Shape = require( 'SIM_CORE/util/Shape' );
-  const Util = require( 'SIM_CORE/util/Util' );
+  const Vector = require( 'SIM_CORE/util/Vector' );
 
   class ResetButton extends Button {
 
@@ -38,21 +35,60 @@ define( require => {
       options = {
 
         // button
-        baseColor: 'blue',           // {string|Gradient} - the base color of the button.
-        listener: null,              // {function} - the listener called when the button is pressed.
+        baseColor: '#C32526',   // {string} - the base color of the button.
+        listener: null,         // {function} - the listener called when the button is pressed.
+        radius: 21.5,           // {number} - the radius of the round Reset Button
+        buttonStroke: 'black',  // {string|Gradient} - the stroke of the border of the Reset Button
+        buttonStrokeWidth: 0.5, // {number} - the stroke-width of the border of the Reset Button
 
         // curvedArrow
-        curvedArrowFill: 'white',    // {string|Gradient} - the fill color the button curvedArrow.
-        curvedArrowStroke: 'black',  // {string|Gradient} - the stroke color of the button curvedArrow.
-        curvedArrowStrokeWidth: 1,   // {number} - the stroke width of the button curved Arrow.
-        curvedArrowHeadHeight: 12,   // {number} - the head-height of the curved arrow. See `set headHeight()`.
-        curvedArrowHeadWidth: 12,    // {number} - the head-width of the curved arrow. See `set headWidth()`.
-        curvedArrowTailWidth: 3,     // {number} - the tail-width of the curved arrow. See `set tailWidth()`.
+        curvedArrowFill: 'white',               // {string|Gradient} - the fill color the button curvedArrow.
+        curvedArrowStroke: 'black',             // {string|Gradient} - the stroke color of the button curvedArrow.
+        curvedArrowStrokeWidth: 0.5,            // {number} - the stroke width of the button curved Arrow.
+        curvedArrowHeadHeight: 8.5,             // {number} - the head-height of the curved arrow.
+        curvedArrowHeadWidth: 13,               // {number} - the head-width of the curved arrow.
+        curvedArrowTailWidth: 5.7,              // {number} - the tail-width of the curved arrow.
+        curvedArrowRadius: 11,                  // {number} - the radius of the curved arrow.
+        curvedArrowStartAngle: Math.PI * 1.95,  // {number} - the start angle of the curved arrow.
+        curvedArrowEndAngle: Math.PI * 1.65,    // {number} - the end angle of the curved arrow.
 
         // Rewrite options so that it overrides the defaults.
         ...options
       };
-      super( options );
+
+      //----------------------------------------------------------------------------------------
+
+      // Generate the Curved Arrow Shape that goes inside the Reset Button
+      const curvedArrowShape = ResetButton.generateCurvedArrowShape(
+        options.curvedArrowStartAngle,
+        options.curvedArrowEndAngle,
+        options.curvedArrowRadius,
+        options.curvedArrowHeadHeight,
+        options.curvedArrowHeadWidth,
+        options.curvedArrowTailWidth
+      );
+
+      // Create the Node that displays the curvedArrowShape. Wrapped with a Node to offset the curvedArrow's triangle
+      // head which allows the center of the curved arrow be the center of the ResetButton.
+      const curvedArrow = new Node().addChild( new Path( curvedArrowShape, {
+        fill: options.curvedArrowFill,
+        stroke: options.curvedArrowStroke,
+        strokeWidth: options.curvedArrowStrokeWidth,
+        left: curvedArrowShape.bounds.maxX + curvedArrowShape.bounds.minY,
+        top: curvedArrowShape.bounds.maxY + curvedArrowShape.bounds.minY
+      } ) );
+
+      // Create the ResetButton's background, which is just a shaded circle.
+      const resetButtonBackground = new Circle( options.radius, {
+        stroke: options.buttonStroke,
+        strokeWidth: options.buttonStrokeWidth,
+        shapeRendering: 'geometricPrecision'
+      } );
+
+      super( resetButtonBackground, curvedArrow, options );
+
+      // Apply the 3D Gradient strategy to allow the Reset Button to look 3D
+      Button.apply3DGradients( this, options.baseColor );
     }
   }
 
