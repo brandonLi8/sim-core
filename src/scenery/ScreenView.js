@@ -1,9 +1,22 @@
 // Copyright © 2019-2020 Brandon Li. All rights reserved.
 
 /**
- * The view portion of a Screen, specifies the layout strategy for the visual view.
+ * ScreenView is the top-level view portion for the each individual Screen of the simulation. Run the simulation with
+ * the `?dev` query parameter to see the outline of each ScreenView.
  *
- * Uses Nodes on a custom scaling width and height system.
+ * ## Coordinates
+ * It is important to note that ScreenView coordinates are not in pixels. The browser width and height (which are in
+ * pixels) change from device to device and the window size may shrink or grow.
+ *
+ * Instead, ScreenView has its own coordinate system that is a scalar of the window width and height. All Node's use
+ * this coordinate system. The layout() then changes the actual CSS pixel coordinates based off the scale, which is
+ * defined as the max scalar such that the entire ScreenView fits inside the window without ratio changes.
+ *
+ * ## Usage
+ * To use a ScreenView for your Screen in your simulation, you must create a sub-class of the ScreenView.
+ * A sub-class is needed since you need to pass the class (not an instance) to the Screen. The ScreenView sub-class
+ * will be instantiated in Screen (during the loading process) and the top-level model for the Screen will be passed in.
+ * See sim-core/Screen.js for more documentation.
  *
  * @author Brandon Li <brandon.li820@gmail.com>
  */
