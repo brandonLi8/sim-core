@@ -14,10 +14,10 @@
  * inside the window without ratio changes.
  *
  * ## Usage
- * To use a ScreenView for a simulation Screen, you must create a sub-class of the ScreenView. A sub-class is needed
- * since you need to pass the class (not an instance) to the Screen. The ScreenView sub-class will be instantiated
- * in Screen (during the loading process) and the top-level model for the Screen will be passed in. See Screen.js
- * for more documentation. ScreenView is a abstract class with no abstract methods (meaning it must be sub-typed).
+ * Generally, to use a ScreenView for a simulation Screen, you should create a sub-class of the ScreenView. A sub-class
+ * is needed since you need to pass the class (not an instance) to the Screen. The ScreenView sub-class will be
+ * instantiated in Screen (during the loading process) and the top-level model for the Screen will be passed in. See
+ * Screen.js for more documentation.
  *
  * @author Brandon Li <brandon.li820@gmail.com>
  */
@@ -30,17 +30,6 @@ define( require => {
   const Bounds = require( 'SIM_CORE/util/Bounds' );
   const DOMObject = require( 'SIM_CORE/core-internal/DOMObject' );
 
-  /*
-   * Default width and height for iPad2, iPad3, iPad4 running Safari with default tabs and decorations
-   * These bounds were added in Sep 2014 and are based on a screenshot from a non-Retina iPad, in Safari, iOS7.
-   * It therefore accounts for the nav bar on the bottom and the space consumed by the browser on the top.
-   */
-  const DEFAULT_VIEW_BOUNDS = new Bounds( 0, 0, 1024, 618 );
-
-  /**
-   * @abstract
-   * ScreenView is a abstract class with no abstract methods, meaning it must be sub-typed.
-   */
   class ScreenView extends DOMObject {
 
     /**
@@ -50,22 +39,35 @@ define( require => {
      */
     constructor( options ) {
 
+      // Some options are set by ScreenView. Assert that they weren't provided.
       assert( !options || Object.getPrototypeOf( options ) === Object.prototype, `invalid options: ${ options }` );
+      assert( !options || !options.style, 'ScreenView sets style.' );
+      assert( !options || !options.type, 'ScreenView sets type.' );
+      assert( !options || !options.text, 'ScreenView should not have text' );
+      assert( !options || !options.id || !options.class || !options.attributes, 'ScreenView sets attributes' );
 
       options = {
 
-        type: 'svg',
-        // {Bounds} the bounds that are safe to draw in on all supported platforms
-        viewBounds: DEFAULT_VIEW_BOUNDS.copy(),
+        // {Bounds} - the Bounds of the scenery coordinate system, which are safe to draw in for all window sizes.
+        //            The default layoutBounds is based off the size of iPad4 running Safari. It is implemented
+        //            to have a reasonable amount of horizontal space but still look reasonably large on mobile.
+        layoutBounds: new Bounds( 0, 0, 1024, 618 ),
+
 
         ...options
       };
 
+      // Set the HTML element type. The root-renderer for all sims is SVG. See
+      // https://developer.mozilla.org/en-US/docs/Web/SVG for the official specification.
+      options.type = 'svg';
+
       super( options );
 
+      // Push this instance of ScreenView to the instances field.
       ScreenView.instances.push( this );
-      // @public (read-only)
-      this.viewBounds = options.viewBounds;
+
+      // @public (read-only) {Bounds} - reference to the layout Bounds of the ScreenView
+      this.layoutBounds = Object.freeze( options.layoutBounds );
     }
 
     /**
@@ -93,9 +95,9 @@ define( require => {
      */
     layout( width, height ) {
 
-      const scale = Math.min( width / this.viewBounds.width, height / this.viewBounds.height );
-      const screenViewHeight = scale * this.viewBounds.height;
-      const screenViewWidth = scale * this.viewBounds.width;
+      const scale = Math.min( width / this.layoutBounds.width, height / this.layoutBounds.height );
+      const screenViewHeight = scale * this.layoutBounds.height;
+      const screenViewWidth = scale * this.layoutBounds.width;
       this._scale = scale;
       this.style.height = `${ screenViewHeight }px`;
       this.style.width = `${ screenViewWidth }px`;

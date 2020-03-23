@@ -97,8 +97,8 @@ define( require => {
 
       // @private {Text} - Create the Text Node that displays the title of the simulation in the loader.
       this._titleLabel = new Text( Sim.simName, {
-        center: this._loaderScreenView.viewBounds.center.subtractXY( 0, options.titleCircleMargin ),
-        maxWidth: this._loaderScreenView.viewBounds.width,
+        center: this._loaderScreenView.layoutBounds.center.subtractXY( 0, options.titleCircleMargin ),
+        maxWidth: this._loaderScreenView.layoutBounds.width,
         fill: options.loaderTitleColor,
         fontSize: options.titleFontSize,
         strokeWidth: 2
@@ -111,7 +111,7 @@ define( require => {
           fill: 'none', // transparent inside
           stroke: options.loaderCircleBg,
           strokeWidth: options.loaderCircleStrokeWidth,
-          center: this._loaderScreenView.viewBounds.center.addXY( 0, options.titleCircleMargin / 2 )
+          center: this._loaderScreenView.layoutBounds.center.addXY( 0, options.titleCircleMargin / 2 )
         } );
 
       // @private {Path} - Create the Path that renders the foregroundCircle circle of the loader circle.
@@ -119,7 +119,7 @@ define( require => {
         fill: 'none', // transparent inside
         stroke: options.loaderCircleFg,
         strokeWidth: options.loaderCircleStrokeWidth + 0.1, // add .1 to give illusion that it is fully filling
-        center: this._loaderScreenView.viewBounds.center.addXY( 0, options.titleCircleMargin / 2 )
+        center: this._loaderScreenView.layoutBounds.center.addXY( 0, options.titleCircleMargin / 2 )
       } );
 
       // Layout the scene graph of the Loader.
