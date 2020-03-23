@@ -52,7 +52,7 @@ define( require => {
       options = {
 
         // track
-        trackFill: '#BCBCBC',  // {string|Gradient} - the fill color the slider track
+        trackFill: '#BCBCBC',  // {string|Gradient} - the fill color of the slider track
         trackStroke: 'black',  // {string|Gradient} - the stroke color of the slider track
         trackStrokeWidth: 1,   // {number} - the stroke width of the slider track
         trackHeight: 3,        // {number} - the height of the track, in scenery coordinates

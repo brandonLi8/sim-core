@@ -42,7 +42,7 @@ define( require => {
         buttonStrokeWidth: 0.5, // {number} - the stroke-width of the border of the Reset Button
 
         // curvedArrow
-        curvedArrowFill: 'white',               // {string|Gradient} - the fill color the button curvedArrow.
+        curvedArrowFill: 'white',               // {string|Gradient} - the fill color of the button curvedArrow.
         curvedArrowStroke: 'black',             // {string|Gradient} - the stroke color of the button curvedArrow.
         curvedArrowStrokeWidth: 0.5,            // {number} - the stroke width of the button curved Arrow.
         curvedArrowHeadHeight: 8.5,             // {number} - the head-height of the curved arrow.

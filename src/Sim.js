@@ -116,6 +116,17 @@ define( require => {
       // Enable the red dev border around ScreenViews if the ?dev query parameter was provided.
       if ( StandardSimQueryParameters.dev ) { ScreenView.enableDevBorder(); }
 
+      const s = this.screens[ 0 ].view;
+
+      const PlayPauseButton = require( 'SIM_CORE/scenery/buttons/PlayPauseButton' );
+      const Property = require( 'SIM_CORE/util/Property' );
+
+      const c = new PlayPauseButton( new Property( false ), {
+        center: s.layoutBounds.center
+      })
+
+      s.addChild( c )
+
       this.display.on( 'resize', ( width, height ) => {
 
         this.navigationBar.layout( width, height );
