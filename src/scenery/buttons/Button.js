@@ -190,9 +190,9 @@ define( require => {
 
   // @public (read-only) {Enum} - Enumeration of possible button states.
   Button.interactionStates = new Enum( [
-    'IDLE',   // Button is not being interacted with
-    'HOVER',  // A pointer is hovering over the button but not pressing down on it
-    'PRESSED' // The button is pressed because the user has pressed down on it
+    'IDLE',   // Button is not being interacted with.
+    'HOVER',  // A pointer is hovering over the button but not pressing down on it.
+    'PRESSED' // The button is pressed because the user has pressed down on it.
   ] );
 
   return Button;

@@ -118,11 +118,8 @@ define( require => {
       const innerRadius = radius - tailWidth / 2;
       const outerRadius = radius + tailWidth / 2;
 
-      // The arrowhead subtended angle is defined as the angle between the vector from the center to the tip of the
-      // arrow and the vector of the center to first point the arc and the triangle intersect
-      const arrowheadSubtendedAngle = Math.abs( Math.asin( headHeight / radius ) );
-
-      const arrowTip = new Vector( 0, radius ).setAngle( -startAngle )
+      // Find and reference the tip location of the arrow head.
+      const arrowHeadTip = new Vector( 0, radius ).setAngle( -startAngle )
           .add( Vector.scratch.setXY( 0, 1 ).setAngle( -startAngle + Math.PI / 2 ).multiply( headHeight ) );
 
       return new Shape()
@@ -130,7 +127,7 @@ define( require => {
         .lineToPoint( Vector.scratch.setXY( 0, innerRadius ).setAngle( -endAngle ) )
         .arc( Vector.ZERO, innerRadius, -endAngle, -startAngle, false )  // draw the inner circle
         .lineToPoint( Vector.scratch.setXY( 0, radius - headWidth / 2 ).setAngle( -startAngle ) )
-        .lineToPoint( arrowTip )
+        .lineToPoint( arrowHeadTip )
         .lineToPoint( Vector.scratch.setXY( 0, radius + headWidth / 2 ).setAngle( -startAngle ) )
         .close();
     }
