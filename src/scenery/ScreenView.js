@@ -106,8 +106,8 @@ define( require => {
 
       // Change the size of the ScreenView to snuggly fit inside the Screen. Pixel coordinates are determined using
       // the layout scale.
-      this.style.height = `${ this.layoutScale * this.layoutBounds.width }px`;
-      this.style.width = `${ this.layoutScale * this.layoutBounds.height }px`;
+      this.style.width = `${ this.layoutScale * this.layoutBounds.width }px`;
+      this.style.height = `${ this.layoutScale * this.layoutBounds.height }px`;
 
       // Call the layout method on each child Node of the ScreenView to position the entire scene-graph.
       this.children.forEach( child => { child.layout( this.layoutScale ); } );
@@ -119,7 +119,7 @@ define( require => {
      * @public
      */
     static enableDevBorder() {
-      ScreenView._instances.forEach( screenView => { screenView.border = '2px solid red'; } );
+      ScreenView._instances.forEach( screenView => { screenView.style.border = '2px solid red'; } );
     }
   }
 
