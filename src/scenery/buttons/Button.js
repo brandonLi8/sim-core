@@ -143,7 +143,7 @@ define( require => {
      * automatically switch Gradients when the interaction state changes.
      * @public
      *
-     * @param {Button} button - the button to apply the gradents to
+     * @param {Button} button - the button to apply the gradients to
      * @param {string} baseColor - any valid CSS color string
      */
     static apply3DGradients( button, baseColor ) {
@@ -176,6 +176,13 @@ define( require => {
           button.hoverFill.addColorStop( ColorWheel.shade( hoverBaseColor, stop[ 0 ] ), stop[ 1 ] );
           button.pressedFill.addColorStop( ColorWheel.shade( pressedBaseColor, stop[ 0 ] ), stop[ 1 ] );
         } );
+
+        // Cache the Gradients
+        CACHED_BASE_COLOR_GRADIENTS[ baseColor ] = {
+          idleFill: button.idleFill,
+          hoverFill: button.hoverFill,
+          pressedFill: button.pressedFill
+        };
       }
 
       // Apply the fills by listening to the interactionStateProperty. The listener function is not referenced as it is

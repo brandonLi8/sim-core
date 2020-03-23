@@ -122,7 +122,7 @@ define( require => {
       const Vector = require( 'SIM_CORE/util/Vector' );
       const ResetButton = require( 'SIM_CORE/scenery/buttons/ResetButton' );
 
-      const r = new ResetButton( {
+      let r = new ResetButton( {
         center: screenView.viewBounds.center,
         listener: () => {
           console.log( 'reset')
@@ -130,6 +130,18 @@ define( require => {
       });
       screenView.addChild( r );
 
+
+      window.addEventListener( 'mousedown', () => {
+        r.dispose();
+      r = new ResetButton( {
+        center: screenView.viewBounds.center,
+        listener: () => {
+          console.log( 'her')
+        }
+      });
+      screenView.addChild( r );
+
+      })
 
 
       this.display.on( 'resize', ( width, height ) => {
