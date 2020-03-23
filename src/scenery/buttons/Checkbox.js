@@ -118,6 +118,7 @@ define( require => {
      */
     dispose() {
       this._toggleProperty.unlink( this._togglePropertyObserver );
+      this._toggleProperty = null; // Un-reference the toggleProperty.
       super.dispose();
     }
   }
