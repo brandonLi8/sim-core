@@ -8,15 +8,16 @@
  * It is important to note that ScreenView coordinates are not in pixels. The browser width and height (which are in
  * pixels) change from device to device and the window size may shrink or grow.
  *
- * Instead, ScreenView has its own coordinate system that is a scalar of the window width and height. All Node's use
- * this coordinate system. The layout() then changes the actual CSS pixel coordinates based off the scale, which is
- * defined as the max scalar such that the entire ScreenView fits inside the window without ratio changes.
+ * Instead, ScreenView has its own coordinate system (termed 'scenery coordinates') that doesn't depend on the window
+ * size. All Node's use this coordinate system. The layout() then changes the actual CSS pixel coordinates based off a
+ * scalar of the window width and height, which is defined as the max scalar such that the entire ScreenView fits
+ * inside the window without ratio changes.
  *
  * ## Usage
- * To use a ScreenView for your Screen in your simulation, you must create a sub-class of the ScreenView.
- * A sub-class is needed since you need to pass the class (not an instance) to the Screen. The ScreenView sub-class
- * will be instantiated in Screen (during the loading process) and the top-level model for the Screen will be passed in.
- * See sim-core/Screen.js for more documentation.
+ * To use a ScreenView for a simulation Screen, you must create a sub-class of the ScreenView. A sub-class is needed
+ * since you need to pass the class (not an instance) to the Screen. The ScreenView sub-class will be instantiated
+ * in Screen (during the loading process) and the top-level model for the Screen will be passed in. See Screen.js
+ * for more documentation. ScreenView is a abstract class with no abstract methods (meaning it must be sub-typed).
  *
  * @author Brandon Li <brandon.li820@gmail.com>
  */
@@ -34,8 +35,12 @@ define( require => {
    * These bounds were added in Sep 2014 and are based on a screenshot from a non-Retina iPad, in Safari, iOS7.
    * It therefore accounts for the nav bar on the bottom and the space consumed by the browser on the top.
    */
-  const DEFAULT_VIEW_BOUNDs = new Bounds( 0, 0, 1024, 618 );
+  const DEFAULT_VIEW_BOUNDS = new Bounds( 0, 0, 1024, 618 );
 
+  /**
+   * @abstract
+   * ScreenView is a abstract class with no abstract methods, meaning it must be sub-typed.
+   */
   class ScreenView extends DOMObject {
 
     /**
@@ -51,7 +56,7 @@ define( require => {
 
         type: 'svg',
         // {Bounds} the bounds that are safe to draw in on all supported platforms
-        viewBounds: DEFAULT_VIEW_BOUNDs.copy(),
+        viewBounds: DEFAULT_VIEW_BOUNDS.copy(),
 
         ...options
       };
