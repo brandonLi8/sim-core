@@ -26,7 +26,6 @@ define( require => {
   const Property = require( 'SIM_CORE/util/Property' );
   const Rectangle = require( 'SIM_CORE/scenery/Rectangle' );
   const Shape = require( 'SIM_CORE/util/Shape' );
-  const Vector = require( 'SIM_CORE/util/Vector' );
 
   class PlayPauseButton extends Button {
 
@@ -121,7 +120,7 @@ define( require => {
       //                       This listener is unlinked in the dispose method of PlayPauseButton.
       this._playPropertyObserver = isPlaying => {
         this.content.children = [ isPlaying ? pauseRectanglesContainer : playTriangle ];
-        this.updatePositioning()
+        this.updatePositioning();
       };
       this._playProperty.link( this._playPropertyObserver );
 
