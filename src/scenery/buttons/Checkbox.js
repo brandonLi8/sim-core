@@ -1,7 +1,13 @@
 // Copyright © 2019-2020 Brandon Li. All rights reserved.
-// NOTE: THIS DOESNT WORK ATM!!!
 
 /**
+ * A Checkbox, which displays a square box with a check-mark shape inside that changes visibility when toggled.
+ * Checkbox is used to allow the user to toggle a Property.<boolean>, where a visible check-mark means this Property's
+ * value is true and vise versa.
+ *
+ * The Checkbox is drawn programmatically (as opposed to using an image file) to allow for slight modifications
+ * and customizations to the appearance of Checkbox.
+ *
  * @author Brandon Li <brandon.li820@gmail.com>
  */
 
@@ -10,95 +16,110 @@ define( require => {
 
   // modules
   const assert = require( 'SIM_CORE/util/assert' );
-  const Polygon = require( 'SIM_CORE/scenery/Polygon' );
+  const Button = require( 'SIM_CORE/scenery/buttons/Button' );
+  const Circle = require( 'SIM_CORE/scenery/Circle' );
+  const Node = require( 'SIM_CORE/scenery/Node' );
+  const Path = require( 'SIM_CORE/scenery/Path' );
+  const Property = require( 'SIM_CORE/util/Property' );
   const Rectangle = require( 'SIM_CORE/scenery/Rectangle' );
-  const SVGNode = require( 'SIM_CORE/scenery/SVGNode' );
+  const Shape = require( 'SIM_CORE/util/Shape' );
   const Vector = require( 'SIM_CORE/util/Vector' );
 
-
-  class Checkbox extends SVGNode {
+  class Checkbox extends Button {
 
     /**
-     * @param {Object} [options] - Various key-value pairs that control the appearance and behavior. Subclasses
-     *                             may have different options for their API. See the code where the options are set in
-     *                             the early portion of the constructor for details.
+     * @param {Property.<boolean>} toggleProperty - the Property to toggle when the Checkbox is pressed. The initial
+     *                                              visibility of the check will be determined by the current value.
+     * @param {Object} [options] - Various key-value pairs that control the appearance and behavior. See the code
+     *                             where the options are set in the early portion of the constructor for details.
      */
     constructor( toggleProperty, options ) {
       assert( !options || Object.getPrototypeOf( options ) === Object.prototype, `invalid options: ${ options }` );
+      assert( toggleProperty instanceof Property && typeof toggleProperty.value === 'boolean',
+       `invalid toggleProperty: ${ toggleProperty }` );
 
-
-      // Defaults for options.
-      const defaults = {
-        spacing: 5,
-        boxSize: 19,
+      options = {
 
         // box
-        boxStroke: 'black',
-        boxFill: 'white',
-        boxCornerRadius: 3,
-        boxStrokeWidth: 2,
+        boxStroke: 'black',   // {string|Gradient} - the stroke color of the box background.
+        boxFill: 'white',     // {string|Gradient} - the fill color of the box background.
+        boxStrokeWidth: 2,    // {number} - the stroke width of the box background.
+        boxCornerRadius: 3,   // {number} - the corner radius of the box background.
+        boxSize: 19,          // {number} - the width and height of the box background.
 
         // check
-        checkFill: 'black',
-        checkStroke: 'white',
-        checkStrokeWidth: 0.8,
+        checkFill: 'black',     // {string|Gradient} - the fill color of the check-mark.
+        checkStroke: 'white',   // {string|Gradient} - the stroke color of the check-mark.
+        checkStrokeWidth: 0.8,  // {number} - the stroke width of the check-mark.
 
-        style: {
-          cursor: 'pointer'
-        }
+        // Rewrite options so that it overrides the defaults.
+        ...options
       };
 
-      // Rewrite options so that it overrides the defaults.
-      options = { ...defaults, ...options };
-      options.width = options.boxSize;
-      options.height = options.boxSize;
-
-      super( options );
-
       //----------------------------------------------------------------------------------------
-      // Create the Rectangle Box
-      const box = new Rectangle( {
-        width: options.boxSize,
-        height: options.boxSize,
-        cornerRadius: options.boxCornerRadius,
-        fill: options.boxFill,
+
+      // Create the Checkbox background, which is just a rounded Rectangle.
+      const box = new Rectangle( options.boxSize, options.boxSize, {
         stroke: options.boxStroke,
-        strokeWidth: options.boxStrokeWidth
+        strokeWidth: options.boxStrokeWidth,
+        fill: options.boxFill,
+        cornerRadius: options.boxCornerRadius
       } );
 
-      //----------------------------------------------------------------------------------------
-      // Create the Check (reverse L rotated)
-      const width = options.boxSize * 5 / 8;
-      const height = width * 27 / 16;
-      const barSize = width * 5 / 12;
-      const offset = new Vector( options.boxSize * 2 / 5, options.boxSize * 1 / 4 );
+      // Create the Check-mark shape, which is drawn as an L rotated.
+      const lWidth = options.boxSize * 5 / 8; // ratio determined through experimentation
+      const lHeight = lWidth * 27 / 16;       // ratio determined through experimentation
+      const barSize = lWidth * 5 / 12;        // ratio determined through experimentation
+      const lRotation = Math.PI * 0.27;       // ratio determined through experimentation
 
-      const lPoints = [
-        new Vector( 0, 0 ),
-        new Vector( width, 0 ),
-        new Vector( width, -height ),
-        new Vector( width - barSize, -height ),
-        new Vector( width - barSize, -barSize ),
-        new Vector( 0, -barSize )
-      ].map( point => point.add( offset ).rotate( Math.PI / 4 ) );
+      const checkShape = new Shape()
+        .moveToPoint( Vector.ZERO )
+        .lineToPoint( Vector.scratch.setXY( lWidth, 0 ).rotate( lRotation ) )
+        .lineToPoint( Vector.scratch.setXY( lWidth, -lHeight ).rotate( lRotation ) )
+        .lineToPoint( Vector.scratch.setXY( lWidth - barSize, -lHeight ).rotate( lRotation ) )
+        .lineToPoint( Vector.scratch.setXY( lWidth - barSize, -barSize  ).rotate( lRotation ) )
+        .lineToPoint( Vector.scratch.setXY( 0, -barSize ).rotate( lRotation ) )
+        .close();
 
-      const check = new Polygon( lPoints, {
+      // Create the Node that displays the check. Wrapped with a Node to offset the check slightly towards the right.
+      const check = new Node().addChild( new Path( checkShape, {
         fill: options.checkFill,
         stroke: options.checkStroke,
-        strokeWidth: options.checkStrokeWidth
-      } );
+        strokeWidth: options.checkStrokeWidth,
+        left: options.boxSize * 2 / 5,    // ratio determined through experimentation
+        bottom: options.boxSize * -1 / 12 // ratio determined through experimentation
+      } ) );
+
+      super( box, check, options );
 
       //----------------------------------------------------------------------------------------
-      // Add the Children
-      this.setChildren( [ box, check ] );
 
-      //----------------------------------------------------------------------------------------
-      // Add the Toggle functionality
-      this.mousedown = () => { toggleProperty.toggle(); };
+      // Ensure validity of additionally location setters in options.
+      this.mutate( options );
 
-      toggleProperty.link( isVisible => {
-        check.style.opacity = isVisible ? 1 : 0;
+      // @private {Property.<boolean>} - reference the passed-in toggleProperty
+      this._toggleProperty = toggleProperty;
+
+      // @private {function} - listener that adjusts the visibility of the check based on the value of the
+      //                       toggleProperty. This listener is unlinked in the dispose method of Checkbox.
+      this._togglePropertyObserver = toggleProperty.linkAttribute( check, 'visible' );
+
+      // Listen to when the Checkbox is pressed to toggle the value of the toggleProperty. The listener function is not
+      // referenced since it is unlinked when interactionStateProperty is disposed, which occurs in the dispose method
+      // of the super class.
+      this.interactionStateProperty.link( interactionState => {
+        if ( interactionState === Button.interactionStates.PRESSED ) toggleProperty.toggle();
       } );
+    }
+
+    /**
+     * @override
+     * Disposes internal links.
+     * @public
+     */
+    dispose() {
+      this._toggleProperty.unlink( this._togglePropertyObserver );
+      super.dispose();
     }
   }
 

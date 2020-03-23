@@ -125,8 +125,6 @@ define( require => {
      */
     updatePositioning() {
       // Ensure that the content fits inside the background Path
-      this.content.maxWidth = this.background.width;
-      this.content.maxHeight = this.background.height;
       this.background.topLeft = Vector.ZERO;
 
       // Strip center to centerX or centerY
