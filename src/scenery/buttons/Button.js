@@ -90,13 +90,15 @@ define( require => {
 
       //----------------------------------------------------------------------------------------
 
-      // @private {PressListener} - create a PressListener for when the user clicks on the Button
+      // @private {PressListener} - create a PressListener for when the user clicks on the Button. Listener to be
+      //                            disposed in the dispose method.
       this._pressListener = new PressListener( this, {
         press: () => { this.interactionStateProperty.value = Button.interactionStates.PRESSED; },
         release: () => { this.interactionStateProperty.value = Button.interactionStates.HOVER; }
       } );
 
-      // @private {HoverListener} - create a HoverListener for when the user hovers over the Button
+      // @private {HoverListener} - create a HoverListener for when the user hovers over the Button. Listener to be
+      //                            disposed in the dispose method.
       this._hoverListener = new HoverListener( this, {
         enter: () => { this.interactionStateProperty.value = Button.interactionStates.HOVER; },
         exit: () => { this.interactionStateProperty.value = Button.interactionStates.IDLE; }
@@ -176,7 +178,8 @@ define( require => {
         } );
       }
 
-      // Apply the fills by listening to the interactionStateProperty
+      // Apply the fills by listening to the interactionStateProperty. The listener function is not referenced as it is
+      // unlinked when interactionStateProperty is disposed, which is disposed in Button's dispose method.
       button.interactionStateProperty.link( interactionState => {
         if ( interactionState === Button.interactionStates.IDLE ) button.background.fill = button.idleFill;
         if ( interactionState === Button.interactionStates.HOVER ) button.background.fill = button.hoverFill;
