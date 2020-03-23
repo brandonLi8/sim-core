@@ -116,34 +116,6 @@ define( require => {
       // Enable the red dev border around ScreenViews if the ?dev query parameter was provided.
       if ( StandardSimQueryParameters.dev ) { ScreenView.enableDevBorder(); }
 
-      const screenView = this.screens[ 0 ].view;
-      const Arrow = require( 'SIM_CORE/scenery/Arrow' );
-      const Node = require( 'SIM_CORE/scenery/Node' );
-      const Vector = require( 'SIM_CORE/util/Vector' );
-      const ResetButton = require( 'SIM_CORE/scenery/buttons/ResetButton' );
-
-      let r = new ResetButton( {
-        center: screenView.viewBounds.center,
-        listener: () => {
-          console.log( 'reset')
-        }
-      });
-      screenView.addChild( r );
-
-
-      window.addEventListener( 'mousedown', () => {
-        r.dispose();
-      r = new ResetButton( {
-        center: screenView.viewBounds.center,
-        listener: () => {
-          console.log( 'her')
-        }
-      });
-      screenView.addChild( r );
-
-      })
-
-
       this.display.on( 'resize', ( width, height ) => {
 
         this.navigationBar.layout( width, height );
