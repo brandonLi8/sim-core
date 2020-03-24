@@ -74,7 +74,7 @@ define( require => {
         fill: options.curvedArrowFill,
         stroke: options.curvedArrowStroke,
         strokeWidth: options.curvedArrowStrokeWidth,
-        left: curvedArrowShape.bounds.maxX + curvedArrowShape.bounds.minY,
+        left: curvedArrowShape.bounds.maxX + curvedArrowShape.bounds.minX,
         top: curvedArrowShape.bounds.maxY + curvedArrowShape.bounds.minY
       } ) );
 

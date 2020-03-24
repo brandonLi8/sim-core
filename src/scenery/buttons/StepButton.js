@@ -24,6 +24,7 @@ define( require => {
   const Path = require( 'SIM_CORE/scenery/Path' );
   const Shape = require( 'SIM_CORE/util/Shape' );
   const Vector = require( 'SIM_CORE/util/Vector' );
+  const Rectangle = require( 'SIM_CORE/scenery/Rectangle' );
 
   class StepButton extends Button {
 
@@ -39,24 +40,24 @@ define( require => {
       options = {
 
         // button
-        baseColor: '#D48D00',     // {string} - the base color of the button.
+        baseColor: '#B87A00',     // {string} - the base color of the button.
         radius: 18,               // {number} - the radius of the round Step Button.
-        buttonStroke: '#5F4510',  // {string|Gradient} - the stroke of the border of the Step Button.
+        buttonStroke: '#1F0500',  // {string|Gradient} - the stroke of the border of the Step Button.
         buttonStrokeWidth: 0.5,   // {number} - the stroke-width of the border of the Step Button.
         listener: null,           // {function} - the listener called when the button is pressed.
 
         // bar
-        barWidth: 2.7,   // {number} - the width of the vertical rectangle-bar.
+        barWidth: 3.5,   // {number} - the width of the vertical rectangle-bar.
         barHeight: 16.2, // {number} - the height of the vertical rectangle-bar.
 
         // triangle
-        triangleSideLength: 2.7, // {number} - the side length of the equilateral triangle.
+        triangleSideLength: 16.2, // {number} - the side length of the equilateral triangle.
 
         // content - applies to both the triangle and the rectangle-bar
         contentFill: 'white',    // {string|Gradient} - the fill of both the triangle and rectangle.
         contentStroke: 'black',  // {string|Gradient} - the stroke of both the triangle and rectangle.
         contentStrokeWidth: 0.5, // {number} - the stroke width of both the triangle and rectangle.
-        contentMargin: 5,        // {number} - the margin between the triangle and rectangle.
+        contentMargin: 2.7,      // {number} - the margin between the triangle and rectangle.
 
         // Rewrite options so that it overrides the defaults.
         ...options
@@ -74,27 +75,28 @@ define( require => {
       // The Content of the Step Button is drawn as assuming it is a forwards button. It is later reversed (by scaling
       // negatively) if the button is backwards.
 
-      // Create the Bar of the Step Button.
-      const bar = new Rectangle( options.barWidth, options.barHeight, {
-        centerY: 0,
-        right: -options.contentMargin,
-        fill: options.contentFill,
-        stroke: options.contentStroke,
-        strokeWidth: options.contentStrokeWidth
-      } );
-
-      // Create the triangle shape, with the left position at the origin.
+      // Create the triangle shape, with the left-top position at the origin.
       const triangleShape = new Shape()
-        .moveTo( options.triangleSideLength / 2 * Math.sqrt( 3 ), 0 )
-        .lineTo( 0, -options.triangleSideLength / 2 )
-        .lineTo( 0, options.triangleSideLength / 2 )
+        .moveTo( options.triangleSideLength * 0.71, options.triangleSideLength / 2 )
+        .lineTo( 0, options.triangleSideLength )
+        .lineTo( 0, 0 )
         .close();
 
-      // Create the triangle.
+      // Create the Bar of the Step Button.
+      const bar = new Rectangle( options.barWidth, options.barHeight, {
+        fill: options.contentFill,
+        stroke: options.contentStroke,
+        strokeWidth: options.contentStrokeWidth,
+        left: triangleShape.bounds.width - options.contentMargin - options.barWidth
+      } );
+
+      // Create the triangle Path and position it relative to the bar.
       const playTriangle = new Path( triangleShape, {
         fill: options.contentFill,
         stroke: options.contentStroke,
-        strokeWidth: options.contentStrokeWidth
+        strokeWidth: options.contentStrokeWidth,
+        left: bar.right + options.contentMargin,
+        centerY: bar.centerY
       } );
 
       super( stepButtonBackground, new Node().setChildren( [ bar, playTriangle ] ), options );
