@@ -116,18 +116,6 @@ define( require => {
       // Enable the red dev border around ScreenViews if the ?dev query parameter was provided.
       if ( StandardSimQueryParameters.dev ) { ScreenView.enableDevBorder(); }
 
-
-      const s = this.screens[ 0 ].view;
-
-      const StepButton = require( 'SIM_CORE/scenery/buttons/StepButton' );
-
-      const st = new StepButton( 'forward', {
-        center: s.layoutBounds.center
-      } );
-
-      s.addChild( st )
-
-
       this.display.on( 'resize', ( width, height ) => {
 
         this.navigationBar.layout( width, height );

@@ -102,7 +102,7 @@ define( require => {
       super( stepButtonBackground, new Node().setChildren( [ bar, playTriangle ] ), options );
 
       // Apply a negative scale if backwards to reverse the direction of the button content.
-      if ( direction === 'backward' ) this.scale( -1 );
+      if ( direction === 'backward' ) this.content.scale( -1 );
 
       //----------------------------------------------------------------------------------------
 
@@ -116,6 +116,24 @@ define( require => {
         if ( interactionState === Button.interactionStates.PRESSED ) options.listener();
       } );
     }
+
+    /**
+     * Static StepButton creator convenience method that returns a backwards StepButton.
+     * @public
+     *
+     * @param {Object} [options] - passed to the StepButton constructor
+     * @returns {StepButton}
+     */
+    static backwards( options ) { return new StepButton( 'backward', options ); }
+
+    /**
+     * Static StepButton creator convenience method that returns a forwards StepButton.
+     * @public
+     *
+     * @param {Object} [options] - passed to the StepButton constructor
+     * @returns {StepButton}
+     */
+    static forwards( options ) { return new StepButton( 'forward', options ); }
   }
 
   return StepButton;
