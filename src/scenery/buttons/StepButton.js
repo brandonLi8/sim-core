@@ -22,9 +22,8 @@ define( require => {
   const Circle = require( 'SIM_CORE/scenery/Circle' );
   const Node = require( 'SIM_CORE/scenery/Node' );
   const Path = require( 'SIM_CORE/scenery/Path' );
-  const Shape = require( 'SIM_CORE/util/Shape' );
-  const Vector = require( 'SIM_CORE/util/Vector' );
   const Rectangle = require( 'SIM_CORE/scenery/Rectangle' );
+  const Shape = require( 'SIM_CORE/util/Shape' );
 
   class StepButton extends Button {
 
