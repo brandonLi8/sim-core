@@ -1,10 +1,14 @@
 // Copyright © 2019-2020 Brandon Li. All rights reserved.
-// NOTE: THIS DOESNT WORK ATM!!!
 
 /**
- * Play pause button for stepping the sim. Often appears at the bottom center of the screen.
+ * A Step Button, which displays a circular button with a vertical rectangle bar and a right or left facing equilateral
+ * triangle, depending on if it is a forward or a backward Step button.
  *
- * Drawn to the right and reversed for backward buttons.
+ * Used generally to allow the user to step the simulation forward or backward by a small increment. It is usually
+ * placed next to a PlayPauseButton.
+ *
+ * The step button is drawn programmatically (as opposed to using an image file) to allow for slight modifications
+ * and customizations to the appearance of StepButton.
  *
  * @author Brandon Li <brandon.li820@gmail.com>
  */
@@ -14,111 +18,101 @@ define( require => {
 
   // modules
   const assert = require( 'SIM_CORE/util/assert' );
-  const CircleNode = require( 'SIM_CORE/scenery/CircleNode' );
-  const Polygon = require( 'SIM_CORE/scenery/Polygon' );
-  const Rectangle = require( 'SIM_CORE/scenery/Rectangle' );
-  const SVGNode = require( 'SIM_CORE/scenery/SVGNode' );
+  const Button = require( 'SIM_CORE/scenery/buttons/Button' );
+  const Circle = require( 'SIM_CORE/scenery/Circle' );
+  const Node = require( 'SIM_CORE/scenery/Node' );
+  const Path = require( 'SIM_CORE/scenery/Path' );
+  const Shape = require( 'SIM_CORE/util/Shape' );
   const Vector = require( 'SIM_CORE/util/Vector' );
 
-  // constants
-  const STROKE_WIDTH = 0.9;
-  const DEFAULT_RADIUS = 18;
-
-  class StepButton extends SVGNode {
+  class StepButton extends Button {
 
     /**
-     * @param {function} listener - called when the button is pressed
-     * @param {Object} [options] - Various key-value pairs that control the appearance and behavior. Subclasses
-     *                             may have different options for their API. See the code where the options are set in
-     *                             the early portion of the constructor for details.
+     * @param {string} direction - 'forward' || 'backward'
+     * @param {Object} [options] - Various key-value pairs that control the appearance and behavior. See the code
+     *                             where the options are set in the early portion of the constructor for details.
      */
-    constructor( listener, options ) {
+    constructor( direction, options ) {
+      assert( direction === 'forward' || direction === 'backward', `invalid direction: ${ direction }` );
       assert( !options || Object.getPrototypeOf( options ) === Object.prototype, `invalid options: ${ options }` );
 
+      options = {
 
-      // Defaults for options.
-      const defaults = {
-        radius: DEFAULT_RADIUS,
-        stroke: 'black',
-        fill: '#A87000',
-        direction: 'forward', // forward || backward
-        style: {
-          userSelect: 'none'
-        },
-        attributes: {
-          'shape-rendering': 'optimizeQuality'
-        },
-        mousedown: () => {
-          listener();
-        }
+        // button
+        baseColor: '#D48D00',     // {string} - the base color of the button.
+        radius: 18,               // {number} - the radius of the round Step Button.
+        buttonStroke: '#5F4510',  // {string|Gradient} - the stroke of the border of the Step Button.
+        buttonStrokeWidth: 0.5,   // {number} - the stroke-width of the border of the Step Button.
+        listener: null,           // {function} - the listener called when the button is pressed.
+
+        // bar
+        barWidth: 2.7,   // {number} - the width of the vertical rectangle-bar.
+        barHeight: 16.2, // {number} - the height of the vertical rectangle-bar.
+
+        // triangle
+        triangleSideLength: 2.7, // {number} - the side length of the equilateral triangle.
+
+        // content - applies to both the triangle and the rectangle-bar
+        contentFill: 'white',    // {string|Gradient} - the fill of both the triangle and rectangle.
+        contentStroke: 'black',  // {string|Gradient} - the stroke of both the triangle and rectangle.
+        contentStrokeWidth: 0.5, // {number} - the stroke width of both the triangle and rectangle.
+        contentMargin: 5,        // {number} - the margin between the triangle and rectangle.
+
+        // Rewrite options so that it overrides the defaults.
+        ...options
       };
 
-      // Rewrite options so that it overrides the defaults.
-      options = { ...defaults, ...options };
-      options.width = 2 * options.radius + STROKE_WIDTH;
-      options.height = 2 * options.radius + STROKE_WIDTH;
-      options.style = { ...defaults.style, ...options.style };
+      //----------------------------------------------------------------------------------------
 
-      super( options );
-
-      // step icon is sized relative to the radius
-      const BAR_WIDTH = options.radius * 0.15;
-      const BAR_HEIGHT = options.radius * 0.9;
-      const TRIANGLE_WIDTH = options.radius * 0.65;
-      const TRIANGLE_HEIGHT = BAR_HEIGHT;
-
-      this.radius = options.radius;
-      this.selfCenter = new Vector( this.width / 2, this.height / 2 );
-
-      // play button
-      const button = new CircleNode( {
-        radius: this.radius,
-        center: this.selfCenter,
-        width: this.width,
-        height: this.height,
-        strokeWidth: STROKE_WIDTH,
+      // Create the StepButton's background, which is just a shaded circle.
+      const stepButtonBackground = new Circle( options.radius, {
+        stroke: options.buttonStroke,
+        strokeWidth: options.buttonStrokeWidth,
         shapeRendering: 'geometricPrecision'
       } );
 
-      const rectangle = new Rectangle( {
-        width: BAR_WIDTH,
-        height: BAR_HEIGHT,
-        x: this.selfCenter.x - 2 * BAR_WIDTH,
-        y: this.height / 2 - BAR_HEIGHT / 2,
-        fill: 'white',
-        shapeRendering: 'optimizeQuality'
+      // The Content of the Step Button is drawn as assuming it is a forwards button. It is later reversed (by scaling
+      // negatively) if the button is backwards.
+
+      // Create the Bar of the Step Button.
+      const bar = new Rectangle( options.barWidth, options.barHeight, {
+        centerY: 0,
+        right: -options.contentMargin,
+        fill: options.contentFill,
+        stroke: options.contentStroke,
+        strokeWidth: options.contentStrokeWidth
       } );
+
+      // Create the triangle shape, with the left position at the origin.
+      const triangleShape = new Shape()
+        .moveTo( options.triangleSideLength / 2 * Math.sqrt( 3 ), 0 )
+        .lineTo( 0, -options.triangleSideLength / 2 )
+        .lineTo( 0, options.triangleSideLength / 2 )
+        .close();
+
+      // Create the triangle.
+      const playTriangle = new Path( triangleShape, {
+        fill: options.contentFill,
+        stroke: options.contentStroke,
+        strokeWidth: options.contentStrokeWidth
+      } );
+
+      super( stepButtonBackground, new Node().setChildren( [ bar, playTriangle ] ), options );
+
+      // Apply a negative scale if backwards to reverse the direction of the button content.
+      if ( direction === 'backward' ) this.scale( -1 );
 
       //----------------------------------------------------------------------------------------
-      // Play button
-      const triangle = new Polygon( [
-        this.selfCenter.copy().addXY( 0, -TRIANGLE_HEIGHT / 2 ),
-        this.selfCenter.copy().addXY( TRIANGLE_WIDTH, 0 ),
-        this.selfCenter.copy().addXY( 0, TRIANGLE_HEIGHT / 2 )
-      ], {
-        fill: 'white',
-        width: this.width,
-        height: this.height,
-        shapeRendering: 'optimizeQuality'
+
+      // Apply the 3D Gradient strategy to allow the Button to look 3D
+      Button.apply3DGradients( this, options.baseColor );
+
+      // Calls the listener passed in the option when the StepButton is pressed. The listener function is not
+      // referenced since it is unlinked when interactionStateProperty is disposed, which occurs in the dispose method
+      // of the super class.
+      options.listener && this.interactionStateProperty.link( interactionState => {
+        if ( interactionState === Button.interactionStates.PRESSED ) options.listener();
       } );
-      this.setChildren( [ button, rectangle, triangle ] );
-
-      this.mouseover = () => {
-        this.addStyles( {
-          filter: 'brightness( 90% )',
-          cursor: 'pointer'
-        } );
-      };
-      this.mouseout = () => {
-        this.addStyles( {
-          filter: 'none',
-          cursor: 'default'
-        } );
-      };
-
-      if ( options.direction === 'backward' ) {
-        this.style.transform = 'scaleX( -1 )';
-      }
     }
   }
 
