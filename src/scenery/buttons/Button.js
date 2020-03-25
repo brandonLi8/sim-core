@@ -189,6 +189,7 @@ define( require => {
         if ( interactionState === Button.interactionStates.IDLE ) button.background.fill = button.idleFill;
         if ( interactionState === Button.interactionStates.HOVER ) button.background.fill = button.hoverFill;
         if ( interactionState === Button.interactionStates.PRESSED ) button.background.fill = button.pressedFill;
+        else assert( false, `invalid interactionState: ${ interactionState }` );
       } );
     }
   }
