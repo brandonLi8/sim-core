@@ -188,6 +188,22 @@ define( require => {
 
     /**
      * @override
+     * Ensures that the FlexBox is formatted when children are added.
+     * @public
+     *
+     * @param {Node} child
+     * @returns {Node} - Returns 'this' reference, for chaining
+     */
+    addChild( child ) {
+      assert( child instanceof Node, `invalid child: ${ child }` );
+      super.addChild( child );
+
+      this._updateLayout();
+      return this;
+    }
+
+    /**
+     * @override
      * Called when this Node's Bounds changes due to a child's Bounds changing or when a child is added or removed.
      * Also responsible for recursively calling the method for each parent up to either the ScreenView or to the
      * point where a Node doesn't have a parent.
