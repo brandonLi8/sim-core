@@ -66,10 +66,10 @@ define( require => {
       // Convert the color string given to rgba.
       let rgb;
       if ( Object.prototype.hasOwnProperty.call( CACHED_COLORS, color ) ) rgb = CACHED_COLORS[ color ];
-      if ( color.includes( 'rgb' ) ) rgb = ColorWheel.parseRgb( color );
-      if ( color.includes( 'hsl' ) ) rgb = ColorWheel.hslToRgba( color );
-      if ( color.includes( '#' ) ) rgb = ColorWheel.hexToRgba( color );
-      if ( ColorWheel.isKeyword( color ) ) rgb = ColorWheel.keywordToRgba( color );
+      else if ( color.includes( 'rgb' ) ) rgb = ColorWheel.parseRgb( color );
+      else if ( color.includes( 'hsl' ) ) rgb = ColorWheel.hslToRgba( color );
+      else if ( color.includes( '#' ) ) rgb = ColorWheel.hexToRgba( color );
+      else if ( ColorWheel.isKeyword( color ) ) rgb = ColorWheel.keywordToRgba( color );
       assert( rgb, `invalid color: ${ color }` );
 
       // Apply the Shade algorithm, adapted implementation from https://stackoverflow.com/a/13532993
