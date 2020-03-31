@@ -119,6 +119,9 @@ define( require => {
       assert( Button.interactionStates.includes( interactionState ),
         `invalid interactionState: ${ interactionState }` );
 
+      this.background.stroke = this._selected ? this._selectedButtonStroke : this._unselectedButtonStroke;
+      this.background.strokeWidth = this._selected ? this._selectedStrokeWidth : this._unselectedStrokeWidth;
+
       if ( interactionState === Button.interactionStates.IDLE ) {
         this.background.opacity = this._selected ? this._selectedButtonOpacity : this._unselectedButtonOpacity;
         this.content.opacity = this._selected ? this._selectedContentOpacity : this._unselectedContentOpacity;
@@ -134,8 +137,8 @@ define( require => {
       if ( interactionState === Button.interactionStates.PRESSED ) {
         this.background.opacity = this._selected ? this._selectedButtonOpacity : this._unselectedButtonOpacity;
         this.content.opacity = this._selected ? this._selectedContentOpacity : this._unselectedContentOpacity;
-        this.background.fill = this._pressedFill;
-        this.cursor = 'pointer';
+        this.background.fill = this._selected ? this._idleFill : this._pressedFill;
+        this.cursor = !this._selected ? 'pointer' : null;
       }
     }
 
@@ -146,7 +149,7 @@ define( require => {
      * Generally, this is called when the button is selected in a RadioButtonGroup.
      */
     select() {
-      this._select = true;
+      this._selected = true;
       this._changeRadioButtonAppearance( this.interactionStateProperty.value );
     }
 
@@ -157,7 +160,7 @@ define( require => {
      * Generally, this is called when the button is un-selected in a RadioButtonGroup.
      */
     unselect() {
-      this._select = false;
+      this._selected = false;
       this._changeRadioButtonAppearance( this.interactionStateProperty.value );
     }
   }
