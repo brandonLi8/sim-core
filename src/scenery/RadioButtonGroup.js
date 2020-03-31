@@ -1,8 +1,15 @@
 // Copyright © 2019-2020 Brandon Li. All rights reserved.
-// NOTE: THIS DOESNT WORK ATM!!!
 
 /**
- * Contains a time control box.
+ * A grouping of RadioButtons, which displays RadioButtons as a FlexBox. See sim-core/src/scenery/buttons/RadioButton
+ * for more documentation.
+ *
+ * A RadioButtonGroup toggles the value of a Enum Property (ie. a Property with a Enum value of a general Enum).
+ * Each RadioButton that is passed in must correspond to a different Enum value of the general Enum.
+ *
+ * RadioButtonGroup will only select one RadioButton at a time. Selecting a RadioButton is triggered when the user
+ * presses on a unselected RadioButton, which sets the value of the Enum Property to the Enum value of the selected
+ * RadioButton.
  *
  * @author Brandon Li <brandon.li820@gmail.com>
  */
@@ -12,57 +19,26 @@ define( require => {
 
   // modules
   const assert = require( 'SIM_CORE/util/assert' );
-  const Node = require( 'SIM_CORE/scenery/Node' );
-  const PlayPauseButton = require( 'SIM_CORE/scenery/buttons/PlayPauseButton' );
-  const StepButton = require( 'SIM_CORE/scenery/buttons/StepButton' );
+  const Bounds = require( 'SIM_CORE/util/Bounds' );
+  const ColorWheel = require( 'SIM_CORE/util/ColorWheel' );
+  const Enum = require( 'SIM_CORE/util/Enum' );
+  const FlexBox = require( 'SIM_CORE/scenery/FlexBox' );
+  const Property = require( 'SIM_CORE/util/Property' );
+  const RadioButton = require( 'SIM_CORE/scenery/buttons/RadioButton' );
 
-
-  class TimeControlBox extends Node {
+  class RadioButtonGroup extends FlexBox {
 
     /**
-     * @param {Object} [options] - Various key-value pairs that control the appearance and behavior. Subclasses
-     *                             may have different options for their API. See the code where the options are set in
-     *                             the early portion of the constructor for details.
+     * @param {Property.<Enum.Member>} enumProperty - the enumeration Property that is toggled when RadioButtons
+     *                                                are selected.
+     * @param {RadioButton[]} radioButtons - the RadioButtons of this RadioButtonGroup.
+     * @param {Object} [options] - Various key-value pairs that control the appearance and behavior of the
+     *                             RadioButtonGroup. All options are passed to the super class.
      */
-    constructor( options ) {
-      assert( !options || Object.getPrototypeOf( options ) === Object.prototype, `invalid options: ${ options }` );
+    constructor( enumProperty, radioButtons, options ) {
 
-
-      // Defaults for options.
-      const defaults = {
-
-        backwardsListener: null,
-        forwardsListener: null,
-        margin: 5,
-        playProperty: null // required
-      };
-
-      // Rewrite options so that it overrides the defaults.
-      options = { ...defaults, ...options };
-
-      super( options );
-
-      const backButton = new StepButton( options.backwardsListener, {
-        direction: 'backward'
-      } );
-
-      const playPauseButton = new PlayPauseButton( options.playProperty, {
-        left: backButton.width + options.margin
-      } );
-
-      const forwardsbutton = new StepButton( options.forwardsListener, {
-        direction: 'forward',
-        left: backButton.width + 2 * options.margin + playPauseButton.width
-      } );
-
-      backButton.top = ( playPauseButton.radius - backButton.radius );
-      forwardsbutton.top = ( playPauseButton.radius - forwardsbutton.radius );
-
-      this.width = backButton.width + 2 * options.margin + playPauseButton.width + forwardsbutton.width;
-      this.height = playPauseButton.height;
-      this.setChildren( [ backButton, playPauseButton, forwardsbutton ] );
     }
   }
 
-  return TimeControlBox;
+  return RadioButtonGroup;
 } );
