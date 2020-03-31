@@ -8,8 +8,9 @@
  * Then, an array of Radio Buttons of different Enum values, along with the Property of Enum values, are passed to
  * RadioButtonGroup, which provides the functionality of only selecting one Radio Button at a time and toggles the Enum.
  *
- * An Radio Button can be selected, meaning the Enum Property's value matches the associated Enum value of the
- * RadioButton. Generally, the methods of RadioButton (select(), unselect()) should be used in RadioButtonGroup only.
+ * An Radio Button can be selected, meaning the Enum Property of the RadioButtonGroup matches the associated Enum value
+ * of the RadioButton. Generally, the methods of RadioButton (select(), unselect()) should only be used in
+ * RadioButtonGroup.
  *
  * @author Brandon Li <brandon.li820@gmail.com>
  */
@@ -19,13 +20,12 @@ define( require => {
 
   // modules
   const assert = require( 'SIM_CORE/util/assert' );
+  const Bounds = require( 'SIM_CORE/util/Bounds' );
   const Button = require( 'SIM_CORE/scenery/buttons/Button' );
-  const Circle = require( 'SIM_CORE/scenery/Circle' );
+  const Enum = require( 'SIM_CORE/util/Enum' );
   const Node = require( 'SIM_CORE/scenery/Node' );
   const Path = require( 'SIM_CORE/scenery/Path' );
   const Rectangle = require( 'SIM_CORE/scenery/Rectangle' );
-  const Shape = require( 'SIM_CORE/util/Shape' );
-  const Enum = require( 'SIM_CORE/util/Enum' );
 
   class RadioButton extends Button {
 
@@ -60,7 +60,6 @@ define( require => {
         unselectedButtonStroke: '#323232', // {string|Gradient} - the stroke of the background when NOT selected.
         baseColor: 'white',                // {string} - the base color of the button. The fills in all 3 states
                                            //            (selected, unselected, hover) are shades of this color.
-
         // other
         unselectedStrokeWidth: 1,  // {number} - the stroke-width of the border of the background when selected.
         selectedStrokeWidth: 1.5,  // {number} - the stroke-width of the border of the background when NOT selected.
@@ -69,6 +68,31 @@ define( require => {
         // Rewrite options so that it overrides the defaults.
         ...options
       };
+
+      //----------------------------------------------------------------------------------------
+
+      // Compute the background rectangle Bounds to expand to the margins.
+      const rectangleBounds = Bounds.scratch.set( contentNode.bounds )
+                                .expand( options.xMargin, options.yMargin, options.xMargin, options.yMargin );
+
+      // Create the RadioButton's background, which is just a Rectangle. Appearance to be set later.
+      const radioButtonBackground = Rectangle.withBounds( rectangleBounds );
+
+      super( radioButtonBackground, contentNode, options );
+    }
+
+    dispose() {
+
+    }
+
+
+
+    select() {
+
+    }
+
+    unselect() {
+
     }
   }
 
