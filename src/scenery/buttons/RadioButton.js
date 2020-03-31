@@ -22,6 +22,7 @@ define( require => {
   const assert = require( 'SIM_CORE/util/assert' );
   const Bounds = require( 'SIM_CORE/util/Bounds' );
   const Button = require( 'SIM_CORE/scenery/buttons/Button' );
+  const ColorWheel = require( 'SIM_CORE/util/ColorWheel' );
   const Enum = require( 'SIM_CORE/util/Enum' );
   const Node = require( 'SIM_CORE/scenery/Node' );
   const Path = require( 'SIM_CORE/scenery/Path' );
@@ -71,28 +72,93 @@ define( require => {
 
       //----------------------------------------------------------------------------------------
 
-      // Compute the background rectangle Bounds to expand to the margins.
+      // Compute the background rectangle's Bounds, which expands to the fit margins.
       const rectangleBounds = Bounds.scratch.set( contentNode.bounds )
                                 .expand( options.xMargin, options.yMargin, options.xMargin, options.yMargin );
 
       // Create the RadioButton's background, which is just a Rectangle. Appearance to be set later.
-      const radioButtonBackground = Rectangle.withBounds( rectangleBounds );
+      const radioButtonBackground = Rectangle.withBounds( rectangleBounds, { cornerRadius: options.cornerRadius } );
 
       super( radioButtonBackground, contentNode, options );
+
+      //----------------------------------------------------------------------------------------
+
+      // @private {*} see the options declaration for documentation
+      this._selectedButtonOpacity = options.selectedButtonOpacity;
+      this._unselectedButtonOpacity = options.unselectedButtonOpacity;
+      this._selectedContentOpacity = options.selectedContentOpacity;
+      this._unselectedContentOpacity = options.unselectedContentOpacity;
+      this._unselectedHoverButtonOpacity = options.unselectedHoverButtonOpacity;
+      this._unselectedHoverContentOpacity = options.unselectedHoverContentOpacity;
+      this._selectedButtonStroke = options.selectedButtonStroke;
+      this._unselectedButtonStroke = options.unselectedButtonStroke;
+      this._unselectedStrokeWidth = options.unselectedStrokeWidth;
+      this._selectedStrokeWidth = options.selectedStrokeWidth;
+
+      // @private {string} - the fill colors of the background for all 3 states
+      this._idleFill = options.baseColor;
+      this._hoverFill = ColorWheel.shade( options.baseColor, 0.4 );
+      this._pressedFill = ColorWheel.shade( options.baseColor, -0.4 );
+
+      // @private {boolean} - indicates if this Radio Button is the selected RadioButton in a RadioButtonGroup
+      this._selected = false;
+
+      // Listen to when the interaction state changes to change the appearance of the RadioButton.
+      // Unlinked in dispose method of the super class.
+      this.interactionStateProperty.link( this._changeRadioButtonAppearance.bind( this ) );
     }
 
-    dispose() {
+    /**
+     * Changes the appearance of the Radio Button when it needs to be changed. This is called when the
+     * interactionStateProperty of the super class changes or when the RadioButton is toggled.
+     * @private
+     *
+     * @param {Enum.Member.<Button.interactionStates>} interactionState
+     */
+    _changeRadioButtonAppearance( interactionState ) {
+      assert( Button.interactionStates.includes( interactionState ),
+        `invalid interactionState: ${ interactionState }` );
 
+      if ( interactionState === Button.interactionStates.IDLE ) {
+        this.background.opacity = this._selected ? this._selectedButtonOpacity : this._unselectedButtonOpacity;
+        this.content.opacity = this._selected ? this._selectedContentOpacity : this._unselectedContentOpacity;
+        this.background.fill = this._idleFill;
+        this.cursor = 'pointer';
+      }
+      if ( interactionState === Button.interactionStates.HOVER ) {
+        this.background.opacity = this._selected ? this._selectedButtonOpacity : this._unselectedHoverButtonOpacity;
+        this.content.opacity = this._selected ? this._selectedContentOpacity : this._unselectedHoverContentOpacity;
+        this.background.fill = this._hoverFill;
+        this.cursor = !this._selected ? 'pointer' : null;
+      }
+      if ( interactionState === Button.interactionStates.PRESSED ) {
+        this.background.opacity = this._selected ? this._selectedButtonOpacity : this._unselectedButtonOpacity;
+        this.content.opacity = this._selected ? this._selectedContentOpacity : this._unselectedContentOpacity;
+        this.background.fill = this._pressedFill;
+        this.cursor = 'pointer';
+      }
     }
 
-
-
+    /**
+     * Changes the appearance set of the RadioButton for hovers and presses.
+     * @public
+     *
+     * Generally, this is called when the button is selected in a RadioButtonGroup.
+     */
     select() {
-
+      this._select = true;
+      this._changeRadioButtonAppearance( this.interactionStateProperty.value );
     }
 
+    /**
+     * Changes the appearance set of the RadioButton for hovers and presses.
+     * @public
+     *
+     * Generally, this is called when the button is un-selected in a RadioButtonGroup.
+     */
     unselect() {
-
+      this._select = false;
+      this._changeRadioButtonAppearance( this.interactionStateProperty.value );
     }
   }
 
