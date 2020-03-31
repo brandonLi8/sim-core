@@ -94,7 +94,10 @@ define( require => {
       //                            disposed in the dispose method.
       this._pressListener = new PressListener( this, {
         press: () => { this.interactionStateProperty.value = Button.interactionStates.PRESSED; },
-        release: () => { this.interactionStateProperty.value = Button.interactionStates.HOVER; }
+        release: () => {
+          this.interactionStateProperty.value = Button.interactionStates.RELEASED;
+          this.interactionStateProperty.value = Button.interactionStates.HOVER;
+        }
       } );
 
       // @private {HoverListener} - create a HoverListener for when the user hovers over the Button. Listener to be
@@ -189,16 +192,16 @@ define( require => {
         if ( interactionState === Button.interactionStates.IDLE ) button.background.fill = button.idleFill;
         if ( interactionState === Button.interactionStates.HOVER ) button.background.fill = button.hoverFill;
         if ( interactionState === Button.interactionStates.PRESSED ) button.background.fill = button.pressedFill;
-        else assert( false, `invalid interactionState: ${ interactionState }` );
       } );
     }
   }
 
   // @public (read-only) {Enum} - Enumeration of possible button states.
   Button.interactionStates = new Enum( [
-    'IDLE',   // Button is not being interacted with.
-    'HOVER',  // A pointer is hovering over the button but not pressing down on it.
-    'PRESSED' // The button is pressed because the user has pressed down on it.
+    'IDLE',    // Button is not being interacted with.
+    'HOVER',   // A pointer is hovering over the button but not pressing down on it.
+    'PRESSED', // The button is pressed because the user has pressed down on it.
+    'RELEASED' // The button was just pressed and now released.
   ] );
 
   return Button;

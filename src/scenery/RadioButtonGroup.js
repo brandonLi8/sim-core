@@ -20,13 +20,14 @@ define( require => {
   // modules
   const assert = require( 'SIM_CORE/util/assert' );
   const Bounds = require( 'SIM_CORE/util/Bounds' );
+  const Button = require( 'SIM_CORE/scenery/buttons/Button' );
   const ColorWheel = require( 'SIM_CORE/util/ColorWheel' );
   const Enum = require( 'SIM_CORE/util/Enum' );
   const FlexBox = require( 'SIM_CORE/scenery/FlexBox' );
+  const Multilink = require( 'SIM_CORE/util/Multilink' );
   const Property = require( 'SIM_CORE/util/Property' );
   const RadioButton = require( 'SIM_CORE/scenery/buttons/RadioButton' );
   const Util = require( 'SIM_CORE/util/Util' );
-  const Button = require( 'SIM_CORE/scenery/buttons/Button' );
 
   class RadioButtonGroup extends FlexBox {
 
@@ -51,28 +52,32 @@ define( require => {
 
       //----------------------------------------------------------------------------------------
 
-      // @private {Object} - object literal that maps Radio Buttons to listeners of its interactionStateProperty.
-      //                     Used in the dispose method to remove listeners.
-      this._radioButtonListenerMap = {};
+      // @private {Property.<Enum.Member>} - reference the enumProperty
+      this._enumProperty;
+
+      // @private {Multilink[]} - Array of the Multilinks that toggles the selections. Used in the dispose method.
+      this._radioButtonMultilinks = [];
+
+      // Keep a reference of the registered Enum values of each Radio Button to check for duplicates.
+      const registeredEnumValues = [];
 
       // Loop through each RadioButton in the passed-in radio Buttons array.
       radioButtons.forEach( radioButton => {
 
         // Check that we haven't already linked to this RadioButton.
-        assert( !this._radioButtonListenerMap[ radioButton ], `duplicate radio button found: ${ radioButton }` );
+        assert( !registeredEnumValues.includes( radioButton.enumValue ), `duplicate: ${ radioButton.enumValue }` );
+        registeredEnumValues.push( radioButton.enumValue );
 
-        // Map a listener to the interactionStateProperty of the RadioButton.
-        this._radioButtonListenerMap[ radioButton ] = interactionState => {
-
-          // If the current radioButton is pressed, unselect all other RadioButtons and select the current radioButton.
-          if ( interactionState === Button.interactionStates.PRESSED ) {
-            radioButtons.forEach( radioButton => { radioButton.unselect(); } );
-            radioButton.select();
-          }
-        };
-
-        // Link the listener, which will be unlinked in the dispose method.
-        radioButton.interactionStateProperty.link( this._radioButtonListenerMap[ radioButton ] );
+        this._radioButtonMultilinks.push( new Multilink( [ radioButton.interactionStateProperty, enumProperty ],
+          ( interactionState, enumValue ) => {
+            // If the current radioButton is pressed or the current Enum value matches the current radioButton,
+            // unselect all other RadioButtons and select the current radioButton.
+            if ( enumValue === radioButton.enumValue || interactionState === Button.interactionStates.RELEASED ) {
+              radioButtons.forEach( radioButton => { radioButton.unselect(); } );
+              radioButton.select();
+              enumProperty.value = radioButton.enumValue;
+            }
+          } ) );
       } );
     }
 
@@ -82,9 +87,7 @@ define( require => {
      * @public
      */
     dispose() {
-      Object.keys( this._radioButtonListenerMap ).forEach( radioButton => {
-        radioButton.interactionStateProperty.unlink( this._radioButtonListenerMap[ radioButton ] );
-      } );
+      this._radioButtonMultilinks.forEach( multilink => multilink.dispose() );
       super.dispose();
     }
   }

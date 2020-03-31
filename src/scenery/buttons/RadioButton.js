@@ -82,6 +82,9 @@ define( require => {
 
       //----------------------------------------------------------------------------------------
 
+      // @public (read-only) {Enum.Member} - reference the passed-in Enum value.
+      this.enumValue = enumValue;
+
       // @private {*} see the options declaration for documentation
       this._selectedButtonOpacity = options.selectedButtonOpacity;
       this._unselectedButtonOpacity = options.unselectedButtonOpacity;
