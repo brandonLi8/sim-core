@@ -25,7 +25,6 @@ define( require => {
   const ColorWheel = require( 'SIM_CORE/util/ColorWheel' );
   const Enum = require( 'SIM_CORE/util/Enum' );
   const Node = require( 'SIM_CORE/scenery/Node' );
-  const Path = require( 'SIM_CORE/scenery/Path' );
   const Rectangle = require( 'SIM_CORE/scenery/Rectangle' );
 
   class RadioButton extends Button {
