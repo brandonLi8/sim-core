@@ -40,7 +40,7 @@ define( require => {
 
         // button
         baseColor: '#7686FF',     // {string} - the base color of the button.
-        radius: 14,               // {number} - the radius of the round Step Button.
+        radius: 15.5,             // {number} - the radius of the round Step Button.
         buttonStroke: '#343B70',  // {string|Gradient} - the stroke of the border of the Step Button.
         buttonStrokeWidth: 0.5,   // {number} - the stroke-width of the border of the Step Button.
         listener: null,           // {function} - the listener called when the button is pressed.
