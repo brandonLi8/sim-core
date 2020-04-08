@@ -40,23 +40,23 @@ define( require => {
 
         // button
         baseColor: '#7686FF',     // {string} - the base color of the button.
-        radius: 18,               // {number} - the radius of the round Step Button.
+        radius: 14,               // {number} - the radius of the round Step Button.
         buttonStroke: '#343B70',  // {string|Gradient} - the stroke of the border of the Step Button.
         buttonStrokeWidth: 0.5,   // {number} - the stroke-width of the border of the Step Button.
         listener: null,           // {function} - the listener called when the button is pressed.
 
         // bar
-        barWidth: 3.5,   // {number} - the width of the vertical rectangle-bar.
-        barHeight: 16.2, // {number} - the height of the vertical rectangle-bar.
+        barWidth: 3,   // {number} - the width of the vertical rectangle-bar.
+        barHeight: 16, // {number} - the height of the vertical rectangle-bar.
 
         // triangle
-        triangleSideLength: 16.2, // {number} - the side length of the equilateral triangle.
+        triangleSideLength: 16, // {number} - the side length of the equilateral triangle.
 
         // content - applies to both the triangle and the rectangle-bar
         contentFill: 'white',      // {string|Gradient} - the fill of both the triangle and rectangle.
         contentStroke: '#5763BD',  // {string|Gradient} - the stroke of both the triangle and rectangle.
         contentStrokeWidth: 1,     // {number} - the stroke width of both the triangle and rectangle.
-        contentMargin: 2.7,        // {number} - the margin between the triangle and rectangle.
+        contentMargin: 2,          // {number} - the margin between the triangle and rectangle.
 
         // Rewrite options so that it overrides the defaults.
         ...options

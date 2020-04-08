@@ -37,7 +37,7 @@ define( require => {
         // button
         baseColor: '#C32526',   // {string} - the base color of the button.
         listener: null,         // {function} - the listener called when the button is pressed.
-        radius: 21.5,           // {number} - the radius of the round Reset Button
+        radius: 25.5,           // {number} - the radius of the round Reset Button
         buttonStroke: 'black',  // {string|Gradient} - the stroke of the border of the Reset Button
         buttonStrokeWidth: 0.5, // {number} - the stroke-width of the border of the Reset Button
 
@@ -45,10 +45,10 @@ define( require => {
         curvedArrowFill: 'white',               // {string|Gradient} - the fill color of the button curvedArrow.
         curvedArrowStroke: 'black',             // {string|Gradient} - the stroke color of the button curvedArrow.
         curvedArrowStrokeWidth: 0.5,            // {number} - the stroke width of the button curved Arrow.
-        curvedArrowHeadHeight: 8.5,             // {number} - the head-height of the curved arrow.
-        curvedArrowHeadWidth: 13,               // {number} - the head-width of the curved arrow.
-        curvedArrowTailWidth: 5.7,              // {number} - the tail-width of the curved arrow.
-        curvedArrowRadius: 11,                  // {number} - the radius of the curved arrow.
+        curvedArrowHeadHeight: 9,               // {number} - the head-height of the curved arrow.
+        curvedArrowHeadWidth: 13.5,             // {number} - the head-width of the curved arrow.
+        curvedArrowTailWidth: 6,                // {number} - the tail-width of the curved arrow.
+        curvedArrowRadius: 13,                  // {number} - the radius of the curved arrow.
         curvedArrowStartAngle: Math.PI * 1.95,  // {number} - the start angle of the curved arrow.
         curvedArrowEndAngle: Math.PI * 1.65,    // {number} - the end angle of the curved arrow.
 
