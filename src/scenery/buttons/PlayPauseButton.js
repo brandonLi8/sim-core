@@ -43,10 +43,10 @@ define( require => {
       options = {
 
         // button
-        baseColor: '#D48D00',     // {string} - the base color of the button.
+        baseColor: '#75B4FF',     // {string} - the base color of the button.
         radius: 32,               // {number} - the radius of the round Reset Button.
-        buttonStroke: '#7F6520',  // {string|Gradient} - the stroke of the border of the Reset Button.
-        buttonStrokeWidth: 2,     // {number} - the stroke-width of the border of the Reset Button.
+        buttonStroke: '#343B70',  // {string|Gradient} - the stroke of the border of the Reset Button.
+        buttonStrokeWidth: 0.5,   // {number} - the stroke-width of the border of the Reset Button.
 
         // play triangle
         playTriangleSideLength: 33, // {number} - the side length of the right-facing equilateral play triangle.
@@ -57,9 +57,9 @@ define( require => {
         pauseRectangleMargin: 6,   // {number} - the margin between each pause vertical rectangle-bar.
 
         // play-pause - applies to both the play triangle and the pause rectangles
-        playPauseFill: 'white',    // {string|Gradient} - the fill of both the play triangle and pause rectangles.
-        playPauseStroke: 'black',  // {string|Gradient} - the stroke of both the play triangle and pause rectangles.
-        playPauseStrokeWidth: 0.5, // {number} - the stroke width of both the play triangle and pause rectangles.
+        playPauseFill: 'white',     // {string|Gradient} - the fill of both the play triangle and pause rectangles.
+        playPauseStroke: '#5A8AC4', // {string|Gradient} - the stroke of both the play triangle and pause rectangles.
+        playPauseStrokeWidth: 1,    // {number} - the stroke width of both the play triangle and pause rectangles.
 
         // Rewrite options so that it overrides the defaults.
         ...options
