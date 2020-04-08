@@ -244,6 +244,9 @@ define( require => {
         addPoint( length - headHeight, -this._headWidth / 2 );
         addPoint( length - headHeight, -this._tailWidth / 2 );
         addPoint( 0, -this._tailWidth / 2 );
+        addPoint( 0, this._tailWidth / 2 );
+        arrowShape.close();
+
         super.shape = arrowShape;
       }
     }
