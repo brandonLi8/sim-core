@@ -185,11 +185,11 @@ define( require => {
       assert( !options || Object.getPrototypeOf( options ) === Object.prototype, `invalid options: ${ options }` );
 
       // Check that there are no conflicting location setters of the bounds of this Node.
-      assert( this.constructor.X_BOUNDS_MUTATORS.filter( key => options[ key ] ).length <= 1, 'more than 1 x-mutator' );
-      assert( this.constructor.Y_BOUNDS_MUTATORS.filter( key => options[ key ] ).length <= 1, 'more than 1 y-mutator' );
+      assert( Node.X_BOUNDS_MUTATORS.filter( key => options[ key ] ).length <= 1, 'more than 1 x-mutator' );
+      assert( Node.Y_BOUNDS_MUTATORS.filter( key => options[ key ] ).length <= 1, 'more than 1 y-mutator' );
 
       // Call the mutators of this instance for the setter options that were provided.
-      this.constructor.MUTATOR_KEYS.forEach( key => {
+      ( this.constructor.MUTATOR_KEYS || Node.MUTATOR_KEYS ).forEach( key => {
         if ( options[ key ] !== null && options[ key ] !== undefined ) { // Only mutate if the option was provided
 
           // If the key refers to a setter, it will call the setter with the option value.

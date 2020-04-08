@@ -70,7 +70,7 @@ define( require => {
         thumbCornerRadius: 2.5,          // {number} - the corner radius of the thumb Rectangle
 
         // ticks
-        majorTickHeight: 35,        // {number} - the height of the major tick lines that lie along the track
+        majorTickHeight: 25,        // {number} - the height of the major tick lines that lie along the track
         majorTickStroke: 'black',   // {string|Gradient} - the stroke of the major tick lines that lie along the track
         majorTickStrokeWidth: 1.3,  // {number} - the stroke width the major tick lines that lie along the track
         minorTickHeight: 8,         // {number} - the height of the minor tick lines that lie along the track
@@ -143,15 +143,19 @@ define( require => {
       options && this.mutate( options );
 
       //----------------------------------------------------------------------------------------
+      let thumbDragStartPosition;
 
       // @private {DragListener} - create a DragListener for when the user drags the thumb, which moves the slider
       //                           value. To be disposed in the dispose() method.
       this._thumbDragListener = new DragListener( this._thumb, {
-        drag: ( displacement, location ) => {
+        drag: displacement => {
           this._thumb.interactionStateProperty.value = Button.interactionStates.PRESSED;
-          this._setThumbPosition( location );
+          this._setThumbPosition( thumbDragStartPosition.copy().add( displacement ) );
         },
-        start: options.startDrag,
+        start: () => {
+          options.startDrag && options.startDrag();
+          thumbDragStartPosition = this._thumb.center;
+        },
         end: () => {
           this._thumb.interactionStateProperty.value = Button.interactionStates.IDLE;
           options.endDrag && options.endDrag();
@@ -207,7 +211,7 @@ define( require => {
      */
     _addTick( value, label, isMajor ) {
       assert( typeof value === 'number' && this._range.contains( value ), `invalid value: ${ value }` );
-      assert( label instanceof Node, `invalid label: ${ label }` );
+      assert( !label || label instanceof Node, `invalid label: ${ label }` );
 
       // Calculate the x-coordinate of the label, in scenery coordinates.
       const labelX = ( value - this._range.min ) / this._range.length * this._track.width + this._track.left;

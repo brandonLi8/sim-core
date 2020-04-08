@@ -212,8 +212,7 @@ define( require => {
      * This is overridden so that the layout of the FlexBox updates when a child changes.
      */
     _recomputeAncestorBounds() {
-      if ( this._isUpdatingLayout === false ) this._updateLayout();
-      super._recomputeAncestorBounds();
+      if ( this._isUpdatingLayout === false ) return this._updateLayout();
     }
   }
 

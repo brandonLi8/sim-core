@@ -79,6 +79,9 @@ define( require => {
       // @public (read-only) {ScreenView} view - the view of the Screen. To be set in start().
       this.view;
 
+      // @public (read-only) {Class.<Object>} model - the model of the Screen. To be set in start().
+      this.model;
+
       // @private {Object} - reference to the passed in config Object.
       this._config = config;
     }
@@ -97,10 +100,10 @@ define( require => {
     start( display ) {
 
       // First create and instantiate the model.
-      const model = new this._config.model();
+      this.model = new this._config.model();
 
       // Create the view and pass the model in.
-      this.view = new this._config.view( model );
+      this.view = new this._config.view( this.model );
 
       // Add the view as a child to render the Screen.
       display.addChild( this.addChild( this.view ) );

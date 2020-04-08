@@ -46,7 +46,7 @@ define( require => {
 
         fontStyle: 'normal',    // {string} - the font-style of the Text. See `set fontStyle()`.
         fontWeight: 'normal',   // {string|number} - the font-weight of the Text. See `set fontWeight()`.
-        fontSize: 12,           // {number} - the font-size of the Text. See `set fontSize()`.
+        fontSize: 13.5,         // {number} - the font-size of the Text. See `set fontSize()`.
         fontFamily: 'Arial',    // {string} - the css font-family of the Text. See `set fontFamily()`.
         fill: '#000000',        // {string|Gradient} - Sets the fill color of the Text. See `set fill()`.
         stroke: null,           // {string|Gradient} - Sets the stroke color of the Text. See `set stroke()`.

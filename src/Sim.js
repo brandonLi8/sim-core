@@ -122,9 +122,12 @@ define( require => {
         const screenHeight = height - parseFloat( this.navigationBar.style.height );
 
         this.screens.forEach( screen => {
-         screen.style.height = `${ screenHeight }px`;
-         screen.view.layout( width, screenHeight );
+          screen.style.height = `${ screenHeight }px`;
+          screen.view.layout( width, screenHeight );
         } );
+      } );
+      this.display.on( 'frame', dt => {
+        this.screens[ 0 ].model.step && this.screens[ 0 ].model.step( dt );
       } );
     }
   }
