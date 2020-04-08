@@ -56,10 +56,13 @@ define( require => {
         // {function(Event)|null} - Called when the drag event ends. See the comment at the top of the file.
         end: null,
 
-        // {function(Vector, Vector, Event)|null} - Called on each movement in the drag event, passing the displacement,
-        //                                          the cursor position (parent coordinates), and the event object.
+        // {function(Vector, Vector, Event)|null} - Called on each movement in the drag event, passing the displacement
+        //                                          of the cursor from where the press started, and the event object.
         //                                          See the comment at the top of the file for details.
         drag: null,
+
+        // {number} - throttle amount for the movement listener. See HoverListener for more documentation.
+        throttle: 5,
 
         // Rewrite options so that it overrides the defaults.
         ...options
@@ -77,6 +80,7 @@ define( require => {
       this._startListener = options.start;
       this._endListener = options.end;
       this._dragListener = options.drag;
+      this._throttle = options.throttle;
 
       //----------------------------------------------------------------------------------------
 
@@ -90,7 +94,7 @@ define( require => {
      * is pressed.
      *
      * This method works by creating a HoverListener to listen to mouse-movements in the Display. This allows the user
-     * to move their pressed poitner away from the Node. Then, if the pointer is ever released, the drag is ended, and
+     * to move their pressed pointer away from the Node. Then, if the pointer is ever released, the drag is ended, and
      * the listener is disposed.
      * @private
      *
@@ -105,27 +109,27 @@ define( require => {
       // Reference the Display to listen to. The require statement is here to avoid circular dependency problems.
       const display = require( 'SIM_CORE/Sim' ).display;
 
-      // Flag that tracks where the user last moved the cursor after pressing down.
-      const lastDragLocation = location.copy();
+      // Get where the press event took place in the window coordinate frame.
+      const windowPressLocation = this._getEventWindowLocation( event );
 
-      // Create a HoverListener to listen to mouse-movements in the Display. Will be disposed if the poitner is released
+      // Create a HoverListener to listen to mouse-movements in the Display. Will be disposed if the pointer is released
       const displayHoverListener = new HoverListener( display, {
         movement: movementEvent => {
           if ( this._dragListener ) {
 
-            // Get the cursor (or pointer) position in the parent coordinate frame.
-            const cursorPosition = this._getEventParentLocation( movementEvent );
+            // Get where the hover event took place in the window coordinate frame.
+            const windowCursorLocation = this._getEventWindowLocation( movementEvent );
 
-            // Get the displacement by comparing the last drag location to the current cursor position.
-            const dragDisplacement = cursorPosition.copy().subtract( lastDragLocation );
-
-            // Update the lastDragLocation flag.
-            lastDragLocation.set( cursorPosition );
+            // Subtract the current cursor position to the location when the node was first pressed.
+            const displacementSincePress = windowCursorLocation
+                                            .subtract( windowPressLocation )
+                                            .divide( this._targetNode.screenViewScale );
 
             // Call the drag listener.
-            this._dragListener( dragDisplacement, cursorPosition, movementEvent );
+            this._dragListener( displacementSincePress, movementEvent );
           }
-        }
+        },
+        movementThrottle: this._throttle
       } );
 
       // Create a PressListener to listen to when the mouse is released, which cancels the drag.

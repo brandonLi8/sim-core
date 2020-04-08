@@ -56,7 +56,7 @@ define( require => {
 
         // {number} - throttle amount for the movement listener. See comment at the top of this file for documentation
         //            on how throttling works. This specific option controls the timeout time for timeout calls.
-        movementThrottle: 5,
+        movementThrottle: 10,
 
         // Rewrite options so that it overrides the defaults.
         ...options
