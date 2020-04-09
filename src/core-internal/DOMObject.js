@@ -432,12 +432,7 @@ define( require => {
         if ( contains( styleKey ) ) setStyle( styleKey, styleKey );
         else if ( contains( `moz${ camelStyleKey }` ) ) setStyle( `moz${ camelStyleKey }`, styleKey );
         else if ( contains( `Moz${ camelStyleKey }` ) ) setStyle( `Moz${ camelStyleKey }`, styleKey );
-        else if ( contains( `MozOsx${ camelStyleKey }` ) ) {
-                  if ( styleKey === 'fontSmoothing' ) {
-          console.log( element.style.MozOsxFontSmoothing, element.id, styleKey,style[ styleKey ] )
-        }
-          setStyle( `MozOsx${ camelStyleKey }`, styleKey );
-        }
+        else if ( contains( `MozOsx${ camelStyleKey }` ) ) setStyle( `MozOsx${ camelStyleKey }`, styleKey );
         else if ( contains( `webkit${ camelStyleKey }` ) ) setStyle( `webkit${ camelStyleKey }`, styleKey );
         else if ( contains( `ms${ camelStyleKey }` ) ) setStyle( `ms${ camelStyleKey }`, styleKey );
         else if ( contains( `o${ camelStyleKey }` ) ) setStyle( `o${ camelStyleKey }`, styleKey );
