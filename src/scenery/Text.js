@@ -246,11 +246,16 @@ define( require => {
     layout( scale ) {
       if ( !scale ) return; // Exit if no scale was provided.
 
-      // Set the dominant-baseline attribute to position the Text in the top-left corner with 0 transformation.
-      if ( this.element.getAttribute( 'dominant-baseline' ) !== 'hanging' ) {
-        this.setAttribute( 'dominant-baseline', 'hanging' );
-        this.setAttribute( 'stroke-width', this._strokeWidth * scale );
+      // Set the dominant-baseline attribute to position the Text to include text that extrudes bellow the base-line.
+      if ( this.element.getAttribute( 'dominant-baseline' ) !== 'text-after-edge' ) {
+        this.setAttribute( 'dominant-baseline', 'text-after-edge' );
       }
+
+      // Scale the stroke-width of the Text to pixels.
+      this.setAttribute( 'stroke-width', this._strokeWidth * scale );
+
+      // Shift the Text downwards so that its top is at 0.
+      this.setAttribute( 'y', this.height * scale );
 
       // Set the CSS font of the Text Node element, correctly passing the scale to scale the font-size pixel amount.
       this.style.font = this._generateCSS3FontString( scale );
