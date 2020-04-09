@@ -63,6 +63,9 @@ define( require => {
 
       super( options );
 
+      // Make anything outside of the ScreenView still visible.
+      this.setAttribute( 'overflow', 'visible' );
+
       // Push this instance of ScreenView to the instances field.
       ScreenView._instances.push( this );
 
