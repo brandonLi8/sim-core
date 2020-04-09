@@ -258,7 +258,8 @@ define( require => {
     set bottom( bottom ) { this.setLocation( 'bottom', bottom ); }
 
     /**
-     * Sets whether this Node (and its sub-tree) is visible.
+     * Sets whether this Node (and its sub-tree) is visible. Note that if visible=false, this is different from setting
+     * opacity to 0 as the Node cannot receive any pointer-events and its cursor is not applied.
      * @public
      *
      * @param {boolean} visible
@@ -267,7 +268,7 @@ define( require => {
       if ( visible === this._visible ) return; // Exit if setting to the same 'visible'
       assert( typeof visible === 'boolean', `invaid visible: ${ visible }` );
       this._visible = visible;
-      this.style.opacity = this._visible ? this._opacity : 0; // Update our CSS style.
+      this.setAttribute( 'visibility', this._visible ? null : 'hidden' );
     }
 
     /**
@@ -281,7 +282,7 @@ define( require => {
       if ( opacity === this._opacity ) return; // Exit if setting to the same opacity
       assert( typeof opacity === 'number' && opacity >= 0 && opacity <= 1, `invaid opacity: ${ opacity }` );
       this._opacity = opacity;
-      this.style.opacity = this._visible ? this._opacity : 0; // Update our CSS style.
+      this.style.opacity = this._opacity; // Update our CSS style.
     }
 
     /**
