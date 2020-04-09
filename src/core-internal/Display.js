@@ -120,6 +120,12 @@ define( require => {
         userDrag: 'none'
       } );
 
+      // Fix bug that makes text look bolder on Firefox on MacOS. See
+      // https://bugzilla.mozilla.org/show_bug.cgi?id=1524250
+      if ( navigator.userAgent.toLowerCase().includes( 'firefox' ) && navigator.platform.includes( 'Mac' ) ) {
+        DOMObject.addElementStyles( bodyElement, { fontSmoothing: 'grayscale' } );
+      }
+
       //----------------------------------------------------------------------------------------
 
       // Set up the 'resize' event. Use throttling technique to improve performance. See core-internal/Throttle.js.
