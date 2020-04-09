@@ -168,7 +168,7 @@ define( require => {
       if ( fill === this._fill ) return; // Exit if setting to the same 'fill'
       assert( !fill || typeof fill === 'string' || fill instanceof Gradient, `invalid fill: ${ fill }` );
       this._fill = fill;
-      this.element.setAttribute( 'fill', fill instanceof Gradient ? fill.SVGGradientString : fill );
+      this.setAttribute( 'fill', fill instanceof Gradient ? fill.SVGGradientString : ( fill || 'none' ) );
     }
 
     /**
@@ -181,7 +181,7 @@ define( require => {
       if ( stroke === this._stroke ) return; // Exit if setting to the same 'stroke'
       assert( !stroke || typeof stroke === 'string' || stroke instanceof Gradient, `invalid stroke: ${ stroke }` );
       this._stroke = stroke;
-      this.element.setAttribute( 'stroke', stroke instanceof Gradient ? stroke.SVGGradientString : stroke );
+      this.setAttribute( 'stroke', stroke instanceof Gradient ? stroke.SVGGradientString : ( stroke || 'none' ) );
     }
 
     /**
@@ -210,7 +210,7 @@ define( require => {
       assert( [ 'auto', 'optimizeSpeed', 'optimizeLegibility', 'geometricPrecision' ].includes( textRendering ),
         `invalid textRendering: ${ textRendering }` );
       this._textRendering = textRendering;
-      this.element.setAttribute( 'text-rendering', textRendering );
+      this.setAttribute( 'text-rendering', textRendering );
     }
 
     //----------------------------------------------------------------------------------------
@@ -249,7 +249,7 @@ define( require => {
       // Set the dominant-baseline attribute to position the Text in the top-left corner with 0 transformation.
       if ( this.element.getAttribute( 'dominant-baseline' ) !== 'hanging' ) {
         this.setAttribute( 'dominant-baseline', 'hanging' );
-        this.element.setAttribute( 'stroke-width', this._strokeWidth * scale );
+        this.setAttribute( 'stroke-width', this._strokeWidth * scale );
       }
 
       // Set the CSS font of the Text Node element, correctly passing the scale to scale the font-size pixel amount.

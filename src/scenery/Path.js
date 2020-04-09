@@ -85,7 +85,7 @@ define( require => {
       if ( fill === this._fill ) return; // Exit if setting to the same 'fill'
       assert( !fill || typeof fill === 'string' || fill instanceof Gradient, `invalid fill: ${ fill }` );
       this._fill = fill;
-      this.element.setAttribute( 'fill', fill instanceof Gradient ? fill.SVGGradientString : fill );
+      this.setAttribute( 'fill', fill instanceof Gradient ? fill.SVGGradientString : ( fill || 'none' ) );
     }
 
     /**
@@ -98,7 +98,7 @@ define( require => {
       if ( stroke === this._stroke ) return; // Exit if setting to the same 'stroke'
       assert( !stroke || typeof stroke === 'string' || stroke instanceof Gradient, `invalid stroke: ${ stroke }` );
       this._stroke = stroke;
-      this.element.setAttribute( 'stroke', stroke instanceof Gradient ? stroke.SVGGradientString : stroke );
+      this.setAttribute( 'stroke', stroke instanceof Gradient ? stroke.SVGGradientString : ( stroke || 'none' ) );
     }
 
     /**
@@ -127,7 +127,7 @@ define( require => {
       assert( [ 'auto', 'optimizeSpeed', 'crispEdges', 'geometricPrecision' ].includes( shapeRendering ),
         `invalid shapeRendering: ${ shapeRendering }` );
       this._shapeRendering = shapeRendering;
-      this.element.setAttribute( 'shape-rendering', shapeRendering );
+      this.setAttribute( 'shape-rendering', shapeRendering );
     }
 
     /**
@@ -177,10 +177,10 @@ define( require => {
       if ( !scale ) return; // Exit if no scale was provided.
 
       if ( this._shape ) { // Set the Element's d-attribute to render the Shape.
-        this.element.setAttribute( 'd', this._shape.getSVGPath( this._shape.bounds.bottomLeft.negate(), scale ) );
-        this.element.setAttribute( 'stroke-width', this._strokeWidth * scale );
+        this.setAttribute( 'd', this._shape.getSVGPath( this._shape.bounds.bottomLeft.negate(), scale ) );
+        this.setAttribute( 'stroke-width', this._strokeWidth * scale );
       }
-      else this.element.setAttribute( 'd', '' );
+      else this.setAttribute( 'd', '' );
       super.layout( scale );
     }
   }
