@@ -189,8 +189,9 @@ define( require => {
      *
      * @param {number} value - the numeric value the tick represents along the range of the slider.
      * @param {Node} [label] - optional label Node (usually a Text Node), placed above the Node.
+     * @returns {Slider} 'this' reference, for chaining.
      */
-    addMajorTick( value, label ) { this._addTick( value, label, true ); }
+    addMajorTick( value, label ) { return this._addTick( value, label, true ); }
 
     /**
      * Adds a minor tick mark, which starts from the top of the track and extrudes upwards.
@@ -198,8 +199,9 @@ define( require => {
      *
      * @param {number} value - the numeric value the tick represents along the range of the slider.
      * @param {Node} [label] - optional label Node (usually a Text Node), placed above the Node.
+     * @returns {Slider} 'this' reference, for chaining.
      */
-    addMinorTick( value, label ) { this._addTick( value, label, false ); }
+    addMinorTick( value, label ) { return this._addTick( value, label, false ); }
 
     /*
      * Adds a tick mark above the track. To be used internally ONLY.
@@ -208,6 +210,7 @@ define( require => {
      * @param {number} value - the numeric value the tick represents along the range of the slider.
      * @param {Node} [label] - optional label Node (usually a Text Node), placed above the Node.
      * @param {boolean} isMajor - whether or not the tick is a major or minor tick.
+     * @returns {Slider} 'this' reference, for chaining.
      */
     _addTick( value, label, isMajor ) {
       assert( typeof value === 'number' && this._range.contains( value ), `invalid value: ${ value }` );
@@ -233,6 +236,7 @@ define( require => {
       }
       this._thumb.moveToFront();
       this.layout( this.screenViewScale );
+      return this;
     }
 
     /**
