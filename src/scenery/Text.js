@@ -86,7 +86,6 @@ define( require => {
     get stroke() { return this._stroke; }
     get strokeWidth() { return this._strokeWidth; }
     get textRendering() { return this._textRendering; }
-    get text() { return this._text; }
 
     //----------------------------------------------------------------------------------------
 
@@ -103,7 +102,6 @@ define( require => {
       super.setText( text );
       this._updateTextBounds();
     }
-    set text( text ) { this.setText( text ); }
 
     /**
      * Sets the font-style of the Text. See https://www.w3schools.com/cssref/pr_font_font-style.asp.
@@ -286,7 +284,7 @@ define( require => {
     }
 
     /**
-     * Approximates the bounds of a Text Node using a DOM-based svg method.
+     * Approximates the bounds of a Text Node using a DOM-based  method.
      * Different methods of approximations have been discussed here:
      * https://stackoverflow.com/questions/118241/calculate-text-width-with-javascript.
      *
@@ -305,41 +303,32 @@ define( require => {
      */
     static _approximateTextBounds( text ) {
 
-      // Initialize the containers and elements required for SVG text measurement.
-      if ( !Text.testSVGText ) {
-        Text.testSVGTextParent = new DOMObject( {
-          type: 'svg',
+      // Initialize our test text element.
+      if ( !Text.testElement ) {
+        Text.testElement = new DOMObject( {
           id: 'scenery-test-text-size-element',
           style: {
-            opacity: 0,
             whiteSpace: 'nowrap',
             position: 'absolute',
-            left: '-65535px', // Ensure that it is not visible to the user.
-            top: '-65535px'
+            visibility: 'hidden',
+            textRendering: 'geometricPrecision'
           }
         } );
-        Text.testSVGText = new DOMObject( { type: 'text', attributes: { 'text-rendering': 'geometricPrecision' } } );
-
-        Text.testSVGTextParent.addChild( Text.testSVGText );
-        document.body.appendChild( Text.testSVGTextParent.element );
+        document.body.appendChild( Text.testElement.element );
       }
       // Set the text and font of the svg text element determine its width and height.
-      Text.testSVGText.text = text.text;
-      Text.testSVGText.style.font = text._generateCSS3FontString( 1 );
-
-      return Text.testSVGText.element.getBoundingClientRect();
+      Text.testElement.text = text.text;
+      Text.testElement.style.font = text._generateCSS3FontString( 1 );
+      return Text.testElement.element.getBoundingClientRect();
     }
   }
 
   // @private {DOMObject} - Test DOMObject element, used to find the size of text elements.
-  Text.testSVGText;
-
-  // @private {DOMObject} - Container for the SVG test element, which will be connected to the document body.
-  Text.testSVGTextParent;
+  Text.testElement;
 
   // @protected @override {string[]} - setter names specific to Text. See Node.MUTATOR_KEYS for documentation.
   Text.MUTATOR_KEYS = [ 'fontSize', 'fontFamily', 'fontStyle', 'fontWeight', 'fontStretch',
-                        'fill', 'stroke', 'strokeWidth', 'shapeRendering', 'text', ...Node.MUTATOR_KEYS ];
+                        'fill', 'stroke', 'strokeWidth', 'shapeRendering', ...Node.MUTATOR_KEYS ];
 
   return Text;
 } );
