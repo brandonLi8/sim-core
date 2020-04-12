@@ -1,4 +1,4 @@
-// Copyright © 2019-2020 Brandon Li. All rights reserved.
+// Copyright © 2020 Brandon Li. All rights reserved.
 
 /**
  * Control Set for changing and displaying the value of a number Property.

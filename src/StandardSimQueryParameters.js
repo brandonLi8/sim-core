@@ -19,7 +19,7 @@ define( require => {
   const StandardSimQueryParameters = QueryParameters.retrieve( {
 
     /**
-     * Enables assertions, which are disable unless this parameter is provided.
+     * Enables assertions, which are disabled unless this parameter is provided.
      * See './util/assert.js' for more details.
      * For internal testing only.
      */
