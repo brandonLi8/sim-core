@@ -22,7 +22,7 @@ define( require => {
   // modules
   const assert = require( 'SIM_CORE/util/assert' );
   const Node = require( 'SIM_CORE/scenery/Node' );
-  const NumberDisplay = require( 'ROTATIONAL_MOTION/common/view/NumberDisplay' );
+  const NumberDisplay = require( 'SIM_CORE/scenery/components/NumberDisplay' );
   const Property = require( 'SIM_CORE/util/Property' );
   const Range = require( 'SIM_CORE/util/Range' );
   const Slider = require( 'SIM_CORE/scenery/components/Slider' );

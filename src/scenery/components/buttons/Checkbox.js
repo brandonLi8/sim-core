@@ -16,7 +16,7 @@ define( require => {
 
   // modules
   const assert = require( 'SIM_CORE/util/assert' );
-  const Button = require( 'SIM_CORE/scenery/buttons/Button' );
+  const Button = require( 'SIM_CORE/scenery/components/buttons/Button' );
   const Node = require( 'SIM_CORE/scenery/Node' );
   const Path = require( 'SIM_CORE/scenery/Path' );
   const Property = require( 'SIM_CORE/util/Property' );

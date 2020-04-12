@@ -1,7 +1,7 @@
 // Copyright © 2019-2020 Brandon Li. All rights reserved.
 
 /**
- * A grouping of RadioButtons, which displays RadioButtons as a FlexBox. See sim-core/src/scenery/buttons/RadioButton
+ * A grouping of RadioButtons, which displays RadioButtons as a FlexBox. See scenery/components/buttons/RadioButton
  * for more documentation.
  *
  * A RadioButtonGroup toggles the value of a Enum Property (ie. a Property with a Enum value of a general Enum).
@@ -19,12 +19,12 @@ define( require => {
 
   // modules
   const assert = require( 'SIM_CORE/util/assert' );
-  const Button = require( 'SIM_CORE/scenery/buttons/Button' );
+  const Button = require( 'SIM_CORE/scenery/components/buttons/Button' );
   const Enum = require( 'SIM_CORE/util/Enum' );
   const FlexBox = require( 'SIM_CORE/scenery/FlexBox' );
   const Multilink = require( 'SIM_CORE/util/Multilink' );
   const Property = require( 'SIM_CORE/util/Property' );
-  const RadioButton = require( 'SIM_CORE/scenery/buttons/RadioButton' );
+  const RadioButton = require( 'SIM_CORE/scenery/components/buttons/RadioButton' );
   const Util = require( 'SIM_CORE/util/Util' );
 
   class RadioButtonGroup extends FlexBox {

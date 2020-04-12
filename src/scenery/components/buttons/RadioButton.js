@@ -21,7 +21,7 @@ define( require => {
   // modules
   const assert = require( 'SIM_CORE/util/assert' );
   const Bounds = require( 'SIM_CORE/util/Bounds' );
-  const Button = require( 'SIM_CORE/scenery/buttons/Button' );
+  const Button = require( 'SIM_CORE/scenery/components/buttons/Button' );
   const ColorWheel = require( 'SIM_CORE/util/ColorWheel' );
   const Enum = require( 'SIM_CORE/util/Enum' );
   const Node = require( 'SIM_CORE/scenery/Node' );

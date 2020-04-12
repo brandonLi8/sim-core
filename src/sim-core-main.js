@@ -7,10 +7,10 @@ define( [
   'SIM_CORE/core-internal/Loader',
   'SIM_CORE/core-internal/NavigationBar',
 
-  'SIM_CORE/scenery/buttons/Checkbox',
-  'SIM_CORE/scenery/buttons/PlayPauseButton',
-  'SIM_CORE/scenery/buttons/StepButton',
-  'SIM_CORE/scenery/buttons/TimeControlBox',
+  'SIM_CORE/scenery/components/buttons/Checkbox',
+  'SIM_CORE/scenery/components/buttons/PlayPauseButton',
+  'SIM_CORE/scenery/components/buttons/StepButton',
+  'SIM_CORE/scenery/components/buttons/TimeControlBox',
 
   'SIM_CORE/scenery/CircleNode',
   'SIM_CORE/scenery/LineNode',
