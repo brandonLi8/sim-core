@@ -25,7 +25,7 @@ define( require => {
   const NumberDisplay = require( 'ROTATIONAL_MOTION/common/view/NumberDisplay' );
   const Property = require( 'SIM_CORE/util/Property' );
   const Range = require( 'SIM_CORE/util/Range' );
-  const Slider = require( 'SIM_CORE/scenery/Slider' );
+  const Slider = require( 'SIM_CORE/scenery/components/Slider' );
 
   class NumberControlSet extends Node {
 

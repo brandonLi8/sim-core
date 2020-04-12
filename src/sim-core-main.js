@@ -18,7 +18,7 @@ define( [
   'SIM_CORE/scenery/Polygon',
   'SIM_CORE/scenery/Rectangle',
   'SIM_CORE/scenery/ScreenView',
-  'SIM_CORE/scenery/SliderNode',
+  'SIM_CORE/scenery/components/SliderNode',
   'SIM_CORE/scenery/SVGNode',
   'SIM_CORE/scenery/Text',
   'SIM_CORE/scenery/VectorNode',
