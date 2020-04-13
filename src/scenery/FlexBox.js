@@ -214,6 +214,24 @@ define( require => {
     _recomputeAncestorBounds() {
       if ( this._isUpdatingLayout === false ) this._updateLayout();
     }
+
+    /**
+     * Static FlexBox creator convenience method that returns a horizontal FlexBox.
+     * @public
+     *
+     * @param {Object} [options] - passed to the FlexBox constructor
+     * @returns {FlexBox}
+     */
+    static horizontal( options ) { return new FlexBox( 'horizontal', options ); }
+
+    /**
+     * Static FlexBox creator convenience method that returns a vertical FlexBox.
+     * @public
+     *
+     * @param {Object} [options] - passed to the FlexBox constructor
+     * @returns {FlexBox}
+     */
+    static vertical( options ) { return new FlexBox( 'vertical', options ); }
   }
 
   // @protected @override {string[]} - setter names specific to FlexBox. See Node.MUTATOR_KEYS for documentation.
