@@ -38,8 +38,8 @@ define( require => {
         stroke: 'black',  // {string|Gradient} - the stroke of the background rectangle
         cornerRadius: 7,  // {number} - the corner radius of the background rectangle
         strokeWidth: 1,   // {number} - the stroke-width of the background rectangle
-        xMargin: 16,      // {number} - the x-margin between the background rectangle and the content
-        yMargin: 26,      // {number} - the y-margin between the background rectangle and the content
+        xMargin: 18.5,    // {number} - the x-margin between the background rectangle and the content
+        yMargin: 27,      // {number} - the y-margin between the background rectangle and the content
 
         // Rewrite options so that the passed-in options overrides the defaults.
         ...options
