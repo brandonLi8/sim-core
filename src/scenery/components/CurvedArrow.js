@@ -43,12 +43,12 @@ define( require => {
 
       options = {
 
-        headHeight: 8,     // {number} - the head-height of the curved arrow.
-        headWidth: 11,     // {number} - the head-width of the curved arrow.
-        tailWidth: 1.2,    // {number} - the tail-width of the curved arrow.
-        fill: 'black',     // {string} - the fill of the curved arrow.
-        clockwise: false,  // {boolean} - indicates if the arrow is in clockwise direction
-
+        headHeight: 8,        // {number} - the head-height of the curved arrow.
+        headWidth: 11,        // {number} - the head-width of the curved arrow.
+        tailWidth: 1.2,       // {number} - the tail-width of the curved arrow.
+        fill: 'black',        // {string} - the fill of the curved arrow.
+        clockwise: false,     // {boolean} - indicates if the arrow is in clockwise direction
+        adjustEndAngle: true, // {boolean} - indicates if the end angle should be adjusted to include the head or not
         ...options
       };
       super( 0, 0, 0, 0, options );
@@ -62,6 +62,7 @@ define( require => {
       this._startAngle = startAngle;
       this._endAngle = endAngle;
       this._arcCenter = arcCenter.copy();
+      this._adjustEndAngle = options.adjustEndAngle;
       this._updateArrowShape();
     }
 
@@ -151,7 +152,8 @@ define( require => {
         const outerRadius = this._radius + this.tailWidth / 2;
 
         // Make sure that head height is less than half the arc length.
-        const headHeight = Math.min( this._headHeight, 0.5 * ( this._radius * ( this.endAngle - this.startAngle ) ) );
+        const arcLength = this._radius * Math.abs( this.endAngle - this.startAngle );
+        const headHeight = Math.min( this._headHeight, 0.5 * arcLength );
 
         // The arrowhead subtended angle is defined as the angle between the vector from the center to the tip of the
         // arrow and the vector of the center to first point the arc and the triangle intersect
@@ -160,20 +162,21 @@ define( require => {
         // The corrected angle is the angle that is between the vector that goes from the center to the first point the
         // arc and the triangle intersect and the vector along the baseline (x-axis). This is used instead to create a
         // more accurate angle excluding the size of the triangle.
-        const endAngle = this._clockwise ?
-                         this.endAngle + arrowheadSubtendedAngle :
-                         this.endAngle - arrowheadSubtendedAngle;
+        const endAngle = this._adjustEndAngle ? ( this._clockwise ?
+                                                  this.endAngle + arrowheadSubtendedAngle :
+                                                  this.endAngle - arrowheadSubtendedAngle ) : this._endAngle;
+
 
         // Find and reference the tip location of the arrow head.
-        const arrowHeadTip = new Vector( 0, this.radius ).setAngle( -endAngle ).add( this.arcCenter )
-            .add( V( 0, 1 ).setAngle( -endAngle - Math.PI / 2 ).multiply( headHeight ) );
+        const arrowHeadTip = new Vector( 0, this.radius ).setAngle( -endAngle ).add( this.arcCenter ).add( V( 0, 1 )
+            .setAngle( -endAngle + ( this._clockwise ? Math.PI / 2 : -Math.PI / 2 ) ).multiply( headHeight ) );
 
         // Set the shape attribute of the Grandparent class (which is Path). See
         // https://stackoverflow.com/questions/55228720/how-to-call-setter-of-grandparent-class-in-javascript
         Object.getOwnPropertyDescriptor( Path.prototype, 'shape' ).set.call( this, new Shape()
-          .arc( this.arcCenter, outerRadius, -endAngle, -this.startAngle, this.clockwise )
+          .arc( this.arcCenter, outerRadius, -endAngle, -this.startAngle, this._clockwise )
           .lineToPoint( V( 0, innerRadius ).setAngle( -this.startAngle ).add( this.arcCenter ) )
-          .arc( this.arcCenter, innerRadius, -this.startAngle, -endAngle, !this.clockwise )
+          .arc( this.arcCenter, innerRadius, -this.startAngle, -endAngle, !this._clockwise )
           .lineToPoint( V( 0, this.radius - this.headWidth / 2 ).setAngle( -endAngle ).add( this.arcCenter ) )
           .lineToPoint( arrowHeadTip )
           .lineToPoint( V( 0, this.radius + this.headWidth / 2 ).setAngle( -endAngle ).add( this.arcCenter ) )

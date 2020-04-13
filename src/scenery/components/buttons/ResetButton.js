@@ -18,6 +18,7 @@ define( require => {
   const assert = require( 'SIM_CORE/util/assert' );
   const Button = require( 'SIM_CORE/scenery/components/buttons/Button' );
   const Circle = require( 'SIM_CORE/scenery/Circle' );
+  const CurvedArrow = require( 'SIM_CORE/scenery/components/CurvedArrow' );
   const Node = require( 'SIM_CORE/scenery/Node' );
   const Path = require( 'SIM_CORE/scenery/Path' );
   const Shape = require( 'SIM_CORE/util/Shape' );
@@ -49,8 +50,8 @@ define( require => {
         curvedArrowHeadWidth: 13.5,             // {number} - the head-width of the curved arrow.
         curvedArrowTailWidth: 6,                // {number} - the tail-width of the curved arrow.
         curvedArrowRadius: 13,                  // {number} - the radius of the curved arrow.
-        curvedArrowStartAngle: Math.PI * 1.95,  // {number} - the start angle of the curved arrow.
-        curvedArrowEndAngle: Math.PI * 1.65,    // {number} - the end angle of the curved arrow.
+        curvedArrowStartAngle: Math.PI * 1.65,  // {number} - the start angle of the curved arrow.
+        curvedArrowEndAngle: Math.PI * -0.05,   // {number} - the end angle of the curved arrow.
 
         // Rewrite options so that it overrides the defaults.
         ...options
@@ -58,25 +59,23 @@ define( require => {
 
       //----------------------------------------------------------------------------------------
 
-      // Generate the Curved Arrow Shape that goes inside the Reset Button
-      const curvedArrowShape = ResetButton.generateCurvedArrowShape(
-        options.curvedArrowStartAngle,
-        options.curvedArrowEndAngle,
+      // Create the Node that displays the a Curved Arrow shape.
+      const curvedArrow = new CurvedArrow( Vector.ZERO,
         options.curvedArrowRadius,
-        options.curvedArrowHeadHeight,
-        options.curvedArrowHeadWidth,
-        options.curvedArrowTailWidth
-      );
+        options.curvedArrowStartAngle,
+        options.curvedArrowEndAngle, {
+          fill: options.curvedArrowFill,
+          stroke: options.curvedArrowStroke,
+          strokeWidth: options.curvedArrowStrokeWidth,
+          headHeight: options.curvedArrowHeadHeight,
+          headWidth: options.curvedArrowHeadWidth,
+          tailWidth: options.curvedArrowTailWidth,
+          adjustEndAngle: false,
+          clockwise: true
+        } );
 
-      // Create the Node that displays the curvedArrowShape. Wrapped with a Node to offset the curvedArrow's triangle
-      // head which allows the center of the curved arrow be the center of the ResetButton.
-      const curvedArrow = new Node().addChild( new Path( curvedArrowShape, {
-        fill: options.curvedArrowFill,
-        stroke: options.curvedArrowStroke,
-        strokeWidth: options.curvedArrowStrokeWidth,
-        left: curvedArrowShape.bounds.maxX + curvedArrowShape.bounds.minX,
-        top: curvedArrowShape.bounds.maxY + curvedArrowShape.bounds.minY
-      } ) );
+      // Translate the curved Arrow so that the center of the curved arrow is curvedArrowTailWidth the center of the ResetButton.
+      curvedArrow.translate( Vector.scratch.setXY( curvedArrow.right, curvedArrow.bottom ) );
 
       // Create the ResetButton's background, which is just a shaded circle.
       const resetButtonBackground = new Circle( options.radius, {
@@ -85,7 +84,7 @@ define( require => {
         shapeRendering: 'geometricPrecision'
       } );
 
-      super( resetButtonBackground, curvedArrow, options );
+      super( resetButtonBackground, new Node().addChild( curvedArrow ), options );
 
       //----------------------------------------------------------------------------------------
 
@@ -98,38 +97,6 @@ define( require => {
       options.listener && this.interactionStateProperty.link( interactionState => {
         if ( interactionState === Button.interactionStates.PRESSED ) options.listener();
       } );
-    }
-
-    /**
-     * Static method that creates a clockwise curved Arrow shape used inside the ResetButton.
-     * NOTE: the center of the curved arrow will be at the origin.
-     * @public
-     *
-     * @param {number} startAngle
-     * @param {number} endAngle
-     * @param {number} radius
-     * @param {number} headHeight
-     * @param {number} headWidth
-     * @param {number} tailWidth
-     */
-    static generateCurvedArrowShape( startAngle, endAngle, radius, headHeight, headWidth, tailWidth ) {
-      assert( headWidth > tailWidth, 'tailWidth must be smaller than the headWidth' );
-      assert( radius > headWidth / 2, 'radius smaller than half of the headWidth' );
-      const innerRadius = radius - tailWidth / 2;
-      const outerRadius = radius + tailWidth / 2;
-
-      // Find and reference the tip location of the arrow head.
-      const arrowHeadTip = new Vector( 0, radius ).setAngle( -startAngle )
-          .add( Vector.scratch.setXY( 0, 1 ).setAngle( -startAngle + Math.PI / 2 ).multiply( headHeight ) );
-
-      return new Shape()
-        .arc( Vector.ZERO, outerRadius, -startAngle, -endAngle, true )   // draw the outer circle
-        .lineToPoint( Vector.scratch.setXY( 0, innerRadius ).setAngle( -endAngle ) )
-        .arc( Vector.ZERO, innerRadius, -endAngle, -startAngle, false )  // draw the inner circle
-        .lineToPoint( Vector.scratch.setXY( 0, radius - headWidth / 2 ).setAngle( -startAngle ) )
-        .lineToPoint( arrowHeadTip )
-        .lineToPoint( Vector.scratch.setXY( 0, radius + headWidth / 2 ).setAngle( -startAngle ) )
-        .close();
     }
   }
 
