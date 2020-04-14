@@ -1,4 +1,4 @@
-// Copyright © 2019-2020 Brandon Li. All rights reserved.
+// Copyright © 2020 Brandon Li. All rights reserved.
 
 /**
  * A ExpandCollapseButton is a Button sub-type for expanding/collapsing something. It displays a '-' when open (to
@@ -14,7 +14,7 @@
  */
 
 define( require => {
-  'use strict/';
+  'use strict';
 
   // modules
   const assert = require( 'SIM_CORE/util/assert' );
@@ -25,7 +25,6 @@ define( require => {
   const Property = require( 'SIM_CORE/util/Property' );
   const Rectangle = require( 'SIM_CORE/scenery/Rectangle' );
   const Shape = require( 'SIM_CORE/util/Shape' );
-  const Vector = require( 'SIM_CORE/util/Vector' );
 
   class ExpandCollapseButton extends Button {
 

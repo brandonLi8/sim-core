@@ -20,8 +20,6 @@ define( require => {
   const Circle = require( 'SIM_CORE/scenery/Circle' );
   const CurvedArrow = require( 'SIM_CORE/scenery/components/CurvedArrow' );
   const Node = require( 'SIM_CORE/scenery/Node' );
-  const Path = require( 'SIM_CORE/scenery/Path' );
-  const Shape = require( 'SIM_CORE/util/Shape' );
   const Vector = require( 'SIM_CORE/util/Vector' );
 
   class ResetButton extends Button {
@@ -74,7 +72,7 @@ define( require => {
           clockwise: true
         } );
 
-      // Translate the curved Arrow so that the center of the curved arrow is curvedArrowTailWidth the center of the ResetButton.
+      // Translate the curved Arrow so that the center of the curved arrow is the center of the ResetButton.
       curvedArrow.translate( Vector.scratch.setXY( curvedArrow.right, curvedArrow.bottom ) );
 
       // Create the ResetButton's background, which is just a shaded circle.
