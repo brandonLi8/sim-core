@@ -41,12 +41,12 @@ define( require => {
       options = {
 
         // button
-        expandedBaseColor: 'rgb( 255, 85, 0 )',    // {string} - the base color of the button when expanded
-        collapsedBaseColor: 'rgb( 0, 179, 0 )', // {string} - the base color of the button when expanded
-        buttonSize: 28,              // {number} - the width and height of the button background
-        buttonStroke: 'black',       // {string|Gradient} - the stroke of the border of the Button.
-        buttonStrokeWidth: 0.5,      // {number} - the stroke-width of the border of the Button.
-        buttonCornerRadius: 3,       // {number} - the corner radius of the box background.
+        expandedBaseColor: '#D92626',  // {string} - the base color of the button when expanded
+        collapsedBaseColor: '#3291B8', // {string} - the base color of the button when collapsed
+        buttonSize: 28,                // {number} - the width and height of the button background
+        buttonStroke: 'black',         // {string|Gradient} - the stroke of the border of the Button.
+        buttonStrokeWidth: 0.5,        // {number} - the stroke-width of the border of the Button.
+        buttonCornerRadius: 3,         // {number} - the corner radius of the box background.
 
         // expand-collapse
         expandCollapseStroke: 'white',  // {string} - the stroke color of the '+' and '-'
