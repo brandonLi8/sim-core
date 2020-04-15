@@ -68,7 +68,7 @@ define( require => {
       this._sliderTopMargin = options.sliderTopMargin;
 
       // @private {NumberDisplay} - the number display of the NumberControlSet
-      this._numberDisplay = new NumberDisplay( numberProperty, range, options.numberDisplayOptions );
+      this._numberDisplay = NumberDisplay.withRange( numberProperty, range, options.numberDisplayOptions );
 
       // @private {Slider} (read-only) - the slider of the NumberControlSet.
       this._slider = new Slider( range, numberProperty, options.sliderOptions );

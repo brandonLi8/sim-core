@@ -2,10 +2,12 @@
 
 /**
  * A NumberDisplay, which displays the value of a number Property in a Text Node on top of a background rectangle.
- *
  * The NumberDisplay will update when the number Property updates and will display a em-dash if the value is 'null'.
- * The background is a fixed width and height, determined by the largest-sized text within a numeric range. If the
- * number Property's value is ever outside the range and not null, an error will be thrown.
+ *
+ * The background of NumberDisplays are a fixed width and height. It is HIGHLY recommended to use
+ * NumberDisplay.withRange(), which will determine the size by the largest-sized text within a numeric range.
+ * See NumberDisplay.withRange() for more documentation. However, if **ABSOLUTELY** necessary, you can use the
+ * constructor, in which you provide the width and height.
  *
  * The NumberDisplay has various key-value options to customize the appearance of the NumberDisplay, including
  * the background Rectangle's appearance, the Text Node's appearance, and the alignment of the TextNode. In addition,
@@ -30,36 +32,38 @@ define( require => {
   const Util = require( 'SIM_CORE/util/Util' );
   const Vector = require( 'SIM_CORE/util/Vector' );
 
+  // constants
+  const DEFAULT_OPTIONS = {
+    xAlign: 'center',  // {string} - the alignment of the Text: 'left', 'center', or 'right'.
+    yAlign: 'center',  // {string} - the alignment of the Text: 'top', 'center', or 'bottom'.
+    unit: null,        // {Node} - if provided, this will be appended to the end of the Text as a unit.
+    unitSpacing: 6,    // {number} - spacing between a potential Unit node and the text.
+    decimalPlaces: 0,  // {number|null} the number of decimal places to show. If null, the full value is displayed.
+    cornerRadius: 0,   // {number} - the corner radius of the background
+
+    backgroundFill: 'white',        // {string|Gradient} the fill of the background
+    backgroundStroke: 'lightGray',  // {string|Gradient} the stroke of the background
+    backgroundStrokeWidth: 1,       // {number} the stroke-width of the background
+
+    // {Object} - if provided, these options will be passed to the Text instance
+    textOptions: null
+  };
+
   class NumberDisplay extends Node {
 
     /**
      * @param {Property.<number|null>} numberProperty
-     * @param {Range} range - this range of the numberProperty, used to determine the background width & height.
+     * @param {number} width - the fixed width of the NumberDisplay. Consider using NumberDisplay.withRange().
+     * @param {number} width - the fixed height of the NumberDisplay. Consider using NumberDisplay.withRange().
      * @param {Object} [options] - Various key-value pairs that control the appearance and behavior. See the code where
      *                             the options are set in the early portion of the constructor for details.
      */
-    constructor( numberProperty, range, options ) {
+    constructor( numberProperty, width, height, options ) {
       assert( numberProperty instanceof Property, `invalid numberProperty: ${ numberProperty }` );
-      assert( range instanceof Range, `invalid range: ${ range }` );
       assert( !options || Object.getPrototypeOf( options ) === Object.prototype, `invalid options: ${ options }` );
 
       options = {
-
-        xAlign: 'center',  // {string} - the alignment of the Text: 'left', 'center', or 'right'.
-        yAlign: 'center',  // {string} - the alignment of the Text: 'top', 'center', or 'bottom'.
-        unit: null,        // {Node} - if provided, this will be appended to the end of the Text as a unit.
-        unitSpacing: 6,    // {number} - spacing between a potential Unit node and the text.
-        decimalPlaces: 0,  // {number|null} the number of decimal places to show. If null, the full value is displayed.
-        xMargin: 14,       // {number} - the x-margin between the longest/tallest Text and the background.
-        yMargin: 4,        // {number} - the x-margin between the longest/tallest Text and the background.
-        cornerRadius: 0,   // {number} - the corner radius of the background
-
-        backgroundFill: 'white',        // {string|Gradient} the fill of the background
-        backgroundStroke: 'lightGray',  // {string|Gradient} the stroke of the background
-        backgroundStrokeWidth: 1,       // {number} the stroke-width of the background
-
-        // {Object} - if provided, these options will be passed to the Text instance
-        textOptions: null,
+        ...DEFAULT_OPTIONS,
 
         // Rewrite options so that it overrides the defaults.
         ...options
@@ -71,23 +75,13 @@ define( require => {
 
       // @private {*} - see options declaration for documentation. Referenced for use in our methods.
       this._numberProperty = numberProperty;
-      this._range = range;
       this._xAlign = options.xAlign;
       this._yAlign = options.yAlign;
       this._unit = options.unit;
       this._decminalPlaces = options.decimalPlaces;
 
-      // Determine the widest value first.
-      const minValueString = `${ range.min.toFixed( this._decminalPlaces ) } `;
-      const maxValueString = `${ range.min.toFixed( this._decminalPlaces ) } `;
-      const longestValueString = minValueString.length > maxValueString.length ? minValueString : maxValueString;
-
       // @private {Text} - create the value Node which displays the Text of the number Property.
-      this._value = new Text( longestValueString, options.textOptions );
-
-      // Determine the width and height of the NumberDisplay, which doesn't change.
-      const width = this._value.width + 2 * options.xMargin + ( this._unit ? this._unit.width : 0 );
-      const height = Math.max( this._value.height, ( this._unit ? this._unit.height : 0 ) || 0 ) + 2 * options.yMargin;
+      this._value = new Text( numberProperty.value, options.textOptions );
 
       // @private {Rectangle} - create the Rectangle background Node
       this._background = new Rectangle( width, height, {
@@ -133,9 +127,6 @@ define( require => {
      * Updates the Text center location to match the alignments.
      */
     _updateNumberDisplay() {
-      assert( this._numberProperty.value === null || this._range.contains( this._numberProperty.value ),
-        `numberProperty outside of range of NumberDisplay range: ${ this._numberProperty.value }` );
-
       // If the Unit Node was provided and isn't a child of our content container, add it as a child.
       if ( this._unit && !this._content.hasChild( this._unit ) ) this._content.addChild( this._unit );
 
@@ -158,6 +149,42 @@ define( require => {
 
       this._content[ xAlignKey ] = this._background[ xAlignKey ];
       this._content[ yAlignKey ] = this._background[ yAlignKey ];
+    }
+
+    /**
+     * Static NumberDisplay creator that determines the width and height from a numeric range.
+     * @public
+     *
+     * @param {Property.<number|null>} numberProperty
+     * @param {Range} numberRange
+     * @param {Object} [options] - Various key-value pairs that control the appearance and behavior. See the code where
+     *                             the options are set in the early portion of the constructor for details.
+     * @return {NumberDisplay}
+     */
+    static withRange( numberProperty, numberRange, options ) {
+      assert( numberRange instanceof Range, `invalid numberRange: ${ numberRange }` );
+
+      options = {
+        ...DEFAULT_OPTIONS,
+
+        xMargin: 14, // {number} - the x-margin between the longest/tallest Text and the background.
+        yMargin: 4,  // {number} - the y-margin between the longest/tallest Text and the background.
+
+        // Rewrite options so that it overrides the defaults.
+        ...options
+      };
+
+      // Determine the widest value first.
+      const min = numberRange.min.toFixed( options.decimalPlaces );
+      const max = numberRange.max.toFixed( options.decimalPlaces );
+      const longestValueString = min.toString().length > max.toString().length ? min : max;
+      const text = new Text( longestValueString, options.textOptions );
+
+      // Determine the width and height of the NumberDisplay, which doesn't change.
+      const width = text.width + 2 * options.xMargin + ( options.unit ? options.unit.width : 0 );
+      const height = Math.max( text.height, ( options.unit ? options.unit.height : 0 ) || 0 ) + 2 * options.yMargin;
+
+      return new NumberDisplay( numberProperty, width, height, options );
     }
   }
 

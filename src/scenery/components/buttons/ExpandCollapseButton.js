@@ -43,15 +43,15 @@ define( require => {
         // button
         expandedBaseColor: '#D92626',  // {string} - the base color of the button when expanded
         collapsedBaseColor: '#3291B8', // {string} - the base color of the button when collapsed
-        buttonSize: 28,                // {number} - the width and height of the button background
+        buttonSize: 25,                // {number} - the width and height of the button background
         buttonStroke: 'black',         // {string|Gradient} - the stroke of the border of the Button.
         buttonStrokeWidth: 0.5,        // {number} - the stroke-width of the border of the Button.
         buttonCornerRadius: 3,         // {number} - the corner radius of the box background.
 
         // expand-collapse
         expandCollapseStroke: 'white',  // {string} - the stroke color of the '+' and '-'
-        expandCollapseStrokeWidth: 4,   // {number} - the stroke width of the '+' and '-'
-        expandCollapseSize: 17,         // {number} - the width and height of the '+' and '-'
+        expandCollapseStrokeWidth: 3.5, // {number} - the stroke width of the '+' and '-'
+        expandCollapseSize: 14,         // {number} - the width and height of the '+' and '-'
 
         // Rewrite options so that it overrides the defaults.
         ...options
