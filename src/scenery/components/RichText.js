@@ -84,6 +84,19 @@ define( require => {
     }
 
     /**
+     * @override
+     * Sets the html displayed by the RichText.
+     * @public
+     *
+     * @param {string|null} text - if null, nothing is displayed
+     * @returns {DOMObject} - Returns 'this' reference, for chaining
+     */
+    setText( text ) {
+      if ( text === this._richText ) return; // exit if setting to the same text
+      this._buildRichText();
+    }
+
+    /**
      * Builds the Rich Text sub-scene graph. This is the main recursive function for constructing the RichText Node
      * sub-tree. Normally called when our rich text changes.
      * @private
