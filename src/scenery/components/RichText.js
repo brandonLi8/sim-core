@@ -42,10 +42,10 @@ define( require => {
 
         subScale: 0.75,  // {number} - Sets the scale of any subscript elements
         subXSpacing: 0,  // {number} - Sets horizontal spacing before any subscript elements
-        subYOffset: 0,   // {number} - Sets vertical offset for any subscript elements
+        subYOffset: 3,   // {number} - Sets vertical offset for any subscript elements
         supScale: 0.75,  // {number} - Sets the scale for any superscript elements
         supXSpacing: 0,  // {number} - Sets the horizontal offset before any superscript elements
-        supYOffset: 0,   // {number} - Sets the vertical offset for any superscript elements
+        supYOffset: 3,   // {number} - Sets the vertical offset for any superscript elements
 
 
         // Rewrite options so that it overrides the defaults.
@@ -132,9 +132,8 @@ define( require => {
       appendChildren( RichText.testElement.element.childNodes );
 
       // Position our containers
-      this._supContainer.top = 0;
-      this._textContainer.centerY = this._supContainer.centerY + this._supYOffset;
-      this._subContainer.top = this._textContainer.centerY + this._subYOffset;
+      this._supContainer.centerY = this._textContainer.centerY - this._supYOffset;
+      this._subContainer.centerY = this._textContainer.centerY + this._subYOffset;
     }
 
     /**
