@@ -47,6 +47,9 @@ define( require => {
         supXSpacing: 0,  // {number} - Sets the horizontal offset before any superscript elements
         supYOffset: 1,   // {number} - Sets the vertical offset for any superscript elements
 
+        // {boolean} - if true, Rich Text will ignore the bounds of the super and subscripts so that its bounds is only
+        //             the bounds of the main-line text.
+        ingoreNonInlineBounds: false,
 
         // Rewrite options so that it overrides the defaults.
         ...options
@@ -63,6 +66,7 @@ define( require => {
       this._supScale = options.supScale;
       this._supXSpacing = options.supXSpacing;
       this._supYOffset = options.supYOffset;
+      this._ignoreNonInlineBounds = options.ingoreNonInlineBounds;
 
       // @private {string} - reference our rich text
       this._richText = text;
@@ -134,6 +138,10 @@ define( require => {
       // Position our containers
       this._supContainer.centerY = this._textContainer.centerY - this._supYOffset;
       this._subContainer.centerY = this._textContainer.centerY + this._subYOffset;
+
+      if ( this._ignoreNonInlineBounds ) {
+        this.bounds.set( this._textContainer.bounds.copy().shift( this.left, this.top ) );
+      }
     }
 
     /**
