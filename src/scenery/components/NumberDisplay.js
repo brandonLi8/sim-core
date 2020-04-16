@@ -34,12 +34,13 @@ define( require => {
 
   // constants
   const DEFAULT_OPTIONS = {
-    xAlign: 'center',  // {string} - the alignment of the Text: 'left', 'center', or 'right'.
-    yAlign: 'center',  // {string} - the alignment of the Text: 'top', 'center', or 'bottom'.
-    unit: null,        // {Node} - if provided, this will be appended to the end of the Text as a unit.
-    unitSpacing: 6,    // {number} - spacing between a potential Unit node and the text.
-    decimalPlaces: 0,  // {number|null} the number of decimal places to show. If null, the full value is displayed.
-    cornerRadius: 0,   // {number} - the corner radius of the background
+    xAlign: 'center',     // {string} - the alignment of the Text: 'left', 'center', or 'right'.
+    yAlign: 'center',     // {string} - the alignment of the Text: 'top', 'center', or 'bottom'.
+    unit: null,           // {Node} - if provided, this will be appended to the end of the Text as a unit.
+    unitAlign: 'center',  // {string} - the alignment of the unit relative to the text: 'bottom', 'center', or 'top'.
+    unitSpacing: 6,       // {number} - spacing between a potential Unit node and the text.
+    decimalPlaces: 0,     // {number|null} the number of decimal places to show. If null, the full value is displayed.
+    cornerRadius: 0,      // {number} - the corner radius of the background
 
     backgroundFill: 'white',        // {string|Gradient} the fill of the background
     backgroundStroke: 'lightGray',  // {string|Gradient} the stroke of the background
@@ -94,7 +95,11 @@ define( require => {
       //----------------------------------------------------------------------------------------
 
       // @private {AlignBox} - create the content Node of the number display
-      this._content = new FlexBox( 'horizontal', { spacing: options.unitSpacing } ).addChild( this._value );
+      this._content = FlexBox.horizontal( {
+        align: options.unitAlign,
+        spacing: options.unitSpacing,
+        children: [ this._value ]
+      } );
 
       // Add the Unit as a child if provided.
       if ( this._unit ) this._content.addChild( this._unit );
