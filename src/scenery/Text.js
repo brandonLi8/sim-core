@@ -244,8 +244,8 @@ define( require => {
     layout( scale ) {
       if ( !scale ) return; // Exit if no scale was provided.
 
-      // Set the 'dy' attribute to shift the Text downwards so that its top is at 0.
-      if ( !this.element.hasAttribute( 'dy' ) ) { this.setAttribute( 'dy', '0.92em' ); }
+      // Shift the Text downwards so that its top is at 0. This number is approximated and is consistent across browsers
+      this.setAttribute( 'y', this.height * scale * 0.81 );
 
       // Scale the stroke-width of the Text to pixels.
       this.setAttribute( 'stroke-width', this._strokeWidth * scale );

@@ -40,12 +40,12 @@ define( require => {
         // {Object} - if provided, these options will be passed to Text instances
         textOptions: null,
 
-        subScale: 0.75,  // {number} - Sets the scale of any subscript elements
+        subScale: 0.69,  // {number} - Sets the scale of any subscript elements
         subXSpacing: 0,  // {number} - Sets horizontal spacing before any subscript elements
-        subYOffset: 3,   // {number} - Sets vertical offset for any subscript elements
-        supScale: 0.75,  // {number} - Sets the scale for any superscript elements
+        subYOffset: 6,   // {number} - Sets vertical offset for any subscript elements
+        supScale: 0.69,  // {number} - Sets the scale for any superscript elements
         supXSpacing: 0,  // {number} - Sets the horizontal offset before any superscript elements
-        supYOffset: 3,   // {number} - Sets the vertical offset for any superscript elements
+        supYOffset: 1,   // {number} - Sets the vertical offset for any superscript elements
 
 
         // Rewrite options so that it overrides the defaults.
