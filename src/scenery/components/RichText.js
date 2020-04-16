@@ -19,18 +19,10 @@ define( require => {
   'use strict';
 
   // modules
-  const AlignBox = require( 'SIM_CORE/scenery/AlignBox' );
   const assert = require( 'SIM_CORE/util/assert' );
   const DOMObject = require( 'SIM_CORE/core-internal/DOMObject' );
-  const FlexBox = require( 'SIM_CORE/scenery/FlexBox' );
   const Node = require( 'SIM_CORE/scenery/Node' );
-  const Property = require( 'SIM_CORE/util/Property' );
-  const Range = require( 'SIM_CORE/util/Range' );
-  const Rectangle = require( 'SIM_CORE/scenery/Rectangle' );
-  const Symbols = require( 'SIM_CORE/util/Symbols' );
   const Text = require( 'SIM_CORE/scenery/Text' );
-  const Util = require( 'SIM_CORE/util/Util' );
-  const Vector = require( 'SIM_CORE/util/Vector' );
 
   class RichText extends Node {
 
@@ -81,6 +73,9 @@ define( require => {
       this._supContainer = new Node();
       this.children = [ this._textContainer, this._subContainer, this._supContainer ];
 
+      // @private {number} - flag of where to position our next in-line Text Node relative to the last Node.
+      this._nextTextPosition = 0;
+
       // Initialize our RichText sub-tree
       this._buildRichText();
 
@@ -89,10 +84,15 @@ define( require => {
     }
 
     /**
-     * Builds the Rich Text sub-scene graph.
+     * Builds the Rich Text sub-scene graph. This is the main recursive function for constructing the RichText Node
+     * sub-tree. Normally called when our rich text changes.
      * @private
+     *
+     * This parsing our rich text HTML and splits it into multiple Text children.
+     * NOTE: this method executes a recursive function, and may incur some performance loss.
      */
     _buildRichText() {
+      // Set our testElement's innerHTML to parse our rich Text into in-line components.
       RichText.testElement.element.innerHTML = this._richText;
 
       // Reset our containers.
@@ -100,38 +100,69 @@ define( require => {
       this._subContainer.removeAllChildren();
       this._supContainer.removeAllChildren();
 
-      // https://stackoverflow.com/questions/22754315/for-loop-for-htmlcollection-elements
-      assert.enabled && Array.prototype.forEach.call( RichText.testElement.element.getElementsByTagName( '*' ), element => {
+      // Bail early if the richText is empty.
+      if ( !this._richText ) return;
 
-        // https://developer.mozilla.org/en-US/docs/Web/API/Node/nodeName
-        assert( [ 'SUB', 'SUP' ].includes( element.nodeName ), `unrecognized RichText tag: ${ element.nodeName }` );
-      } );
+      // Function that appends each child (with this._appendElement) of a children array and recurses down the tree.
+      const appendChildren = children => {
+        children.forEach( child => {
+          this._appendElement( child ); // Append the child first
 
-      let nextTextLeftLocation = 0;
-      RichText.testElement.element.childNodes.forEach( element => {
-        const text = new Text( element.textContent, this._textOptions );
+          // If the child is a element (not a text element), recurse this function down its sub-tree. Use
+          // element.children to NOT include text nodes. See
+          // https://developer.mozilla.org/en-US/docs/Web/API/Node/childNodes.
+          if ( child.nodeType === 1 ) appendChildren( [ ...child.children ] );
+        } );
+      };
 
-        if ( element.nodeName === 'SUB' ) {
-          text.scale( this._subScale );
-          text.left = nextTextLeftLocation + this._subXSpacing;
-          this._subContainer.addChild( text );
-        }
-        else if ( element.nodeName === 'SUP' ) {
-          text.scale( this._supScale );
-          text.left = nextTextLeftLocation + this._supXSpacing;
-          this._supContainer.addChild( text );
-        }
-        else {
-          text.left = nextTextLeftLocation;
-          this._textContainer.addChild( text );
-        }
-        nextTextLeftLocation = text.right;
-      } );
+      // Call AppendChildren of the RichText testElement. Use element.childNodes, which includes Text Nodes.
+      appendChildren( RichText.testElement.element.childNodes );
 
-      // Position containers
+      // Position our containers
       this._supContainer.top = 0;
       this._textContainer.centerY = this._supContainer.centerY + this._supYOffset;
       this._subContainer.top = this._textContainer.centerY + this._subYOffset;
+    }
+
+    /**
+     * Appends a in-line HTMLElement, which is either a <sub>, <sup>, or #text element, to one of our RichText children
+     * containers.
+     * @private
+     *
+     * This is called on each recursive in-line element in each buildRichText() call.
+     *
+     * @param {HTMLElement} element - the in-line element of the Rich Text
+     */
+    _appendElement( element ) {
+
+      // Create the Text Node to be added to our RichText children containers
+      const inlineText = new Text( element.firstChild ?
+                                   element.firstChild.textContent :
+                                   element.textContent, this._textOptions );
+
+      // Get the element type with element.nodeName. See https://developer.mozilla.org/en-US/docs/Web/API/Node/nodeName
+      const type = element.nodeName.toLowerCase();
+
+      // Subscript
+      if ( type === 'sub' ) {
+        inlineText.scale( this._subScale );
+        inlineText.left = this._nextTextPosition + this._subXSpacing;
+        this._subContainer.addChild( inlineText );
+      }
+      // Superscript
+      else if ( type === 'sup' ) {
+        inlineText.scale( this._supScale );
+        inlineText.left = this._nextTextPosition + this._supXSpacing;
+        this._supContainer.addChild( inlineText );
+      }
+      // Plain Text
+      else {
+        assert( type === '#text', `unrecognized RichText inline tag: ${ type }` );
+        inlineText.left = this._nextTextPosition;
+        this._textContainer.addChild( inlineText );
+      }
+      // Update our nextTextPosition flag.
+      this._nextTextPosition = inlineText.right;
     }
   }
 
