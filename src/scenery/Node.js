@@ -77,7 +77,7 @@ define( require => {
         // transformations
         translation: null,  // {Vector} - If provided, (x, y) translation of the Node. See set translation().
         rotation: 0,        // {number} - rotation (in radians) of the Node. See set rotation() for more doc.
-        scale: 1,           // {Vector|number} - scale of the Node. See scale() for more doc.
+        scalar: 1,          // {Vector|number} - scalar of the Node. See set scalar() for more doc.
 
         // Overrides the location of the Node, if provided. See setLocation() for more doc.
         topLeft: null,      // {Vector} - The upper-left corner of this Node's bounds.
@@ -398,6 +398,7 @@ define( require => {
      */
     set scalar( a ) {
       if ( a instanceof Vector ) {
+        if ( !( isFinite( this._scalar ) || this._scalar instanceof Vector ) ) this.scale( 1 ); // First time
         if ( this._scalar instanceof Vector && this._scalar.equals( a ) ) return; // Exit if setting to the same scale.
         if ( a.x === this._scalar && a.y === this._scalar ) return; // Exit if setting to the same scale.
 
@@ -529,15 +530,15 @@ define( require => {
       const scaleX = ( this._scalar instanceof Vector ? this._scalar.x : this._scalar ).toFixed( 10 );
       const scaleY = ( this._scalar instanceof Vector ? this._scalar.y : this._scalar ).toFixed( 10 );
       const rotation = ( Util.toDegrees( this.rotation ) ).toFixed( 10 );
-      const translateX = ( this._bounds.minX * scale ).toFixed( 10 );  // Scale to convert to pixels.
-      const translateY = ( this._bounds.minY * scale ).toFixed( 10 );  // Scale to convert to pixels.
+      const translateX = ( this._bounds.minX * scale / scaleX );  // Scale to convert to pixels.
+      const translateY = ( this._bounds.minY * scale / scaleY );  // Scale to convert to pixels.
       const width = ( this.width * scale ).toFixed( 10 );              // Scale to convert to pixels.
       const height = ( this.height * scale ).toFixed( 10 );            // Scale to convert to pixels.
 
       // Create a flag for the final transform attribute string.
-      const transformString = `translate( ${ translateX } ${ translateY } )`
+      const transformString = `scale( ${ scaleX } ${ scaleY } )`
                               + ` rotate( ${ rotation } ${ width / 2 } ${ height / 2 } )`
-                              + ` scale( ${ scaleX } ${ scaleY } )`;
+                              + ` translate( ${ translateX } ${ translateY } )`;
 
       // Set the svg transform attribute and reference the new screenViewScale.
       this.setAttribute( 'transform', transformString );
@@ -681,7 +682,7 @@ define( require => {
 
   // @protected {string[]} - setter names used in Node.mutate(), in the order that the setters are called.
   //                         The order is important! Don't change this without knowing the implications.
-  Node.MUTATOR_KEYS = [ 'children', 'opacity', 'cursor', 'visible', 'rotation', 'width', 'height', 'scale',
+  Node.MUTATOR_KEYS = [ 'children', 'opacity', 'cursor', 'visible', 'rotation', 'width', 'height', 'scalar',
                         'maxWidth', 'maxHeight', 'translation', 'topLeft', 'topCenter', 'topRight',
                         'centerLeft', 'center', 'centerRight', 'bottomLeft', 'bottomCenter',
                         'bottomRight', 'left', 'right', 'centerX', 'top', 'bottom', 'centerY' ];

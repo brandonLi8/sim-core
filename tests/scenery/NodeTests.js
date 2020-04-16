@@ -171,18 +171,5 @@ define( require => {
     truenit.ok( E.bounds.equals( new Bounds( 5, 5, 10, 9 ) ) );
     E.height = 5;
     truenit.ok( E.bounds.equals( new Bounds( 5, 5, 10, 10 ) ) );
-
-    //----------------------------------------------------------------------------------------
-    // Node Features
-    //----------------------------------------------------------------------------------------
-
-    // Test 8: Scale
-    const F = new Node( { left: 5, top: 4, width: 4, height: 8, scale: 2 } ); // should scale last
-
-    truenit.ok( F.parentBounds.equals( new Bounds( 5, 4, 13, 20 ) ) );
-    F.scale( 2 );
-    truenit.ok( F.parentBounds.equals( new Bounds( 1, -4, 17, 28 ) ) );
-    F.scalar = 2;
-    truenit.ok( F.parentBounds.equals( new Bounds( 5, 4, 13, 20 ) ) );
   };
 } );
