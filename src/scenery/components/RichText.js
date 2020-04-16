@@ -1,4 +1,4 @@
-// Copyright © 2019-2020 Brandon Li. All rights reserved.
+// Copyright © 2020 Brandon Li. All rights reserved.
 
 /**
  * RichText is similar to Text but interprets the input text as HTML, supporting some in-line tags. It does this by
