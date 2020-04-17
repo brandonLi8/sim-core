@@ -36,7 +36,7 @@ define( require => {
       options = {
         fill: 'white',    // {string|Gradient} - the fill of the background rectangle
         stroke: 'black',  // {string|Gradient} - the stroke of the background rectangle
-        cornerRadius: 7,  // {number} - the corner radius of the background rectangle
+        cornerRadius: 5,  // {number} - the corner radius of the background rectangle
         strokeWidth: 1,   // {number} - the stroke-width of the background rectangle
         xMargin: 18.5,    // {number} - the x-margin between the background rectangle and the content
         yMargin: 27,      // {number} - the y-margin between the background rectangle and the content
