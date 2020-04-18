@@ -141,13 +141,17 @@ define( require => {
     /**
      * Applies the 'fill' of a Button's background to make it look 3D by using gradients that create the illusion of
      * shadows and highlights. Will set the 'idleFill', 'hoverFill' and 'pressedFill' properties of the Button, and will
-     * automatically switch Gradients when the interaction state changes.
+     * automatically switch Gradients when the interaction state changes. You also may pass a stops array to customize
+     * shading for your custom button.
      * @public
      *
      * @param {Button} button - the button to apply the gradients to
      * @param {string} baseColor - any valid CSS color string
+     * @param {number[][]} [stops] - OPTIONAL Array of an array of length 2, where the first item represents the shade
+     *                               factor and the second item represents the stop percentage. Each array of length 2
+     *                               represents stop of the Gradient. See stops declaration for the default config.
      */
-    static apply3DGradients( button, baseColor ) {
+    static apply3DGradients( button, baseColor, stops ) {
       assert( !button.idleFill && !button.hoverFill && !button.pressedFill, 'Button already has 3D gradients applied' );
 
       // If the base-color is cached, used the cached values.
@@ -160,8 +164,8 @@ define( require => {
         // Array of an array of length 2, where the first item represents the shade factor and the second item
         // represents the stop percentage. Each array of length 2 represents a stop of the Gradient.
         // Values were determined through experimentation.
-        const stops = [ [ 0.75, 0 ], [ 0.5, 20 ], [ 0.3, 40 ], [ 0, 59 ], [ -0.03, 69 ], [ -0.06, 75 ],
-                        [ -0.11, 81 ], [ -0.15, 87 ], [ -0.22, 92.5 ], [ -0.26, 95.5 ], [ -0.30, 100 ] ];
+        stops = stops || [ [ 0.75, 0 ], [ 0.5, 20 ], [ 0.3, 40 ], [ 0, 59 ], [ -0.03, 69 ], [ -0.06, 75 ],
+                           [ -0.11, 81 ], [ -0.15, 87 ], [ -0.22, 92.5 ], [ -0.26, 95.5 ], [ -0.30, 100 ] ];
 
         // Create the Linear Gradients for each fill type.
         button.idleFill = new LinearGradient( 0, 13, 100, 78 );

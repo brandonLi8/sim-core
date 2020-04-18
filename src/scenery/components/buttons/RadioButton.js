@@ -56,7 +56,7 @@ define( require => {
         unselectedHoverContentOpacity: 0.8, // {number} opacity of the content when hovered over, if unselected.
 
         // colors
-        selectedButtonStroke: '#419AC9',   // {string|Gradient} - the stroke of the background when selected.
+        selectedButtonStroke: '#048A66',   // {string|Gradient} - the stroke of the background when selected.
         unselectedButtonStroke: '#323232', // {string|Gradient} - the stroke of the background when NOT selected.
         baseColor: 'white',                // {string} - the base color of the button. The fills in all 3 states
                                            //            (selected, unselected, hover) are shades of this color.

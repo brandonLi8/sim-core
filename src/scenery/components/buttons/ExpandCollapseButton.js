@@ -41,7 +41,7 @@ define( require => {
       options = {
 
         // button
-        expandedBaseColor: '#D92626',  // {string} - the base color of the button when expanded
+        expandedBaseColor: '#FF8963',  // {string} - the base color of the button when expanded
         collapsedBaseColor: '#3291B8', // {string} - the base color of the button when collapsed
         buttonSize: 21,                // {number} - the width and height of the button background
         buttonStroke: 'black',         // {string|Gradient} - the stroke of the border of the Button.
