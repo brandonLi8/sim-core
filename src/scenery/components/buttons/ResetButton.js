@@ -34,11 +34,11 @@ define( require => {
       options = {
 
         // button
-        baseColor: '#C32526',   // {string} - the base color of the button.
+        baseColor: '#DB1916',   // {string} - the base color of the button.
         listener: null,         // {function} - the listener called when the button is pressed.
         radius: 25.5,           // {number} - the radius of the round Reset Button
-        buttonStroke: 'black',  // {string|Gradient} - the stroke of the border of the Reset Button
-        buttonStrokeWidth: 0.5, // {number} - the stroke-width of the border of the Reset Button
+        buttonStroke: '#8C100E',  // {string|Gradient} - the stroke of the border of the Reset Button
+        buttonStrokeWidth: 1.1, // {number} - the stroke-width of the border of the Reset Button
 
         // curvedArrow
         curvedArrowFill: 'white',               // {string|Gradient} - the fill color of the button curvedArrow.
@@ -86,8 +86,12 @@ define( require => {
 
       //----------------------------------------------------------------------------------------
 
+      // Custom stops for the ResetButton. Values determined through experimentation.
+      const gradientStops = [ [ 0.73, 0 ], [ 0.3, 25 ], [ 0.255, 30 ], [ 0.2, 35 ], [ 0, 59 ],
+                              [ -0.03, 63 ], [ -0.08, 69 ], [ -0.15, 75 ], [ -0.3, 86 ], [ -0.55, 93 ] ];
+
       // Apply the 3D Gradient strategy to allow the Reset Button to look 3D
-      Button.apply3DGradients( this, options.baseColor );
+      Button.apply3DGradients( this, options.baseColor, gradientStops );
 
       // Calls the listener passed in the option when the ResetButton is pressed. The listener function is not
       // referenced since it is unlinked when interactionStateProperty is disposed, which occurs in the dispose method
