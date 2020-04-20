@@ -44,6 +44,9 @@ define( require => {
         // {string} - the name of the Screen, displayed in the navigation-bar.
         name: config.name,
 
+        // {string} (optional) - the icon of the Screen, displayed in the navigation-bar.
+        icon: config.icon,
+
         // {string} (optional) - the background color of the Screen behind the ScrenView
         background: config.background || 'white',
 
