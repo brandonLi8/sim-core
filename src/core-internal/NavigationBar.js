@@ -15,13 +15,15 @@ define( require => {
   // modules
   const assert = require( 'SIM_CORE/util/assert' );
   const Bounds = require( 'SIM_CORE/util/Bounds' );
+  const Button = require( 'SIM_CORE/scenery/components/buttons/Button' );
   const DOMObject = require( 'SIM_CORE/core-internal/DOMObject' );
+  const FlexBox = require( 'SIM_CORE/scenery/FlexBox' );
+  const Node = require( 'SIM_CORE/scenery/Node' );
   const Property = require( 'SIM_CORE/util/Property' );
+  const Rectangle = require( 'SIM_CORE/scenery/Rectangle' );
   const Screen = require( 'SIM_CORE/Screen' );
   const ScreenView = require( 'SIM_CORE/scenery/ScreenView' );
   const Text = require( 'SIM_CORE/scenery/Text' );
-  const Util = require( 'SIM_CORE/util/Util' );
-  const Vector = require( 'SIM_CORE/util/Vector' );
 
   class NavigationBar extends DOMObject {
 
@@ -54,6 +56,13 @@ define( require => {
 
         // {number} - the left margin of the title
         titleLeftMargin: 8,
+
+        // screen-icons
+        screenIconHeight: 26,          // {number} the height of the screen icons
+        screenIconWidth: 36,           // {number} the width of the screen icons
+        maxIconWidthProportion: 0.85,  // {number} max proportion of the background width occupied by screen-icon
+        maxIconHeightProportion: 0.85, // {number} max proportion of the background height occupied by screen-icon
+        screenIconLabelFontSize: 9.5,  // {number} - the font-size of the screen icon labels
 
         // Rewrite options so that it overrides the defaults.
         ...options
@@ -95,6 +104,60 @@ define( require => {
 
       // Layout the scene graph of the NavigationBar.
       this.addChild( this._screenView.setChildren( [ this._titleLabel ] ) );
+
+      //----------------------------------------------------------------------------------------
+
+      // Add screen icons if applicable
+      if ( screens.length > 1 ) {
+
+        // Create the Container of that Screen Icons
+        const screenIcons = FlexBox.horizontal( { spacing: 5 } );
+
+        screens.forEach( screen => {
+
+          // Constrain the Icon's width and height
+          const icon = screen.icon || new Node();
+          icon.maxWidth = options.screenIconWidth * options.maxIconWidthProportion;
+          icon.maxHeight = options.screenIconHeight * options.maxIconHeightProportion;
+
+          // Create the background
+          const background = new Rectangle( options.screenIconWidth, options.screenIconHeight, { fill: 'white' } );
+          icon.center = background.center; // alignment
+
+          // Create the icon Label
+          const label = new Text( screen.name, {
+            fontSize: options.screenIconLabelFontSize,
+            topCenter: background.bottomCenter,
+            fill: 'white'
+          } );
+
+          // Create the Screen Icon wrapper Node
+          const screenIcon = new Node().setChildren( [ background, icon, label ] );
+
+          // Create an overlay to adjust pointer-areas
+          const overlay = new Rectangle( screenIcon.width, screenIcon.height, { fill: 'none' } );
+
+          // Create the Button wrapper of the Screen Icon
+          const screenIconButton = new Button( overlay, screenIcon );
+
+          // Observe when the Button is interacted with to adjust appearance and change the activeScreenProperty. The
+          // listener function is not referenced as it is never unlinked, as NavigationBars are never disposed.
+          screenIconButton.interactionStateProperty.link( interactionState => {
+            if ( interactionState === Button.interactionStates.IDLE ) screenIconButton.opacity = 1;
+            if ( interactionState === Button.interactionStates.HOVER ) screenIconButton.opacity = 0.7;
+            if ( interactionState === Button.interactionStates.PRESSED ) {
+              screenIconButton.opacity = 0.88;
+              activeScreenProperty.value = screen;
+            }
+          } );
+
+          // Add the Screen Icon Button
+          screenIcons.addChild( screenIconButton );
+        } );
+
+        screenIcons.center = this._screenView.layoutBounds.center;
+        this._screenView.addChild( screenIcons );
+      }
     }
 
     /**
