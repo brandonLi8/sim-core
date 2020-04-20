@@ -79,6 +79,9 @@ define( require => {
       // @public (read-only) {string} - the name of the Screen.
       this.name = config.name;
 
+      // @public (read-only) {Node} - the icon of the Screen.
+      this.icon = config.icon;
+
       // @public (read-only) {ScreenView} view - the view of the Screen. To be set in start().
       this.view;
 
