@@ -1,22 +1,10 @@
 // Copyright © 2019-2020 Brandon Li. All rights reserved.
 
 /**
- * The navigation bar at the bottom of the screen.
- * For a single-screen sim, it shows the name of the sim at the far right.
+ * The navigation bar at the bottom of the simulation.
  *
- * Layout of NavigationBar adapts to different text widths, icon widths, and numbers of screens, and attempts to
- * perform an 'optimal' layout. The sim title is initially constrained to a max percentage of the bar width,
- * and that's used to compute how much space is available for screen buttons.  After creation and layout of the
- * screen buttons, we then compute how much space is actually available for the sim title, and use that to
- * constrain the title's width.
- *
- * The bar is composed of a background (always pixel-perfect), and expandable content (that gets scaled as one part).
- * If we are width-constrained, the navigation bar is in a 'compact' state where the children of the content (e.g.
- * home button, screen buttons, menu, title) do not change positions. If we are height-constrained, the amount
- * available to the bar expands, so we lay out the children to fit.
- *
- * TODO: This module needs significant reconsidering. In particular, the layout method is manually calculated a new
- *       width. This should be handled in ScreenView and with Nodes instead of DOMObject.
+ * For a single-screen sim, it shows the name of the sim at the far left. For multi-screen sims, it shows the name at
+ * the far left with screen-icon Buttons in the center. These Buttons allow the user to select the active Screen.
  *
  * @author Brandon Li <brandon.li820@gmail.com>
  */
@@ -26,72 +14,87 @@ define( require => {
 
   // modules
   const assert = require( 'SIM_CORE/util/assert' );
+  const Bounds = require( 'SIM_CORE/util/Bounds' );
   const DOMObject = require( 'SIM_CORE/core-internal/DOMObject' );
+  const Property = require( 'SIM_CORE/util/Property' );
+  const Screen = require( 'SIM_CORE/Screen' );
+  const ScreenView = require( 'SIM_CORE/scenery/ScreenView' );
+  const Text = require( 'SIM_CORE/scenery/Text' );
+  const Util = require( 'SIM_CORE/util/Util' );
   const Vector = require( 'SIM_CORE/util/Vector' );
-
-  // constants
-  const NAVIGATION_BAR_HEIGHT = 40;
-  const SCREEN_SIZE = new Vector( 768, 504 );
-  const TITLE_FONT_SIZE = 16;
-  const TITLE_LEFT_MARGIN = 8;
 
   class NavigationBar extends DOMObject {
 
     /**
-     * @param {string} title - the title string of the simulation to be displayed
+     * @param {string} title
+     * @param {Screen[]} screens
+     * @param {Property.<Screen>} activeScreenProperty
      * @param {Object} [options] - Various key-value pairs that control the appearance and behavior of this class.
      *                             Some options are specific to this class while others are passed to the super class.
      *                             See the early portion of the constructor for details.
      */
-    constructor( title, options ) {
-
+    constructor( title, screens, activeScreenProperty, options ) {
       assert( typeof title === 'string', `invalid title: ${ title }` );
+      assert( screens.every( screen => screen instanceof Screen ), `invalid screens: ${ screens }` );
+      assert( activeScreenProperty instanceof Property, `invalid activeScreenProperty: ${ activeScreenProperty }` );
       assert( !options || Object.getPrototypeOf( options ) === Object.prototype, `invalid options: ${ options }` );
 
-      const defaults = {
+      options = {
 
-        id: 'navigation-bar',
-        style: {
-          width: '100%',
-          color: 'white',
-          bottom: 0,
-          background: 'black',
-          position: 'absolute'
-        }
+        // {Bounds} - the Bounds of the navigation-bar coordinate system, which are safe to draw in for all window sizes
+        layoutBounds: new Bounds( 0, 0, 768, 40 ),
+
+        // {number} - percentage of the height navigation-bar in pixels, relative to the height of the browser. This is
+        //            only applied if the window width is larger than the layoutBounds width.
+        heightRatio: 40 / 504,
+
+        // {number} - percentage of the height navigation-bar in pixels, relative to the width of the browser. This is
+        //            only applied if the window width is smaller than the layoutBounds width.
+        constrainedHeightRatio: 40 / 768,
+
+        // {number} - the left margin of the title
+        titleLeftMargin: 8,
+
+        // Rewrite options so that it overrides the defaults.
+        ...options
       };
 
-      // Rewrite options so that it overrides the defaults.
-      options = { ...defaults, ...options };
-      options.style = { ...defaults.style, ...options.style };
+      // Set the style of the NavigationBar
+      options.style = {
+        width: '100%',
+        color: 'white',
+        bottom: 0,
+        background: 'black',
+        position: 'absolute',
+        display: 'flex',
+        justifyContent: 'center',
+        alignContent: 'center',
+        alignItems: 'center'
+      };
+      options.id = 'navigation-bar';
 
       super( options );
 
+      //----------------------------------------------------------------------------------------
 
-      // @public {DOMObject} navigationBarContent - container of all the navigation bar content.
-      this.navigationBarContent = new DOMObject( {
-        id: 'content',
-        style: {
-          height: '100%', // width set later
-          fontSmoothing: 'antialiased',
-          margin: '0 auto'
-        }
+      // @private {number} - reference the ratios from the options declaration.
+      this._heightRatio = options.heightRatio;
+      this._constrainedHeightRatio = options.constrainedHeightRatio;
+
+      // @private {ScreenView} - initialize a ScreenView for the NavigationBar to use scenery Nodes and to properly
+      //                          guarantee content is scaled and positioned properly.
+      this._screenView = new ScreenView( { id: 'navigation-bar-screen-view', layoutBounds: options.layoutBounds } );
+
+      // @private {Text} - Create the Text Node that displays the title of the simulation.
+      this._titleLabel = new Text( title, {
+        centerY: options.layoutBounds.centerY,
+        left: options.titleLeftMargin,
+        fill: 'white',
+        fontSize: 16
       } );
 
-      // @public {DOMObject} titleDOMObject - the title node
-      this.titleDOMObject = new DOMObject( {
-        text: title,
-        style: {
-          height: '100%',
-          display: 'inline-flex',
-          alignItems: 'center'
-        }
-      } );
-
-      this.addChild( this.navigationBarContent );
-
-      this.navigationBarContent.setChildren( [
-        this.titleDOMObject
-      ] );
+      // Layout the scene graph of the NavigationBar.
+      this.addChild( this._screenView.setChildren( [ this._titleLabel ] ) );
     }
 
     /**
@@ -103,22 +106,14 @@ define( require => {
      */
     layout( width, height ) {
 
-      const scale = Math.min( width / SCREEN_SIZE.x, height / SCREEN_SIZE.y );
-      const navBarHeight = scale * NAVIGATION_BAR_HEIGHT;
-      const navBarContentWidth = scale * SCREEN_SIZE.x;
-      const titleFont = scale * TITLE_FONT_SIZE;
+      // Set the height of the NavigationBar, in pixels.
+      const navigationBarHeight = Math.min( this._constrainedHeightRatio * width, this._heightRatio * height );
+      this.style.height = `${ navigationBarHeight }px`;
 
-      this.style.height = `${ navBarHeight }px`;
-
-      this.navigationBarContent.style.width = `${ navBarContentWidth }px`;
-
-      this.titleDOMObject.style.fontSize = `${ titleFont }px`;
-      this.titleDOMObject.style.left = `${ scale * TITLE_LEFT_MARGIN }px`;
+      // Call the layout method of the screen view
+      this._screenView.layout( width, navigationBarHeight );
     }
   }
-
-  NavigationBar.SCREEN_SIZE = SCREEN_SIZE;
-  NavigationBar.NAVIGATION_BAR_HEIGHT = NAVIGATION_BAR_HEIGHT;
 
   return NavigationBar;
 } );

@@ -1,8 +1,15 @@
 // Copyright © 2019-2020 Brandon Li. All rights reserved.
 
 /**
- * Main class encapsulation for a simulation. Provides:
- *  - Sim Query Parameters
+ * Main class encapsulation for a simulation. A Sim can only be started once.
+ *
+ * Some of the tasks that Sim executes on the `start()` method are:
+ *   - initiating the standard set of Sim Query Parameters
+ *   - initiating a Display
+ *   - initiating a Loader
+ *   - initiating a fps-counter if ?fps was provided
+ *   - initiating a navigation-bar
+ *   - resizing the simulation when needed
  *
  * @author Brandon Li <brandon.li820@gmail.com>
  */
@@ -19,6 +26,7 @@ define( require => {
   const FPSCounter = require( 'SIM_CORE/core-internal/FPSCounter' );
   const Loader = require( 'SIM_CORE/core-internal/Loader' );
   const NavigationBar = require( 'SIM_CORE/core-internal/NavigationBar' );
+  const Property = require( 'SIM_CORE/util/Property' );
   const Screen = require( 'SIM_CORE/Screen' );
   const ScreenView = require( 'SIM_CORE/scenery/ScreenView' );
   const Util = require( 'SIM_CORE/util/Util' );
@@ -50,7 +58,7 @@ define( require => {
         ...config
       };
 
-      assert( Util.isArray( config.screens ), `invalid screens: ${ config.screens }` );
+      assert( Util.isArray( config.screens ) && config.screens.length, `invalid screens: ${ config.screens }` );
       assert( config.screens.every( screen => screen instanceof Screen ), `invalid screens: ${ config.screens }` );
       assert( typeof config.name === 'string', `invalid name: ${ config.name }` );
       assert( typeof config.maxDT === 'number' && config.maxDT > 0, `invalid maxDT: ${ config.maxDT }` );
@@ -67,6 +75,9 @@ define( require => {
       // @public {Screens[]} (read-only) - reference to the screens of the simulation.
       this.screens = config.screens;
 
+      // @public {Property.<Screen>} (read-only) - reference to the active Screen.
+      this.activeScreenProperty = new Property( this.screens[ 0 ], { validValues: config.screens } );
+
       // @public {Display} (read-only) - Initialize a display to attach to the browser window.
       this.display = new Display().initiate();
 
@@ -75,9 +86,8 @@ define( require => {
       this.display.addChild( loader );
       loader.load( this ); // Start loading
 
-
       // Add the navigation bar
-      this.navigationBar = new NavigationBar( config.name );
+      this.navigationBar = new NavigationBar( config.name, config.screens, this.activeScreenProperty );
       this.display.addChild( this.navigationBar );
 
       // Initialize a fps-counter if the ?fps query parameter was provided.
@@ -116,19 +126,37 @@ define( require => {
       // Enable the red dev border around ScreenViews if the ?dev query parameter was provided.
       if ( StandardSimQueryParameters.dev ) { ScreenView.enableDevBorder(); }
 
-      this.display.on( 'resize', ( width, height ) => {
+      // Observe when the Display is resized and layout the active screen. Link is never unlinked.
+      this.display.on( 'resize', () => Sim._layoutActiveScreen() );
 
-        this.navigationBar.layout( width, height );
-        const screenHeight = height - parseFloat( this.navigationBar.style.height );
+      // Observe when the active screen changes and layout the ScreenView. Link is never disposed of since Sims cannot
+      // be disposed.
+      this.activeScreenProperty.lazyLink( screen => Sim._layoutActiveScreen() );
 
-        this.screens.forEach( screen => {
-          screen.style.height = `${ screenHeight }px`;
-          screen.view.layout( width, screenHeight );
+      this.screens.forEach( screen => {
+
+        // If a screen has a step method, call the step method on each frame, passing the delta time.
+        screen.model.step && this.display.on( 'frame', dt => {
+          ( screen === this.activeScreenProperty.value ) && this.activeScreenProperty.value.model.step( dt );
+        } );
+
+        // Observe when the active screen changes and change the visibility of the Screen based on if it is active.
+        this.activeScreenProperty.link( activeScreen => {
+          screen.view.style.display = ( activeScreen === screen ) ? 'initial' : 'none';
         } );
       } );
-      this.display.on( 'frame', dt => {
-        this.screens[ 0 ].model.step && this.screens[ 0 ].model.step( dt );
-      } );
+    }
+
+    /**
+     * Calls the layout method on the active Screen's view.
+     * @private
+     */
+    static _layoutActiveScreen() {
+      this.navigationBar.layout( window.innerWidth, window.innerHeight );
+      const screenHeight = window.innerHeight - parseFloat( this.navigationBar.style.height );
+
+      this.activeScreenProperty.value.style.height = `${ screenHeight }px`;
+      this.activeScreenProperty.value.view.layout( window.innerWidth, screenHeight );
     }
   }
 

@@ -146,8 +146,7 @@ define( require => {
      *
      * @param {Class.<Sim>} Sim - the sim class.
      */
-    load( Sim, simScreens ) {
-
+    load( Sim ) {
       this.synchronousLoadScreens( Sim );
     }
 
