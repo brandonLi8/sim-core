@@ -116,18 +116,32 @@ define( require => {
 
         screens.forEach( screen => {
 
+          // Allow the Screen to override the icon options.
+          const screenIconOptions = {
+            screenIconHeight: options.screenIconHeight,
+            screenIconWidth: options.screenIconWidth,
+            maxIconWidthProportion: options.maxIconWidthProportion,
+            maxIconHeightProportion: options.maxIconHeightProportion,
+            screenIconLabelFontSize: options.screenIconLabelFontSize,
+            ...screen.screenIconOptions
+          }
+
           // Constrain the Icon's width and height
           const icon = screen.icon || new Node();
-          icon.maxWidth = options.screenIconWidth * options.maxIconWidthProportion;
-          icon.maxHeight = options.screenIconHeight * options.maxIconHeightProportion;
+          icon.maxWidth = screenIconOptions.screenIconWidth * screenIconOptions.maxIconWidthProportion;
+          icon.maxHeight = screenIconOptions.screenIconHeight * screenIconOptions.maxIconHeightProportion;
 
           // Create the background
-          const background = new Rectangle( options.screenIconWidth, options.screenIconHeight, { fill: 'white' } );
+          const background = new Rectangle(
+            screenIconOptions.screenIconWidth,
+            screenIconOptions.screenIconHeight, {
+              fill: 'white'
+            } );
           icon.center = background.center; // alignment
 
           // Create the icon Label
           const label = new Text( screen.name, {
-            fontSize: options.screenIconLabelFontSize,
+            fontSize: screenIconOptions.screenIconLabelFontSize,
             topCenter: background.bottomCenter,
             fill: 'white'
           } );

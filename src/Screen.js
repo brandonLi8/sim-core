@@ -50,6 +50,9 @@ define( require => {
         // {string} (optional) - the background color of the Screen behind the ScrenView
         background: config.background || 'white',
 
+        // {Object} - if provided, these options will be read by the navigation bar when creating the screen icon.
+        screenIconOptions: null,
+
         ...config
       };
 
@@ -90,6 +93,9 @@ define( require => {
 
       // @private {Object} - reference to the passed in config Object.
       this._config = config;
+
+      // @public (read-only) {Object} - reference the screen icon options
+      this.screenIconOptions = config.screenIconOptions;
     }
 
     /**
