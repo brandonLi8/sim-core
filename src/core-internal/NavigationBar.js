@@ -124,7 +124,7 @@ define( require => {
             maxIconHeightProportion: options.maxIconHeightProportion,
             screenIconLabelFontSize: options.screenIconLabelFontSize,
             ...screen.screenIconOptions
-          }
+          };
 
           // Constrain the Icon's width and height
           const icon = screen.icon || new Node();
