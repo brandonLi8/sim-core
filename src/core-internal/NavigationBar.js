@@ -23,6 +23,7 @@ define( require => {
   const Property = require( 'SIM_CORE/util/Property' );
   const Rectangle = require( 'SIM_CORE/scenery/Rectangle' );
   const Screen = require( 'SIM_CORE/Screen' );
+  const ScreenIcon = require( 'SIM_CORE/scenery/components/ScreenIcon' );
   const ScreenView = require( 'SIM_CORE/scenery/ScreenView' );
   const Text = require( 'SIM_CORE/scenery/Text' );
 
@@ -57,13 +58,6 @@ define( require => {
 
         // {number} - the left margin of the title
         titleLeftMargin: 8,
-
-        // screen-icons
-        screenIconHeight: 26,          // {number} the height of the screen icons
-        screenIconWidth: 38,           // {number} the width of the screen icons
-        maxIconWidthProportion: 0.85,  // {number} max proportion of the background width occupied by screen-icon
-        maxIconHeightProportion: 0.85, // {number} max proportion of the background height occupied by screen-icon
-        screenIconLabelFontSize: 9.5,  // {number} - the font-size of the screen icon labels
 
         // Rewrite options so that it overrides the defaults.
         ...options
@@ -115,58 +109,42 @@ define( require => {
         const screenIcons = FlexBox.horizontal( { spacing: 18 } );
 
         screens.forEach( screen => {
-
-          // Allow the Screen to override the icon options.
-          const screenIconOptions = {
-            screenIconHeight: options.screenIconHeight,
-            screenIconWidth: options.screenIconWidth,
-            maxIconWidthProportion: options.maxIconWidthProportion,
-            maxIconHeightProportion: options.maxIconHeightProportion,
-            screenIconLabelFontSize: options.screenIconLabelFontSize,
-            ...screen.screenIconOptions
-          };
-
-          // Constrain the Icon's width and height
-          const icon = screen.icon || new Node();
-          icon.maxWidth = screenIconOptions.screenIconWidth * screenIconOptions.maxIconWidthProportion;
-          icon.maxHeight = screenIconOptions.screenIconHeight * screenIconOptions.maxIconHeightProportion;
-
-          // Create the background
-          const background = new Rectangle(
-            screenIconOptions.screenIconWidth,
-            screenIconOptions.screenIconHeight, {
-              fill: 'white'
-            } );
-          icon.center = background.center; // alignment
+          const screenIcon = screen.icon || new ScreenIcon( new Node() );
 
           // Create the icon Label
           const label = new Text( screen.name, {
-            fontSize: screenIconOptions.screenIconLabelFontSize,
-            topCenter: background.bottomCenter,
+            fontSize: screenIcon.labelFontSize,
+            topCenter: screenIcon.bottomCenter,
             fill: 'white'
           } );
 
-          // Create the Screen Icon wrapper Node
-          const screenIcon = new Node().setChildren( [ background, icon, label ] );
+          // Create the Screen Icon wrapper Node with the Label.
+          const labeledScreenIcon = new Node().setChildren( [ screenIcon, label ] );
 
           // Create an overlay to adjust pointer-areas
-          const overlay = new Rectangle( screenIcon.width, screenIcon.height, { fill: 'none' } );
+          const overlay = new Rectangle( labeledScreenIcon.width, labeledScreenIcon.height, { fill: 'none' } );
 
           // Create the Button wrapper of the Screen Icon
-          const screenIconButton = new Button( overlay, screenIcon );
+          const screenIconButton = new Button( overlay, labeledScreenIcon );
 
           // Observe when the Button is interacted with to adjust appearance or when the active screen changes and
           // change the activeScreenProperty. The Multilink is never disposed as NavigationBars are never disposed.
           new Multilink( [ screenIconButton.interactionStateProperty, activeScreenProperty ],
             ( interactionState, activeScreen ) => {
               if ( interactionState === Button.interactionStates.IDLE ) {
-                screenIconButton.opacity = activeScreen === screen ? 1 : 0.5;
+                screenIconButton.opacity = activeScreen === screen ?
+                                           screenIcon.activeIdleOpacity :
+                                           screenIcon.inactiveIdleOpacity;
               }
               if ( interactionState === Button.interactionStates.HOVER ) {
-                screenIconButton.opacity = activeScreen === screen ? 0.9 : 0.4;
+                screenIconButton.opacity = activeScreen === screen ?
+                                           screenIcon.activeHoverOpacity :
+                                           screenIcon.inactiveHoverOpacity;
               }
               if ( interactionState === Button.interactionStates.PRESSED ) {
-                screenIconButton.opacity = activeScreen === screen ? 0.95 : 0.6;
+                screenIconButton.opacity = activeScreen === screen ?
+                                           screenIcon.activePressedOpacity :
+                                           screenIcon.inactivePressedOpacity;
               }
               if ( interactionState === Button.interactionStates.RELEASED ) activeScreenProperty.value = screen;
             } );

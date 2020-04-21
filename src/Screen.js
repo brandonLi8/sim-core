@@ -19,6 +19,7 @@ define( require => {
   // modules
   const assert = require( 'SIM_CORE/util/assert' );
   const DOMObject = require( 'SIM_CORE/core-internal/DOMObject' );
+  const ScreenIcon = require( 'SIM_CORE/scenery/components/ScreenIcon' );
   const ScreenView = require( 'SIM_CORE/scenery/ScreenView' );
 
   class Screen extends DOMObject {
@@ -44,7 +45,7 @@ define( require => {
         // {string} - the name of the Screen, displayed in the navigation-bar.
         name: config.name,
 
-        // {string} (optional) - the icon of the Screen, displayed in the navigation-bar.
+        // {ScreenIcon} (optional) - the icon of the Screen, displayed in the navigation-bar.
         icon: config.icon,
 
         // {string} (optional) - the background color of the Screen behind the ScrenView
@@ -63,6 +64,7 @@ define( require => {
           `invalid config.view: ${ config.view }` );
         assert( typeof config.name === 'string', `invalid config.name: ${ config.name }` );
         assert( typeof config.background === 'string', `invalid config.background: ${ config.background }` );
+        assert( !config.icon || config.icon instanceof ScreenIcon, `invalid config.icon: ${ config.icon }` );
       }
 
       //----------------------------------------------------------------------------------------
@@ -82,7 +84,7 @@ define( require => {
       // @public (read-only) {string} - the name of the Screen.
       this.name = config.name;
 
-      // @public (read-only) {Node} - the icon of the Screen.
+      // @public (read-only) {ScreenIcon} - the icon of the Screen.
       this.icon = config.icon;
 
       // @public (read-only) {ScreenView} view - the view of the Screen. To be set in start().
@@ -93,9 +95,6 @@ define( require => {
 
       // @private {Object} - reference to the passed in config Object.
       this._config = config;
-
-      // @public (read-only) {Object} - reference the screen icon options
-      this.screenIconOptions = config.screenIconOptions;
     }
 
     /**
