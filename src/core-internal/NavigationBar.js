@@ -18,6 +18,7 @@ define( require => {
   const Button = require( 'SIM_CORE/scenery/components/buttons/Button' );
   const DOMObject = require( 'SIM_CORE/core-internal/DOMObject' );
   const FlexBox = require( 'SIM_CORE/scenery/FlexBox' );
+  const Multilink = require( 'SIM_CORE/util/Multilink' );
   const Node = require( 'SIM_CORE/scenery/Node' );
   const Property = require( 'SIM_CORE/util/Property' );
   const Rectangle = require( 'SIM_CORE/scenery/Rectangle' );
@@ -59,7 +60,7 @@ define( require => {
 
         // screen-icons
         screenIconHeight: 26,          // {number} the height of the screen icons
-        screenIconWidth: 36,           // {number} the width of the screen icons
+        screenIconWidth: 38,           // {number} the width of the screen icons
         maxIconWidthProportion: 0.85,  // {number} max proportion of the background width occupied by screen-icon
         maxIconHeightProportion: 0.85, // {number} max proportion of the background height occupied by screen-icon
         screenIconLabelFontSize: 9.5,  // {number} - the font-size of the screen icon labels
@@ -111,7 +112,7 @@ define( require => {
       if ( screens.length > 1 ) {
 
         // Create the Container of that Screen Icons
-        const screenIcons = FlexBox.horizontal( { spacing: 5 } );
+        const screenIcons = FlexBox.horizontal( { spacing: 18 } );
 
         screens.forEach( screen => {
 
@@ -140,16 +141,21 @@ define( require => {
           // Create the Button wrapper of the Screen Icon
           const screenIconButton = new Button( overlay, screenIcon );
 
-          // Observe when the Button is interacted with to adjust appearance and change the activeScreenProperty. The
-          // listener function is not referenced as it is never unlinked, as NavigationBars are never disposed.
-          screenIconButton.interactionStateProperty.link( interactionState => {
-            if ( interactionState === Button.interactionStates.IDLE ) screenIconButton.opacity = 1;
-            if ( interactionState === Button.interactionStates.HOVER ) screenIconButton.opacity = 0.7;
-            if ( interactionState === Button.interactionStates.PRESSED ) {
-              screenIconButton.opacity = 0.88;
-              activeScreenProperty.value = screen;
-            }
-          } );
+          // Observe when the Button is interacted with to adjust appearance or when the active screen changes and
+          // change the activeScreenProperty. The Multilink is never disposed as NavigationBars are never disposed.
+          new Multilink( [ screenIconButton.interactionStateProperty, activeScreenProperty ],
+            ( interactionState, activeScreen ) => {
+              if ( interactionState === Button.interactionStates.IDLE ) {
+                screenIconButton.opacity = activeScreen === screen ? 1 : 0.5;
+              }
+              if ( interactionState === Button.interactionStates.HOVER ) {
+                screenIconButton.opacity = activeScreen === screen ? 0.9 : 0.4;
+              }
+              if ( interactionState === Button.interactionStates.PRESSED ) {
+                screenIconButton.opacity = activeScreen === screen ? 0.95 : 0.6;
+              }
+              if ( interactionState === Button.interactionStates.RELEASED ) activeScreenProperty.value = screen;
+            } );
 
           // Add the Screen Icon Button
           screenIcons.addChild( screenIconButton );

@@ -142,7 +142,8 @@ define( require => {
 
         // Observe when the active screen changes and change the visibility of the Screen based on if it is active.
         this.activeScreenProperty.link( activeScreen => {
-          screen.view.style.display = ( activeScreen === screen ) ? 'initial' : 'none';
+          screen.style.display = ( activeScreen === screen ) ? 'flex' : 'none';
+          screen.style.position = ( activeScreen === screen ) ? 'relative' : 'absolute';
         } );
       } );
     }
