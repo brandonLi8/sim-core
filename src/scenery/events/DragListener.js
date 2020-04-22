@@ -20,6 +20,9 @@
  *       longer in use, make sure to dispose of the DragListener to allow Javascript to garbage collect the
  *       DragListener. Not disposing can result in a memory leak! See the `dispose()` method in the super class.
  *
+ * If the drag target Node has a cursor of 'scenery-drag', DragListener will apply a custom dragging cursor, with
+ * browser support, for when the Node is hovered and dragged.
+ *
  * @author Brandon Li <brandon.li820@gmail.com>
  */
 
@@ -87,6 +90,9 @@ define( require => {
       // Set the super-class press listener to the start method. Then call _initiate to link the listener.
       this._pressListener = this._start.bind( this );
       this._initiate();
+
+      // If the target-node has a cursor of 'scenery-drag', apply the custom drag cursor.
+      if ( this._targetNode.cursor === 'scenery-drag' ) this._applyDragCursor();
     }
 
     /**
@@ -105,6 +111,9 @@ define( require => {
 
       // First call the start listener if it was provided.
       if ( this._startListener ) this._startListener( location, event );
+
+      // If the target-node has a cursor of 'scenery-drag', apply the custom pressed cursor.
+      if ( this._targetNode.cursor === 'scenery-drag' ) this._applyDragPressedCursor();
 
       // Reference the Display to listen to. The require statement is here to avoid circular dependency problems.
       const display = require( 'SIM_CORE/Sim' ).display;
@@ -142,8 +151,53 @@ define( require => {
 
           // Call the end listener if it exists.
           this._endListener && this._endListener( releaseEvent );
+
+          // If the target-node has a cursor of 'scenery-drag', reset the cursor back to the custom drag-hover cursor.
+          if ( this._targetNode.cursor === 'scenery-drag' ) this._applyDragCursor();
         }
       } );
+    }
+
+    /**
+     * Applies a custom dragging cursor for when the target Node is hovered, indicating to the user that the target Node
+     * can be dragged. This is called if the drag target Node has a cursor of 'scenery-drag'.
+     * @private
+     *
+     * This function also has a fall-back for browsers that don't support css cursor 'grab'. See
+     * https://stackoverflow.com/a/18294634 for solution.
+     */
+    _applyDragCursor() {
+
+      // Attempt to set the cursor to 'grab'
+      this._targetNode.style.cursor = 'grab';
+
+      // Provide multiple fall-backs for if the target Node's cursor isn't set in its style Object, meaning the cursor
+      // isn't supported.
+      if ( !this._targetNode.style.cursor ) this._targetNode.style.cursor = '-webkit-grab';
+      if ( !this._targetNode.style.cursor ) this._targetNode.style.cursor = '-moz-grab';
+      if ( !this._targetNode.style.cursor ) this._targetNode.style.cursor = 'move';
+      if ( !this._targetNode.style.cursor ) this._targetNode.style.cursor = 'pointer';
+    }
+
+    /**
+     * Applies a custom dragging cursor for when the target Node is pressed, indicating to the user that the target Node
+     * is currently being dragged. This is called if the drag target Node has a cursor of 'scenery-drag'.
+     * @private
+     *
+     * This function also has a fall-back for browsers that don't support css cursor 'grabbing'. See
+     * https://stackoverflow.com/a/18294634 for solution.
+     */
+    _applyDragPressedCursor() {
+
+      // Attempt to set the cursor to 'grabbing'
+      this._targetNode.style.cursor = 'grabbing';
+
+      // Provide multiple fall-backs for if the target Node's cursor isn't set in its style Object, meaning the cursor
+      // isn't supported.
+      if ( !this._targetNode.style.cursor ) this._targetNode.style.cursor = '-webkit-grabbing';
+      if ( !this._targetNode.style.cursor ) this._targetNode.style.cursor = '-moz-grabbing';
+      if ( !this._targetNode.style.cursor ) this._targetNode.style.cursor = 'move';
+      if ( !this._targetNode.style.cursor ) this._targetNode.style.cursor = 'pointer';
     }
   }
 

@@ -287,10 +287,11 @@ define( require => {
 
     /**
      * Sets the CSS cursor string that should be used when the mouse is over this Node. Null is the default, which
-     * indicates that ancestor nodes cursor (or the browser default) should be used.
+     * indicates that ancestor nodes cursor (or the browser default) should be used. If cursor is 'scenery-drag' and a
+     * DragListener is applied, the DragListener will apply a custom cursor for dragging.
      * @public
      *
-     * @param {string|null} cursor - A CSS cursor string, like 'pointer', or 'none'
+     * @param {string|null} cursor - A CSS cursor string, like 'pointer', or 'none', or 'scenery-drag'
      */
     set cursor( cursor ) {
       if ( cursor === this._cursor ) return; // Exit if setting to the same cursor
