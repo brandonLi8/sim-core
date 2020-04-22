@@ -122,13 +122,13 @@ define( require => {
 
       // Function that appends each child (with this._appendElement) of a children array and recurses down the tree.
       const appendChildren = children => {
-        children.forEach( child => {
+         Array.prototype.slice.call( children, 0 ).forEach( child => {
           this._appendElement( child ); // Append the child first
 
           // If the child is a element (not a text element), recurse this function down its sub-tree. Use
           // element.children to NOT include text nodes. See
           // https://developer.mozilla.org/en-US/docs/Web/API/Node/childNodes.
-          if ( child.nodeType === 1 ) appendChildren( Array.prototype.slice.call( child.children, 0 ) );
+          if ( child.nodeType === 1 ) appendChildren( child.children );
         } );
       };
 
