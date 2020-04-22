@@ -128,7 +128,7 @@ define( require => {
           // If the child is a element (not a text element), recurse this function down its sub-tree. Use
           // element.children to NOT include text nodes. See
           // https://developer.mozilla.org/en-US/docs/Web/API/Node/childNodes.
-          if ( child.nodeType === 1 ) appendChildren( [ ...child.children ] );
+          if ( child.nodeType === 1 ) appendChildren( Array.prototype.slice.call( child.children, 0 ) );
         } );
       };
 
