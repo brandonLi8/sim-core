@@ -73,7 +73,8 @@ define( require => {
         display: 'flex',
         justifyContent: 'center',
         alignContent: 'center',
-        alignItems: 'center'
+        alignItems: 'center',
+        zIndex: 999
       };
       options.id = 'navigation-bar';
 
