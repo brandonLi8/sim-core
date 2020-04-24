@@ -24,10 +24,7 @@
     "truenit": "^0.9.16"
   },
   "dependencies": {
-    "merkle-tree-gen": "^1.1.0",
-    "merkletreejs": "^0.1.11",
-    "requirejs": "^2.3.6",
-    "sha256": "^0.2.0"
+    "requirejs": "^2.3.6"
   },
   "bugs": {
     "url": "https://github.com/brandonLi8/sim-core/issues",
