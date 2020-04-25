@@ -3,7 +3,7 @@
 /**
  * A Arrow Node that displays a single-headed pointy arrow shape, with different head widths, tail widths, etc.
  *
- * Arrow inherits from Path to allow for different strokes, fills, shapeRenderings, etc.
+ * Arrow inherits from Path to allow for different strokes, fills, shapeRenderings, head-styles, etc.
  *
  * Currently, Arrows are constructed by their tailX, tailY, tipX, tipY.
  * Possible ways of initiating Arrows include:
@@ -44,9 +44,11 @@ define( require => {
 
       options = {
 
-        headHeight: 12, // {number} - the head-height of the Arrow. See `set headHeight()`.
-        headWidth: 12,  // {number} - the head-width of the Arrow. See `set headWidth()`.
-        tailWidth: 3,   // {number} - the tail-width of the Arrow. See `set tailWidth()`.
+        headHeight: 12,      // {number} - the head-height of the Arrow. See `set headHeight()`.
+        headWidth: 12,       // {number} - the head-width of the Arrow. See `set headWidth()`.
+        tailWidth: 3,        // {number} - the tail-width of the Arrow. See `set tailWidth()`.
+        doubleHead: false,   // {boolean} - indicates if there are heads on both sides of the arrow.
+        headStyle: 'closed', // {string} - the style of the head. See `set headStyle()` for documentation.
 
         // Rewrite options so that it overrides the defaults.
         ...options
@@ -58,6 +60,8 @@ define( require => {
       this._headHeight = options.headHeight;
       this._headWidth = options.headWidth;
       this._tailWidth = options.tailWidth;
+      this._doubleHead = options.doubleHead;
+      this._headStyle = options.headStyle;
 
       // @public {Vector} - create references to the coordinates of the tip and the tail of the Arrow.
       this._tail = new Vector( tailX, tailY );
@@ -75,6 +79,8 @@ define( require => {
     get headHeight() { return this._headHeight; }
     get headWidth() { return this._headWidth; }
     get tailWidth() { return this._tailWidth; }
+    get doubleHead() { return this._doubleHead; }
+    get headStyle() { return this._headStyle; }
     get tail() { return this._tail; }
     get tip() { return this._tip; }
 
@@ -206,13 +212,28 @@ define( require => {
     }
 
     /**
+     * Sets the head style of arrow.
+     * @public
+     *
+     * @param {string} headStyle - Either:
+     *                               'closed' -⮀
+     *                               'open' —⮁. The line-width of the head will be the same as the tail width.
+     */
+    set headStyle( headStyle ) {
+      if ( headStyle === this._headStyle ) return; // Exit if setting to the same 'headStyle'
+      assert( headStyle === 'closed' || headStyle === 'open', `invalid headStyle: ${ headStyle }` );
+      this._headStyle = headStyle;
+      this._updateArrowShape();
+    }
+
+    /**
      * Generates a Arrow shape and updates the shape of this Arrow. Called when a property or the Arrow that is
      * displayed is changed, resulting in a different Arrow Shape.
      * @private
      */
     _updateArrowShape() {
       // Must be a valid Arrow Node.
-      if ( this._tail && this._tip && this._headWidth && this._headHeight && this._tailWidth ) {
+      if ( this._tail && this._tip && this._headWidth && this._headHeight && this._tailWidth && this._headStyle ) {
         if ( this._tail.equalsEpsilon( this._tip ) ) return ( super.shape = null ); // Exit if same tip and tail.
 
         // create a vector representation of the arrow
@@ -237,14 +258,51 @@ define( require => {
           else arrowShape.lineTo( x, y );
         };
 
-        addPoint( 0, this._tailWidth / 2 );
-        addPoint( length - headHeight, this._tailWidth / 2 );
-        addPoint( length - headHeight, this._headWidth / 2 );
-        addPoint( length, 0 );
-        addPoint( length - headHeight, -this._headWidth / 2 );
-        addPoint( length - headHeight, -this._tailWidth / 2 );
-        addPoint( 0, -this._tailWidth / 2 );
-        addPoint( 0, this._tailWidth / 2 );
+        // Draw the arrow shape.
+        if ( this._headStyle === 'closed' ) {
+          if ( this._doubleHead ) {
+            addPoint( 0, 0 );
+            addPoint( headHeight, this._headWidth / 2 );
+            addPoint( headHeight, this._tailWidth / 2 );
+          }
+          else addPoint( 0, this._tailWidth / 2 );
+          addPoint( length - headHeight, this._tailWidth / 2 );
+          addPoint( length - headHeight, this._headWidth / 2 );
+          addPoint( length, 0 );
+          addPoint( length - headHeight, -this._headWidth / 2 );
+          addPoint( length - headHeight, -this._tailWidth / 2 );
+          if ( this._doubleHead ) {
+            addPoint( headHeight, -this._tailWidth / 2 );
+            addPoint( headHeight, -this._headWidth / 2 );
+          }
+          else addPoint( 0, -this._tailWidth / 2 );
+        }
+        else {
+          const angle = Math.atan( this._headWidth / headHeight );
+          const dx = Math.cos( angle ) * this._tailWidth;
+          const dy = Math.sin( angle ) * this._tailWidth;
+          const lineWidth = headHeight - ( this._headWidth / 2 - this._tailWidth / 2 - dy ) / Math.tan( angle );
+          if ( this._doubleHead ) {
+            addPoint( 0, 0 );
+            addPoint( headHeight, this._headWidth / 2 );
+            addPoint( headHeight + dx, this._headWidth / 2 - dy );
+            addPoint( lineWidth, this._tailWidth / 2 );
+          }
+          else addPoint( 0, this._tailWidth / 2 );
+          addPoint( length - lineWidth, this._tailWidth / 2 );
+          addPoint( length - headHeight - dx, this._headWidth / 2 - dy );
+          addPoint( length - headHeight, this._headWidth / 2 );
+          addPoint( length, 0 );
+          addPoint( length - headHeight, -this._headWidth / 2 );
+          addPoint( length - headHeight - dx, -this._headWidth / 2 + dy );
+          addPoint( length - lineWidth, -this._tailWidth / 2 );
+          if ( this._doubleHead ) {
+            addPoint( lineWidth, -this._tailWidth / 2 );
+            addPoint( headHeight + dx, -this._headWidth / 2 + dy );
+            addPoint( headHeight, -this._headWidth / 2 );
+          }
+          else addPoint( 0, -this._tailWidth / 2 );
+        }
         arrowShape.close();
 
         super.shape = arrowShape;
@@ -270,7 +328,7 @@ define( require => {
   }
 
   // @protected @override {string[]} - setter names specific to Arrow. See Path.MUTATOR_KEYS for documentation.
-  Arrow.MUTATOR_KEYS = [ 'headHeight', 'headWidth', 'tailWidth', ...Path.MUTATOR_KEYS ];
+  Arrow.MUTATOR_KEYS = [ 'headHeight', 'headWidth', 'tailWidth', 'headStyle', ...Path.MUTATOR_KEYS ];
 
   return Arrow;
 } );
