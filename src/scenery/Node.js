@@ -533,8 +533,8 @@ define( require => {
       const rotation = ( Util.toDegrees( this.rotation ) ).toFixed( 10 );
       const translateX = ( this._bounds.minX * scale / scaleX );  // Scale to convert to pixels.
       const translateY = ( this._bounds.minY * scale / scaleY );  // Scale to convert to pixels.
-      const width = ( this.width * scale ).toFixed( 10 );              // Scale to convert to pixels.
-      const height = ( this.height * scale ).toFixed( 10 );            // Scale to convert to pixels.
+      const width = ( this.width * scale ).toFixed( 10 );         // Scale to convert to pixels.
+      const height = ( this.height * scale ).toFixed( 10 );       // Scale to convert to pixels.
 
       // Create a flag for the final transform attribute string.
       const transformString = `scale( ${ scaleX } ${ scaleY } )`

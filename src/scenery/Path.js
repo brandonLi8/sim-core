@@ -41,6 +41,7 @@ define( require => {
         stroke: null,           // {string|Gradient} - Sets the stroke color of the Path. See `set stroke()`.
         strokeWidth: 1,         // {number} - Sets the stroke width of this Path. See `set strokeWidth()`.
         shapeRendering: 'auto', // {string} - Sets the shape-rendering method of this Path. See `set shapeRendering()`.
+        lineDash: null,         // {null|number[]} - if given, the line-dash of the Path. See `set lineDash()`
 
         // Rewrite options so that it overrides the defaults.
         ...options
@@ -55,6 +56,7 @@ define( require => {
       this._stroke = options.stroke;
       this._strokeWidth = options.strokeWidth;
       this._shapeRendering = options.shapeRendering;
+      this._lineDash = options.lineDash;
 
       // @private {Shape|null} - the Shape object of this Path.
       this._shape = options.shape;
@@ -70,13 +72,14 @@ define( require => {
     get fill() { return this._fill; }
     get stroke() { return this._stroke; }
     get strokeWidth() { return this._strokeWidth; }
+    get lineDash() { return this._lineDash; }
     get shapeRendering() { return this._shapeRendering; }
     get shape() { return this._shape; }
 
     //----------------------------------------------------------------------------------------
 
     /**
-     * Sets the inner-fill color of the Shape. See https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/fill.
+     * Sets the inner-fill color of the Path. See https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/fill.
      * @public
      *
      * @param {string|Gradient|null} fill - any CSS-compatible color string or a Gradient instance.
@@ -89,7 +92,7 @@ define( require => {
     }
 
     /**
-     * Sets the outline stroke-color of the Shape. See https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/stroke
+     * Sets the outline stroke-color of the Path. See https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/stroke
      * @public
      *
      * @param {string|Gradient|null} stroke - any CSS-compatible color string or a Gradient instance.
@@ -102,7 +105,7 @@ define( require => {
     }
 
     /**
-     * Sets the outline stroke-width of the Shape. See
+     * Sets the outline stroke-width of the Path. See
      * https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/stroke-width.
      * @public
      *
@@ -112,6 +115,21 @@ define( require => {
       if ( strokeWidth === this._strokeWidth ) return; // Exit if setting to the same 'strokeWidth'
       assert( typeof strokeWidth === 'number', `invalid strokeWidth: ${ strokeWidth }` );
       this._strokeWidth = strokeWidth;
+      this.layout( this.screenViewScale );
+    }
+
+    /**
+     * Sets the outline line-dash of the Path. Even values in the array are the dash length, odd values are the gap
+     * length. See https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/stroke-dasharray.
+     * @public
+     *
+     * @param {number[]} lineDash
+     */
+    set lineDash( lineDash ) {
+      if ( this._lineDash && lineDash.length === this._lineDash.length &&
+        lineDash.every( ( length, index ) => this._lineDash[ index ] === length ) ) return; // Same dash array
+      assert.enabled && assert( lineDash.every( length => typeof length === 'number' ), 'invalid lineDash' );
+      this._lineDash = lineDash;
       this.layout( this.screenViewScale );
     }
 
@@ -179,6 +197,12 @@ define( require => {
       if ( this._shape ) { // Set the Element's d-attribute to render the Shape.
         this.setAttribute( 'd', this._shape.getSVGPath( this._shape.bounds.bottomLeft.negate(), scale ) );
         this.setAttribute( 'stroke-width', this._strokeWidth * scale );
+
+        // Set the line-dash if appropriate
+        if ( this._lineDash ) {
+          const lineDashString = this._lineDash.map( length => ( length * scale ).toFixed( 10 ) ).join( ' ' );
+          this.setAttribute( 'stroke-dasharray', lineDashString );
+        }
       }
       else this.setAttribute( 'd', '' );
       super.layout( scale );
@@ -186,7 +210,7 @@ define( require => {
   }
 
   // @protected @override {string[]} - setter names specific to Node. See Node.MUTATOR_KEYS for documentation.
-  Path.MUTATOR_KEYS = [ 'shape', 'fill', 'stroke', 'strokeWidth', 'shapeRendering', ...Node.MUTATOR_KEYS ];
+  Path.MUTATOR_KEYS = [ 'shape', 'fill', 'stroke', 'strokeWidth', 'lineDash', 'shapeRendering', ...Node.MUTATOR_KEYS ];
 
   return Path;
 } );
