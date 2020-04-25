@@ -281,7 +281,7 @@ define( require => {
           const angle = Math.atan( this._headWidth / headHeight );
           const dx = Math.cos( angle ) * this._tailWidth;
           const dy = Math.sin( angle ) * this._tailWidth;
-          const lineWidth = headHeight - ( headHeight - this._tailWidth / 2 - dy ) / Math.tan( angle );
+          const lineWidth = headHeight - this._headWidth / 2 / Math.tan( angle );
           if ( this._doubleHead ) {
             addPoint( 0, 0 );
             addPoint( headHeight, this._headWidth / 2 );
